@@ -172,8 +172,12 @@ export function createStore({ db, meta, clock, getSettings }) {
         return !!p.authorHandle && p.authorHandle.toLowerCase() === d.value.toLowerCase();
       case 'keyword':
         return !!p.text && p.text.toLowerCase().includes(d.value.toLowerCase());
-      case 'topic':
-        return p.topicId === d.value;
+      case 'topic': {
+        // topicId はクラスタ内の最小投稿IDから決まるため、再クラスタで変わっても基準投稿のクラスタを追う
+        if (p.topicId === d.value) return true;
+        const anchor = computeTopics().byPost.get(String(d.value).replace(/^t_/, ''));
+        return !!anchor && p.topicId === anchor.id;
+      }
       default:
         return false;
     }
@@ -347,8 +351,8 @@ export function createStore({ db, meta, clock, getSettings }) {
         if (ex) {
           db.prepare(
             `UPDATE posts SET url=?, author_handle=?, author_name=?, text=?, posted_at=?, genre=?, genre_hint=?, lang=?, matched_keywords=?, sources=?,
-             merged_count = merged_count + 1, last_seen_at=?, is_sample = ? WHERE post_id=?`,
-          ).run(...fields, now, ex.is_sample && isSample ? 1 : 0, postId);
+             merged_count = merged_count + ?, last_seen_at=?, is_sample = ? WHERE post_id=?`,
+          ).run(...fields, sources.length > j(ex.sources, []).length ? 1 : 0, now, ex.is_sample && isSample ? 1 : 0, postId);
           result.merged += 1;
         } else {
           db.prepare(

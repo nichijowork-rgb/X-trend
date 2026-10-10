@@ -320,7 +320,7 @@ async function main() {
     const card = page.locator('.post-card', { hasText: `ID ${ID.dup}` });
     const n = await card.count();
     const merged = n ? await card.locator('.badge-merged').innerText() : '';
-    check('重複: フィードに1枚・「4件の取得を統合」', n === 1 && merged === '4件の取得を統合', `cards=${n} badge="${merged}"`);
+    check('重複: フィードに1枚・「4件の取得元を統合」', n === 1 && merged === '4件の取得元を統合', `cards=${n} badge="${merged}"`);
     await card.first().screenshot({ path: path.join(SHOTS, 'dup-card-pc.png') });
     console.log('  csv:', csvRes.replace(/\n/g, ' '), '| json:', jsonRes.replace(/\n/g, ' '), '| capture:', capRes.replace(/\n/g, ' '));
 

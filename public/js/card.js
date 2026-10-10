@@ -76,7 +76,7 @@ export function postCard(p, { onChanged, showRank = true } = {}) {
     p.isSample ? badge('サンプル', 'badge-sample', 'サンプルデータです（実データではありません）') : null,
     p.genre ? badge(GENRE_LABELS[p.genre] || p.genre, `genre genre-${p.genre}`) : null,
     sourceBadges(p.sources),
-    p.mergedCount > 1 ? badge(`${exactNum(p.mergedCount)}件の取得を統合`, 'badge-merged', '同じ投稿を複数回取得したため1件にまとめています') : null);
+    p.mergedCount > 1 ? badge(`${exactNum(p.mergedCount)}件の取得元を統合`, 'badge-merged', '同じ投稿を複数の取得元から取得したため1件にまとめています') : null);
 
   const notices = [];
   if (p.hidden || p.demoted) {

@@ -130,7 +130,7 @@ test('重複統合：sources追記・mergedCount・非null優先・指標を消�
   store.upsertPosts([{ ...post(77, { source: { type: 'url', detail: 'https://x.com/i/web/status/77' } }), text: null, authorHandle: null }]);
   store.upsertPosts([post(77, { text: '最初の本文 ホスト', metrics: { likes: 10, views: 200 }, source: { type: 'import_json', detail: 'a.json' } })]);
   const p = store.getPost('77');
-  assert.equal(p.mergedCount, 3);
+  assert.equal(p.mergedCount, 2, "同じ取得元の再取り込みでは増えない");
   assert.equal(p.sources.length, 2);
   assert.equal(p.text, '最初の本文 ホスト');
   assert.equal(p.authorHandle, 'tester');
