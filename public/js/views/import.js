@@ -49,8 +49,11 @@ function urlSection() {
   });
   let genre = '';
   const out = h('div', { class: 'result-area', attrs: { 'aria-live': 'polite' } });
+  let finishedAt = 0;
   const save = async () => {
     const lines = ta.value.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+    // 保存直後の連打（欄は空になっている）で結果表示を「URLを入力してください」に置き換えない
+    if (!lines.length && Date.now() - finishedAt < 1500) return;
     if (!lines.length) { mount(out, h('p', { class: 'form-error', text: 'URLを入力してください。' })); ta.focus(); return; }
     if (lines.length > 200) { mount(out, h('p', { class: 'form-error', text: '一度に保存できるのは200件までです。' })); return; }
     const rows = h('ul', { class: 'url-results' });
@@ -73,6 +76,7 @@ function urlSection() {
     }
     progress.textContent = `${ok}件を保存しました（新規 ${created}件）${failed.length ? `、${failed.length}件は失敗` : ''}。`;
     ta.value = failed.join('\n');
+    finishedAt = Date.now();
     if (ok) { toast(`${ok}件のURLを保存しました`, { type: 'success' }); refreshStatus(); }
   };
   return sectionCard('URLを貼り付けて保存',

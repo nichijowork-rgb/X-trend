@@ -22,7 +22,11 @@ export async function refreshStatus() {
 
 /** 書き込みUIを出してよいか（viewer なら false） */
 export function canWrite() {
-  return !!state.status && state.status.role !== 'viewer';
+  return !!state.status && state.status.role === 'admin';
+}
+/** 認証が必要なのに共有トークン/管理者トークンが無い（または無効） */
+export function isUnauthenticated() {
+  return !!state.status && state.status.authRequired === true && state.status.role !== 'admin' && state.status.role !== 'viewer';
 }
 export function isViewer() {
   return !!state.status && state.status.role === 'viewer';

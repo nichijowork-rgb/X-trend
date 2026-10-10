@@ -199,7 +199,7 @@ export function openDismissSheet(p, { onChanged } = {}) {
   ], st.effect, (v) => { st.effect = v; });
 
   const body = h('div', { class: 'dismiss-form' },
-    h('p', { class: 'notice-inline' }, icon('alert'), h('span', { text: 'ツール内の表示・順位にのみ反映します。Xのおすすめやフォローは変更しません。' })),
+    h('p', { class: 'notice-inline' }, icon('alert'), h('span', { text: 'ツール内の表示・順位にのみ反映します。Xには反映されません（Xのおすすめやフォローは変わりません）。' })),
     scopeGroup, kwBox, reasonGroup,
     h('div', { class: 'field' }, h('label', { attrs: { for: (note.id = nextId('note')) }, text: 'メモ（任意）' }), note),
     effectGroup, err);

@@ -15,7 +15,7 @@ export async function render(root, ctx) {
 
   mount(root,
     pageHead('興味なし', '不要な投稿・投稿者・キーワード・トピックを登録して、一覧から外したり順位を下げたりします。'),
-    h('p', { class: 'notice-inline' }, icon('alert'), h('span', { text: 'ツール内の表示・順位にのみ反映します。Xのおすすめやフォローは変更しません。' })),
+    h('p', { class: 'notice-inline' }, icon('alert'), h('span', { text: 'ツール内の表示・順位にのみ反映します。Xには反映されません（Xのおすすめやフォローは変わりません）。' })),
     tabsHost, list);
 
   function renderTabs() {

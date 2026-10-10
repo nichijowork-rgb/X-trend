@@ -1,6 +1,6 @@
 // X-trend フロントエンド エントリ（ハッシュルーティング）
 import { apiEvents, tokens } from './js/api.js';
-import { state, refreshStatus, onStatus, isViewer } from './js/state.js';
+import { state, refreshStatus, onStatus, isViewer, isUnauthenticated } from './js/state.js';
 import { h, icon, mount, clear, button, field, loadingEl, errorEl, toast } from './js/ui.js';
 import * as feed from './js/views/feed.js';
 import * as topics from './js/views/topics.js';
@@ -116,7 +116,7 @@ function renderBanners() {
   const st = document.getElementById('topbar-status');
   const pills = [];
   if (s && isViewer()) pills.push(h('span', { class: 'pill pill-viewer', attrs: { title: '共有リンクで閲覧中です。編集はできません' } }, icon('lock'), h('span', { text: '閲覧専用' })));
-  else if (s && s.authRequired) pills.push(h('span', { class: 'pill pill-admin', text: '管理者' }));
+  else if (s && s.authRequired && s.role === 'admin') pills.push(h('span', { class: 'pill pill-admin', text: '管理者' }));
   if (s && s.sampleMode) pills.push(h('span', { class: 'pill pill-sample', text: 'サンプル' }));
   mount(st, pills);
   document.body.classList.toggle('is-viewer', !!(s && isViewer()));
@@ -144,7 +144,7 @@ function renderAuthScreen() {
     if (adminInput.value.trim()) tokens.admin = adminInput.value.trim();
     authBlocked = false;
     await refreshStatus();
-    if (state.statusError && state.statusError.status === 401) { authBlocked = true; toast('認証できませんでした。リンクまたはトークンを確認してください。', { type: 'error' }); return; }
+    if ((state.statusError && state.statusError.status === 401) || isUnauthenticated()) { authBlocked = true; toast('認証できませんでした。リンクまたはトークンを確認してください。', { type: 'error' }); return; }
     route();
   };
   const form = h('form', { class: 'auth-form', noValidate: true, on: { submit: (e) => { e.preventDefault(); } } },
@@ -171,13 +171,18 @@ apiEvents.addEventListener('unauthorized', () => {
 async function start() {
   captureShareToken();
   onStatus(renderBanners);
+  // 共有リンクの再発行などで閲覧権限を失ったら（定期ステータス更新で検知）認証画面へ
+  onStatus(() => {
+    if (!authBlocked && isUnauthenticated()) { authBlocked = true; current.token++; renderAuthScreen(); }
+  });
   window.addEventListener('hashchange', () => route({ focus: true }));
   window.addEventListener('online', () => { toast('オンラインに戻りました', { type: 'success', timeout: 2500 }); refreshStatus(); });
   window.addEventListener('offline', () => toast('オフラインです。接続が戻るまで操作できません。', { type: 'error', timeout: 8000 }));
   renderNav(parseRoute().name);
   mount(viewEl, loadingEl('起動中…'));
   await refreshStatus();
-  if (state.statusError && state.statusError.status === 401) { authBlocked = true; renderAuthScreen(); return; }
+  // /api/status は未認証でも 200 { authRequired: true, role: "none" } を返すので、それも認証画面へ
+  if ((state.statusError && state.statusError.status === 401) || isUnauthenticated()) { authBlocked = true; renderAuthScreen(); return; }
   route();
   // ステータスは定期的に更新（サンプル帯・最終実行などを最新に）
   setInterval(() => { if (!document.hidden && !authBlocked) refreshStatus(); }, 60000);
