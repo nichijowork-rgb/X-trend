@@ -1,0 +1,13 @@
+{
+  "name": "x-trend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Xの情報を集め、夜職の業界把握と投稿ネタ探しに使うツール",
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch src/server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/"
+  }
+}
