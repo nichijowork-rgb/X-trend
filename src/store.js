@@ -182,7 +182,7 @@ export function createStore({ db, meta, clock, getSettings }) {
     for (const p of posts) {
       for (const d of dismissals) {
         if (!dismissalMatches(p, d)) continue;
-        p.matchedDismissals.push({ id: d.id, scope: d.scope, value: d.value, reasonCode: d.reasonCode, reasonNote: d.reasonNote });
+        p.matchedDismissals.push({ id: d.id, scope: d.scope, value: d.value, reasonCode: d.reasonCode, reasonNote: d.reasonNote, effect: d.effect });
         if (d.effect === 'hide') p.hidden = true;
         else p.demoted = true;
       }
@@ -390,13 +390,17 @@ export function createStore({ db, meta, clock, getSettings }) {
   function listDismissals({ includeRevoked = false } = {}) {
     const rows = db.prepare(`SELECT * FROM dismissals ${includeRevoked ? '' : 'WHERE revoked_at IS NULL'} ORDER BY id DESC`).all().map(dismissalRow);
     const posts = visiblePosts();
-    return rows.map((d) => ({ ...d, matchCount: posts.filter((p) => dismissalMatches(p, d)).length }));
+    return rows.map((d) => withMatchInfo(d, posts));
   }
   function getDismissal(id) {
     const r = db.prepare('SELECT * FROM dismissals WHERE id = ?').get(Number(id));
     if (!r) return null;
     const d = dismissalRow(r);
-    return { ...d, matchCount: visiblePosts().filter((p) => dismissalMatches(p, d)).length };
+    return withMatchInfo(d, visiblePosts());
+  }
+  function withMatchInfo(d, posts) {
+    const valueLabel = d.scope === 'topic' ? (posts.find((p) => p.topicId === d.value)?.topicLabel ?? null) : null;
+    return { ...d, valueLabel, matchCount: posts.filter((p) => dismissalMatches(p, d)).length };
   }
   function findActiveDismissal(scope, value) {
     const key = value.toLowerCase();

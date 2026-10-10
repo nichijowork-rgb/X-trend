@@ -44,7 +44,7 @@ export async function render(root, ctx) {
   function item(d) {
     const writable = canWrite();
     const value = d.scope === 'author' ? `@${String(d.value || '').replace(/^@/, '')}`
-      : d.scope === 'keyword' ? `「${d.value}」` : d.scope === 'post' ? `投稿ID ${d.value}` : String(d.value ?? '');
+      : d.scope === 'keyword' ? `「${d.value}」` : d.scope === 'post' ? `投稿ID ${d.value}` : d.scope === 'topic' && d.valueLabel ? `トピック「${d.valueLabel}」` : String(d.value ?? '');
     const action = !writable ? null : d.revokedAt
       ? button('再有効化', { small: true, iconName: 'refresh', ariaLabel: `${value} の「興味なし」を再有効化`, onClick: () => act(d, 'restore') })
       : button('取り消し', { small: true, iconName: 'undo', ariaLabel: `${value} の「興味なし」を取り消す`, onClick: () => act(d, 'revoke') });
