@@ -1,0 +1,2698 @@
+{
+ "generated_at": "2026-10-11T18:41:00+09:00",
+ "total_posts": 1500,
+ "total_accounts": 114,
+ "period": {
+  "oldest_jst": "2016-03-04T10:00:00+09:00",
+  "newest_jst": "2026-10-11T18:32:00+09:00"
+ },
+ "by_category": {
+  "ホスト": {
+   "posts": 458,
+   "impressions": 3307446,
+   "likes": 77908
+  },
+  "キャバクラ": {
+   "posts": 420,
+   "impressions": 3504857,
+   "likes": 89254
+  },
+  "歌舞伎町": {
+   "posts": 461,
+   "impressions": 4974951,
+   "likes": 120682
+  },
+  "夜職その他": {
+   "posts": 494,
+   "impressions": 3465492,
+   "likes": 92473
+  },
+  "監視アカウント": {
+   "posts": 158,
+   "impressions": 4856465,
+   "likes": 120149
+  },
+  "その他": {
+   "posts": 41,
+   "impressions": 1340154,
+   "likes": 16780
+  },
+  "テスト新カテゴリ": {
+   "posts": 5,
+   "impressions": 12064,
+   "likes": 332
+  }
+ },
+ "by_account": [
+  {
+   "user": "sample_girlsbar_jin90",
+   "is_watched": false,
+   "posts": 38,
+   "impressions": 147676,
+   "likes": 4216
+  },
+  {
+   "user": "sample_host_ryu02",
+   "is_watched": false,
+   "posts": 38,
+   "impressions": 116839,
+   "likes": 3146
+  },
+  {
+   "user": "sample_host_ryu09",
+   "is_watched": false,
+   "posts": 34,
+   "impressions": 173038,
+   "likes": 3901
+  },
+  {
+   "user": "sample_kabuki_jin60",
+   "is_watched": false,
+   "posts": 34,
+   "impressions": 151632,
+   "likes": 2921
+  },
+  {
+   "user": "sample_night_yuna84",
+   "is_watched": false,
+   "posts": 32,
+   "impressions": 256139,
+   "likes": 5015
+  },
+  {
+   "user": "sample_host_emi15",
+   "is_watched": false,
+   "posts": 32,
+   "impressions": 253849,
+   "likes": 7854
+  },
+  {
+   "user": "sample_cabajo_luna52",
+   "is_watched": false,
+   "posts": 31,
+   "impressions": 184920,
+   "likes": 3675
+  },
+  {
+   "user": "sample_watch_08",
+   "is_watched": true,
+   "posts": 30,
+   "impressions": 962223,
+   "likes": 25568
+  },
+  {
+   "user": "sample_girlsbar_luna94",
+   "is_watched": false,
+   "posts": 30,
+   "impressions": 116161,
+   "likes": 2032
+  },
+  {
+   "user": "sample_host_aoi26",
+   "is_watched": false,
+   "posts": 29,
+   "impressions": 133426,
+   "likes": 2435
+  },
+  {
+   "user": "sample_girlsbar_ryu102",
+   "is_watched": false,
+   "posts": 29,
+   "impressions": 133236,
+   "likes": 3681
+  },
+  {
+   "user": "sample_night_rina96",
+   "is_watched": false,
+   "posts": 28,
+   "impressions": 149777,
+   "likes": 3598
+  },
+  {
+   "user": "sample_cabajo_mio49",
+   "is_watched": false,
+   "posts": 27,
+   "impressions": 131784,
+   "likes": 2423
+  },
+  {
+   "user": "sample_hostclub_jin08",
+   "is_watched": false,
+   "posts": 27,
+   "impressions": 123205,
+   "likes": 2984
+  },
+  {
+   "user": "sample_watch_06",
+   "is_watched": true,
+   "posts": 26,
+   "impressions": 900614,
+   "likes": 25274
+  },
+  {
+   "user": "sample_girlsbar_sakura98",
+   "is_watched": false,
+   "posts": 26,
+   "impressions": 270824,
+   "likes": 7575
+  },
+  {
+   "user": "sample_night_mei103",
+   "is_watched": false,
+   "posts": 26,
+   "impressions": 134256,
+   "likes": 3471
+  },
+  {
+   "user": "sample_gourmet_mio59",
+   "is_watched": false,
+   "posts": 26,
+   "impressions": 73524,
+   "likes": 2274
+  },
+  {
+   "user": "sample_hostclub_mei03",
+   "is_watched": false,
+   "posts": 25,
+   "impressions": 192724,
+   "likes": 3801
+  },
+  {
+   "user": "sample_girlsbar_ten87",
+   "is_watched": false,
+   "posts": 25,
+   "impressions": 144455,
+   "likes": 3761
+  },
+  {
+   "user": "sample_shinjuku_rei76",
+   "is_watched": false,
+   "posts": 25,
+   "impressions": 131095,
+   "likes": 2943
+  },
+  {
+   "user": "sample_cabajo_jin32",
+   "is_watched": false,
+   "posts": 23,
+   "impressions": 114157,
+   "likes": 3195
+  },
+  {
+   "user": "sample_hostclub_mio04",
+   "is_watched": false,
+   "posts": 23,
+   "impressions": 104102,
+   "likes": 2025
+  },
+  {
+   "user": "sample_girlsbar_ryu92",
+   "is_watched": false,
+   "posts": 23,
+   "impressions": 93938,
+   "likes": 2731
+  },
+  {
+   "user": "sample_lounge_ten33",
+   "is_watched": false,
+   "posts": 23,
+   "impressions": 85128,
+   "likes": 1974
+  },
+  {
+   "user": "sample_concafe_kaito88",
+   "is_watched": false,
+   "posts": 23,
+   "impressions": 80667,
+   "likes": 2358
+  },
+  {
+   "user": "sample_watch_01",
+   "is_watched": true,
+   "posts": 22,
+   "impressions": 589546,
+   "likes": 12587
+  },
+  {
+   "user": "sample_watch_02",
+   "is_watched": true,
+   "posts": 22,
+   "impressions": 485841,
+   "likes": 10495
+  },
+  {
+   "user": "sample_shinjuku_aoi61",
+   "is_watched": false,
+   "posts": 22,
+   "impressions": 103317,
+   "likes": 2502
+  },
+  {
+   "user": "sample_kyaba_luna41",
+   "is_watched": false,
+   "posts": 21,
+   "impressions": 178801,
+   "likes": 4934
+  },
+  {
+   "user": "sample_lounge_sora48",
+   "is_watched": false,
+   "posts": 21,
+   "impressions": 64053,
+   "likes": 1648
+  },
+  {
+   "user": "sample_cabajo_rei29",
+   "is_watched": false,
+   "posts": 20,
+   "impressions": 152703,
+   "likes": 3575
+  },
+  {
+   "user": "sample_night_hikaru93",
+   "is_watched": false,
+   "posts": 19,
+   "impressions": 170442,
+   "likes": 5419
+  },
+  {
+   "user": "sample_watch_03",
+   "is_watched": true,
+   "posts": 18,
+   "impressions": 753514,
+   "likes": 18255
+  },
+  {
+   "user": "sample_hostclub_nana25",
+   "is_watched": false,
+   "posts": 18,
+   "impressions": 121782,
+   "likes": 2950
+  },
+  {
+   "user": "sample_hostclub_jin07",
+   "is_watched": false,
+   "posts": 18,
+   "impressions": 88116,
+   "likes": 1471
+  },
+  {
+   "user": "sample_host_sora21",
+   "is_watched": false,
+   "posts": 18,
+   "impressions": 87528,
+   "likes": 1742
+  },
+  {
+   "user": "sample_lounge_sora36",
+   "is_watched": false,
+   "posts": 18,
+   "impressions": 75349,
+   "likes": 1712
+  },
+  {
+   "user": "sample_cabajo_kaito34",
+   "is_watched": false,
+   "posts": 17,
+   "impressions": 58097,
+   "likes": 1532
+  },
+  {
+   "user": "sample_shinjuku_kai70",
+   "is_watched": false,
+   "posts": 16,
+   "impressions": 92073,
+   "likes": 2654
+  },
+  {
+   "user": "sample_shinjuku_ren55",
+   "is_watched": false,
+   "posts": 16,
+   "impressions": 63280,
+   "likes": 2137
+  },
+  {
+   "user": "sample_watch_07",
+   "is_watched": true,
+   "posts": 15,
+   "impressions": 528105,
+   "likes": 17794
+  },
+  {
+   "user": "sample_watch_05",
+   "is_watched": true,
+   "posts": 15,
+   "impressions": 257203,
+   "likes": 5256
+  },
+  {
+   "user": "sample_kabuki_leo67",
+   "is_watched": false,
+   "posts": 15,
+   "impressions": 121994,
+   "likes": 2290
+  },
+  {
+   "user": "sample_night_luna81",
+   "is_watched": false,
+   "posts": 15,
+   "impressions": 107636,
+   "likes": 4246
+  },
+  {
+   "user": "sample_gourmet_ren56",
+   "is_watched": false,
+   "posts": 15,
+   "impressions": 76554,
+   "likes": 1355
+  },
+  {
+   "user": "sample_cabajo_shin51",
+   "is_watched": false,
+   "posts": 15,
+   "impressions": 64417,
+   "likes": 1745
+  },
+  {
+   "user": "sample_kabuki_aoi65",
+   "is_watched": false,
+   "posts": 14,
+   "impressions": 66393,
+   "likes": 2179
+  },
+  {
+   "user": "sample_night_ryu91",
+   "is_watched": false,
+   "posts": 14,
+   "impressions": 52005,
+   "likes": 1144
+  },
+  {
+   "user": "sample_host_yuna12",
+   "is_watched": false,
+   "posts": 13,
+   "impressions": 128538,
+   "likes": 3467
+  },
+  {
+   "user": "sample_shinjuku_shin73",
+   "is_watched": false,
+   "posts": 13,
+   "impressions": 61861,
+   "likes": 1406
+  },
+  {
+   "user": "sample_girlsbar_sakura100",
+   "is_watched": false,
+   "posts": 12,
+   "impressions": 47205,
+   "likes": 648
+  },
+  {
+   "user": "sample_hostclub_jin01",
+   "is_watched": false,
+   "posts": 12,
+   "impressions": 32368,
+   "likes": 656
+  },
+  {
+   "user": "sample_kabuki_leo71",
+   "is_watched": false,
+   "posts": 12,
+   "impressions": 23225,
+   "likes": 470
+  },
+  {
+   "user": "sample_watch_04",
+   "is_watched": true,
+   "posts": 11,
+   "impressions": 421007,
+   "likes": 5332
+  },
+  {
+   "user": "sample_player_rei24",
+   "is_watched": false,
+   "posts": 11,
+   "impressions": 61268,
+   "likes": 1702
+  },
+  {
+   "user": "sample_host_jin18",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 75763,
+   "likes": 1152
+  },
+  {
+   "user": "sample_girlsbar_kai104",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 56845,
+   "likes": 1686
+  },
+  {
+   "user": "sample_kabuki_rei53",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 50943,
+   "likes": 1145
+  },
+  {
+   "user": "sample_lounge_hikaru28",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 45772,
+   "likes": 798
+  },
+  {
+   "user": "sample_gourmet_emi77",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 34614,
+   "likes": 946
+  },
+  {
+   "user": "sample_hostclub_mio17",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 26535,
+   "likes": 508
+  },
+  {
+   "user": "sample_kabuki_aoi62",
+   "is_watched": false,
+   "posts": 9,
+   "impressions": 110282,
+   "likes": 3755
+  },
+  {
+   "user": "sample_lounge_hikaru40",
+   "is_watched": false,
+   "posts": 9,
+   "impressions": 66975,
+   "likes": 1296
+  },
+  {
+   "user": "sample_kyaba_ryu45",
+   "is_watched": false,
+   "posts": 9,
+   "impressions": 11685,
+   "likes": 359
+  },
+  {
+   "user": "sample_host_kai19",
+   "is_watched": false,
+   "posts": 8,
+   "impressions": 61641,
+   "likes": 1293
+  },
+  {
+   "user": "sample_player_ten10",
+   "is_watched": false,
+   "posts": 8,
+   "impressions": 15495,
+   "likes": 447
+  },
+  {
+   "user": "sample_kabuki_mio72",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 82948,
+   "likes": 1388
+  },
+  {
+   "user": "sample_shinjuku_nana78",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 60903,
+   "likes": 1245
+  },
+  {
+   "user": "sample_night_ten101",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 34481,
+   "likes": 986
+  },
+  {
+   "user": "sample_concafe_luna86",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 27917,
+   "likes": 1040
+  },
+  {
+   "user": "sample_player_mio14",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 22695,
+   "likes": 548
+  },
+  {
+   "user": "sample_cabajo_aoi39",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 6181,
+   "likes": 110
+  },
+  {
+   "user": "sample_misc_04",
+   "is_watched": false,
+   "posts": 6,
+   "impressions": 1161782,
+   "likes": 12508
+  },
+  {
+   "user": "sample_kabuki_mei66",
+   "is_watched": false,
+   "posts": 6,
+   "impressions": 79942,
+   "likes": 2167
+  },
+  {
+   "user": "sample_lounge_sora43",
+   "is_watched": false,
+   "posts": 6,
+   "impressions": 33352,
+   "likes": 1212
+  },
+  {
+   "user": "sample_kyaba_rina47",
+   "is_watched": false,
+   "posts": 6,
+   "impressions": 28903,
+   "likes": 446
+  },
+  {
+   "user": "sample_kabuki_nana63",
+   "is_watched": false,
+   "posts": 6,
+   "impressions": 9717,
+   "likes": 316
+  },
+  {
+   "user": "sample_misc_05",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 33400,
+   "likes": 1147
+  },
+  {
+   "user": "sample_misc_02",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 26992,
+   "likes": 730
+  },
+  {
+   "user": "sample_misc_06",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 26314,
+   "likes": 907
+  },
+  {
+   "user": "sample_cabajo_kaito46",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 14068,
+   "likes": 399
+  },
+  {
+   "user": "sample_girlsbar_emi85",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 13878,
+   "likes": 317
+  },
+  {
+   "user": "sample_lounge_mio35",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 7694,
+   "likes": 146
+  },
+  {
+   "user": "sample_misc_03",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 1891,
+   "likes": 34
+  },
+  {
+   "user": "sample_shinjuku_rina68",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 28307,
+   "likes": 397
+  },
+  {
+   "user": "sample_concafe_leo89",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 16517,
+   "likes": 501
+  },
+  {
+   "user": "sample_player_leo06",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 4902,
+   "likes": 90
+  },
+  {
+   "user": "sample_night_hikaru80",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 3378,
+   "likes": 106
+  },
+  {
+   "user": "sample_kyaba_ryu42",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 3149,
+   "likes": 67
+  },
+  {
+   "user": "sample_gourmet_yuna74",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 25098,
+   "likes": 760
+  },
+  {
+   "user": "sample_kyaba_nana27",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 24570,
+   "likes": 717
+  },
+  {
+   "user": "sample_shinjuku_aoi64",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 15105,
+   "likes": 643
+  },
+  {
+   "user": "sample_misc_01",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 14004,
+   "likes": 399
+  },
+  {
+   "user": "sample_misc_10",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 11816,
+   "likes": 343
+  },
+  {
+   "user": "sample_misc_08",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 7152,
+   "likes": 160
+  },
+  {
+   "user": "sample_kabuki_rei54",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 4970,
+   "likes": 159
+  },
+  {
+   "user": "sample_host_rei05",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 2951,
+   "likes": 77
+  },
+  {
+   "user": "sample_lounge_ten38",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 2365,
+   "likes": 252
+  },
+  {
+   "user": "sample_concafe_ren95",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 1683,
+   "likes": 53
+  },
+  {
+   "user": "sample_misc_09",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 13980,
+   "likes": 101
+  },
+  {
+   "user": "sample_concafe_ryu97",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 2498,
+   "likes": 74
+  },
+  {
+   "user": "sample_kyaba_kai37",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1862,
+   "likes": 60
+  },
+  {
+   "user": "sample_misc_07",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1129,
+   "likes": 21
+  },
+  {
+   "user": "sample_girlsbar_aoi79",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1106,
+   "likes": 33
+  },
+  {
+   "user": "sample_night_ren82",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 13142,
+   "likes": 155
+  },
+  {
+   "user": "sample_hostclub_kaito20",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 6088,
+   "likes": 209
+  },
+  {
+   "user": "sample_player_aoi13",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 5759,
+   "likes": 29
+  },
+  {
+   "user": "sample_kyaba_mio44",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2922,
+   "likes": 26
+  },
+  {
+   "user": "sample_kyaba_mio30",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1963,
+   "likes": 16
+  },
+  {
+   "user": "sample_gourmet_emi69",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 667,
+   "likes": 26
+  },
+  {
+   "user": "sample_shinjuku_sora75",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 539,
+   "likes": 10
+  },
+  {
+   "user": "sample_kyaba_mei50",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 45,
+   "likes": 1
+  },
+  {
+   "user": "sample_lounge_ten31",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 0,
+   "likes": 77
+  }
+ ],
+ "by_day": [
+  {
+   "date": "2026-10-11",
+   "posts": 121,
+   "impressions": 726772,
+   "likes": 14002,
+   "categories": {
+    "夜職その他": 47,
+    "監視アカウント": 14,
+    "キャバクラ": 36,
+    "ホスト": 34,
+    "歌舞伎町": 33
+   }
+  },
+  {
+   "date": "2026-10-10",
+   "posts": 59,
+   "impressions": 266141,
+   "likes": 6109,
+   "categories": {
+    "キャバクラ": 19,
+    "歌舞伎町": 20,
+    "監視アカウント": 6,
+    "ホスト": 15,
+    "夜職その他": 18,
+    "その他": 2
+   }
+  },
+  {
+   "date": "2026-10-09",
+   "posts": 51,
+   "impressions": 405345,
+   "likes": 12256,
+   "categories": {
+    "夜職その他": 18,
+    "歌舞伎町": 13,
+    "キャバクラ": 17,
+    "ホスト": 15,
+    "監視アカウント": 3
+   }
+  },
+  {
+   "date": "2026-10-08",
+   "posts": 47,
+   "impressions": 280362,
+   "likes": 7611,
+   "categories": {
+    "ホスト": 18,
+    "その他": 1,
+    "夜職その他": 15,
+    "キャバクラ": 8,
+    "歌舞伎町": 14,
+    "監視アカウント": 5,
+    "テスト新カテゴリ": 1
+   }
+  },
+  {
+   "date": "2026-10-07",
+   "posts": 42,
+   "impressions": 333528,
+   "likes": 8026,
+   "categories": {
+    "その他": 2,
+    "キャバクラ": 14,
+    "ホスト": 8,
+    "歌舞伎町": 15,
+    "夜職その他": 13,
+    "監視アカウント": 4
+   }
+  },
+  {
+   "date": "2026-10-06",
+   "posts": 32,
+   "impressions": 657943,
+   "likes": 19850,
+   "categories": {
+    "歌舞伎町": 11,
+    "その他": 1,
+    "ホスト": 12,
+    "夜職その他": 13,
+    "キャバクラ": 7,
+    "監視アカウント": 8
+   }
+  },
+  {
+   "date": "2026-10-05",
+   "posts": 40,
+   "impressions": 238405,
+   "likes": 6443,
+   "categories": {
+    "夜職その他": 15,
+    "監視アカウント": 4,
+    "その他": 1,
+    "ホスト": 15,
+    "歌舞伎町": 11,
+    "キャバクラ": 8
+   }
+  },
+  {
+   "date": "2026-10-04",
+   "posts": 22,
+   "impressions": 121114,
+   "likes": 3946,
+   "categories": {
+    "キャバクラ": 7,
+    "夜職その他": 6,
+    "歌舞伎町": 5,
+    "テスト新カテゴリ": 1,
+    "ホスト": 6,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-10-03",
+   "posts": 31,
+   "impressions": 187292,
+   "likes": 3959,
+   "categories": {
+    "キャバクラ": 5,
+    "歌舞伎町": 9,
+    "ホスト": 10,
+    "夜職その他": 10,
+    "その他": 3
+   }
+  },
+  {
+   "date": "2026-10-02",
+   "posts": 29,
+   "impressions": 231505,
+   "likes": 5852,
+   "categories": {
+    "ホスト": 10,
+    "夜職その他": 9,
+    "歌舞伎町": 13,
+    "キャバクラ": 7,
+    "監視アカウント": 6
+   }
+  },
+  {
+   "date": "2026-10-01",
+   "posts": 31,
+   "impressions": 275245,
+   "likes": 5777,
+   "categories": {
+    "夜職その他": 10,
+    "キャバクラ": 12,
+    "監視アカウント": 4,
+    "ホスト": 9,
+    "歌舞伎町": 3
+   }
+  },
+  {
+   "date": "2026-09-30",
+   "posts": 32,
+   "impressions": 1354832,
+   "likes": 16687,
+   "categories": {
+    "キャバクラ": 5,
+    "ホスト": 10,
+    "夜職その他": 7,
+    "歌舞伎町": 14,
+    "その他": 1,
+    "監視アカウント": 2
+   }
+  },
+  {
+   "date": "2026-09-29",
+   "posts": 30,
+   "impressions": 492110,
+   "likes": 13072,
+   "categories": {
+    "ホスト": 13,
+    "夜職その他": 11,
+    "歌舞伎町": 13,
+    "監視アカウント": 4,
+    "キャバクラ": 7
+   }
+  },
+  {
+   "date": "2026-09-28",
+   "posts": 22,
+   "impressions": 435524,
+   "likes": 8450,
+   "categories": {
+    "夜職その他": 6,
+    "その他": 1,
+    "ホスト": 4,
+    "キャバクラ": 7,
+    "歌舞伎町": 8,
+    "監視アカウント": 3
+   }
+  },
+  {
+   "date": "2026-09-27",
+   "posts": 16,
+   "impressions": 129361,
+   "likes": 2690,
+   "categories": {
+    "夜職その他": 6,
+    "ホスト": 4,
+    "キャバクラ": 7,
+    "歌舞伎町": 4,
+    "監視アカウント": 2
+   }
+  },
+  {
+   "date": "2026-09-26",
+   "posts": 11,
+   "impressions": 167619,
+   "likes": 4750,
+   "categories": {
+    "歌舞伎町": 5,
+    "ホスト": 2,
+    "キャバクラ": 3,
+    "監視アカウント": 4,
+    "夜職その他": 5
+   }
+  },
+  {
+   "date": "2026-09-25",
+   "posts": 16,
+   "impressions": 129004,
+   "likes": 1972,
+   "categories": {
+    "ホスト": 5,
+    "キャバクラ": 3,
+    "歌舞伎町": 4,
+    "夜職その他": 4,
+    "監視アカウント": 1,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-09-24",
+   "posts": 31,
+   "impressions": 77222,
+   "likes": 2166,
+   "categories": {
+    "夜職その他": 8,
+    "ホスト": 12,
+    "歌舞伎町": 8,
+    "キャバクラ": 9,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-09-23",
+   "posts": 17,
+   "impressions": 86303,
+   "likes": 1956,
+   "categories": {
+    "キャバクラ": 5,
+    "歌舞伎町": 6,
+    "監視アカウント": 3,
+    "夜職その他": 6,
+    "ホスト": 5
+   }
+  },
+  {
+   "date": "2026-09-22",
+   "posts": 17,
+   "impressions": 81087,
+   "likes": 1592,
+   "categories": {
+    "キャバクラ": 5,
+    "歌舞伎町": 6,
+    "監視アカウント": 3,
+    "夜職その他": 7,
+    "ホスト": 5
+   }
+  },
+  {
+   "date": "2026-09-21",
+   "posts": 28,
+   "impressions": 156328,
+   "likes": 3009,
+   "categories": {
+    "キャバクラ": 9,
+    "夜職その他": 11,
+    "監視アカウント": 3,
+    "その他": 1,
+    "ホスト": 8,
+    "歌舞伎町": 8
+   }
+  },
+  {
+   "date": "2026-09-20",
+   "posts": 30,
+   "impressions": 264494,
+   "likes": 5805,
+   "categories": {
+    "キャバクラ": 11,
+    "監視アカウント": 4,
+    "夜職その他": 9,
+    "歌舞伎町": 12,
+    "ホスト": 7
+   }
+  },
+  {
+   "date": "2026-09-19",
+   "posts": 16,
+   "impressions": 128258,
+   "likes": 2066,
+   "categories": {
+    "夜職その他": 7,
+    "キャバクラ": 5,
+    "歌舞伎町": 4,
+    "ホスト": 3,
+    "監視アカウント": 1,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-09-18",
+   "posts": 25,
+   "impressions": 144769,
+   "likes": 4159,
+   "categories": {
+    "ホスト": 4,
+    "夜職その他": 12,
+    "キャバクラ": 7,
+    "監視アカウント": 2,
+    "歌舞伎町": 7
+   }
+  },
+  {
+   "date": "2026-09-17",
+   "posts": 27,
+   "impressions": 261784,
+   "likes": 8201,
+   "categories": {
+    "その他": 3,
+    "ホスト": 10,
+    "キャバクラ": 8,
+    "歌舞伎町": 4,
+    "監視アカウント": 3,
+    "夜職その他": 10
+   }
+  },
+  {
+   "date": "2026-09-16",
+   "posts": 20,
+   "impressions": 104147,
+   "likes": 2943,
+   "categories": {
+    "夜職その他": 4,
+    "キャバクラ": 7,
+    "ホスト": 5,
+    "歌舞伎町": 8,
+    "その他": 1,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-09-15",
+   "posts": 21,
+   "impressions": 154269,
+   "likes": 4159,
+   "categories": {
+    "夜職その他": 7,
+    "歌舞伎町": 4,
+    "その他": 2,
+    "キャバクラ": 6,
+    "監視アカウント": 2,
+    "ホスト": 4
+   }
+  },
+  {
+   "date": "2026-09-14",
+   "posts": 23,
+   "impressions": 123879,
+   "likes": 3548,
+   "categories": {
+    "歌舞伎町": 8,
+    "ホスト": 8,
+    "その他": 2,
+    "キャバクラ": 5,
+    "監視アカウント": 2,
+    "夜職その他": 4
+   }
+  },
+  {
+   "date": "2026-09-13",
+   "posts": 18,
+   "impressions": 150822,
+   "likes": 4592,
+   "categories": {
+    "ホスト": 5,
+    "キャバクラ": 5,
+    "夜職その他": 9,
+    "歌舞伎町": 2,
+    "その他": 1,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-09-12",
+   "posts": 12,
+   "impressions": 48826,
+   "likes": 1600,
+   "categories": {
+    "ホスト": 4,
+    "歌舞伎町": 3,
+    "キャバクラ": 3,
+    "夜職その他": 3,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-09-11",
+   "posts": 18,
+   "impressions": 581718,
+   "likes": 19801,
+   "categories": {
+    "夜職その他": 6,
+    "ホスト": 4,
+    "キャバクラ": 7,
+    "監視アカウント": 7,
+    "歌舞伎町": 4,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-09-10",
+   "posts": 13,
+   "impressions": 68226,
+   "likes": 2348,
+   "categories": {
+    "キャバクラ": 3,
+    "夜職その他": 6,
+    "歌舞伎町": 4,
+    "監視アカウント": 2,
+    "ホスト": 3
+   }
+  },
+  {
+   "date": "2026-09-09",
+   "posts": 16,
+   "impressions": 69977,
+   "likes": 1450,
+   "categories": {
+    "ホスト": 5,
+    "キャバクラ": 3,
+    "夜職その他": 6,
+    "歌舞伎町": 6,
+    "監視アカウント": 2
+   }
+  },
+  {
+   "date": "2026-09-08",
+   "posts": 17,
+   "impressions": 453176,
+   "likes": 6885,
+   "categories": {
+    "キャバクラ": 1,
+    "ホスト": 6,
+    "歌舞伎町": 9,
+    "監視アカウント": 3,
+    "夜職その他": 5,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-09-07",
+   "posts": 15,
+   "impressions": 60588,
+   "likes": 1770,
+   "categories": {
+    "キャバクラ": 4,
+    "歌舞伎町": 5,
+    "その他": 2,
+    "夜職その他": 6,
+    "ホスト": 3,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-09-06",
+   "posts": 20,
+   "impressions": 177818,
+   "likes": 4894,
+   "categories": {
+    "ホスト": 7,
+    "夜職その他": 7,
+    "歌舞伎町": 5,
+    "監視アカウント": 3,
+    "キャバクラ": 5
+   }
+  },
+  {
+   "date": "2026-09-05",
+   "posts": 14,
+   "impressions": 49945,
+   "likes": 1140,
+   "categories": {
+    "歌舞伎町": 4,
+    "ホスト": 7,
+    "夜職その他": 2,
+    "キャバクラ": 5
+   }
+  },
+  {
+   "date": "2026-09-04",
+   "posts": 10,
+   "impressions": 33463,
+   "likes": 770,
+   "categories": {
+    "歌舞伎町": 3,
+    "キャバクラ": 5,
+    "夜職その他": 6,
+    "ホスト": 2
+   }
+  },
+  {
+   "date": "2026-09-03",
+   "posts": 16,
+   "impressions": 61695,
+   "likes": 1566,
+   "categories": {
+    "歌舞伎町": 5,
+    "夜職その他": 6,
+    "ホスト": 6,
+    "キャバクラ": 3
+   }
+  },
+  {
+   "date": "2026-09-02",
+   "posts": 14,
+   "impressions": 62682,
+   "likes": 1473,
+   "categories": {
+    "歌舞伎町": 4,
+    "キャバクラ": 5,
+    "ホスト": 6,
+    "夜職その他": 4,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-09-01",
+   "posts": 12,
+   "impressions": 66045,
+   "likes": 818,
+   "categories": {
+    "夜職その他": 2,
+    "ホスト": 6,
+    "キャバクラ": 1,
+    "歌舞伎町": 3
+   }
+  },
+  {
+   "date": "2026-08-31",
+   "posts": 10,
+   "impressions": 54090,
+   "likes": 1466,
+   "categories": {
+    "キャバクラ": 3,
+    "ホスト": 4,
+    "夜職その他": 3,
+    "歌舞伎町": 5
+   }
+  },
+  {
+   "date": "2026-08-30",
+   "posts": 11,
+   "impressions": 91005,
+   "likes": 3224,
+   "categories": {
+    "ホスト": 4,
+    "夜職その他": 5,
+    "歌舞伎町": 5,
+    "キャバクラ": 1,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-29",
+   "posts": 16,
+   "impressions": 85200,
+   "likes": 2154,
+   "categories": {
+    "歌舞伎町": 3,
+    "夜職その他": 2,
+    "ホスト": 11,
+    "キャバクラ": 3,
+    "テスト新カテゴリ": 1,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-28",
+   "posts": 13,
+   "impressions": 115185,
+   "likes": 3668,
+   "categories": {
+    "ホスト": 5,
+    "キャバクラ": 1,
+    "歌舞伎町": 5,
+    "夜職その他": 6,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-27",
+   "posts": 9,
+   "impressions": 19376,
+   "likes": 604,
+   "categories": {
+    "歌舞伎町": 3,
+    "監視アカウント": 2,
+    "キャバクラ": 3,
+    "夜職その他": 3
+   }
+  },
+  {
+   "date": "2026-08-26",
+   "posts": 19,
+   "impressions": 320141,
+   "likes": 4085,
+   "categories": {
+    "歌舞伎町": 9,
+    "キャバクラ": 3,
+    "その他": 2,
+    "ホスト": 3,
+    "夜職その他": 6,
+    "監視アカウント": 3
+   }
+  },
+  {
+   "date": "2026-08-25",
+   "posts": 14,
+   "impressions": 41169,
+   "likes": 1249,
+   "categories": {
+    "歌舞伎町": 3,
+    "キャバクラ": 6,
+    "監視アカウント": 1,
+    "その他": 2,
+    "ホスト": 4,
+    "夜職その他": 2
+   }
+  },
+  {
+   "date": "2026-08-24",
+   "posts": 20,
+   "impressions": 130217,
+   "likes": 2757,
+   "categories": {
+    "キャバクラ": 8,
+    "夜職その他": 9,
+    "歌舞伎町": 4,
+    "監視アカウント": 3,
+    "ホスト": 2
+   }
+  },
+  {
+   "date": "2026-08-23",
+   "posts": 9,
+   "impressions": 111340,
+   "likes": 3679,
+   "categories": {
+    "ホスト": 3,
+    "夜職その他": 3,
+    "監視アカウント": 1,
+    "歌舞伎町": 3,
+    "キャバクラ": 2
+   }
+  },
+  {
+   "date": "2026-08-22",
+   "posts": 20,
+   "impressions": 113428,
+   "likes": 3934,
+   "categories": {
+    "歌舞伎町": 7,
+    "ホスト": 9,
+    "夜職その他": 4,
+    "キャバクラ": 6
+   }
+  },
+  {
+   "date": "2026-08-21",
+   "posts": 9,
+   "impressions": 59109,
+   "likes": 1414,
+   "categories": {
+    "キャバクラ": 4,
+    "ホスト": 2,
+    "監視アカウント": 3,
+    "歌舞伎町": 2,
+    "夜職その他": 2
+   }
+  },
+  {
+   "date": "2026-08-20",
+   "posts": 13,
+   "impressions": 48216,
+   "likes": 1071,
+   "categories": {
+    "キャバクラ": 4,
+    "夜職その他": 3,
+    "歌舞伎町": 3,
+    "ホスト": 6,
+    "監視アカウント": 2
+   }
+  },
+  {
+   "date": "2026-08-19",
+   "posts": 12,
+   "impressions": 54128,
+   "likes": 1382,
+   "categories": {
+    "歌舞伎町": 2,
+    "夜職その他": 6,
+    "ホスト": 3,
+    "キャバクラ": 3,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-08-18",
+   "posts": 12,
+   "impressions": 63819,
+   "likes": 1206,
+   "categories": {
+    "歌舞伎町": 2,
+    "夜職その他": 4,
+    "キャバクラ": 2,
+    "ホスト": 7,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-17",
+   "posts": 16,
+   "impressions": 141631,
+   "likes": 3399,
+   "categories": {
+    "キャバクラ": 6,
+    "夜職その他": 4,
+    "ホスト": 7,
+    "歌舞伎町": 2,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-16",
+   "posts": 9,
+   "impressions": 34443,
+   "likes": 1158,
+   "categories": {
+    "歌舞伎町": 1,
+    "ホスト": 3,
+    "夜職その他": 6,
+    "キャバクラ": 3,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-15",
+   "posts": 12,
+   "impressions": 162156,
+   "likes": 4511,
+   "categories": {
+    "ホスト": 5,
+    "歌舞伎町": 5,
+    "夜職その他": 5,
+    "監視アカウント": 1,
+    "キャバクラ": 1
+   }
+  },
+  {
+   "date": "2026-08-14",
+   "posts": 9,
+   "impressions": 33388,
+   "likes": 342,
+   "categories": {
+    "夜職その他": 3,
+    "キャバクラ": 4,
+    "ホスト": 3,
+    "歌舞伎町": 2
+   }
+  },
+  {
+   "date": "2026-08-13",
+   "posts": 15,
+   "impressions": 53775,
+   "likes": 914,
+   "categories": {
+    "歌舞伎町": 3,
+    "キャバクラ": 4,
+    "夜職その他": 9,
+    "ホスト": 4,
+    "監視アカウント": 1,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-08-12",
+   "posts": 13,
+   "impressions": 22711,
+   "likes": 643,
+   "categories": {
+    "キャバクラ": 4,
+    "夜職その他": 4,
+    "ホスト": 5,
+    "監視アカウント": 1,
+    "歌舞伎町": 3,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-08-11",
+   "posts": 7,
+   "impressions": 83591,
+   "likes": 1765,
+   "categories": {
+    "キャバクラ": 4,
+    "歌舞伎町": 3,
+    "夜職その他": 1,
+    "ホスト": 1
+   }
+  },
+  {
+   "date": "2026-08-10",
+   "posts": 11,
+   "impressions": 39891,
+   "likes": 1247,
+   "categories": {
+    "歌舞伎町": 8,
+    "夜職その他": 1,
+    "ホスト": 2,
+    "キャバクラ": 1,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-09",
+   "posts": 10,
+   "impressions": 54958,
+   "likes": 1200,
+   "categories": {
+    "夜職その他": 3,
+    "歌舞伎町": 3,
+    "キャバクラ": 5,
+    "その他": 1,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-08",
+   "posts": 13,
+   "impressions": 150662,
+   "likes": 3561,
+   "categories": {
+    "ホスト": 4,
+    "歌舞伎町": 5,
+    "監視アカウント": 3,
+    "キャバクラ": 3,
+    "夜職その他": 5
+   }
+  },
+  {
+   "date": "2026-08-07",
+   "posts": 10,
+   "impressions": 134312,
+   "likes": 2129,
+   "categories": {
+    "キャバクラ": 3,
+    "監視アカウント": 2,
+    "ホスト": 2,
+    "テスト新カテゴリ": 1,
+    "歌舞伎町": 3,
+    "その他": 1,
+    "夜職その他": 1
+   }
+  },
+  {
+   "date": "2026-08-06",
+   "posts": 14,
+   "impressions": 87910,
+   "likes": 2199,
+   "categories": {
+    "ホスト": 5,
+    "歌舞伎町": 4,
+    "夜職その他": 3,
+    "キャバクラ": 5,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-05",
+   "posts": 13,
+   "impressions": 40612,
+   "likes": 1276,
+   "categories": {
+    "ホスト": 3,
+    "キャバクラ": 4,
+    "歌舞伎町": 5,
+    "夜職その他": 2,
+    "監視アカウント": 1
+   }
+  },
+  {
+   "date": "2026-08-04",
+   "posts": 7,
+   "impressions": 68771,
+   "likes": 1862,
+   "categories": {
+    "キャバクラ": 4,
+    "ホスト": 2,
+    "歌舞伎町": 3,
+    "監視アカウント": 2
+   }
+  },
+  {
+   "date": "2026-08-03",
+   "posts": 14,
+   "impressions": 107196,
+   "likes": 1418,
+   "categories": {
+    "ホスト": 6,
+    "夜職その他": 6,
+    "キャバクラ": 3,
+    "歌舞伎町": 4,
+    "監視アカウント": 1,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2026-08-02",
+   "posts": 16,
+   "impressions": 161459,
+   "likes": 1913,
+   "categories": {
+    "キャバクラ": 6,
+    "夜職その他": 4,
+    "ホスト": 4,
+    "歌舞伎町": 6,
+    "監視アカウント": 3
+   }
+  },
+  {
+   "date": "2026-08-01",
+   "posts": 4,
+   "impressions": 23077,
+   "likes": 285,
+   "categories": {
+    "夜職その他": 1,
+    "ホスト": 1,
+    "キャバクラ": 1,
+    "歌舞伎町": 1
+   }
+  },
+  {
+   "date": "2026-07-31",
+   "posts": 10,
+   "impressions": 26916,
+   "likes": 783,
+   "categories": {
+    "キャバクラ": 5,
+    "歌舞伎町": 4,
+    "夜職その他": 3,
+    "監視アカウント": 1,
+    "ホスト": 3
+   }
+  },
+  {
+   "date": "2026-07-30",
+   "posts": 10,
+   "impressions": 173038,
+   "likes": 5429,
+   "categories": {
+    "夜職その他": 4,
+    "その他": 1,
+    "歌舞伎町": 5,
+    "ホスト": 3,
+    "監視アカウント": 2,
+    "キャバクラ": 3
+   }
+  },
+  {
+   "date": "2026-07-29",
+   "posts": 11,
+   "impressions": 110955,
+   "likes": 3888,
+   "categories": {
+    "ホスト": 5,
+    "キャバクラ": 3,
+    "夜職その他": 3,
+    "歌舞伎町": 3,
+    "監視アカウント": 1,
+    "テスト新カテゴリ": 1
+   }
+  },
+  {
+   "date": "2026-07-28",
+   "posts": 3,
+   "impressions": 8831,
+   "likes": 243,
+   "categories": {
+    "夜職その他": 2,
+    "ホスト": 2,
+    "歌舞伎町": 1
+   }
+  },
+  {
+   "date": "2019-05-01",
+   "posts": 1,
+   "impressions": 10573,
+   "likes": 382,
+   "categories": {
+    "歌舞伎町": 1
+   }
+  },
+  {
+   "date": "2016-12-31",
+   "posts": 1,
+   "impressions": 1107,
+   "likes": 30,
+   "categories": {
+    "歌舞伎町": 1
+   }
+  },
+  {
+   "date": "2016-07-21",
+   "posts": 1,
+   "impressions": 1318,
+   "likes": 36,
+   "categories": {
+    "歌舞伎町": 1
+   }
+  },
+  {
+   "date": "2016-03-04",
+   "posts": 1,
+   "impressions": 1558,
+   "likes": 58,
+   "categories": {
+    "歌舞伎町": 1
+   }
+  }
+ ],
+ "top_posts": {
+  "by_impressions": [
+   {
+    "id": "1844674407370942180",
+    "url": "https://x.com/sample_misc_04/status/1844674407370942180",
+    "user": "sample_misc_04",
+    "created_jst": "2026-09-30T09:07:04+09:00",
+    "ts": 1790726824,
+    "metrics": {
+     "impression_count": 1155424,
+     "like_count": 12345,
+     "retweet_count": 12,
+     "reply_count": 6,
+     "quote_count": 1,
+     "bookmark_count": 4
+    },
+    "text": "【サンプル】雑談です",
+    "categories": [
+     "その他"
+    ]
+   },
+   {
+    "id": "1844674407365783500",
+    "url": "https://x.com/sample_watch_07/status/1844674407365783500",
+    "user": "sample_watch_07",
+    "created_jst": "2026-09-11T08:50:42+09:00",
+    "ts": 1789084242,
+    "metrics": {
+     "impression_count": 401293,
+     "like_count": 14771,
+     "retweet_count": 1532,
+     "reply_count": 44,
+     "quote_count": 258,
+     "bookmark_count": 1869
+    },
+    "text": "【サンプル】最近のトー横の話題をまとめてみた #歌舞伎町\nラウンジも話題に。\n\n補足：感想どうぞ",
+    "categories": [
+     "歌舞伎町",
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407370446647",
+    "url": "https://x.com/sample_watch_04/status/1844674407370446647",
+    "user": "sample_watch_04",
+    "created_jst": "2026-09-08T14:08:19+09:00",
+    "ts": 1788844099,
+    "metrics": {
+     "impression_count": 348290,
+     "like_count": 3609,
+     "retweet_count": 619,
+     "reply_count": 333,
+     "quote_count": 89,
+     "bookmark_count": 986
+    },
+    "text": "【サンプル】月末のホストについて気になったことメモ #歌舞伎町\n新宿も話題に。\n\n補足：写真は後で",
+    "categories": [
+     "ホスト",
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407367489241",
+    "url": "https://x.com/sample_watch_06/status/1844674407367489241",
+    "user": "sample_watch_06",
+    "created_jst": "2026-10-06T05:51:41+09:00",
+    "ts": 1791233501,
+    "metrics": {
+     "impression_count": 336122,
+     "like_count": 11793,
+     "retweet_count": 2813,
+     "reply_count": 335,
+     "quote_count": 5,
+     "bookmark_count": 1992
+    },
+    "text": "【サンプル】今夜のナイトワーク、混雑していたのでレポート\n担当も話題に。\n\n補足：また書きます",
+    "categories": [
+     "夜職その他",
+     "ホスト",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407370291711",
+    "url": "https://x.com/sample_watch_03/status/1844674407370291711",
+    "user": "sample_watch_03",
+    "created_jst": "2026-09-28T11:32:44+09:00",
+    "ts": 1790562764,
+    "metrics": {
+     "impression_count": 302874,
+     "like_count": 5569,
+     "retweet_count": 1457,
+     "reply_count": 90,
+     "quote_count": 144,
+     "bookmark_count": 1597
+    },
+    "text": "【サンプル】最近のゴジラロードの相場感についての雑談 #夜職",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366312812",
+    "url": "https://x.com/sample_watch_08/status/1844674407366312812",
+    "user": "sample_watch_08",
+    "created_jst": "2026-09-29T13:11:28+09:00",
+    "ts": 1790655088,
+    "metrics": {
+     "impression_count": 247961,
+     "like_count": 6175,
+     "retweet_count": 479,
+     "reply_count": 616,
+     "quote_count": 62,
+     "bookmark_count": 2032
+    },
+    "text": "【サンプル】今夜のキャバクラ、混雑していたのでレポート",
+    "categories": [
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407369879810",
+    "url": "https://x.com/sample_watch_03/status/1844674407369879810",
+    "user": "sample_watch_03",
+    "created_jst": "2026-09-17T17:37:38+09:00",
+    "ts": 1789634258,
+    "metrics": {
+     "impression_count": 179030,
+     "like_count": 6709,
+     "retweet_count": 1447,
+     "reply_count": 310,
+     "quote_count": 121,
+     "bookmark_count": 2207
+    },
+    "text": "【サンプル】今日のゴジラロード、混雑していたのでレポート #歌舞伎町 https://t.co/cpuuNxtHMT",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366719633",
+    "url": "https://x.com/sample_watch_08/status/1844674407366719633",
+    "user": "sample_watch_08",
+    "created_jst": "2026-10-09T03:44:49+09:00",
+    "ts": 1791485089,
+    "metrics": {
+     "impression_count": 137784,
+     "like_count": 5782,
+     "retweet_count": 133,
+     "reply_count": 581,
+     "quote_count": 101,
+     "bookmark_count": 361
+    },
+    "text": "【サンプル】週末のキャバ嬢でイベント告知が出ていた #歌舞伎町 https://t.co/KcM3t9rQgD",
+    "categories": [
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407368061828",
+    "url": "https://x.com/sample_host_emi15/status/1844674407368061828",
+    "user": "sample_host_emi15",
+    "created_jst": "2026-07-30T09:19:07+09:00",
+    "ts": 1785370747,
+    "metrics": {
+     "impression_count": 130238,
+     "like_count": 4277,
+     "retweet_count": 1117,
+     "reply_count": 217,
+     "quote_count": 135,
+     "bookmark_count": 1694
+    },
+    "text": "【サンプル】今日の指名の話題をまとめてみた 詳細はリンク先へ\n新宿も話題に。",
+    "categories": [
+     "ホスト",
+     "歌舞伎町"
+    ]
+   },
+   {
+    "id": "1844674407359875038",
+    "url": "https://x.com/sample_watch_01/status/1844674407359875038",
+    "user": "sample_watch_01",
+    "created_jst": "2026-08-26T08:24:46+09:00",
+    "ts": 1787700286,
+    "metrics": {
+     "impression_count": 128900,
+     "like_count": 1980,
+     "retweet_count": 13,
+     "reply_count": 43,
+     "quote_count": 35,
+     "bookmark_count": 47
+    },
+    "text": "【サンプル】今日のゴジラロードでイベント告知が出ていた https://t.co/aQEAvKyfGr",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366998240",
+    "url": "https://x.com/sample_watch_05/status/1844674407366998240",
+    "user": "sample_watch_05",
+    "created_jst": "2026-08-07T02:37:22+09:00",
+    "ts": 1786037842,
+    "metrics": {
+     "impression_count": 121784,
+     "like_count": 1941,
+     "retweet_count": 232,
+     "reply_count": 119,
+     "quote_count": 34,
+     "bookmark_count": 613
+    },
+    "text": "【サンプル】週末の同伴界隈のニュースを見かけた",
+    "categories": [
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407364938327",
+    "url": "https://x.com/sample_watch_01/status/1844674407364938327",
+    "user": "sample_watch_01",
+    "created_jst": "2026-08-26T04:17:49+09:00",
+    "ts": 1787685469,
+    "metrics": {
+     "impression_count": 118283,
+     "like_count": 609,
+     "retweet_count": 82,
+     "reply_count": 48,
+     "quote_count": 29,
+     "bookmark_count": 155
+    },
+    "text": "【サンプル】最近の歌舞伎町の相場感についての雑談 #夜職",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407365289519",
+    "url": "https://x.com/sample_girlsbar_sakura98/status/1844674407365289519",
+    "user": "sample_girlsbar_sakura98",
+    "created_jst": "2026-08-15T13:27:13+09:00",
+    "ts": 1786768033,
+    "metrics": {
+     "impression_count": 91576,
+     "like_count": 2186,
+     "retweet_count": 112,
+     "reply_count": 24,
+     "quote_count": 17,
+     "bookmark_count": 227
+    },
+    "text": "【サンプル】今夜の源氏名の話題をまとめてみた #歌舞伎町\n歌舞伎町も話題に。\n\nちなみにまた書きます",
+    "categories": [
+     "夜職その他",
+     "歌舞伎町"
+    ]
+   },
+   {
+    "id": "1844674407362356740",
+    "url": "https://x.com/sample_watch_03/status/1844674407362356740",
+    "user": "sample_watch_03",
+    "created_jst": "2026-10-06T05:15:20+09:00",
+    "ts": 1791231320,
+    "metrics": {
+     "impression_count": 89443,
+     "like_count": 2068,
+     "retweet_count": 389,
+     "reply_count": 249,
+     "quote_count": 73,
+     "bookmark_count": 267
+    },
+    "text": "【サンプル】昨日のゴジラロードについて気になったことメモ #歌舞伎町\nキャバ嬢も話題に。",
+    "categories": [
+     "歌舞伎町",
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366877814",
+    "url": "https://x.com/sample_watch_01/status/1844674407366877814",
+    "user": "sample_watch_01",
+    "created_jst": "2026-10-02T02:32:07+09:00",
+    "ts": 1790875927,
+    "metrics": {
+     "impression_count": 79074,
+     "like_count": 3064,
+     "retweet_count": 483,
+     "reply_count": 391,
+     "quote_count": 54,
+     "bookmark_count": 434
+    },
+    "text": "【サンプル】昨日の一番街の話題をまとめてみた\n担当も話題に。\n\nちなみに感想どうぞ",
+    "categories": [
+     "歌舞伎町",
+     "ホスト",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407359479189",
+    "url": "https://x.com/sample_cabajo_rei29/status/1844674407359479189",
+    "user": "sample_cabajo_rei29",
+    "created_jst": "2026-10-11T03:15:03+09:00",
+    "ts": 1791656103,
+    "metrics": {
+     "impression_count": 76567,
+     "like_count": 1413,
+     "retweet_count": 296,
+     "reply_count": 188,
+     "quote_count": 50,
+     "bookmark_count": 494
+    },
+    "text": "【サンプル】月末のラウンジについて気になったことメモ（続く） https://t.co/Eao7nj7JSf",
+    "categories": [
+     "キャバクラ"
+    ]
+   },
+   {
+    "id": "1844674407366812326",
+    "url": "https://x.com/sample_watch_06/status/1844674407366812326",
+    "user": "sample_watch_06",
+    "created_jst": "2026-09-29T17:32:30+09:00",
+    "ts": 1790670750,
+    "metrics": {
+     "impression_count": 76398,
+     "like_count": 1871,
+     "retweet_count": 257,
+     "reply_count": 54,
+     "quote_count": 43,
+     "bookmark_count": 629
+    },
+    "text": "【サンプル】月末のナイトワーク、混雑していたのでレポート 詳細はリンク先へ\n歌舞伎町も話題に。\n\n補足：感想どうぞ https://t.co/UXSNtAlNdb",
+    "categories": [
+     "夜職その他",
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407369580632",
+    "url": "https://x.com/sample_watch_02/status/1844674407369580632",
+    "user": "sample_watch_02",
+    "created_jst": "2026-08-02T00:48:37+09:00",
+    "ts": 1785599317,
+    "metrics": {
+     "impression_count": 72367,
+     "like_count": 623,
+     "retweet_count": 150,
+     "reply_count": 56,
+     "quote_count": 13,
+     "bookmark_count": 198
+    },
+    "text": "【サンプル】昨日の歌舞伎町の話題をまとめてみた",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407362809031",
+    "url": "https://x.com/sample_girlsbar_sakura98/status/1844674407362809031",
+    "user": "sample_girlsbar_sakura98",
+    "created_jst": "2026-10-01T00:30:51+09:00",
+    "ts": 1790782251,
+    "metrics": {
+     "impression_count": 71021,
+     "like_count": 2232,
+     "retweet_count": 393,
+     "reply_count": 2,
+     "quote_count": 98,
+     "bookmark_count": 192
+    },
+    "text": "【サンプル】最近のナイトワークでイベント告知が出ていた https://t.co/J7N7dTeXB4",
+    "categories": [
+     "夜職その他"
+    ]
+   },
+   {
+    "id": "1844674407369060013",
+    "url": "https://x.com/sample_kabuki_aoi62/status/1844674407369060013",
+    "user": "sample_kabuki_aoi62",
+    "created_jst": "2026-07-29T00:08:09+09:00",
+    "ts": 1785251289,
+    "metrics": {
+     "impression_count": 70848,
+     "like_count": 2851,
+     "retweet_count": 296,
+     "reply_count": 97,
+     "quote_count": 95,
+     "bookmark_count": 1006
+    },
+    "text": "【サンプル】最近のトー横の話題をまとめてみた\n\n補足：また書きます https://t.co/jEHOwZdbUF",
+    "categories": [
+     "歌舞伎町"
+    ]
+   }
+  ],
+  "by_likes": [
+   {
+    "id": "1844674407365783500",
+    "url": "https://x.com/sample_watch_07/status/1844674407365783500",
+    "user": "sample_watch_07",
+    "created_jst": "2026-09-11T08:50:42+09:00",
+    "ts": 1789084242,
+    "metrics": {
+     "impression_count": 401293,
+     "like_count": 14771,
+     "retweet_count": 1532,
+     "reply_count": 44,
+     "quote_count": 258,
+     "bookmark_count": 1869
+    },
+    "text": "【サンプル】最近のトー横の話題をまとめてみた #歌舞伎町\nラウンジも話題に。\n\n補足：感想どうぞ",
+    "categories": [
+     "歌舞伎町",
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407370942180",
+    "url": "https://x.com/sample_misc_04/status/1844674407370942180",
+    "user": "sample_misc_04",
+    "created_jst": "2026-09-30T09:07:04+09:00",
+    "ts": 1790726824,
+    "metrics": {
+     "impression_count": 1155424,
+     "like_count": 12345,
+     "retweet_count": 12,
+     "reply_count": 6,
+     "quote_count": 1,
+     "bookmark_count": 4
+    },
+    "text": "【サンプル】雑談です",
+    "categories": [
+     "その他"
+    ]
+   },
+   {
+    "id": "1844674407367489241",
+    "url": "https://x.com/sample_watch_06/status/1844674407367489241",
+    "user": "sample_watch_06",
+    "created_jst": "2026-10-06T05:51:41+09:00",
+    "ts": 1791233501,
+    "metrics": {
+     "impression_count": 336122,
+     "like_count": 11793,
+     "retweet_count": 2813,
+     "reply_count": 335,
+     "quote_count": 5,
+     "bookmark_count": 1992
+    },
+    "text": "【サンプル】今夜のナイトワーク、混雑していたのでレポート\n担当も話題に。\n\n補足：また書きます",
+    "categories": [
+     "夜職その他",
+     "ホスト",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407369879810",
+    "url": "https://x.com/sample_watch_03/status/1844674407369879810",
+    "user": "sample_watch_03",
+    "created_jst": "2026-09-17T17:37:38+09:00",
+    "ts": 1789634258,
+    "metrics": {
+     "impression_count": 179030,
+     "like_count": 6709,
+     "retweet_count": 1447,
+     "reply_count": 310,
+     "quote_count": 121,
+     "bookmark_count": 2207
+    },
+    "text": "【サンプル】今日のゴジラロード、混雑していたのでレポート #歌舞伎町 https://t.co/cpuuNxtHMT",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366312812",
+    "url": "https://x.com/sample_watch_08/status/1844674407366312812",
+    "user": "sample_watch_08",
+    "created_jst": "2026-09-29T13:11:28+09:00",
+    "ts": 1790655088,
+    "metrics": {
+     "impression_count": 247961,
+     "like_count": 6175,
+     "retweet_count": 479,
+     "reply_count": 616,
+     "quote_count": 62,
+     "bookmark_count": 2032
+    },
+    "text": "【サンプル】今夜のキャバクラ、混雑していたのでレポート",
+    "categories": [
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366719633",
+    "url": "https://x.com/sample_watch_08/status/1844674407366719633",
+    "user": "sample_watch_08",
+    "created_jst": "2026-10-09T03:44:49+09:00",
+    "ts": 1791485089,
+    "metrics": {
+     "impression_count": 137784,
+     "like_count": 5782,
+     "retweet_count": 133,
+     "reply_count": 581,
+     "quote_count": 101,
+     "bookmark_count": 361
+    },
+    "text": "【サンプル】週末のキャバ嬢でイベント告知が出ていた #歌舞伎町 https://t.co/KcM3t9rQgD",
+    "categories": [
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407370291711",
+    "url": "https://x.com/sample_watch_03/status/1844674407370291711",
+    "user": "sample_watch_03",
+    "created_jst": "2026-09-28T11:32:44+09:00",
+    "ts": 1790562764,
+    "metrics": {
+     "impression_count": 302874,
+     "like_count": 5569,
+     "retweet_count": 1457,
+     "reply_count": 90,
+     "quote_count": 144,
+     "bookmark_count": 1597
+    },
+    "text": "【サンプル】最近のゴジラロードの相場感についての雑談 #夜職",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407368061828",
+    "url": "https://x.com/sample_host_emi15/status/1844674407368061828",
+    "user": "sample_host_emi15",
+    "created_jst": "2026-07-30T09:19:07+09:00",
+    "ts": 1785370747,
+    "metrics": {
+     "impression_count": 130238,
+     "like_count": 4277,
+     "retweet_count": 1117,
+     "reply_count": 217,
+     "quote_count": 135,
+     "bookmark_count": 1694
+    },
+    "text": "【サンプル】今日の指名の話題をまとめてみた 詳細はリンク先へ\n新宿も話題に。",
+    "categories": [
+     "ホスト",
+     "歌舞伎町"
+    ]
+   },
+   {
+    "id": "1844674407370446647",
+    "url": "https://x.com/sample_watch_04/status/1844674407370446647",
+    "user": "sample_watch_04",
+    "created_jst": "2026-09-08T14:08:19+09:00",
+    "ts": 1788844099,
+    "metrics": {
+     "impression_count": 348290,
+     "like_count": 3609,
+     "retweet_count": 619,
+     "reply_count": 333,
+     "quote_count": 89,
+     "bookmark_count": 986
+    },
+    "text": "【サンプル】月末のホストについて気になったことメモ #歌舞伎町\n新宿も話題に。\n\n補足：写真は後で",
+    "categories": [
+     "ホスト",
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407366877814",
+    "url": "https://x.com/sample_watch_01/status/1844674407366877814",
+    "user": "sample_watch_01",
+    "created_jst": "2026-10-02T02:32:07+09:00",
+    "ts": 1790875927,
+    "metrics": {
+     "impression_count": 79074,
+     "like_count": 3064,
+     "retweet_count": 483,
+     "reply_count": 391,
+     "quote_count": 54,
+     "bookmark_count": 434
+    },
+    "text": "【サンプル】昨日の一番街の話題をまとめてみた\n担当も話題に。\n\nちなみに感想どうぞ",
+    "categories": [
+     "歌舞伎町",
+     "ホスト",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407369060013",
+    "url": "https://x.com/sample_kabuki_aoi62/status/1844674407369060013",
+    "user": "sample_kabuki_aoi62",
+    "created_jst": "2026-07-29T00:08:09+09:00",
+    "ts": 1785251289,
+    "metrics": {
+     "impression_count": 70848,
+     "like_count": 2851,
+     "retweet_count": 296,
+     "reply_count": 97,
+     "quote_count": 95,
+     "bookmark_count": 1006
+    },
+    "text": "【サンプル】最近のトー横の話題をまとめてみた\n\n補足：また書きます https://t.co/jEHOwZdbUF",
+    "categories": [
+     "歌舞伎町"
+    ]
+   },
+   {
+    "id": "1844674407367934259",
+    "url": "https://x.com/sample_watch_02/status/1844674407367934259",
+    "user": "sample_watch_02",
+    "created_jst": "2026-08-30T12:06:47+09:00",
+    "ts": 1788059207,
+    "metrics": {
+     "impression_count": 64023,
+     "like_count": 2392,
+     "retweet_count": 567,
+     "reply_count": 303,
+     "quote_count": 37,
+     "bookmark_count": 561
+    },
+    "text": "【サンプル】最近の歌舞伎町でイベント告知が出ていた\n出勤も話題に。",
+    "categories": [
+     "歌舞伎町",
+     "夜職その他",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407369248567",
+    "url": "https://x.com/sample_watch_06/status/1844674407369248567",
+    "user": "sample_watch_06",
+    "created_jst": "2026-09-08T07:46:07+09:00",
+    "ts": 1788821167,
+    "metrics": {
+     "impression_count": 68422,
+     "like_count": 2302,
+     "retweet_count": 505,
+     "reply_count": 281,
+     "quote_count": 33,
+     "bookmark_count": 247
+    },
+    "text": "【サンプル】今日のガールズバーについて気になったことメモ\n担当も話題に。",
+    "categories": [
+     "夜職その他",
+     "ホスト",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407362809031",
+    "url": "https://x.com/sample_girlsbar_sakura98/status/1844674407362809031",
+    "user": "sample_girlsbar_sakura98",
+    "created_jst": "2026-10-01T00:30:51+09:00",
+    "ts": 1790782251,
+    "metrics": {
+     "impression_count": 71021,
+     "like_count": 2232,
+     "retweet_count": 393,
+     "reply_count": 2,
+     "quote_count": 98,
+     "bookmark_count": 192
+    },
+    "text": "【サンプル】最近のナイトワークでイベント告知が出ていた https://t.co/J7N7dTeXB4",
+    "categories": [
+     "夜職その他"
+    ]
+   },
+   {
+    "id": "1844674407365289519",
+    "url": "https://x.com/sample_girlsbar_sakura98/status/1844674407365289519",
+    "user": "sample_girlsbar_sakura98",
+    "created_jst": "2026-08-15T13:27:13+09:00",
+    "ts": 1786768033,
+    "metrics": {
+     "impression_count": 91576,
+     "like_count": 2186,
+     "retweet_count": 112,
+     "reply_count": 24,
+     "quote_count": 17,
+     "bookmark_count": 227
+    },
+    "text": "【サンプル】今夜の源氏名の話題をまとめてみた #歌舞伎町\n歌舞伎町も話題に。\n\nちなみにまた書きます",
+    "categories": [
+     "夜職その他",
+     "歌舞伎町"
+    ]
+   },
+   {
+    "id": "1844674407362356740",
+    "url": "https://x.com/sample_watch_03/status/1844674407362356740",
+    "user": "sample_watch_03",
+    "created_jst": "2026-10-06T05:15:20+09:00",
+    "ts": 1791231320,
+    "metrics": {
+     "impression_count": 89443,
+     "like_count": 2068,
+     "retweet_count": 389,
+     "reply_count": 249,
+     "quote_count": 73,
+     "bookmark_count": 267
+    },
+    "text": "【サンプル】昨日のゴジラロードについて気になったことメモ #歌舞伎町\nキャバ嬢も話題に。",
+    "categories": [
+     "歌舞伎町",
+     "キャバクラ",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407361250492",
+    "url": "https://x.com/sample_girlsbar_sakura98/status/1844674407361250492",
+    "user": "sample_girlsbar_sakura98",
+    "created_jst": "2026-09-15T07:10:38+09:00",
+    "ts": 1789423838,
+    "metrics": {
+     "impression_count": 54953,
+     "like_count": 2064,
+     "retweet_count": 581,
+     "reply_count": 139,
+     "quote_count": 19,
+     "bookmark_count": 813
+    },
+    "text": "【サンプル】最近の出勤の話題をまとめてみた #夜職",
+    "categories": [
+     "夜職その他"
+    ]
+   },
+   {
+    "id": "1844674407367527259",
+    "url": "https://x.com/sample_night_luna81/status/1844674407367527259",
+    "user": "sample_night_luna81",
+    "created_jst": "2026-10-08T13:32:11+09:00",
+    "ts": 1791433931,
+    "metrics": {
+     "impression_count": 48038,
+     "like_count": 2052,
+     "retweet_count": 85,
+     "reply_count": 148,
+     "quote_count": 22,
+     "bookmark_count": 51
+    },
+    "text": "【サンプル】昨日の出勤の相場感についての雑談（続く） https://t.co/gkvw3VeifG",
+    "categories": [
+     "夜職その他"
+    ]
+   },
+   {
+    "id": "1844674407359875038",
+    "url": "https://x.com/sample_watch_01/status/1844674407359875038",
+    "user": "sample_watch_01",
+    "created_jst": "2026-08-26T08:24:46+09:00",
+    "ts": 1787700286,
+    "metrics": {
+     "impression_count": 128900,
+     "like_count": 1980,
+     "retweet_count": 13,
+     "reply_count": 43,
+     "quote_count": 35,
+     "bookmark_count": 47
+    },
+    "text": "【サンプル】今日のゴジラロードでイベント告知が出ていた https://t.co/aQEAvKyfGr",
+    "categories": [
+     "歌舞伎町",
+     "監視アカウント"
+    ]
+   },
+   {
+    "id": "1844674407363494453",
+    "url": "https://x.com/sample_night_hikaru93/status/1844674407363494453",
+    "user": "sample_night_hikaru93",
+    "created_jst": "2026-08-23T15:18:55+09:00",
+    "ts": 1787465935,
+    "metrics": {
+     "impression_count": 47206,
+     "like_count": 1969,
+     "retweet_count": 559,
+     "reply_count": 2,
+     "quote_count": 96,
+     "bookmark_count": 660
+    },
+    "text": "【サンプル】今夜の源氏名でイベント告知が出ていた https://t.co/LGjukCaPcp",
+    "categories": [
+     "夜職その他"
+    ]
+   }
+  ]
+ }
+}

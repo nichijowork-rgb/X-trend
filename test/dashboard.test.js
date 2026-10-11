@@ -1,0 +1,353 @@
+// 静的ダッシュボード（index.html / assets/）の純粋関数テスト
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import {
+  formatCompact, formatExact, formatDateTime, formatDateTimeFull, parseTimestamp, dateKeyFromTs, addDays,
+  normalizeDataset, filterPosts, sortPosts, parseKeywords, aggregate, mergeSummary, fillDays, chartDayRange,
+  countBefore, linkifySegments, isSafeHttpUrl, highlightSegments, serializeState, parseState, DEFAULT_STATE,
+  categorySlot, hashString, KNOWN_CATEGORY_SLOTS, SPARE_SLOTS, isFilterActive, topAccounts, countByCategory,
+  niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, CHART_MAX_DAYS,
+} from '../assets/js/core.js';
+
+const ts = (iso) => Math.floor(Date.parse(iso) / 1000);
+
+function rawPost(over = {}) {
+  return {
+    id: '1', url: 'https://x.com/sample_a/status/1', user: 'sample_a',
+    created_jst: '2026-10-11T13:34:00+09:00', ts: ts('2026-10-11T13:34:00+09:00'),
+    metrics: { impression_count: 100, like_count: 10, retweet_count: 1, reply_count: 0, quote_count: 0, bookmark_count: 2 },
+    text: '【サンプル】本文', categories: ['ホスト'], matched_terms: ['ホスト'], is_watched: false,
+    ...over,
+  };
+}
+
+function dataset(posts, categories = ['ホスト', 'キャバクラ', 'その他']) {
+  return normalizeDataset({ generated_at: '2026-10-11T18:41:00+09:00', categories, posts });
+}
+
+// ---------------------------------------------------------------- 数値
+
+test('formatCompact: 万・億表記と 1万未満のカンマ区切り', () => {
+  assert.equal(formatCompact(1155424), '115.5万');
+  assert.equal(formatCompact(123456789), '1.2億');
+  assert.equal(formatCompact(0), '0');
+  assert.equal(formatCompact(9999), '9,999');
+  assert.equal(formatCompact(10000), '1万');
+  assert.equal(formatCompact(12345), '1.2万');
+  assert.equal(formatCompact(99999999), '1億'); // 繰り上がりで 10000万 にならない
+  assert.equal(formatCompact(100000000), '1億');
+  assert.equal(formatCompact(1234567890123), '12,345.7億');
+});
+
+test('formatCompact / formatExact: 欠損は「不明」で 0 扱いしない', () => {
+  assert.equal(formatCompact(null), '不明');
+  assert.equal(formatCompact(undefined), '不明');
+  assert.equal(formatCompact(NaN), '不明');
+  assert.equal(formatExact(null), '不明');
+  assert.equal(formatExact(1155424), '1,155,424');
+});
+
+// ---------------------------------------------------------------- 日時
+
+test('formatDateTime: 「10/11 13:34」形式（created_jst 優先、無ければ ts を JST で）', () => {
+  assert.equal(formatDateTime('2026-10-11T13:34:05+09:00', null), '10/11 13:34');
+  assert.equal(formatDateTime('2026-01-02 03:04', null), '1/2 03:04');
+  // created_jst が null → ts（UTC 04:34 = JST 13:34）
+  assert.equal(formatDateTime(null, ts('2026-10-11T04:34:00Z')), '10/11 13:34');
+  // 年が違う場合のみ年を付ける
+  assert.equal(formatDateTime('2016-03-04T10:00:00+09:00', null, 2026), '2016/3/4 10:00');
+  assert.equal(formatDateTime('2026-03-04T10:00:00+09:00', null, 2026), '3/4 10:00');
+  assert.equal(formatDateTime(null, null), '不明');
+  assert.equal(formatDateTimeFull(null, ts('2026-10-11T04:34:00Z')), '2026/10/11 13:34 JST');
+});
+
+test('parseTimestamp / dateKeyFromTs / addDays', () => {
+  assert.equal(parseTimestamp('2026-10-11T18:41:00+09:00'), ts('2026-10-11T09:41:00Z'));
+  assert.equal(parseTimestamp('2026-10-11 18:41'), ts('2026-10-11T09:41:00Z')); // TZ 無しは JST
+  assert.equal(parseTimestamp(''), null);
+  assert.equal(dateKeyFromTs(ts('2026-10-10T15:30:00Z')), '2026-10-11'); // JST では翌日
+  assert.equal(addDays('2026-12-31', 1), '2027-01-01');
+  assert.equal(addDays('2026-03-01', -1), '2026-02-28');
+});
+
+// ---------------------------------------------------------------- 正規化
+
+test('normalizeDataset: id は文字列・指標欠損は null・カテゴリは動的生成', () => {
+  const ds = dataset([
+    rawPost({ id: 1844674407370955161n.toString() }),
+    rawPost({ id: 42, categories: ['テスト新カテゴリ'], metrics: { like_count: 3 } }),
+    rawPost({ id: '3', metrics: undefined, categories: [] }),
+  ]);
+  assert.equal(ds.posts.length, 3);
+  for (const p of ds.posts) assert.equal(typeof p.id, 'string');
+  assert.deepEqual(ds.categories, ['ホスト', 'キャバクラ', 'その他', 'テスト新カテゴリ']);
+  const p42 = ds.posts.find((p) => p.id === '42');
+  assert.equal(p42.metrics.impression_count, null);
+  assert.equal(p42.metrics.like_count, 3);
+  const p3 = ds.posts.find((p) => p.id === '3');
+  assert.deepEqual(p3.categories, ['その他']); // カテゴリ空は「その他」
+  assert.equal(p3.metrics.like_count, null);
+});
+
+test('normalizeDataset: 不正な形式は例外', () => {
+  assert.throws(() => normalizeDataset(null));
+  assert.throws(() => normalizeDataset({}));
+  assert.throws(() => normalizeDataset([]));
+  assert.throws(() => normalizeDataset({ posts: 'x' }));
+  const empty = normalizeDataset({ posts: [] });
+  assert.equal(empty.posts.length, 0);
+  assert.equal(empty.refTs, null);
+});
+
+// ---------------------------------------------------------------- フィルタ・並べ替え
+
+const REF = ts('2026-10-11T18:00:00+09:00');
+function sampleSet() {
+  return dataset([
+    rawPost({ id: '1', ts: REF, text: '【サンプル】歌舞伎町で指名の話', categories: ['ホスト'], user: 'sample_a', metrics: { impression_count: 500, like_count: 5, bookmark_count: 1 } }),
+    rawPost({ id: '2', ts: REF - 3600 * 30, text: '【サンプル】キャバクラ 同伴', categories: ['キャバクラ'], user: 'sample_b', is_watched: true, metrics: { impression_count: null, like_count: 50, bookmark_count: null } }),
+    rawPost({ id: '3', ts: REF - 86400 * 10, text: '【サンプル】ホストとキャバクラ　指名', categories: ['ホスト', 'キャバクラ'], user: 'Sample_C', metrics: { impression_count: 2000, like_count: 1 } }),
+    rawPost({ id: '4', ts: ts('2016-03-04T10:00:00+09:00'), text: '【サンプル】昔の投稿', categories: ['その他'], user: 'sample_a', metrics: { impression_count: 10 } }),
+  ]);
+}
+
+test('filterPosts: 期間はデータ内の最新投稿時刻基準', () => {
+  const ds = sampleSet();
+  assert.equal(ds.refTs, REF);
+  const ids = (st) => filterPosts(ds.posts, st, ds.refTs).map((p) => p.id);
+  assert.deepEqual(ids({ period: '24h' }), ['1']);
+  assert.deepEqual(ids({ period: '7d' }), ['1', '2']);
+  assert.deepEqual(ids({ period: '30d' }), ['1', '2', '3']);
+  assert.deepEqual(ids({ period: 'all' }), ['1', '2', '3', '4']);
+});
+
+test('filterPosts: カテゴリ OR・キーワード AND（全角スペース可）・アカウント・監視のみ', () => {
+  const ds = sampleSet();
+  const ids = (st) => filterPosts(ds.posts, st, ds.refTs).map((p) => p.id);
+  assert.deepEqual(ids({ cats: ['ホスト'] }), ['1', '3']);
+  assert.deepEqual(ids({ cats: ['ホスト', 'キャバクラ'] }), ['1', '2', '3']);
+  assert.deepEqual(ids({ q: '指名' }), ['1', '3']);
+  assert.deepEqual(ids({ q: '指名　キャバクラ' }), ['3']);
+  assert.deepEqual(ids({ q: 'ｷｬﾊﾞｸﾗ' }), ['2', '3']); // NFKC で半角カナも一致
+  assert.deepEqual(ids({ user: 'sample_c' }), ['3']); // 大文字小文字を無視
+  assert.deepEqual(ids({ user: '@sample_a' }), ['1', '4']);
+  assert.deepEqual(ids({ watched: true }), ['2']);
+  assert.deepEqual(filterPosts(ds.posts, { cats: ['ホスト'] }, ds.refTs, { ignoreCategories: true }).length, 4);
+  assert.deepEqual(parseKeywords(' a  B　c '), ['a', 'b', 'c']);
+});
+
+test('sortPosts: 欠損指標は末尾・同値は新しい順', () => {
+  const ds = sampleSet();
+  assert.deepEqual(sortPosts(ds.posts, 'new').map((p) => p.id), ['1', '2', '3', '4']);
+  assert.deepEqual(sortPosts(ds.posts, 'imp').map((p) => p.id), ['3', '1', '4', '2']);
+  assert.deepEqual(sortPosts(ds.posts, 'like').map((p) => p.id), ['2', '1', '3', '4']);
+  // bookmark: 1 のみ既知、他は null（新しい順で末尾）
+  assert.deepEqual(sortPosts(ds.posts, 'bookmark').map((p) => p.id), ['1', '2', '3', '4']);
+  // 元配列は変更しない
+  assert.deepEqual(ds.posts.map((p) => p.id), ['1', '2', '3', '4']);
+});
+
+// ---------------------------------------------------------------- 集計
+
+test('aggregate: 既知値のみ合計し、欠損件数を数える', () => {
+  const ds = sampleSet();
+  const agg = aggregate(ds.posts, ds.categories);
+  assert.equal(agg.totalPosts, 4);
+  assert.equal(agg.totalAccounts, 3);
+  assert.deepEqual(agg.impressions, { sum: 2510, unknown: 1 });
+  assert.equal(agg.maxImp.id, '3');
+  const host = agg.byCategory.find((c) => c.name === 'ホスト');
+  assert.equal(host.posts, 2);
+  assert.deepEqual(host.impressions, { sum: 2500, unknown: 0 });
+  const caba = agg.byCategory.find((c) => c.name === 'キャバクラ');
+  assert.deepEqual(caba.impressions, { sum: 2000, unknown: 1 });
+  assert.equal(agg.byDay[0].date, '2016-03-04');
+  assert.equal(countByCategory(ds.posts).get('キャバクラ'), 2);
+  const top = topAccounts(agg.byAccount, 'posts');
+  assert.equal(top[0].user, 'sample_a');
+  assert.equal(topAccounts(agg.byAccount, 'imp')[0].user, 'Sample_C');
+});
+
+test('aggregate: 0 件でも落ちない', () => {
+  const agg = aggregate([], ['ホスト']);
+  assert.equal(agg.totalPosts, 0);
+  assert.equal(agg.maxImp, null);
+  assert.deepEqual(agg.byCategory[0], { name: 'ホスト', posts: 0, impressions: { sum: 0, unknown: 0 }, likes: { sum: 0, unknown: 0 } });
+});
+
+test('mergeSummary: 件数が一致する summary だけ使い、不一致や不正なら投稿から集計', () => {
+  const ds = sampleSet();
+  const client = aggregate(ds.posts, ds.categories);
+  const byId = new Map(ds.posts.map((p) => [p.id, p]));
+  const summary = {
+    total_posts: 4, total_accounts: 3,
+    by_category: { 'ホスト': { posts: 2, impressions: 2500, likes: 6 } },
+    by_account: [{ user: 'sample_a', is_watched: false, posts: 2, impressions: 510, likes: 5 }],
+    by_day: [{ date: '2026-10-11', posts: 1, impressions: 500, likes: 5, categories: { 'ホスト': 1 } }],
+    top_posts: { by_impressions: [{ id: '3' }] },
+  };
+  const merged = mergeSummary(client, summary, byId);
+  assert.equal(merged.source, 'summary');
+  assert.equal(merged.maxImp.id, '3');
+  assert.equal(merged.impressions.unknown, 1); // 不明件数は投稿から
+  assert.equal(mergeSummary(client, { ...summary, total_posts: 99 }, byId).source, 'client');
+  assert.equal(mergeSummary(client, null, byId).source, 'client');
+  assert.equal(mergeSummary(client, { total_posts: 4 }, byId).source, 'client');
+});
+
+test('fillDays: 投稿のない日を 0 埋め、範囲外は捨てる', () => {
+  const days = fillDays([
+    { date: '2026-10-09', posts: 2, impressions: 10, likes: 1, categories: { 'ホスト': 2 } },
+    { date: '2026-10-11', posts: 1, impressions: 5, likes: 0, categories: { 'その他': 1 } },
+    { date: '2016-01-01', posts: 9, impressions: 0, likes: 0, categories: {} },
+  ], '2026-10-08', '2026-10-11');
+  assert.deepEqual(days.map((d) => [d.date, d.posts]), [['2026-10-08', 0], ['2026-10-09', 2], ['2026-10-10', 0], ['2026-10-11', 1]]);
+  assert.deepEqual(days[2].categories, {});
+  assert.equal(countBefore([{ date: '2016-01-01', posts: 9 }, { date: '2026-10-09', posts: 2 }], '2026-10-08'), 9);
+});
+
+test('chartDayRange: 期間に合わせ、「すべて」は直近90日', () => {
+  const ref = ts('2026-10-11T18:00:00+09:00');
+  assert.deepEqual(chartDayRange('all', ref), { startKey: addDays('2026-10-11', -(CHART_MAX_DAYS - 1)), endKey: '2026-10-11' });
+  assert.deepEqual(chartDayRange('7d', ref), { startKey: '2026-10-04', endKey: '2026-10-11' });
+  assert.deepEqual(chartDayRange('24h', ref), { startKey: '2026-10-10', endKey: '2026-10-11' });
+  assert.equal(fillDays([], ...Object.values(chartDayRange('all', ref))).length, 90);
+  assert.equal(chartDayRange('all', null), null);
+});
+
+test('niceTicks: 0 を含む切りのよい目盛り', () => {
+  assert.deepEqual(niceTicks(37, 4), [0, 10, 20, 30, 40]);
+  assert.deepEqual(niceTicks(0), [0, 1]);
+  assert.ok(niceTicks(3, 4).every((v) => Number.isInteger(v)));
+});
+
+// ---------------------------------------------------------------- 本文
+
+test('linkifySegments: http(s) のみ URL、末尾の句読点は含めない', () => {
+  const segs = linkifySegments('見て https://t.co/AbC123。\njavascript:alert(1) と http://example.com/a?b=1).');
+  assert.deepEqual(segs, [
+    { type: 'text', value: '見て ' },
+    { type: 'url', value: 'https://t.co/AbC123' },
+    { type: 'text', value: '。\njavascript:alert(1) と ' },
+    { type: 'url', value: 'http://example.com/a?b=1' },
+    { type: 'text', value: ').' },
+  ]);
+  assert.deepEqual(linkifySegments('<script>alert(1)</script>'), [{ type: 'text', value: '<script>alert(1)</script>' }]);
+  assert.deepEqual(linkifySegments(''), []);
+  assert.equal(isSafeHttpUrl('https://x.com/a'), true);
+  assert.equal(isSafeHttpUrl('javascript:alert(1)'), false);
+  assert.equal(isSafeHttpUrl('data:text/html,1'), false);
+});
+
+test('highlightSegments: 大文字小文字無視・長い語優先・重なりなし', () => {
+  const segs = highlightSegments('Host ホストクラブのホスト', [{ kind: 'term', terms: ['ホスト', 'ホストクラブ'] }, { kind: 'q', terms: ['host'] }]);
+  assert.deepEqual(segs, [
+    { text: 'Host', hit: true, kind: 'q' },
+    { text: ' ', hit: false },
+    { text: 'ホストクラブ', hit: true, kind: 'term' },
+    { text: 'の', hit: false },
+    { text: 'ホスト', hit: true, kind: 'term' },
+  ]);
+  // HTML はそのまま文字列として返る（DOM 側で textContent として挿入）
+  assert.deepEqual(highlightSegments('<b>x</b>', [{ kind: 'term', terms: ['x'] }]).map((s) => s.text).join(''), '<b>x</b>');
+  assert.deepEqual(highlightSegments('abc', []), [{ text: 'abc', hit: false }]);
+});
+
+// ---------------------------------------------------------------- URL 状態
+
+test('serializeState / parseState: 往復で一致し、既定値は省略', () => {
+  assert.equal(serializeState(DEFAULT_STATE), '');
+  const st = { cats: ['ホスト', 'テスト,カンマ'], period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed' };
+  const s = serializeState(st);
+  assert.deepEqual(parseState('#' + s), st);
+  assert.deepEqual(parseState('?' + s), st);
+  assert.deepEqual(parseState('period=xx&sort=yy&view=zz'), { ...DEFAULT_STATE, cats: [] });
+  assert.equal(parseState('', 'embed').view, 'embed'); // URL に無ければ保存値
+  assert.equal(parseState('view=card', 'embed').view, 'card'); // URL が優先
+  assert.equal(isFilterActive(DEFAULT_STATE), false);
+  assert.equal(isFilterActive({ view: 'embed' }), false); // 表示切替は絞り込みではない
+  assert.equal(isFilterActive({ q: '  ' }), false);
+  assert.equal(isFilterActive({ watched: true }), true);
+});
+
+// ---------------------------------------------------------------- カテゴリ色
+
+test('categorySlot: 既知は固定、未知はハッシュで決定的に予備スロットへ', () => {
+  for (const [name, slot] of Object.entries(KNOWN_CATEGORY_SLOTS)) assert.equal(categorySlot(name), slot);
+  const a = categorySlot('テスト新カテゴリ');
+  assert.ok(SPARE_SLOTS.includes(a));
+  assert.equal(categorySlot('テスト新カテゴリ'), a);
+  assert.equal(hashString('abc'), hashString('abc'));
+  assert.notEqual(hashString('abc'), hashString('abd'));
+});
+
+// ---------------------------------------------------------------- メディア・埋め込み
+
+test('isAllowedMediaUrl: https の pbs/video.twimg.com のみ', () => {
+  assert.equal(isAllowedMediaUrl('https://pbs.twimg.com/media/a.jpg'), true);
+  assert.equal(isAllowedMediaUrl('https://video.twimg.com/a.mp4'), true);
+  assert.equal(isAllowedMediaUrl('http://pbs.twimg.com/media/a.jpg'), false);
+  assert.equal(isAllowedMediaUrl('https://evil.example.com/a.jpg'), false);
+  assert.equal(isAllowedMediaUrl('https://pbs.twimg.com.evil.example/a.jpg'), false);
+  assert.equal(isAllowedMediaUrl('https://user@pbs.twimg.com/a.jpg'), false);
+  assert.equal(isAllowedMediaUrl('javascript:alert(1)'), false);
+  assert.equal(isAllowedMediaUrl(null), false);
+});
+
+test('sanitizeMedia / bestMp4: 許可外を捨て、mp4 の最高 bit_rate を選ぶ', () => {
+  const v = [
+    { content_type: 'application/x-mpegURL', url: 'https://video.twimg.com/p.m3u8' },
+    { content_type: 'video/mp4', bit_rate: 800, url: 'https://video.twimg.com/low.mp4' },
+    { content_type: 'video/mp4', bit_rate: 2000, url: 'https://video.twimg.com/high.mp4' },
+    { content_type: 'video/mp4', bit_rate: 9999, url: 'https://evil.example.com/x.mp4' },
+  ];
+  assert.equal(bestMp4(v), 'https://video.twimg.com/high.mp4');
+  assert.equal(bestMp4([v[0]]), null);
+  const m = sanitizeMedia([
+    { type: 'photo', url: 'https://pbs.twimg.com/1.jpg', alt_text: 'a', width: 10, height: 5 },
+    { type: 'photo', url: 'https://evil.example.com/2.jpg' },
+    { type: 'video', preview_image_url: 'https://pbs.twimg.com/t.jpg', variants: v },
+    { type: 'animated_gif', preview_image_url: 'javascript:alert(1)', variants: [] },
+    { type: 'unknown', url: 'https://pbs.twimg.com/x.jpg' },
+    null,
+  ]);
+  assert.deepEqual(m, [
+    { type: 'photo', url: 'https://pbs.twimg.com/1.jpg', width: 10, height: 5, alt: 'a' },
+    { type: 'video', preview: 'https://pbs.twimg.com/t.jpg', video: 'https://video.twimg.com/high.mp4', width: null, height: null, alt: '' },
+  ]);
+  const five = Array.from({ length: 5 }, (_, i) => ({ type: 'photo', url: `https://pbs.twimg.com/${i}.jpg` }));
+  assert.equal(sanitizeMedia(five).length, 4);
+  assert.deepEqual(sanitizeMedia(undefined), []);
+  assert.deepEqual(sanitizeMedia('x'), []);
+});
+
+test('embedTweetId: 数字の id を優先し、無ければ URL から', () => {
+  assert.equal(embedTweetId({ id: '1844674407370955161' }), '1844674407370955161');
+  assert.equal(embedTweetId({ id: 'abc', url: 'https://x.com/a/status/123?s=20' }), '123');
+  assert.equal(embedTweetId({ id: 'abc', url: 'https://x.com/a' }), null);
+});
+
+// ---------------------------------------------------------------- サンプルデータ
+
+test('sample/posts.json: 仕様どおりで検証ケースを含む', () => {
+  const raw = JSON.parse(readFileSync(new URL('../sample/posts.json', import.meta.url), 'utf8'));
+  const summary = JSON.parse(readFileSync(new URL('../sample/summary.json', import.meta.url), 'utf8'));
+  const ds = normalizeDataset(raw);
+  assert.ok(ds.posts.length >= 1400 && ds.posts.length <= 1600);
+  assert.ok(ds.categories.includes('テスト新カテゴリ'));
+  assert.ok(raw.posts.every((p) => typeof p.id === 'string' && p.user.startsWith('sample_') && p.text.startsWith('【サンプル】')));
+  assert.ok(raw.posts.some((p) => p.is_watched));
+  assert.ok(raw.posts.some((p) => /^【サンプル】\s*https:\/\/t\.co\/\S+$/.test(p.text) && p.categories.includes('その他')));
+  assert.ok(raw.posts.some((p) => p.created_jst && p.created_jst.startsWith('2016')));
+  assert.ok(raw.posts.some((p) => p.text.includes('<script>')));
+  assert.ok(raw.posts.some((p) => p.text.includes('onerror')));
+  assert.ok(raw.posts.some((p) => p.metrics && p.metrics.impression_count === null));
+  assert.ok(raw.posts.some((p) => !p.metrics || !('bookmark_count' in p.metrics)));
+  assert.ok(raw.posts.some((p) => Array.isArray(p.media) && p.media.some((m) => m.type === 'video')));
+  assert.equal(summary.total_posts, raw.posts.length);
+  // summary の件数とクライアント集計が一致
+  const agg = aggregate(ds.posts, ds.categories);
+  for (const c of agg.byCategory) assert.equal(summary.by_category[c.name].posts, c.posts, c.name);
+  assert.equal(summary.total_accounts, agg.totalAccounts);
+});

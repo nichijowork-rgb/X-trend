@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- 通信先は自サイトのみ。例外は「X埋め込み」選択時の platform.twitter.com と、X の画像・動画ドメイン（pbs/video.twimg.com）。
+       widgets.js が iframe に style 属性を付けるため style-src に 'unsafe-inline' を許可（本文は常に textContent で挿入） -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark light">
+  <title>Xレポート ダッシュボード</title>
+  <meta name="description" content="X の夜職・歌舞伎町まわりの投稿をカテゴリ別に閲覧する静的ダッシュボード">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0712'/%3E%3Cpath d='M8 22l5-7 4 4 7-10' fill='none' stroke='%23ff4fae' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/dashboard.css">
+  <script src="assets/js/theme-init.js"></script>
+  <script type="module" src="assets/dashboard.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#posts-heading">投稿一覧へスキップ</a>
+
+  <div id="sample-banner" class="sample-banner" role="status" hidden>
+    <strong>サンプルデータを表示中（data/ が見つかりません）</strong>
+    <span id="sample-reason" class="sample-reason"></span>
+  </div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <h1 class="title"><span class="title-neon">Xレポート</span> ダッシュボード</h1>
+        <dl class="meta">
+          <div><dt>最終更新</dt><dd id="meta-generated">—</dd></div>
+          <div><dt>データ期間</dt><dd id="meta-period">—</dd></div>
+          <div><dt>期間の基準</dt><dd id="meta-ref" title="期間フィルタ（24時間/7日/30日）はデータ内の最新投稿時刻を基準にしています">—</dd></div>
+        </dl>
+      </div>
+      <button type="button" id="theme-toggle" class="btn btn-ghost theme-toggle" aria-label="表示テーマを切り替え">
+        <span class="theme-icon" aria-hidden="true"></span><span id="theme-label">自動</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" aria-busy="true">
+    <div id="loading" class="state-box" role="status">読み込み中…</div>
+
+    <section id="error" class="state-box state-error" hidden aria-live="assertive">
+      <h2>データを読み込めませんでした</h2>
+      <p id="error-detail" class="muted"></p>
+      <button type="button" id="reload" class="btn btn-primary">再読み込み</button>
+    </section>
+
+    <div id="app" hidden>
+      <!-- サマリー -->
+      <section class="cards" aria-labelledby="summary-heading">
+        <h2 id="summary-heading" class="sr-only">サマリー</h2>
+        <article class="card stat">
+          <h3 class="stat-label">総投稿数</h3>
+          <p class="stat-value" id="stat-posts">—</p>
+          <p class="stat-sub" id="stat-posts-sub"></p>
+        </article>
+        <article class="card stat">
+          <h3 class="stat-label">アカウント数</h3>
+          <p class="stat-value" id="stat-accounts">—</p>
+          <p class="stat-sub" id="stat-accounts-sub"></p>
+        </article>
+        <article class="card stat">
+          <h3 class="stat-label">合計インプレッション</h3>
+          <p class="stat-value" id="stat-imp">—</p>
+          <p class="stat-sub" id="stat-imp-sub"></p>
+        </article>
+        <article class="card stat stat-top">
+          <h3 class="stat-label">最大インプレッションの投稿</h3>
+          <div id="stat-top"></div>
+        </article>
+      </section>
+      <p class="source-note muted" id="source-note"></p>
+
+      <!-- フィルタ -->
+      <section class="card filters" aria-labelledby="filter-heading">
+        <div class="filters-head">
+          <h2 id="filter-heading" class="section-title">絞り込み</h2>
+          <p class="result-count" id="result-count" aria-live="polite"></p>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label" id="cat-label">カテゴリ<span class="hint">（複数選択でOR）</span></span>
+          <div class="chips" id="cat-chips" role="group" aria-labelledby="cat-label"></div>
+        </div>
+
+        <div class="filter-grid">
+          <div class="field">
+            <span class="filter-label" id="period-label">期間</span>
+            <div class="segmented" id="period-group" role="group" aria-labelledby="period-label"></div>
+          </div>
+          <div class="field">
+            <label class="filter-label" for="q">キーワード<span class="hint">（スペース区切りでAND）</span></label>
+            <input id="q" class="input" type="search" inputmode="search" autocomplete="off" placeholder="例: 指名 歌舞伎町">
+          </div>
+          <div class="field">
+            <label class="filter-label" for="user">アカウント</label>
+            <input id="user" class="input" type="search" list="user-list" autocomplete="off" placeholder="ユーザー名（@なし）" spellcheck="false">
+            <datalist id="user-list"></datalist>
+          </div>
+          <div class="field">
+            <label class="filter-label" for="sort">並び替え</label>
+            <select id="sort" class="input"></select>
+          </div>
+          <div class="field">
+            <span class="filter-label" id="view-label">表示</span>
+            <div class="segmented" id="view-group" role="group" aria-labelledby="view-label"></div>
+          </div>
+          <div class="field field-check">
+            <label class="check">
+              <input id="watched" type="checkbox">
+              <span>監視アカウントのみ</span>
+            </label>
+          </div>
+          <div class="field field-reset">
+            <button type="button" id="reset" class="btn btn-ghost">条件をクリア</button>
+          </div>
+        </div>
+        <p class="embed-notice" id="embed-notice" hidden>
+          <span>埋め込み表示はXのサーバーから読み込みます（X側のCookie等が使われる場合があります）</span>
+          <button type="button" class="notice-close" id="embed-notice-close" aria-label="この注記を閉じる">×</button>
+        </p>
+      </section>
+
+      <!-- グラフ -->
+      <section class="charts" aria-labelledby="charts-heading">
+        <h2 id="charts-heading" class="sr-only">グラフ</h2>
+        <article class="card chart-card">
+          <h3 class="chart-title">カテゴリ別の件数</h3>
+          <p class="chart-sub muted">複数カテゴリの投稿は各カテゴリに計上</p>
+          <div class="chart" id="chart-cat-posts"></div>
+        </article>
+        <article class="card chart-card">
+          <h3 class="chart-title">カテゴリ別のインプレッション</h3>
+          <p class="chart-sub muted" id="chart-cat-imp-sub">既知の値の合計</p>
+          <div class="chart" id="chart-cat-imp"></div>
+        </article>
+        <article class="card chart-card chart-wide">
+          <h3 class="chart-title">日別の投稿数（カテゴリ別の積み上げ）</h3>
+          <p class="chart-sub muted" id="chart-day-sub"></p>
+          <div class="legend" id="chart-day-legend"></div>
+          <div class="chart chart-day" id="chart-day"></div>
+          <details class="table-view">
+            <summary>表で見る</summary>
+            <div class="table-scroll" id="chart-day-table"></div>
+          </details>
+        </article>
+      </section>
+
+      <!-- 一覧 -->
+      <div class="lower">
+        <section class="card accounts" aria-labelledby="acc-heading">
+          <div class="section-head">
+            <h2 id="acc-heading" class="section-title">上位アカウント</h2>
+            <div class="segmented segmented-sm" id="acct-group" role="group" aria-label="上位アカウントの並び順"></div>
+          </div>
+          <p class="muted small">クリックでそのアカウントに絞り込み</p>
+          <ol class="acc-list" id="acc-list"></ol>
+        </section>
+
+        <section class="posts" aria-labelledby="posts-heading">
+          <div class="section-head">
+            <h2 id="posts-heading" class="section-title" tabindex="-1">投稿</h2>
+            <p class="muted small" id="posts-count"></p>
+          </div>
+          <div id="active-filters" class="active-filters"></div>
+          <ol class="post-list" id="post-list"></ol>
+          <p class="empty" id="posts-empty" hidden>条件に合う投稿はありません</p>
+          <div class="more-wrap">
+            <button type="button" id="more" class="btn btn-ghost" hidden>さらに表示</button>
+            <div id="sentinel" aria-hidden="true"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer wrap">
+    <p class="muted small">データ: <code>data/posts.json</code>・<code>data/summary.json</code>（別botが自動更新）。このページ自体は外部へデータを送信せず、Cookie も使いません（「X埋め込み」表示と添付メディアは X のサーバーから読み込みます）。</p>
+  </footer>
+
+  <dialog id="lightbox" class="lightbox" aria-label="画像の拡大表示">
+    <div class="lb-body">
+      <img alt="">
+      <p class="lb-error" hidden>画像を読み込めませんでした</p>
+      <p class="lb-caption" hidden></p>
+    </div>
+    <button type="button" class="lb-close btn" aria-label="閉じる（Esc）">閉じる ×</button>
+  </dialog>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <noscript><p class="state-box">このページの表示には JavaScript が必要です。</p></noscript>
+</body>
+</html>
