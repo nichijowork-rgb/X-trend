@@ -24,10 +24,10 @@ export const PERIODS = [
 
 export const SORTS = [
   { key: 'new', label: '新しい順', metric: null },
-  { key: 'imp', label: 'インプレッション', metric: 'impression_count' },
-  { key: 'like', label: 'いいね', metric: 'like_count' },
-  { key: 'bookmark', label: 'ブックマーク', metric: 'bookmark_count' },
-  { key: 'pace', label: '伸びペース（1時間あたり表示）', metric: null, pace: true },
+  { key: 'imp', label: '表示回数が多い順', metric: 'impression_count' },
+  { key: 'like', label: 'いいねが多い順', metric: 'like_count' },
+  { key: 'bookmark', label: 'ブックマークが多い順', metric: 'bookmark_count' },
+  { key: 'pace', label: '伸びペースが速い順（1時間あたり表示）', metric: null, pace: true },
 ];
 
 export const ACCOUNT_SORTS = [
