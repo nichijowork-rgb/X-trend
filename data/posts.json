@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T00:32:31+09:00",
+ "generated_at": "2026-10-12T06:45:21+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -11,6 +11,29 @@
  ],
  "posts": [
   {
+   "id": "2109315682173427863",
+   "url": "https://x.com/tkzwgrs/status/2109315682173427863",
+   "user": "tkzwgrs",
+   "created_utc": "2026-10-11T16:10:22Z",
+   "created_jst": "2026-10-12T01:10:22+09:00",
+   "ts": 1791735022,
+   "metrics": {
+    "impression_count": 520030,
+    "like_count": 3149,
+    "retweet_count": 261,
+    "reply_count": 16,
+    "quote_count": 16,
+    "bookmark_count": 428
+   },
+   "text": "【朗報】江の島で以前ちいかわを鳥に奪われた韓国人女性、江の島を再訪するも過去から学んで今度はちいかわをがっちりホールドする\nhttps://t.co/Ir3QWEOyft https://t.co/pmldHriXcT",
+   "categories": [
+    "その他",
+    "監視アカウント"
+   ],
+   "matched_terms": [],
+   "is_watched": true
+  },
+  {
    "id": "2109289637076422662",
    "url": "https://x.com/SAK_SAK_SAKUMA/status/2109289637076422662",
    "user": "SAK_SAK_SAKUMA",
@@ -18,12 +41,12 @@
    "created_jst": "2026-10-11T23:26:52+09:00",
    "ts": 1791728812,
    "metrics": {
-    "impression_count": 167411,
-    "like_count": 17756,
+    "impression_count": 325684,
+    "like_count": 31684,
     "retweet_count": null,
-    "reply_count": 662,
-    "quote_count": 216,
-    "bookmark_count": 508
+    "reply_count": 722,
+    "quote_count": 249,
+    "bookmark_count": 739
    },
    "text": "パパの膝の上でくつろいでるツナくん https://t.co/FJFEBDfkRu",
    "categories": [
@@ -48,8 +71,7 @@
    "in_reports": true,
    "report_refs": [
     "rising"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2109286282954461418",
@@ -59,12 +81,12 @@
    "created_jst": "2026-10-11T23:13:33+09:00",
    "ts": 1791728013,
    "metrics": {
-    "impression_count": 221035,
-    "like_count": 18615,
+    "impression_count": 368741,
+    "like_count": 27367,
     "retweet_count": null,
-    "reply_count": 1005,
-    "quote_count": 395,
-    "bookmark_count": 435
+    "reply_count": 1061,
+    "quote_count": 420,
+    "bookmark_count": 589
    },
    "text": "初めてのホルモンカレー作り。\n成功！\n\n#佐久間のドタバタクッキング https://t.co/L7H4WNSsZj",
    "categories": [
@@ -89,8 +111,7 @@
    "in_reports": true,
    "report_refs": [
     "rising"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2109285178187428069",
@@ -100,12 +121,12 @@
    "created_jst": "2026-10-11T23:09:09+09:00",
    "ts": 1791727749,
    "metrics": {
-    "impression_count": 232252,
-    "like_count": 7429,
+    "impression_count": 875168,
+    "like_count": 18704,
     "retweet_count": null,
-    "reply_count": 2,
-    "quote_count": 46,
-    "bookmark_count": 656
+    "reply_count": 11,
+    "quote_count": 90,
+    "bookmark_count": 1739
    },
    "text": "和田さん登場🥲🥲🥲\n認知されてて喜ぶ山本しぬWWWWWWW\n\n#VIVANT #悪役会議室 https://t.co/xkjHzzumKB",
    "categories": [
@@ -145,8 +166,7 @@
    "in_reports": true,
    "report_refs": [
     "rising"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2109281328554467587",
@@ -156,12 +176,12 @@
    "created_jst": "2026-10-11T22:53:51+09:00",
    "ts": 1791726831,
    "metrics": {
-    "impression_count": 154756,
-    "like_count": 3180,
+    "impression_count": 290234,
+    "like_count": 5284,
     "retweet_count": null,
-    "reply_count": 5,
-    "quote_count": 16,
-    "bookmark_count": 88
+    "reply_count": 8,
+    "quote_count": 18,
+    "bookmark_count": 149
    },
    "text": "🇯🇵 鎌田大地に待望のプレミア初ゴール！⚽\n\nノッティンガム・フォレスト戦の41分、日本代表 MF 鎌田大地のゴールでクリスタル・パレスが同点に追いつく！\n\nゴール前で細かくパスをつなぐと、最後は鎌田が左足で上手く押し込みネットを揺らした！\n\n🎥：@UNEXT_football https://t.co/EpzA5iGe0i",
    "categories": [
@@ -372,12 +392,12 @@
    "created_jst": "2026-10-11T22:00:04+09:00",
    "ts": 1791723604,
    "metrics": {
-    "impression_count": 412013,
-    "like_count": 7071,
+    "impression_count": 610593,
+    "like_count": 10013,
     "retweet_count": null,
-    "reply_count": 4,
-    "quote_count": 59,
-    "bookmark_count": 615
+    "reply_count": 5,
+    "quote_count": 74,
+    "bookmark_count": 866
    },
    "text": "顔ボコボコでも黒須がイケメンだと見抜く千里眼チョッキーに、メロメロブルーウォーカーに嫉妬する東条に最後お母さんの怒りにふれて恋愛カオス😅\n#VIVANT #VIVANTep20 https://t.co/SCtiQJT1cN",
    "categories": [
@@ -774,6 +794,28 @@
    "is_watched": false
   },
   {
+   "id": "2109255914176102794",
+   "url": "https://x.com/recta_erabi/status/2109255914176102794",
+   "user": "recta_erabi",
+   "created_utc": "2026-10-11T12:12:52Z",
+   "created_jst": "2026-10-11T21:12:52+09:00",
+   "ts": 1791720772,
+   "metrics": {
+    "impression_count": 610148,
+    "like_count": 703,
+    "retweet_count": null,
+    "reply_count": 9,
+    "quote_count": 2,
+    "bookmark_count": 107
+   },
+   "text": "本日のラストコールジャッジ‼️かえでさんの変顔レベル高いwww https://t.co/iANawpTM0Y",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2109252832599904576",
    "url": "https://x.com/MToriofficial/status/2109252832599904576",
    "user": "MToriofficial",
@@ -781,12 +823,12 @@
    "created_jst": "2026-10-11T21:00:37+09:00",
    "ts": 1791720037,
    "metrics": {
-    "impression_count": 401815,
-    "like_count": 28552,
+    "impression_count": 480946,
+    "like_count": 33965,
     "retweet_count": null,
-    "reply_count": 200,
-    "quote_count": 83,
-    "bookmark_count": 113
+    "reply_count": 217,
+    "quote_count": 87,
+    "bookmark_count": 150
    },
    "text": "VIVANT 20\nあっという間に20話です。\n果たしてどんな結末を迎えるのか… https://t.co/2CQqvkz1Nd",
    "categories": [
@@ -807,12 +849,12 @@
    "created_jst": "2026-10-11T20:36:10+09:00",
    "ts": 1791718570,
    "metrics": {
-    "impression_count": 492564,
-    "like_count": 5376,
+    "impression_count": 668196,
+    "like_count": 7537,
     "retweet_count": null,
-    "reply_count": 17,
-    "quote_count": 33,
-    "bookmark_count": 299
+    "reply_count": 22,
+    "quote_count": 43,
+    "bookmark_count": 444
    },
    "text": "【発見】“名探偵津田”が幕を開けた「オールスター感謝祭」、エンドロールにまさかの名前\nhttps://t.co/hVFdQsWcFf\n\nエンドロールには「倉田規行」の名前が。彼はこれまで「名探偵津田」が開幕すると、スタジオに現れ事件の隠蔽工作を企てる、いわゆる物語世界「1の世界」に住む謎のプロデューサー。 https://t.co/Ig6MlE0EO1",
    "categories": [
@@ -841,12 +883,12 @@
    "created_jst": "2026-10-11T20:22:44+09:00",
    "ts": 1791717764,
    "metrics": {
-    "impression_count": 458730,
-    "like_count": 28159,
+    "impression_count": 627238,
+    "like_count": 33958,
     "retweet_count": null,
-    "reply_count": 401,
-    "quote_count": 245,
-    "bookmark_count": 557
+    "reply_count": 446,
+    "quote_count": 295,
+    "bookmark_count": 719
    },
    "text": "憧れていたオールスター感謝祭に大好きなAKB48として頑張れる環境をいただけて、なんて素敵な状況だろう！と思っていました😭これまでの出会いが呼んだ奇跡だね😭\n\n私に詳しくない方も名前を呼んでくださったり声をかけてくださったりして嬉しかった！！！\n\n私を、AKB48を見つけてくれてありがとう🌟🤍 https://t.co/Z9J0G6sjRi",
    "categories": [
@@ -868,6 +910,28 @@
    ]
   },
   {
+   "id": "2109235306381901920",
+   "url": "https://x.com/1okukure_/status/2109235306381901920",
+   "user": "1okukure_",
+   "created_utc": "2026-10-11T10:50:59Z",
+   "created_jst": "2026-10-11T19:50:59+09:00",
+   "ts": 1791715859,
+   "metrics": {
+    "impression_count": 2107612,
+    "like_count": 5173,
+    "retweet_count": null,
+    "reply_count": 71,
+    "quote_count": 65,
+    "bookmark_count": 468
+   },
+   "text": "ひめかちゃん次元違いすぎてすごい https://t.co/NAWFNqNdoj",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2109228263436366136",
    "url": "https://x.com/livedoornews/status/2109228263436366136",
    "user": "livedoornews",
@@ -875,12 +939,12 @@
    "created_jst": "2026-10-11T19:23:00+09:00",
    "ts": 1791714180,
    "metrics": {
-    "impression_count": 351082,
-    "like_count": 3035,
+    "impression_count": 382116,
+    "like_count": 3261,
     "retweet_count": null,
-    "reply_count": 162,
-    "quote_count": 222,
-    "bookmark_count": 142
+    "reply_count": 174,
+    "quote_count": 228,
+    "bookmark_count": 160
    },
    "text": "【騒然】敗退の巨人ナインに一部ファンが大ブーイング\nhttps://t.co/zgD0q1KE2h\n\nCSセ・ファーストS・第2戦で、巨人はDeNAに2連敗を喫し敗退。ファイナルS進出はならなかった。巨人ナインが試合後にすると、拍手も響いたが敗退に納得がいかない右翼席のファンからはブーイングも巻き起こった。 https://t.co/TVNV7Q3grX",
    "categories": [
@@ -970,6 +1034,50 @@
      "height": 1536
     }
    ]
+  },
+  {
+   "id": "2109219851403493876",
+   "url": "https://x.com/existence_213_/status/2109219851403493876",
+   "user": "existence_213_",
+   "created_utc": "2026-10-11T09:49:34Z",
+   "created_jst": "2026-10-11T18:49:34+09:00",
+   "ts": 1791712174,
+   "metrics": {
+    "impression_count": 2655583,
+    "like_count": 43680,
+    "retweet_count": 3892,
+    "reply_count": 142,
+    "quote_count": 2117,
+    "bookmark_count": 4608
+   },
+   "text": "みんな今絶対池袋来た方がいい https://t.co/8tnofZKNLc",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2109217785901715681",
+   "url": "https://x.com/i_melody_you/status/2109217785901715681",
+   "user": "i_melody_you",
+   "created_utc": "2026-10-11T09:41:22Z",
+   "created_jst": "2026-10-11T18:41:22+09:00",
+   "ts": 1791711682,
+   "metrics": {
+    "impression_count": 11365443,
+    "like_count": 224621,
+    "retweet_count": 24244,
+    "reply_count": 240,
+    "quote_count": 2269,
+    "bookmark_count": 13506
+   },
+   "text": "江ノ島🧏🏻‍♀️ https://t.co/vZgxHekbBa",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2109214523215446179",
@@ -1103,6 +1211,30 @@
    ]
   },
   {
+   "id": "2109191972862984447",
+   "url": "https://x.com/kipa_4/status/2109191972862984447",
+   "user": "kipa_4",
+   "created_utc": "2026-10-11T07:58:47Z",
+   "created_jst": "2026-10-11T16:58:47+09:00",
+   "ts": 1791705527,
+   "metrics": {
+    "impression_count": 3590966,
+    "like_count": 2599,
+    "retweet_count": null,
+    "reply_count": 66,
+    "quote_count": 32,
+    "bookmark_count": 600
+   },
+   "text": "黒人スカウトがトー横キッズに催涙スプレーをかけられる→顔面が火傷したと思い込む→救急隊員にひたすら火傷してると主張→搬送 https://t.co/jZ4nQKN8Ck",
+   "categories": [
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "トー横"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2109189955344093598",
    "url": "https://x.com/osaka_sirokichi/status/2109189955344093598",
    "user": "osaka_sirokichi",
@@ -1154,12 +1286,12 @@
    "created_jst": "2026-10-11T16:25:44+09:00",
    "ts": 1791703544,
    "metrics": {
-    "impression_count": 357401,
-    "like_count": 2275,
-    "retweet_count": null,
-    "reply_count": 345,
-    "quote_count": 102,
-    "bookmark_count": 782
+    "impression_count": 986109,
+    "like_count": 5627,
+    "retweet_count": 415,
+    "reply_count": 824,
+    "quote_count": 231,
+    "bookmark_count": 1920
    },
    "text": "入店してから5分後くらいの出来事\nタブレット使えへんと言われ、バイトの子が親切に対応していた\nその後に店主に向かってモダン焼きできんのか？と言われたので\n言動注意したら逆ギレ\n金払わんと帰ろうとするし誰にゆうとんねんやらカスコラ連呼\nウチはそーゆー店やし注意書きも書いてんのにな https://t.co/4tSSHKL8MB",
    "categories": [
@@ -1205,12 +1337,12 @@
    "created_jst": "2026-10-11T16:16:31+09:00",
    "ts": 1791702991,
    "metrics": {
-    "impression_count": 488710,
-    "like_count": 1235,
+    "impression_count": 600294,
+    "like_count": 1568,
     "retweet_count": null,
-    "reply_count": 11,
-    "quote_count": 7,
-    "bookmark_count": 248
+    "reply_count": 13,
+    "quote_count": 8,
+    "bookmark_count": 296
    },
    "text": "まりりんが言ってるのってこれかな？確かにアンチコメあった。なんか相当ストレス溜まってそうな感じだね… https://t.co/J1VdX30sf2",
    "categories": [
@@ -1535,6 +1667,34 @@
    "is_watched": false
   },
   {
+   "id": "2109163625642606693",
+   "url": "https://x.com/yorusyokuhost/status/2109163625642606693",
+   "user": "yorusyokuhost",
+   "created_utc": "2026-10-11T06:06:09Z",
+   "created_jst": "2026-10-11T15:06:09+09:00",
+   "ts": 1791698769,
+   "metrics": {
+    "impression_count": 1429889,
+    "like_count": 2020,
+    "retweet_count": 154,
+    "reply_count": 95,
+    "quote_count": 44,
+    "bookmark_count": 535
+   },
+   "text": "【エルコレ・クラブLeoからの声明発表】\n【某胸糞事件該当店舗】\n\n2026.10.11\n関係者各位\n\nいつもclubLeoを応援していただき、誠にありがとうございます。\n\n突然のご報告となりますが、この度、店所属の平良翔太が2026年9月30日をもちまして、clubLeoを退店いたしました。 https://t.co/cIzab6CrjQ",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "平良翔太",
+    "エルコレ",
+    "club leo",
+    "report:ホスト",
+    "topic:平良翔太さんの退店・引退"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2109162630808207729",
    "url": "https://x.com/bakausapipi2/status/2109162630808207729",
    "user": "bakausapipi2",
@@ -1542,16 +1702,17 @@
    "created_jst": "2026-10-11T15:02:12+09:00",
    "ts": 1791698532,
    "metrics": {
-    "impression_count": 519311,
-    "like_count": 1497,
+    "impression_count": 573960,
+    "like_count": 1684,
     "retweet_count": null,
-    "reply_count": 40,
-    "quote_count": 43,
-    "bookmark_count": 156
+    "reply_count": 41,
+    "quote_count": 49,
+    "bookmark_count": 174
    },
    "text": "【歌舞伎町有名ホスト平良翔太が自身の在籍退店を公表】 https://t.co/SKaHoIrf3i",
    "categories": [
-    "ホスト"
+    "ホスト",
+    "監視アカウント"
    ],
    "matched_terms": [
     "ホスト 歌舞伎町",
@@ -1562,7 +1723,7 @@
     "report:ホスト",
     "topic:平良翔太さんの退店・引退"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -1580,12 +1741,12 @@
    "created_jst": "2026-10-11T15:00:02+09:00",
    "ts": 1791698402,
    "metrics": {
-    "impression_count": 4448822,
-    "like_count": 5612,
+    "impression_count": 4824350,
+    "like_count": 6229,
     "retweet_count": null,
-    "reply_count": 147,
-    "quote_count": 151,
-    "bookmark_count": 1246
+    "reply_count": 154,
+    "quote_count": 162,
+    "bookmark_count": 1339
    },
    "text": "坂口杏里のストーリーがだいぶ切羽詰まりすぎてる\nいまは歌舞伎町のデ〇ヘルに在籍してるらしい https://t.co/9v8GXVBxJo",
    "categories": [
@@ -1616,6 +1777,28 @@
      "height": 1671
     }
    ]
+  },
+  {
+   "id": "2109162077202076002",
+   "url": "https://x.com/Alchemy_0ari_/status/2109162077202076002",
+   "user": "Alchemy_0ari_",
+   "created_utc": "2026-10-11T06:00:00Z",
+   "created_jst": "2026-10-11T15:00:00+09:00",
+   "ts": 1791698400,
+   "metrics": {
+    "impression_count": 5832962,
+    "like_count": 36358,
+    "retweet_count": null,
+    "reply_count": 232,
+    "quote_count": 1114,
+    "bookmark_count": 2114
+   },
+   "text": "成人式の時期になると現れる勘違い男マジで好き https://t.co/8rwJkIEZaB",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2109161984919023737",
@@ -1871,12 +2054,12 @@
    "created_jst": "2026-10-11T13:33:56+09:00",
    "ts": 1791693236,
    "metrics": {
-    "impression_count": 804088,
-    "like_count": 814,
-    "retweet_count": null,
+    "impression_count": 851055,
+    "like_count": 852,
+    "retweet_count": 92,
     "reply_count": 0,
-    "quote_count": 137,
-    "bookmark_count": 142
+    "quote_count": 142,
+    "bookmark_count": 145
    },
    "text": "【関係者各位】\nhttps://t.co/AP1vq6HAZH",
    "categories": [
@@ -2120,6 +2303,31 @@
    ],
    "matched_terms": [
     "風俗"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2109111245895004194",
+   "url": "https://x.com/nigeyama369/status/2109111245895004194",
+   "user": "nigeyama369",
+   "created_utc": "2026-10-11T02:38:01Z",
+   "created_jst": "2026-10-11T11:38:01+09:00",
+   "ts": 1791686281,
+   "metrics": {
+    "impression_count": 911129,
+    "like_count": 1159,
+    "retweet_count": null,
+    "reply_count": 18,
+    "quote_count": 3,
+    "bookmark_count": 258
+   },
+   "text": "10年でこんなに変わったの？\n\n←平成キャバ嬢　　　　令和キャバ嬢→ https://t.co/QYWHH1br6F",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false
   },
@@ -2380,6 +2588,31 @@
    ]
   },
   {
+   "id": "2109094278869991457",
+   "url": "https://x.com/kousannoai517/status/2109094278869991457",
+   "user": "kousannoai517",
+   "created_utc": "2026-10-11T01:30:35Z",
+   "created_jst": "2026-10-11T10:30:35+09:00",
+   "ts": 1791682235,
+   "metrics": {
+    "impression_count": 896384,
+    "like_count": 3806,
+    "retweet_count": null,
+    "reply_count": 6,
+    "quote_count": 28,
+    "bookmark_count": 277
+   },
+   "text": "これ見せられて、この子に金落としてるキャバクラの客、凄いね、、、 https://t.co/9N0EwazIv1",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバクラ",
+    "キャバ"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2109093343091466414",
    "url": "https://x.com/tkzwgrs/status/2109093343091466414",
    "user": "tkzwgrs",
@@ -2435,6 +2668,28 @@
      "height": 1920
     }
    ]
+  },
+  {
+   "id": "2109091613175881748",
+   "url": "https://x.com/kiko_kabu/status/2109091613175881748",
+   "user": "kiko_kabu",
+   "created_utc": "2026-10-11T01:20:00Z",
+   "created_jst": "2026-10-11T10:20:00+09:00",
+   "ts": 1791681600,
+   "metrics": {
+    "impression_count": 504160,
+    "like_count": 629,
+    "retweet_count": null,
+    "reply_count": 54,
+    "quote_count": 33,
+    "bookmark_count": 153
+   },
+   "text": "前のお店について\n私の席で起きた出来事ですが、\nヘルプのキャストが言い出したことがきっかけです。\n私からクビにしてくださいとお店側に告げました。\n\nジャングルについて\nお店側と話し合いをした上で退店させていだくことになりました。 https://t.co/6lmovZ3kqk",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2109088879076905051",
@@ -2527,12 +2782,12 @@
    "created_jst": "2026-10-11T09:53:22+09:00",
    "ts": 1791680002,
    "metrics": {
-    "impression_count": 2778421,
-    "like_count": 4353,
+    "impression_count": 2914260,
+    "like_count": 4605,
     "retweet_count": null,
-    "reply_count": 292,
-    "quote_count": 488,
-    "bookmark_count": 823
+    "reply_count": 303,
+    "quote_count": 506,
+    "bookmark_count": 875
    },
    "text": "【衝撃】\n元六本木のキャバ嬢さん、特殊器具を使って一日に4回スパナでネジネジして2ヶ月で身長を+3.7cm伸ばす。\n\nさすがに、面構えが違う。 https://t.co/HmmNURURD0",
    "categories": [
@@ -2612,6 +2867,28 @@
    "is_watched": false
   },
   {
+   "id": "2109069843114955186",
+   "url": "https://x.com/misakinurse1997/status/2109069843114955186",
+   "user": "misakinurse1997",
+   "created_utc": "2026-10-10T23:53:29Z",
+   "created_jst": "2026-10-11T08:53:29+09:00",
+   "ts": 1791676409,
+   "metrics": {
+    "impression_count": 1627793,
+    "like_count": 7885,
+    "retweet_count": 1330,
+    "reply_count": 140,
+    "quote_count": 125,
+    "bookmark_count": 937
+   },
+   "text": "夜勤の休憩中に懲戒解雇のヤバさについて話してたんだけど、やめたあとが怖い😨\n\n①退職金ゼロ（もしかしたら損害賠償）\n②離職票に重責解雇って書かれる\n③履歴書で隠すと経歴詐称\n④再就職先探しが難しくなる\n\n普通に辞めたひと、何人も見てきたけど、懲戒解雇の本当の恐ろしさって辞めた後なのよー https://t.co/AjmcR4OA3l",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2109062428915060771",
    "url": "https://x.com/8u07wx/status/2109062428915060771",
    "user": "8u07wx",
@@ -2619,12 +2896,12 @@
    "created_jst": "2026-10-11T08:24:02+09:00",
    "ts": 1791674642,
    "metrics": {
-    "impression_count": 829034,
-    "like_count": 4314,
-    "retweet_count": 237,
-    "reply_count": 47,
-    "quote_count": 111,
-    "bookmark_count": 716
+    "impression_count": 1621017,
+    "like_count": 5528,
+    "retweet_count": null,
+    "reply_count": 51,
+    "quote_count": 129,
+    "bookmark_count": 967
    },
    "text": "ジャングル銀座きこさんについて\n衝撃の情報が回ってきました\nキャストの個人情報漏洩して\n太客に横取りしていたのか\n\nキャバ嬢って怖いね https://t.co/GUCVYhyC2F",
    "categories": [
@@ -2645,6 +2922,28 @@
      "height": 886
     }
    ]
+  },
+  {
+   "id": "2109051773696745975",
+   "url": "https://x.com/REX_TwiHai/status/2109051773696745975",
+   "user": "REX_TwiHai",
+   "created_utc": "2026-10-10T22:41:41Z",
+   "created_jst": "2026-10-11T07:41:41+09:00",
+   "ts": 1791672101,
+   "metrics": {
+    "impression_count": 3086454,
+    "like_count": 7540,
+    "retweet_count": 686,
+    "reply_count": 80,
+    "quote_count": 68,
+    "bookmark_count": 2384
+   },
+   "text": "これが整形を繰り返すサイボーグ女の人生の末路。顔の整形をする前に考え方の整形をしなさい。自分の顔と身体をいじって誰かと比べて幸福度が高まると思う？他人と比べている限り、幸せにはなれないよ。整形なんてするな！ちゃんと飯を食え！筋トレしろ！水たくさん飲め！内側から綺麗にしろ！！ https://t.co/kCNphavDrn https://t.co/YDcctCqbu5",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2109049430574034964",
@@ -2897,12 +3196,12 @@
    "created_jst": "2026-10-11T02:43:37+09:00",
    "ts": 1791654217,
    "metrics": {
-    "impression_count": 443687,
-    "like_count": 7729,
-    "retweet_count": null,
-    "reply_count": 231,
-    "quote_count": 232,
-    "bookmark_count": 443
+    "impression_count": 456432,
+    "like_count": 8182,
+    "retweet_count": 1007,
+    "reply_count": 242,
+    "quote_count": 245,
+    "bookmark_count": 461
    },
    "text": "オタク趣味を間違っていると断じる中年の言う「正しい趣味」ってなんだ？\n\n酒や風俗やパチンコか？w",
    "categories": [
@@ -3584,12 +3883,12 @@
    "created_jst": "2026-10-10T23:18:20+09:00",
    "ts": 1791641900,
    "metrics": {
-    "impression_count": 2378892,
-    "like_count": 8482,
-    "retweet_count": 136,
-    "reply_count": 71,
+    "impression_count": 2484832,
+    "like_count": 8612,
+    "retweet_count": null,
+    "reply_count": 72,
     "quote_count": 72,
-    "bookmark_count": 542
+    "bookmark_count": 549
    },
    "text": "ルナちゃん、10/31をもってCLUB NILSを卒業。『夜の街に「るな」の名前は置いていきます』って意味深すぎる。約8年間のキャバ嬢人生に幕を下ろすのか、本名「みみな」として新しい道に進むのか、それとも水揚げなのか。卒業イベントもなく、次の活動も未定。人気絶頂での決断、今後の動きが気になる。 https://t.co/uNGwQ2AmK1",
    "categories": [
@@ -3732,12 +4031,12 @@
    "created_jst": "2026-10-10T22:19:27+09:00",
    "ts": 1791638367,
    "metrics": {
-    "impression_count": 6627573,
-    "like_count": 22206,
-    "retweet_count": 718,
-    "reply_count": 193,
-    "quote_count": 262,
-    "bookmark_count": 3815
+    "impression_count": 6711929,
+    "like_count": 22467,
+    "retweet_count": null,
+    "reply_count": 194,
+    "quote_count": 267,
+    "bookmark_count": 3850
    },
    "text": "【話題】世界的ボクサーさん、日本のキャバクラにハマる\n\n🇺🇸ライアン・ガルシア(28)\n・現WBC世界ウェルター級王者\n・インスタフォロワー1350万人の世界的スター\n→何故か日本のキャバクラにハマってシャンパンを入れまくる姿が目撃される\n\n(六本木LIRIC TOKYOの桜伊みやこさんを推している模様) https://t.co/NwRKV42gYa",
    "categories": [
@@ -3786,12 +4085,12 @@
    "created_jst": "2026-10-10T22:10:50+09:00",
    "ts": 1791637850,
    "metrics": {
-    "impression_count": 2442727,
-    "like_count": 10830,
-    "retweet_count": 107,
+    "impression_count": 2469529,
+    "like_count": 11053,
+    "retweet_count": null,
     "reply_count": 11,
-    "quote_count": 100,
-    "bookmark_count": 717
+    "quote_count": 101,
+    "bookmark_count": 721
    },
    "text": "TikTokで猪俣ホストしてるって書いてる人多いんだけどどこか気になり過ぎてやばい",
    "categories": [
@@ -3811,12 +4110,12 @@
    "created_jst": "2026-10-10T22:02:46+09:00",
    "ts": 1791637366,
    "metrics": {
-    "impression_count": 1656823,
-    "like_count": 4011,
-    "retweet_count": 57,
-    "reply_count": 25,
-    "quote_count": 63,
-    "bookmark_count": 322
+    "impression_count": 1704099,
+    "like_count": 4082,
+    "retweet_count": null,
+    "reply_count": 26,
+    "quote_count": 65,
+    "bookmark_count": 325
    },
    "text": "ルナちゃんのニルス卒業報告にルネもいいねしてる。もしや水揚げ…！？ https://t.co/j0hUU52CHW https://t.co/rDXtFoTtZ0",
    "categories": [
@@ -3874,12 +4173,12 @@
    "created_jst": "2026-10-10T21:47:08+09:00",
    "ts": 1791636428,
    "metrics": {
-    "impression_count": 5253523,
-    "like_count": 11628,
-    "retweet_count": 213,
+    "impression_count": 5422709,
+    "like_count": 11670,
+    "retweet_count": null,
     "reply_count": 54,
-    "quote_count": 243,
-    "bookmark_count": 825
+    "quote_count": 244,
+    "bookmark_count": 827
    },
    "text": "ルナちゃんニルス卒業だって！キャバ嬢も辞めちゃうのかな… https://t.co/YoOvdwjSSE",
    "categories": [
@@ -3913,6 +4212,28 @@
      "height": 1570
     }
    ]
+  },
+  {
+   "id": "2108901784421011510",
+   "url": "https://x.com/shinu___444/status/2108901784421011510",
+   "user": "shinu___444",
+   "created_utc": "2026-10-10T12:45:41Z",
+   "created_jst": "2026-10-10T21:45:41+09:00",
+   "ts": 1791636341,
+   "metrics": {
+    "impression_count": 2456380,
+    "like_count": 4374,
+    "retweet_count": null,
+    "reply_count": 11,
+    "quote_count": 24,
+    "bookmark_count": 456
+   },
+   "text": "薄々察してましたが、これ https://t.co/7YkcnH0Bip",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2108900111782994317",
@@ -4199,12 +4520,12 @@
    "created_jst": "2026-10-10T20:32:08+09:00",
    "ts": 1791631928,
    "metrics": {
-    "impression_count": 2683321,
-    "like_count": 38848,
-    "retweet_count": 1410,
+    "impression_count": 2763109,
+    "like_count": 39872,
+    "retweet_count": null,
     "reply_count": 58,
-    "quote_count": 406,
-    "bookmark_count": 1002
+    "quote_count": 416,
+    "bookmark_count": 1035
    },
    "text": "仁川国際空港にいるダウンタイム中のホスト\n\n#地味ハロウィン　#地味ハロ\n#地味ハロウィン2026 https://t.co/thSGpqVG3E",
    "categories": [
@@ -4229,6 +4550,28 @@
      "height": 2048
     }
    ]
+  },
+  {
+   "id": "2108877676136235506",
+   "url": "https://x.com/HarukiKai0628/status/2108877676136235506",
+   "user": "HarukiKai0628",
+   "created_utc": "2026-10-10T11:09:53Z",
+   "created_jst": "2026-10-10T20:09:53+09:00",
+   "ts": 1791630593,
+   "metrics": {
+    "impression_count": 1814346,
+    "like_count": 7039,
+    "retweet_count": null,
+    "reply_count": 90,
+    "quote_count": 112,
+    "bookmark_count": 1722
+   },
+   "text": "「10億貯金」19歳の荻野目ちゃんの金銭感覚と恋愛観がバグってたwww https://t.co/hirJ3OuHZs",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2108877462105137385",
@@ -4357,12 +4700,12 @@
    "created_jst": "2026-10-10T18:53:24+09:00",
    "ts": 1791626004,
    "metrics": {
-    "impression_count": 608490,
-    "like_count": 1675,
-    "retweet_count": 166,
-    "reply_count": 8,
+    "impression_count": 613356,
+    "like_count": 1727,
+    "retweet_count": null,
+    "reply_count": 7,
     "quote_count": 6,
-    "bookmark_count": 341
+    "bookmark_count": 351
    },
    "text": "ここ十年で相場が半額になり、供給過多で文字通り世界を股にかけて〇春してるのは女さんはホンマキモいんだわ…\n\nそして夜職女どころか昼職女ですら求められなくなってるのが現実、真面目に現実見た方がええで https://t.co/iITMIs3qgE https://t.co/VrPdkq96jj",
    "categories": [
@@ -4408,12 +4751,12 @@
    "created_jst": "2026-10-10T18:50:41+09:00",
    "ts": 1791625841,
    "metrics": {
-    "impression_count": 776022,
-    "like_count": 1636,
+    "impression_count": 781051,
+    "like_count": 1641,
     "retweet_count": null,
     "reply_count": 45,
-    "quote_count": 98,
-    "bookmark_count": 396
+    "quote_count": 99,
+    "bookmark_count": 397
    },
    "text": "まおちゃるの整形\n\n・骨延長2ヶ月で+3.7cm\n・肋骨折ってくびれ形成\n・目の下に眼窩プレート入れて奥目解消\n・その他部位に1800万円\n\n全部、確実に可愛くなる選択。\n可愛さに一切妥協しない女、強い。 https://t.co/rIJpEfyhnA",
    "categories": [
@@ -4512,10 +4855,11 @@
    },
    "text": "【悲報】ルッキズム文化さん、中学生の輪郭3点・ウエストサイズ・足の太さにまで侵食する\n\n平成は目が二重かどうかしかみんな気にしていなかったのに、爆美女のデータが数値化された為に、令和時代はJCの目鼻顔の大きさ体型まで全てが比較し競い合う時代へと突入した。 https://t.co/q71n7VEiOr",
    "categories": [
-    "その他"
+    "その他",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -4672,6 +5016,31 @@
    ]
   },
   {
+   "id": "2108834307913748748",
+   "url": "https://x.com/ellbe4fv/status/2108834307913748748",
+   "user": "ellbe4fv",
+   "created_utc": "2026-10-10T08:17:33Z",
+   "created_jst": "2026-10-10T17:17:33+09:00",
+   "ts": 1791620253,
+   "metrics": {
+    "impression_count": 2628562,
+    "like_count": 8085,
+    "retweet_count": null,
+    "reply_count": 31,
+    "quote_count": 193,
+    "bookmark_count": 2011
+   },
+   "text": "ホストコール見てたらびっくりした笑 https://t.co/HDikqcz6uS",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2108832343087849579",
    "url": "https://x.com/hmweum/status/2108832343087849579",
    "user": "hmweum",
@@ -4807,16 +5176,17 @@
    "created_jst": "2026-10-10T16:24:57+09:00",
    "ts": 1791617097,
    "metrics": {
-    "impression_count": 2783605,
-    "like_count": 12611,
-    "retweet_count": 540,
+    "impression_count": 2816870,
+    "like_count": 12710,
+    "retweet_count": null,
     "reply_count": 294,
-    "quote_count": 695,
-    "bookmark_count": 3823
+    "quote_count": 703,
+    "bookmark_count": 3825
    },
    "text": "有名キャバ嬢の荻野ちゃん本当に19歳？\nこの気の強さは将来大物になるのかそれとも苦労するか😂\n\nお顔可愛いけど黒服への罵倒シーン見てたら将来がちょっと心配になったよ私はww https://t.co/dAbV7iHAos",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "監視アカウント"
    ],
    "matched_terms": [
     "キャバ嬢",
@@ -4824,7 +5194,7 @@
     "黒服",
     "report:キャバクラ"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "video",
@@ -4861,6 +5231,28 @@
    ]
   },
   {
+   "id": "2108819584753299944",
+   "url": "https://x.com/tantolovesuki/status/2108819584753299944",
+   "user": "tantolovesuki",
+   "created_utc": "2026-10-10T07:19:03Z",
+   "created_jst": "2026-10-10T16:19:03+09:00",
+   "ts": 1791616743,
+   "metrics": {
+    "impression_count": 874686,
+    "like_count": 2735,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 66,
+    "bookmark_count": 345
+   },
+   "text": "全然好きじゃなかった頃のストーリー草 https://t.co/LjnIxJUkuV",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2108819058443649451",
    "url": "https://x.com/kangminlee/status/2108819058443649451",
    "user": "kangminlee",
@@ -4881,6 +5273,77 @@
    ],
    "matched_terms": [],
    "is_watched": false
+  },
+  {
+   "id": "2108811974071218410",
+   "url": "https://x.com/dzazqx/status/2108811974071218410",
+   "user": "dzazqx",
+   "created_utc": "2026-10-10T06:48:49Z",
+   "created_jst": "2026-10-10T15:48:49+09:00",
+   "ts": 1791614929,
+   "metrics": {
+    "impression_count": 908479,
+    "like_count": 6438,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 31,
+    "bookmark_count": 532
+   },
+   "text": "体調不良で休み続けて飛ぶんだよ🎶時給4000円ごときの夜職（笑）でまともに辞めようとするやついるんだ https://t.co/NIkxvcCW8D",
+   "categories": [
+    "キャバクラ",
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "quote:キャバ",
+    "夜職"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2108810977684979965",
+   "url": "https://x.com/nxvorz/status/2108810977684979965",
+   "user": "nxvorz",
+   "created_utc": "2026-10-10T06:44:51Z",
+   "created_jst": "2026-10-10T15:44:51+09:00",
+   "ts": 1791614691,
+   "metrics": {
+    "impression_count": 818351,
+    "like_count": 6218,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 62,
+    "bookmark_count": 336
+   },
+   "text": "パンピなのに出勤ツイート意味わからん https://t.co/YlE6fy9sak",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108802557263110153",
+   "url": "https://x.com/super_sachico/status/2108802557263110153",
+   "user": "super_sachico",
+   "created_utc": "2026-10-10T06:11:23Z",
+   "created_jst": "2026-10-10T15:11:23+09:00",
+   "ts": 1791612683,
+   "metrics": {
+    "impression_count": 1229385,
+    "like_count": 3165,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 0,
+    "bookmark_count": 543
+   },
+   "text": "↓リアちゃん本人はこう言ってるけど、\nXで「星乃リア」って検索すると、この世の終わりみたいな光景しか広がってないんよ…。\n活動名の変更はガチで検討した方が良さそう😵‍💫 https://t.co/wCzxEcQhWP https://t.co/6Z8QEMbCr9",
+   "categories": [
+    "その他",
+    "監視アカウント"
+   ],
+   "matched_terms": [],
+   "is_watched": true
   },
   {
    "id": "2108799691118747704",
@@ -4953,6 +5416,29 @@
     "夜職"
    ],
    "is_watched": false
+  },
+  {
+   "id": "2108789130868248880",
+   "url": "https://x.com/super_sachico/status/2108789130868248880",
+   "user": "super_sachico",
+   "created_utc": "2026-10-10T05:18:02Z",
+   "created_jst": "2026-10-10T14:18:02+09:00",
+   "ts": 1791609482,
+   "metrics": {
+    "impression_count": 1329836,
+    "like_count": 324,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 9,
+    "bookmark_count": 135
+   },
+   "text": "【🔥速報🔥】ラストコール・星乃リア《メイクレシピ更新》❣️\n\nリオのアカウントと併せて、インスタ動き始めた……そろそろ《復帰》⁉️\n\n新規客しばらくつかないほうがいいかも…と勝手に心配🙏 https://t.co/2TRifFsl6G",
+   "categories": [
+    "その他",
+    "監視アカウント"
+   ],
+   "matched_terms": [],
+   "is_watched": true
   },
   {
    "id": "2108774165620883505",
@@ -5028,6 +5514,30 @@
    "is_watched": false
   },
   {
+   "id": "2108756491931115663",
+   "url": "https://x.com/pjohinanaaa/status/2108756491931115663",
+   "user": "pjohinanaaa",
+   "created_utc": "2026-10-10T03:08:21Z",
+   "created_jst": "2026-10-10T12:08:21+09:00",
+   "ts": 1791601701,
+   "metrics": {
+    "impression_count": 844606,
+    "like_count": 2791,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 22,
+    "bookmark_count": 352
+   },
+   "text": "夜職の客おぢ(歯科医院の院長)のクリニックで昼に歯科医師として勤務することになったのガチでウケる。もはや何でも屋。 https://t.co/7V8h9r5C7h",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "夜職"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2108756112573083798",
    "url": "https://x.com/t77VQkZKDzLpvdz/status/2108756112573083798",
    "user": "t77VQkZKDzLpvdz",
@@ -5043,6 +5553,28 @@
     "bookmark_count": 383
    },
    "text": "【速報】「女子枠問題」に新展開。\n「女子枠総長問題」に続き、ついに芝浦工業大学が女子枠の一部を廃止すると発表した。「目的達成」を理由としているが、実際にはSNSでの強い反発や、学内の反対団体の要請を受けての決定だ。",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108743643775574264",
+   "url": "https://x.com/workouteating/status/2108743643775574264",
+   "user": "workouteating",
+   "created_utc": "2026-10-10T02:17:17Z",
+   "created_jst": "2026-10-10T11:17:17+09:00",
+   "ts": 1791598637,
+   "metrics": {
+    "impression_count": 2781693,
+    "like_count": 3524,
+    "retweet_count": null,
+    "reply_count": 173,
+    "quote_count": 67,
+    "bookmark_count": 302
+   },
+   "text": "ローランドはおそらくパンプ後で\n盛れた写真使ってる\n\n右はノーパンプで盛れないスタジオ\n\nローランドの方が流石にデカいかもしれんけど\n同じ条件で並んだら大して変わらんぞ\n\n笑っちゃいけないレベルの差だよ https://t.co/N51i581neQ",
    "categories": [
     "その他"
    ],
@@ -5069,6 +5601,53 @@
     "その他"
    ],
    "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108740322872508447",
+   "url": "https://x.com/revine86/status/2108740322872508447",
+   "user": "revine86",
+   "created_utc": "2026-10-10T02:04:06Z",
+   "created_jst": "2026-10-10T11:04:06+09:00",
+   "ts": 1791597846,
+   "metrics": {
+    "impression_count": 4358726,
+    "like_count": 28196,
+    "retweet_count": null,
+    "reply_count": 13,
+    "quote_count": 76,
+    "bookmark_count": 29464
+   },
+   "text": "やっとけよマジで。\n闇市に個人情報はもう流れとる。\nあとはそれを使って乗っ取りにくるからな https://t.co/TekyCewP41",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108721827547918760",
+   "url": "https://x.com/ee_ee_3/status/2108721827547918760",
+   "user": "ee_ee_3",
+   "created_utc": "2026-10-10T00:50:36Z",
+   "created_jst": "2026-10-10T09:50:36+09:00",
+   "ts": 1791593436,
+   "metrics": {
+    "impression_count": 9644213,
+    "like_count": 20535,
+    "retweet_count": null,
+    "reply_count": 265,
+    "quote_count": 692,
+    "bookmark_count": 3401
+   },
+   "text": "일본 최고 호스트 롤랜드 얼굴만봐도 일본 여성들이 안타까움… https://t.co/M0PRN2Lk8u https://t.co/llm4jMTHQv",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "quote:ホスト",
+    "quote:ホストコール"
+   ],
    "is_watched": false
   },
   {
@@ -5247,6 +5826,30 @@
      "height": 720
     }
    ]
+  },
+  {
+   "id": "2108705234281533527",
+   "url": "https://x.com/Ortho_FL/status/2108705234281533527",
+   "user": "Ortho_FL",
+   "created_utc": "2026-10-09T23:44:40Z",
+   "created_jst": "2026-10-10T08:44:40+09:00",
+   "ts": 1791589480,
+   "metrics": {
+    "impression_count": 3653090,
+    "like_count": 34294,
+    "retweet_count": null,
+    "reply_count": 95,
+    "quote_count": 194,
+    "bookmark_count": 1099
+   },
+   "text": "そこそこ整形外科医やってるけれど、松葉杖にファーつけてる人初めて見て感動している https://t.co/M7WMQnd54Y",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "quote:ジャングル東京"
+   ],
+   "is_watched": false
   },
   {
    "id": "2108702339884552384",
@@ -5457,6 +6060,30 @@
    "is_watched": false
   },
   {
+   "id": "2108606527942828361",
+   "url": "https://x.com/p_izapa_n/status/2108606527942828361",
+   "user": "p_izapa_n",
+   "created_utc": "2026-10-09T17:12:26Z",
+   "created_jst": "2026-10-10T02:12:26+09:00",
+   "ts": 1791565946,
+   "metrics": {
+    "impression_count": 5176138,
+    "like_count": 6923,
+    "retweet_count": null,
+    "reply_count": 128,
+    "quote_count": 243,
+    "bookmark_count": 1808
+   },
+   "text": "病気でお酒が飲めなくなったので辞めると言った途端これなんですけど\n泣き寝入りするしかない感じですか？\n地方のキャバなので時給4000円で契約してたのですが最低賃金の1231円になりそうです…😔 https://t.co/pl3hFQ0wdN",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2108600387964129436",
    "url": "https://x.com/nantokanarumaji/status/2108600387964129436",
    "user": "nantokanarumaji",
@@ -5479,6 +6106,28 @@
     "キャバクラ",
     "キャバ"
    ],
+   "is_watched": false
+  },
+  {
+   "id": "2108572711496892480",
+   "url": "https://x.com/takano_hiroshi/status/2108572711496892480",
+   "user": "takano_hiroshi",
+   "created_utc": "2026-10-09T14:58:04Z",
+   "created_jst": "2026-10-09T23:58:04+09:00",
+   "ts": 1791557884,
+   "metrics": {
+    "impression_count": 2577389,
+    "like_count": 43575,
+    "retweet_count": null,
+    "reply_count": 9,
+    "quote_count": 284,
+    "bookmark_count": 58437
+   },
+   "text": "これ、わかりやすかったです\n\nhttps://t.co/7CFobMl8az",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
    "is_watched": false
   },
   {
@@ -5701,12 +6350,12 @@
    "created_jst": "2026-10-09T19:58:14+09:00",
    "ts": 1791543494,
    "metrics": {
-    "impression_count": 3008623,
-    "like_count": 6267,
-    "retweet_count": 703,
+    "impression_count": 3012381,
+    "like_count": 6274,
+    "retweet_count": null,
     "reply_count": 110,
-    "quote_count": 348,
-    "bookmark_count": 1423
+    "quote_count": 350,
+    "bookmark_count": 1419
    },
    "text": "歌舞伎町の激安物件🌙\n\n歌舞伎町2丁目に80000万円で住めるとか安くない？\n\n現地見に行ってみたらまじでびっくり！\n\nなんとラブホの入り口の廊下を抜けないとマンションのエントランスに辿り着けない導線\n\nこんなの初めてみたよ衝撃！\n\n1年くらい住んでみようかな？ https://t.co/CdeTljQX2d",
    "categories": [
@@ -5806,6 +6455,32 @@
    ]
   },
   {
+   "id": "2108510091112792430",
+   "url": "https://x.com/_chiaki_310/status/2108510091112792430",
+   "user": "_chiaki_310",
+   "created_utc": "2026-10-09T10:49:14Z",
+   "created_jst": "2026-10-09T19:49:14+09:00",
+   "ts": 1791542954,
+   "metrics": {
+    "impression_count": 575983,
+    "like_count": 1391,
+    "retweet_count": null,
+    "reply_count": 9,
+    "quote_count": 292,
+    "bookmark_count": 139
+   },
+   "text": "【緊急告知】\nホストコール第13話に出演した千秋です！\n\nこの度、10月10日から「CANDY DIAMOND」でレギュラーとして働くことになりました！🙇‍♂️\n\nお店の方々とたくさん話し合い、ここで成長し、目標であるホストの頂点を目指したいと思い、入店を決めました。 https://t.co/8pCWegf60z",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホストの",
+    "ホスト",
+    "ホストコール"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2108502816394502153",
    "url": "https://x.com/ryuhei_blog/status/2108502816394502153",
    "user": "ryuhei_blog",
@@ -5855,6 +6530,28 @@
      "height": 720
     }
    ]
+  },
+  {
+   "id": "2108498879058792563",
+   "url": "https://x.com/canyong_1000000/status/2108498879058792563",
+   "user": "canyong_1000000",
+   "created_utc": "2026-10-09T10:04:41Z",
+   "created_jst": "2026-10-09T19:04:41+09:00",
+   "ts": 1791540281,
+   "metrics": {
+    "impression_count": 2340750,
+    "like_count": 16429,
+    "retweet_count": null,
+    "reply_count": 80,
+    "quote_count": 39,
+    "bookmark_count": 469
+   },
+   "text": "超びっくりした🥹💦\n\nこの間社美緒さんに会ったから\nツーショットお願いしたんだけど、\n\nカメラ構えたら📷\n急にしゃがみ込んじゃったの💦\n\nきゃにょんが可愛すぎて\n照れたのかも？💗 https://t.co/NjVgxHq5kz https://t.co/MNERQDMqnd",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2108486183584166341",
@@ -5916,12 +6613,12 @@
    "created_jst": "2026-10-09T17:44:14+09:00",
    "ts": 1791535454,
    "metrics": {
-    "impression_count": 32673054,
-    "like_count": 74762,
-    "retweet_count": 2458,
+    "impression_count": 32682601,
+    "like_count": 74764,
+    "retweet_count": null,
     "reply_count": 781,
-    "quote_count": 3439,
-    "bookmark_count": 7790
+    "quote_count": 3440,
+    "bookmark_count": 7786
    },
    "text": "ホストコールのホストさん達の実物とパッケージの比較。 https://t.co/bLqsKtPctd",
    "categories": [
@@ -5968,12 +6665,12 @@
    "created_jst": "2026-10-09T17:14:26+09:00",
    "ts": 1791533666,
    "metrics": {
-    "impression_count": 1256809,
+    "impression_count": 1259386,
     "like_count": 3470,
-    "retweet_count": 274,
+    "retweet_count": null,
     "reply_count": 230,
     "quote_count": 344,
-    "bookmark_count": 797
+    "bookmark_count": 796
    },
    "text": "ホストコールのホストさん達の実物とパッケージの比較。\n\n鼻整形＋貴族プロテ、目の下のクマ取り、オトガイ形成、フェイスリフト＋ベイザー脂肪吸引などの顔課金でよくある引き攣れがとても顕著だ。\n\n実物の方はよりミドル世代に親近感を得られるビジュアルだ。 https://t.co/AUUYi4lM8o",
    "categories": [
@@ -6011,6 +6708,28 @@
      "height": 1280
     }
    ]
+  },
+  {
+   "id": "2108467599101313431",
+   "url": "https://x.com/nyu_____00/status/2108467599101313431",
+   "user": "nyu_____00",
+   "created_utc": "2026-10-09T08:00:23Z",
+   "created_jst": "2026-10-09T17:00:23+09:00",
+   "ts": 1791532823,
+   "metrics": {
+    "impression_count": 3305040,
+    "like_count": 21865,
+    "retweet_count": null,
+    "reply_count": 18,
+    "quote_count": 111,
+    "bookmark_count": 2334
+   },
+   "text": "これマジ、さすがに盲点だったと思う。 https://t.co/yM2HQm8HR9 https://t.co/CJKz4zqlp4",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2108457934812557572",
@@ -6066,22 +6785,23 @@
    "created_jst": "2026-10-09T16:12:57+09:00",
    "ts": 1791529977,
    "metrics": {
-    "impression_count": 1145451,
-    "like_count": 3630,
-    "retweet_count": 223,
-    "reply_count": 219,
-    "quote_count": 264,
-    "bookmark_count": 644
+    "impression_count": 1148401,
+    "like_count": 3631,
+    "retweet_count": null,
+    "reply_count": 218,
+    "quote_count": 266,
+    "bookmark_count": 642
    },
    "text": "【悲報】ホストコールのメンバーさん、パネマジ率100%で事故る\n\n鼻整形＋貴族手術、人中縮小、輪郭骨切り、糸リフト＋脂肪吸引の影響なのか、明るいスタジオで動いている様子に全員違和感を感じる。\n\n粗雑な美容外科でアプデしているのか、流石につっこまざるを得ない。 https://t.co/TqkFPER0Xb",
    "categories": [
-    "ホスト"
+    "ホスト",
+    "監視アカウント"
    ],
    "matched_terms": [
     "ホスト",
     "ホストコール"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -6137,6 +6857,28 @@
    "is_watched": false
   },
   {
+   "id": "2108440911198003677",
+   "url": "https://x.com/DenBeivis0344/status/2108440911198003677",
+   "user": "DenBeivis0344",
+   "created_utc": "2026-10-09T06:14:20Z",
+   "created_jst": "2026-10-09T15:14:20+09:00",
+   "ts": 1791526460,
+   "metrics": {
+    "impression_count": 8441488,
+    "like_count": 161973,
+    "retweet_count": null,
+    "reply_count": 282,
+    "quote_count": 673,
+    "bookmark_count": 4956
+   },
+   "text": "群馬の億って日本円でなんぼなん？ https://t.co/vTw4mZZPjt",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2108429751602098338",
    "url": "https://x.com/shota201907/status/2108429751602098338",
    "user": "shota201907",
@@ -6156,6 +6898,32 @@
     "その他"
    ],
    "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108429591438381161",
+   "url": "https://x.com/tea_jay1d/status/2108429591438381161",
+   "user": "tea_jay1d",
+   "created_utc": "2026-10-09T05:29:21Z",
+   "created_jst": "2026-10-09T14:29:21+09:00",
+   "ts": 1791523761,
+   "metrics": {
+    "impression_count": 819944,
+    "like_count": 3193,
+    "retweet_count": null,
+    "reply_count": 9,
+    "quote_count": 27,
+    "bookmark_count": 192
+   },
+   "text": "モエとかヴーヴとか１本もなくて、ベルエとかクリュッグが最下段で安物扱い受けてる世界線怖い https://t.co/OvAWoyX5wY",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "quote:嬢 シャンパン"
+   ],
    "is_watched": false
   },
   {
@@ -6213,6 +6981,52 @@
    ]
   },
   {
+   "id": "2108422204132372568",
+   "url": "https://x.com/KxeSHkstW453827/status/2108422204132372568",
+   "user": "KxeSHkstW453827",
+   "created_utc": "2026-10-09T05:00:00Z",
+   "created_jst": "2026-10-09T14:00:00+09:00",
+   "ts": 1791522000,
+   "metrics": {
+    "impression_count": 2061604,
+    "like_count": 5423,
+    "retweet_count": null,
+    "reply_count": 27,
+    "quote_count": 27,
+    "bookmark_count": 1025
+   },
+   "text": "【ゆいぴす、エースグループ全員を引き連れて溝口の番組を降りてた】\n\n凄いなゆいぴすww\n\nエースグループも全力でゆいぴすを守りに行く姿勢は流石\n\nそんだけ徹底して拒否るって\n\nあのマンジャロの一件で結局何があったんだよ　笑 https://t.co/f3jlKdnH9E",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2108419607241646280",
+   "url": "https://x.com/shitsuji_juto/status/2108419607241646280",
+   "user": "shitsuji_juto",
+   "created_utc": "2026-10-09T04:49:41Z",
+   "created_jst": "2026-10-09T13:49:41+09:00",
+   "ts": 1791521381,
+   "metrics": {
+    "impression_count": 747040,
+    "like_count": 1697,
+    "retweet_count": null,
+    "reply_count": 4,
+    "quote_count": 13,
+    "bookmark_count": 201
+   },
+   "text": "またノーコールが増えましたね https://t.co/wOfKjACjDD https://t.co/BSfW7TtzL6",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2108406932411502901",
    "url": "https://x.com/ori_newsroom2/status/2108406932411502901",
    "user": "ori_newsroom2",
@@ -6220,12 +7034,12 @@
    "created_jst": "2026-10-09T12:59:19+09:00",
    "ts": 1791518359,
    "metrics": {
-    "impression_count": 505020,
+    "impression_count": 507338,
     "like_count": 1061,
-    "retweet_count": 44,
+    "retweet_count": null,
     "reply_count": 12,
     "quote_count": 53,
-    "bookmark_count": 353
+    "bookmark_count": 354
    },
    "text": "【熱愛】\n\nハーレム　樹里\n真島なおみ\n\n説明\nハッカーの姫が発狂。\nジュッリジュリにされた模様。\n末長くお幸せにしてください。 https://t.co/u1BMhph8Ne https://t.co/TGU0nqRQXt",
    "categories": [
@@ -6325,9 +7139,9 @@
    "created_jst": "2026-10-09T12:50:01+09:00",
    "ts": 1791517801,
    "metrics": {
-    "impression_count": 898800,
+    "impression_count": 899716,
     "like_count": 1215,
-    "retweet_count": 97,
+    "retweet_count": null,
     "reply_count": 8,
     "quote_count": 35,
     "bookmark_count": 292
@@ -6537,13 +7351,14 @@
    },
    "text": "【🔥悲報🔥】鈴音りん、一条響を《煽りまくる》⁉️\n\nさすがに喧嘩売ってるだろ….😅\n\n激サムだし共感性羞恥えぐい。\n本人たちは面白いと思ってるのかな😅\n\nゆいぴすといい、ネチネチしすぎでは😖\n\n響ちゃんからしたら、ただただ不快だと思うし、よく大先輩にこんなことできるなぁ…。 https://t.co/FeDSfhLjbe",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "監視アカウント"
    ],
    "matched_terms": [
     "一条響",
     "ゆいぴす"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -6628,13 +7443,14 @@
    },
    "text": "ゆいぴす「溝口🫘⚫︎だほうがいい」\n↓\n溝口「陰湿。さすがに一線超えすぎ」\n\nまた、ミゾがヤマトリノに「説教する」って言ったポストのスクショ撮って、周りに送りまくったらしい。\n\nいつまでもネチネチ粘着しすぎだし、そういうことするから、またLINE晒されるんでしょ🤦‍♀️💫 https://t.co/nuKQ33qJmV",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "監視アカウント"
    ],
    "matched_terms": [
     "ゆいぴす",
     "ヤマトリノ"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "video",
@@ -6735,6 +7551,28 @@
    ]
   },
   {
+   "id": "2108301213364318350",
+   "url": "https://x.com/yukichdaisukis2/status/2108301213364318350",
+   "user": "yukichdaisukis2",
+   "created_utc": "2026-10-08T20:59:14Z",
+   "created_jst": "2026-10-09T05:59:14+09:00",
+   "ts": 1791493154,
+   "metrics": {
+    "impression_count": 6600095,
+    "like_count": 77505,
+    "retweet_count": null,
+    "reply_count": 396,
+    "quote_count": 685,
+    "bookmark_count": 1902
+   },
+   "text": "ガリガリの刺青ってキモいな https://t.co/3llgcaonwD",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2108245200728670407",
    "url": "https://x.com/ayaseaoi0627/status/2108245200728670407",
    "user": "ayaseaoi0627",
@@ -6742,9 +7580,9 @@
    "created_jst": "2026-10-09T02:16:39+09:00",
    "ts": 1791479799,
    "metrics": {
-    "impression_count": 865000,
-    "like_count": 1154,
-    "retweet_count": 25,
+    "impression_count": 869409,
+    "like_count": 1156,
+    "retweet_count": null,
     "reply_count": 67,
     "quote_count": 37,
     "bookmark_count": 84
@@ -6777,6 +7615,7 @@
     "監視アカウント"
    ],
    "matched_terms": [
+    "quote:ジャングル東京",
     "manual"
    ],
    "is_watched": true,
@@ -6794,6 +7633,52 @@
      "height": 1708
     }
    ]
+  },
+  {
+   "id": "2108192598485823972",
+   "url": "https://x.com/lastcall_krnk/status/2108192598485823972",
+   "user": "lastcall_krnk",
+   "created_utc": "2026-10-08T13:47:38Z",
+   "created_jst": "2026-10-08T22:47:38+09:00",
+   "ts": 1791467258,
+   "metrics": {
+    "impression_count": 5354933,
+    "like_count": 3128,
+    "retweet_count": null,
+    "reply_count": 190,
+    "quote_count": 261,
+    "bookmark_count": 891
+   },
+   "text": "「筋トレを大学2年から続けてます」と言った田中くん、脱いだ瞬間にROLANDが崩れ落ちるwww\n\n田中くん「僕自身、筋トレを大学2年生のときから続けてます」\n↓\n戦神「あなたが口だけの人間か、僕らでは分からなくなってしまっている。見せてくださいとかできますか？」\n↓\n田中くん「できます」\n↓ https://t.co/Y6cGClN2E1 https://t.co/5Sj7LZfLiL",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108191753966903777",
+   "url": "https://x.com/lastcall_krnk/status/2108191753966903777",
+   "user": "lastcall_krnk",
+   "created_utc": "2026-10-08T13:44:17Z",
+   "created_jst": "2026-10-08T22:44:17+09:00",
+   "ts": 1791467057,
+   "metrics": {
+    "impression_count": 719016,
+    "like_count": 58,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 3,
+    "bookmark_count": 15
+   },
+   "text": "明日花キララ「なんで23年間で一度も新幹線に乗ったことないんですか？」→田中くんの答えにROLANDが崩れるwww\n\n明日花キララ「ちょっと怖いなって思ったことがありまして」\n↓\n明日花キララ「なんで23年間で一度も新幹線に乗ったことはないんでしょうか？」\n↓\nスタジオ「確かに怖い」\n↓ https://t.co/6CbEocphIZ https://t.co/EX0jKWCjnw",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "quote:ホスト"
+   ],
+   "is_watched": false
   },
   {
    "id": "2108191484096954428",
@@ -6874,10 +7759,11 @@
    },
    "text": "は？？？意味不明 https://t.co/rWKV124LMP",
    "categories": [
-    "その他"
+    "その他",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -6886,6 +7772,30 @@
      "height": 150
     }
    ]
+  },
+  {
+   "id": "2108177159957422157",
+   "url": "https://x.com/m_b_d_f_00/status/2108177159957422157",
+   "user": "m_b_d_f_00",
+   "created_utc": "2026-10-08T12:46:17Z",
+   "created_jst": "2026-10-08T21:46:17+09:00",
+   "ts": 1791463577,
+   "metrics": {
+    "impression_count": 9142830,
+    "like_count": 10496,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 420,
+    "bookmark_count": 805
+   },
+   "text": "まってジャングル東京るいちゃん\n六本木でボコられたって……怖…… https://t.co/aTWExHzhBI",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "ジャングル東京"
+   ],
+   "is_watched": false
   },
   {
    "id": "2108175266157830505",
@@ -6946,6 +7856,28 @@
     "bookmark_count": 94
    },
    "text": "第一興商も約872万件個人情報流出きたか。\n今年マジで半端じゃないよな。\n個人情報無修正AV時代に突入してる。",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2108169806457577870",
+   "url": "https://x.com/yuhi03_04/status/2108169806457577870",
+   "user": "yuhi03_04",
+   "created_utc": "2026-10-08T12:17:04Z",
+   "created_jst": "2026-10-08T21:17:04+09:00",
+   "ts": 1791461824,
+   "metrics": {
+    "impression_count": 781679,
+    "like_count": 437,
+    "retweet_count": null,
+    "reply_count": 20,
+    "quote_count": 22,
+    "bookmark_count": 52
+   },
+   "text": "HOST CALL第15話に出演させて頂いた、田中友陽（たなかゆうひ）です。\n\nこの番組に出るために僕は28回の応募をしました。\n何回も僕は応募をするにつれてもう出れないんだ、応募しても意味ないんだと何回も心が折れかけました。\nでもその都度溝口さんにもらった言葉を思い出して毎日応募しました。 https://t.co/lLCeUZx5cb",
    "categories": [
     "その他"
    ],
@@ -7276,10 +8208,11 @@
    },
    "text": "絶対引くに引けなくなってて草 https://t.co/gF0AB0Uigj",
    "categories": [
-    "その他"
+    "その他",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -7306,10 +8239,11 @@
    },
    "text": "義務教育の敗北とかってレベルじゃないだろこれwww https://t.co/PzCRv414NU",
    "categories": [
-    "その他"
+    "その他",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -7677,9 +8611,9 @@
    "created_jst": "2026-10-08T13:02:02+09:00",
    "ts": 1791432122,
    "metrics": {
-    "impression_count": 1787697,
+    "impression_count": 1789727,
     "like_count": 395,
-    "retweet_count": 38,
+    "retweet_count": null,
     "reply_count": 38,
     "quote_count": 25,
     "bookmark_count": 38
@@ -7720,10 +8654,11 @@
    },
    "text": "よく見たら「返金」じゃないの草 https://t.co/qTCN9E2PQL",
    "categories": [
-    "その他"
+    "その他",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -7768,13 +8703,13 @@
   },
   {
    "id": "2108004592302858321",
-   "url": "https://x.com/i/status/2108004592302858321",
-   "user": null,
+   "url": "https://x.com/news24ntv/status/2108004592302858321",
+   "user": "news24ntv",
    "created_utc": "2026-10-08T01:20:34Z",
    "created_jst": "2026-10-08T10:20:34+09:00",
    "ts": 1791422434,
    "metrics": {
-    "impression_count": 1910360,
+    "impression_count": 1910885,
     "like_count": 401,
     "retweet_count": 104,
     "reply_count": 22,
@@ -7821,12 +8756,12 @@
    "created_jst": "2026-10-08T10:01:08+09:00",
    "ts": 1791421268,
    "metrics": {
-    "impression_count": 19348627,
-    "like_count": 98016,
-    "retweet_count": 5777,
+    "impression_count": 19353969,
+    "like_count": 97982,
+    "retweet_count": null,
     "reply_count": 619,
     "quote_count": 995,
-    "bookmark_count": 8305
+    "bookmark_count": 8278
    },
    "text": "歌舞伎町でホストやってるよ https://t.co/imeulGf7OG https://t.co/mqfjLNvSRi",
    "categories": [
@@ -7989,6 +8924,32 @@
    ]
   },
   {
+   "id": "2107885273602551808",
+   "url": "https://x.com/epichan77/status/2107885273602551808",
+   "user": "epichan77",
+   "created_utc": "2026-10-07T17:26:26Z",
+   "created_jst": "2026-10-08T02:26:26+09:00",
+   "ts": 1791393986,
+   "metrics": {
+    "impression_count": 5272189,
+    "like_count": 14760,
+    "retweet_count": null,
+    "reply_count": 34,
+    "quote_count": 111,
+    "bookmark_count": 623
+   },
+   "text": "一条響ちゃんが若手キャバ嬢から舐められまくってるの見ると、マジでもう時代移ったんだなと思う。 https://t.co/RCSPO6qoLZ",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "一条響"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2107856021947666561",
    "url": "https://x.com/yorudeki/status/2107856021947666561",
    "user": "yorudeki",
@@ -8105,12 +9066,12 @@
    "created_jst": "2026-10-07T22:21:43+09:00",
    "ts": 1791379303,
    "metrics": {
-    "impression_count": 7016914,
-    "like_count": 19031,
-    "retweet_count": 344,
+    "impression_count": 7060257,
+    "like_count": 19044,
+    "retweet_count": 345,
     "reply_count": 90,
-    "quote_count": 63,
-    "bookmark_count": 4546
+    "quote_count": 64,
+    "bookmark_count": 4535
    },
    "text": "もしかしてこれは星乃リアちゃんのことかな？？ https://t.co/vkhyLoApb3 https://t.co/EuepbSJgbq",
    "categories": [
@@ -8148,6 +9109,33 @@
      "height": 484
     }
    ]
+  },
+  {
+   "id": "2107808914821799955",
+   "url": "https://x.com/satukihakawaii/status/2107808914821799955",
+   "user": "satukihakawaii",
+   "created_utc": "2026-10-07T12:23:01Z",
+   "created_jst": "2026-10-07T21:23:01+09:00",
+   "ts": 1791375781,
+   "metrics": {
+    "impression_count": 2141420,
+    "like_count": 2054,
+    "retweet_count": null,
+    "reply_count": 28,
+    "quote_count": 30,
+    "bookmark_count": 116
+   },
+   "text": "シャンパンの数バグってない？🤣🍾\n\nひめかちゃん、\nこれ一晩でいくら売れてるの…？\n\n令和ナンバー1キャバ嬢の売上\n桁が違いすぎる😂 https://t.co/4SGCe7FX7J",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "嬢 シャンパン"
+   ],
+   "is_watched": true
   },
   {
    "id": "2107795149174796613",
@@ -8389,10 +9377,11 @@
    },
    "text": "守屋麗奈、元々目鼻パーツはカオトトノイだったけど6年前スキントーンまるで別人だな。\n\n坂系はSMやHYBEと違って鼻整形や豊胸は許されないけど、歯列矯正と肌管理はガンガンだもんな。\n\n泥べ冬が、ブルベ夏になる為のハウトゥー全て詰まってるまさに生ける伝説のアイドルだよ。 https://t.co/IhihYiULaN",
    "categories": [
-    "その他"
+    "その他",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -8428,6 +9417,8 @@
     "夜職その他"
    ],
    "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
     "manual"
    ],
    "is_watched": false,
@@ -8439,6 +9430,30 @@
      "height": 1454
     }
    ]
+  },
+  {
+   "id": "2107672836966142426",
+   "url": "https://x.com/SYAMIIYU/status/2107672836966142426",
+   "user": "SYAMIIYU",
+   "created_utc": "2026-10-07T03:22:17Z",
+   "created_jst": "2026-10-07T12:22:17+09:00",
+   "ts": 1791343337,
+   "metrics": {
+    "impression_count": 4989988,
+    "like_count": 32200,
+    "retweet_count": null,
+    "reply_count": 193,
+    "quote_count": 181,
+    "bookmark_count": 1897
+   },
+   "text": "待って、ソープランドで売春が行われていたなんて信じられない…\nちょっと衝撃的すぎて頭がついてこないんだけど、責任者たちは、一体、何してくれたの？\nソープランドってお風呂屋さんだよ？\nなんでわざわざお風呂屋さんで、よりによって売春場所提供をしたの？\nもう子供は近寄らせないようにしよう… https://t.co/QuxFVyM6H4",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "ソープランド"
+   ],
+   "is_watched": false
   },
   {
    "id": "2107671600191713310",
@@ -9315,6 +10330,28 @@
    ]
   },
   {
+   "id": "2107415982474162630",
+   "url": "https://x.com/canyong_1000000/status/2107415982474162630",
+   "user": "canyong_1000000",
+   "created_utc": "2026-10-06T10:21:38Z",
+   "created_jst": "2026-10-06T19:21:38+09:00",
+   "ts": 1791282098,
+   "metrics": {
+    "impression_count": 11615584,
+    "like_count": 25363,
+    "retweet_count": null,
+    "reply_count": 130,
+    "quote_count": 86,
+    "bookmark_count": 673
+   },
+   "text": "超びっくりした🥹💦\n\nこの間ここにゃんに会ったから\nツーショットお願いしたんだけど、\n\nカメラ構えたら📷\n急にしゃがみ込んじゃったの💦\n\nきゃにょんが可愛すぎて\n照れたのかも？💗 https://t.co/C7IPkRQfJO",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2107415768967024982",
    "url": "https://x.com/fdmmkg/status/2107415768967024982",
    "user": "fdmmkg",
@@ -9466,6 +10503,82 @@
    ]
   },
   {
+   "id": "2107396105390682571",
+   "url": "https://x.com/8u07wx/status/2107396105390682571",
+   "user": "8u07wx",
+   "created_utc": "2026-10-06T09:02:39Z",
+   "created_jst": "2026-10-06T18:02:39+09:00",
+   "ts": 1791277359,
+   "metrics": {
+    "impression_count": 866580,
+    "like_count": 7869,
+    "retweet_count": null,
+    "reply_count": 146,
+    "quote_count": 174,
+    "bookmark_count": 580
+   },
+   "text": "先日摘発された吉原ソープは\n歌舞伎町ホストクラブで売掛払えなくなった客の受け皿になっていて\n強制的に働かせていたようです",
+   "categories": [
+    "ホスト",
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "ホスト 歌舞伎町",
+    "ホストクラブ",
+    "売掛",
+    "ホスト",
+    "歌舞伎町"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2107376025881420040",
+   "url": "https://x.com/nBwQSzmg3qU2ysd/status/2107376025881420040",
+   "user": "nBwQSzmg3qU2ysd",
+   "created_utc": "2026-10-06T07:42:52Z",
+   "created_jst": "2026-10-06T16:42:52+09:00",
+   "ts": 1791272572,
+   "metrics": {
+    "impression_count": 4067199,
+    "like_count": 8432,
+    "retweet_count": null,
+    "reply_count": 364,
+    "quote_count": 160,
+    "bookmark_count": 666
+   },
+   "text": "ヤマトリノ、再逮捕へ。\n\nコカイン所持で逮捕\n↓\n尿から陽性\n↓\n今度は使用容疑でも再逮捕へ\n\n本人は\n「クスリは彼氏からもらった」と供述。\n\n逮捕後は\n・勤務先との契約解除\n・タワマン退去要請\n・スマホなし\n・自由なし\n\nそして例のハンドサイン＆てへぺろは\n「精神的にとても不安定でやった」 https://t.co/gbCKAXn4Hf",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "ヤマトリノ"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2107369374885839197",
+   "url": "https://x.com/super_sachico/status/2107369374885839197",
+   "user": "super_sachico",
+   "created_utc": "2026-10-06T07:16:26Z",
+   "created_jst": "2026-10-06T16:16:26+09:00",
+   "ts": 1791270986,
+   "metrics": {
+    "impression_count": 1606743,
+    "like_count": 5486,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 164,
+    "bookmark_count": 517
+   },
+   "text": "【❤️‍🔥匂わせ速報❤️‍🔥】天使ニア＆黒崎みさ\n双子も連れて、《宮古島旅行》✈️🌺⁉️\n\nアルハンブラとカルティエのブレス《おそろい》‼️‼️✨（大興奮）\n\n同じタイミングであげてるし、ちいかわ＆シーサーそれぞれ持ってるし…。\n\nこれもうオープンにしたと捉えてもいいですか….😭✨⁉️ https://t.co/wr7CP5KCuz",
+   "categories": [
+    "その他",
+    "監視アカウント"
+   ],
+   "matched_terms": [],
+   "is_watched": true
+  },
+  {
    "id": "2107359899487486004",
    "url": "https://x.com/MARUN0UCHI_MAN/status/2107359899487486004",
    "user": "MARUN0UCHI_MAN",
@@ -9558,6 +10671,33 @@
    ]
   },
   {
+   "id": "2107350389909508567",
+   "url": "https://x.com/fuyuyasumiminai/status/2107350389909508567",
+   "user": "fuyuyasumiminai",
+   "created_utc": "2026-10-06T06:01:00Z",
+   "created_jst": "2026-10-06T15:01:00+09:00",
+   "ts": 1791266460,
+   "metrics": {
+    "impression_count": 3113954,
+    "like_count": 3714,
+    "retweet_count": null,
+    "reply_count": 222,
+    "quote_count": 173,
+    "bookmark_count": 279
+   },
+   "text": "林社長、西麻布のバーでトップキャバ嬢達がゆいぴすお疲れ様会をしていて、会計だけ払いに来たとか優しすぎるだろ\n\nしかもタクシー代20万あげてさっと帰るってなに？マジの神客すぎるだろwww https://t.co/qtPlE7IxSV",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "ゆいぴす"
+   ],
+   "is_watched": true
+  },
+  {
    "id": "2107336404980392300",
    "url": "https://x.com/yuipis18/status/2107336404980392300",
    "user": "yuipis18",
@@ -9641,6 +10781,57 @@
    ]
   },
   {
+   "id": "2107322025413124418",
+   "url": "https://x.com/boardgame317/status/2107322025413124418",
+   "user": "boardgame317",
+   "created_utc": "2026-10-06T04:08:17Z",
+   "created_jst": "2026-10-06T13:08:17+09:00",
+   "ts": 1791259697,
+   "metrics": {
+    "impression_count": 1306735,
+    "like_count": 10023,
+    "retweet_count": null,
+    "reply_count": 15,
+    "quote_count": 28,
+    "bookmark_count": 2808
+   },
+   "text": "ひろゆきさんホスト嫌いなのに社美緒会長と対話して「凄いまとものこと言ってるけど本当にホストの人！？」\n「社さんは他の仕事してもうまくいくタイプ」って忖度なしで褒めてて嬉しい。\nでも、ホストは嫌いなままでいて欲しい。 https://t.co/4uQ4Xq2Ogy",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホストの",
+    "ホスト"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2107319945029702105",
+   "url": "https://x.com/fuyuyasumiminai/status/2107319945029702105",
+   "user": "fuyuyasumiminai",
+   "created_utc": "2026-10-06T04:00:01Z",
+   "created_jst": "2026-10-06T13:00:01+09:00",
+   "ts": 1791259201,
+   "metrics": {
+    "impression_count": 6336391,
+    "like_count": 24226,
+    "retweet_count": null,
+    "reply_count": 95,
+    "quote_count": 175,
+    "bookmark_count": 1166
+   },
+   "text": "キャバ嬢にじほの飲みかけの水が欲しくて40万払うお客さんがいるらしい\nホントに顔がかわいいって無敵すぎるよな https://t.co/aFa61YY4zq",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ"
+   ],
+   "is_watched": true
+  },
+  {
    "id": "2107314851471368331",
    "url": "https://x.com/MARUN0UCHI_MAN/status/2107314851471368331",
    "user": "MARUN0UCHI_MAN",
@@ -9686,6 +10877,33 @@
    ]
   },
   {
+   "id": "2107310669997781358",
+   "url": "https://x.com/agakun11/status/2107310669997781358",
+   "user": "agakun11",
+   "created_utc": "2026-10-06T03:23:10Z",
+   "created_jst": "2026-10-06T12:23:10+09:00",
+   "ts": 1791256990,
+   "metrics": {
+    "impression_count": 997958,
+    "like_count": 1424,
+    "retweet_count": null,
+    "reply_count": 38,
+    "quote_count": 85,
+    "bookmark_count": 794
+   },
+   "text": "「毛量は全てを解決する」を体現している。\n\nこの方は歌舞伎町のホストだけあって、眉毛アートメイク、二重、肌治療、髭と顔の脱毛、歯列矯正（セラミック矯正かも？）などなど、外見に気を使っている。私も全てやってるから、すぐに分かる。 https://t.co/rLQMKnrnzI https://t.co/8ZsF0hIlCV",
+   "categories": [
+    "ホスト",
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "ホスト 歌舞伎町",
+    "ホスト",
+    "歌舞伎町"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2107304852170682526",
    "url": "https://x.com/fuyuyasumiminai/status/2107304852170682526",
    "user": "fuyuyasumiminai",
@@ -9702,14 +10920,15 @@
    },
    "text": "有名キャバ嬢の太客こまちぃさん、所得税5億3千万だって...\nヤバすぎるよ..... https://t.co/kCvBMygyQC",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "監視アカウント"
    ],
    "matched_terms": [
     "キャバ嬢",
     "キャバ",
     "太客"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -9766,6 +10985,30 @@
    ]
   },
   {
+   "id": "2107289292297158698",
+   "url": "https://x.com/mahoccco/status/2107289292297158698",
+   "user": "mahoccco",
+   "created_utc": "2026-10-06T01:58:13Z",
+   "created_jst": "2026-10-06T10:58:13+09:00",
+   "ts": 1791251893,
+   "metrics": {
+    "impression_count": 1872752,
+    "like_count": 3553,
+    "retweet_count": null,
+    "reply_count": 87,
+    "quote_count": 235,
+    "bookmark_count": 861
+   },
+   "text": "徳川流一さんのお客様情報を公開するプロ意識に感服致しましたので私も公開しますね。\n初回指名、2回目、今回3回目お伺いしました。2回目は新幹線の大幅な遅延で同伴予定が無くなり代替としてアフターをお願いしましたのでそれが事あるたびにアフターをねだるの正体です。\nスクショありがと応援感謝🙏 https://t.co/gz3hpyp1rf",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "同伴 アフター"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2107270130229289468",
    "url": "https://x.com/tkzwgrs/status/2107270130229289468",
    "user": "tkzwgrs",
@@ -9804,12 +11047,12 @@
    "created_jst": "2026-10-06T09:23:38+09:00",
    "ts": 1791246218,
    "metrics": {
-    "impression_count": 8137999,
-    "like_count": 63731,
-    "retweet_count": 556,
+    "impression_count": 8151167,
+    "like_count": 63724,
+    "retweet_count": null,
     "reply_count": 153,
     "quote_count": 224,
-    "bookmark_count": 979
+    "bookmark_count": 980
    },
    "text": "コラボしてあげたいな😯僕、隣いたら\n顔の大きさとかどうでも良くなるよ😮？ https://t.co/Gm20RWgTuu",
    "categories": [
@@ -9850,6 +11093,32 @@
      "height": 3777
     }
    ]
+  },
+  {
+   "id": "2107250190155739402",
+   "url": "https://x.com/ximu6723/status/2107250190155739402",
+   "user": "ximu6723",
+   "created_utc": "2026-10-05T23:22:50Z",
+   "created_jst": "2026-10-06T08:22:50+09:00",
+   "ts": 1791242570,
+   "metrics": {
+    "impression_count": 7576699,
+    "like_count": 9592,
+    "retweet_count": null,
+    "reply_count": 114,
+    "quote_count": 319,
+    "bookmark_count": 1108
+   },
+   "text": "ゆいぴす、そもそも誰と並んでも顔が大きく見える(高身長だから仕方がない) https://t.co/r1IJbO9jfr https://t.co/8Zm4o5A0tB",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "ゆいぴす"
+   ],
+   "is_watched": false
   },
   {
    "id": "2107141158870888862",
@@ -10034,6 +11303,31 @@
    ]
   },
   {
+   "id": "2107092485281628272",
+   "url": "https://x.com/binnzuru/status/2107092485281628272",
+   "user": "binnzuru",
+   "created_utc": "2026-10-05T12:56:11Z",
+   "created_jst": "2026-10-05T21:56:11+09:00",
+   "ts": 1791204971,
+   "metrics": {
+    "impression_count": 6328031,
+    "like_count": 20473,
+    "retweet_count": null,
+    "reply_count": 52,
+    "quote_count": 112,
+    "bookmark_count": 1885
+   },
+   "text": "キャバ嬢を水揚げして8年、それなりに幸せに夫婦生活してる立場で一つ言わせていただくと\n\n気に入った女が大金持ちながら顔がデカい画角が遠いで争うくらい気が狂っちゃう前に、早く手元で囲って人間に戻してあげて欲しいなと思います",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2107084320066412855",
    "url": "https://x.com/spana883709/status/2107084320066412855",
    "user": "spana883709",
@@ -10114,7 +11408,8 @@
    "text": "【悲報】歌舞伎町のホストさん、額縮小手術をした所、血流が無くなり前髪がいっせいに生えてこなくなる現象が起きる\n\n頭皮を強く前進させたことによる血流障害が疑われ、直美によるテクニカルエラーを疑わざるを得ないマッコトに残念な事例なのである。 https://t.co/F9dzrA1xP4",
    "categories": [
     "ホスト",
-    "歌舞伎町"
+    "歌舞伎町",
+    "監視アカウント"
    ],
    "matched_terms": [
     "ホスト 歌舞伎町",
@@ -10122,7 +11417,7 @@
     "歌舞伎町",
     "report:ホスト"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -10211,6 +11506,28 @@
    ]
   },
   {
+   "id": "2107070768731636218",
+   "url": "https://x.com/tama4649hikihun/status/2107070768731636218",
+   "user": "tama4649hikihun",
+   "created_utc": "2026-10-05T11:29:53Z",
+   "created_jst": "2026-10-05T20:29:53+09:00",
+   "ts": 1791199793,
+   "metrics": {
+    "impression_count": 7629013,
+    "like_count": 12628,
+    "retweet_count": null,
+    "reply_count": 329,
+    "quote_count": 594,
+    "bookmark_count": 3914
+   },
+   "text": "吉原ソープ摘発！！！\n#エルドール\n#吉原 https://t.co/SLybqjuwoP",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2107067411245703182",
    "url": "https://x.com/4ndpq/status/2107067411245703182",
    "user": "4ndpq",
@@ -10282,7 +11599,8 @@
    "text": "ヒカル → バツイチ子持ち元キャバ嬢\nカノックスター → 元ラウンジ嬢 \nはじめしゃちょー → 元コンカフェ嬢\n\nYouTuber、元夜職売女に喰われすぎてるだろwww\nしかもみんな金目当て臭すごい https://t.co/9YC7yrMnDa",
    "categories": [
     "キャバクラ",
-    "夜職その他"
+    "夜職その他",
+    "監視アカウント"
    ],
    "matched_terms": [
     "キャバ嬢",
@@ -10292,7 +11610,7 @@
     "コンカフェ",
     "report:夜職その他"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -10319,6 +11637,58 @@
      "height": 1433
     }
    ]
+  },
+  {
+   "id": "2107025270654091655",
+   "url": "https://x.com/lastcallworld/status/2107025270654091655",
+   "user": "lastcallworld",
+   "created_utc": "2026-10-05T08:29:05Z",
+   "created_jst": "2026-10-05T17:29:05+09:00",
+   "ts": 1791188945,
+   "metrics": {
+    "impression_count": 627583,
+    "like_count": 5020,
+    "retweet_count": null,
+    "reply_count": 16,
+    "quote_count": 14,
+    "bookmark_count": 1003
+   },
+   "text": "【悲報】きゃにょんが語る、キャバクラの過酷なリアルがヤバすぎる…\n\n「てかあんま可愛くないじゃん。何ができんの？」 色物キャラゆえに、普通の女の子以上に冷たい言葉を浴びる過酷な現実。\n\n普通のメンタルなら心が折れる環境…\n\n#LASTCALL #ラストコール\n動画の続きはリプ欄のURLから👇 https://t.co/Snd6pGmbb9 https://t.co/BzVAxX2POr",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバクラ",
+    "quote:キャバ嬢",
+    "キャバ"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2107011645310701719",
+   "url": "https://x.com/lastcallworld/status/2107011645310701719",
+   "user": "lastcallworld",
+   "created_utc": "2026-10-05T07:34:57Z",
+   "created_jst": "2026-10-05T16:34:57+09:00",
+   "ts": 1791185697,
+   "metrics": {
+    "impression_count": 550629,
+    "like_count": 60,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 3,
+    "bookmark_count": 12
+   },
+   "text": "「舐めてんのかなと思ってその格好」\n↓\n面接開始早々、厳しい洗礼を受ける志願者。 他の審査員からも「キャバクラは男性ウケしてなんぼ」と追撃され、絶体絶命の空気に…\n↓\nそこで助け舟を出したのが、伝説のキャバ嬢エンリケだった。\n↓\n「名前からインパクトあるし覚えられやすい」 https://t.co/yNjYufWMlD https://t.co/tlet2tzRBB",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバクラ",
+    "キャバ嬢",
+    "キャバ"
+   ],
+   "is_watched": false
   },
   {
    "id": "2107009721869984182",
@@ -10402,6 +11772,54 @@
      "height": 2048
     }
    ]
+  },
+  {
+   "id": "2106982691682025788",
+   "url": "https://x.com/yabuinu_dojin/status/2106982691682025788",
+   "user": "yabuinu_dojin",
+   "created_utc": "2026-10-05T05:39:54Z",
+   "created_jst": "2026-10-05T14:39:54+09:00",
+   "ts": 1791178794,
+   "metrics": {
+    "impression_count": 5603406,
+    "like_count": 80089,
+    "retweet_count": null,
+    "reply_count": 30,
+    "quote_count": 219,
+    "bookmark_count": 72874
+   },
+   "text": "これやって一晩寝たらガッチガチの肩すごい楽になってる\nすげえ https://t.co/e94WCIMVTb",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2106978711052730875",
+   "url": "https://x.com/daitai_shitteru/status/2106978711052730875",
+   "user": "daitai_shitteru",
+   "created_utc": "2026-10-05T05:24:05Z",
+   "created_jst": "2026-10-05T14:24:05+09:00",
+   "ts": 1791177845,
+   "metrics": {
+    "impression_count": 15570379,
+    "like_count": 13648,
+    "retweet_count": null,
+    "reply_count": 130,
+    "quote_count": 144,
+    "bookmark_count": 1241
+   },
+   "text": "レジェンドキャバ嬢に喧嘩売ってまで自分が小顔に思われたい姑息なゆいぴす草すぎ https://t.co/ojC6amIP46 https://t.co/C8hAEKsD9q",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "ゆいぴす"
+   ],
+   "is_watched": false
   },
   {
    "id": "2106967164595159394",
@@ -10630,6 +12048,33 @@
    ]
   },
   {
+   "id": "2106862831656443981",
+   "url": "https://x.com/bakausapipi2/status/2106862831656443981",
+   "user": "bakausapipi2",
+   "created_utc": "2026-10-04T21:43:37Z",
+   "created_jst": "2026-10-05T06:43:37+09:00",
+   "ts": 1791150217,
+   "metrics": {
+    "impression_count": 2485163,
+    "like_count": 5740,
+    "retweet_count": null,
+    "reply_count": 34,
+    "quote_count": 88,
+    "bookmark_count": 857
+   },
+   "text": "【六本木キャバ嬢だった、インフルエンサーで双子のママも開戦の狼煙をあげたと話題】 https://t.co/zm64Sn5pJS",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "六本木 キャバ"
+   ],
+   "is_watched": true
+  },
+  {
    "id": "2106853768293929069",
    "url": "https://x.com/MARUN0UCHI_MAN/status/2106853768293929069",
    "user": "MARUN0UCHI_MAN",
@@ -10826,6 +12271,34 @@
    "matched_terms": [
     "quote:一条響",
     "quote:ゆいぴす"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2106762517254991920",
+   "url": "https://x.com/lastcallkindan/status/2106762517254991920",
+   "user": "lastcallkindan",
+   "created_utc": "2026-10-04T15:05:00Z",
+   "created_jst": "2026-10-05T00:05:00+09:00",
+   "ts": 1791126300,
+   "metrics": {
+    "impression_count": 422841,
+    "like_count": 2707,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 10,
+    "bookmark_count": 648
+   },
+   "text": "社美緒の源氏名、ただの誤字だったことが判明ｗｗｗ\n\n東北出身だから「杜美緒」にしようと決める\n↓\n酔っ払った勢いで「社美緒」と書いて提出\n↓\n直すのも面倒でそのまま使い続ける\n↓\n歌舞伎町を代表する超有名源氏名へ\n\n社美緒って名前がまさか酔っ払った勢いの誤筆だったとは誰も思わないよね🤣笑 https://t.co/5A7F1FKuLA https://t.co/YvGfCPI5Ov",
+   "categories": [
+    "キャバクラ",
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "quote:嬢 シャンパン",
+    "歌舞伎町"
    ],
    "is_watched": false
   },
@@ -11087,13 +12560,14 @@
    },
    "text": "【🔥速報🔥】一条響、ゆいぴすコラボ動画《非公開》に\n↓\n・非公開はゆいぴすの希望\n・「自分だけ画角を引いて小顔に見せた」のは事実無根\n・ゆいぴすに事前確認も行なっている（元素材提供、必要であればゆいぴすサイドで編集可と伝えた）\n\n響ちゃんは、きちんと順序踏んでいるように思えるけど……。 https://t.co/8SkjJ7RQFd",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "監視アカウント"
    ],
    "matched_terms": [
     "一条響",
     "ゆいぴす"
    ],
-   "is_watched": false
+   "is_watched": true
   },
   {
    "id": "2106753766200639725",
@@ -11145,6 +12619,32 @@
    "is_watched": false
   },
   {
+   "id": "2106751925945537019",
+   "url": "https://x.com/lastcallkindan/status/2106751925945537019",
+   "user": "lastcallkindan",
+   "created_utc": "2026-10-04T14:22:55Z",
+   "created_jst": "2026-10-04T23:22:55+09:00",
+   "ts": 1791123775,
+   "metrics": {
+    "impression_count": 360191,
+    "like_count": 48,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 2,
+    "bookmark_count": 6
+   },
+   "text": "キャバ嬢オーディションで20歳「らーめん」がエンリケをシャンパン早飲みで撃破！？\n\nシャンパンの早飲みで有名なエンリケに志願者「らーめん」が勝負を挑んだんだけど、相手が強すぎて秒で完飲されて...\n\n勝った瞬間のらーめんの笑顔も最高だったしラストコール名シーン多すぎる🥺✨\n#ラストコール https://t.co/RHmqdK6Dry https://t.co/NAfkUrxUnI",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "嬢 シャンパン"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2106751210695057915",
    "url": "https://x.com/ichijyo_hibiki/status/2106751210695057915",
    "user": "ichijyo_hibiki",
@@ -11152,12 +12652,12 @@
    "created_jst": "2026-10-04T23:20:04+09:00",
    "ts": 1791123604,
    "metrics": {
-    "impression_count": 31111309,
-    "like_count": 26241,
-    "retweet_count": 526,
+    "impression_count": 31125460,
+    "like_count": 26238,
+    "retweet_count": null,
     "reply_count": 640,
-    "quote_count": 866,
-    "bookmark_count": 3484
+    "quote_count": 868,
+    "bookmark_count": 3476
    },
    "text": "【ご報告】\n\n昨日投稿した、ゆいぴすさんとのコラボ動画について、一部ご意見をいただいております。\n\n本件については、ゆいぴすさんご本人からのご希望もあり、該当動画を速やかに非公開とさせていただきました。",
    "categories": [
@@ -11166,6 +12666,30 @@
    "matched_terms": [
     "ゆいぴす",
     "report:キャバクラ"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2106749597687406689",
+   "url": "https://x.com/canyong_1000000/status/2106749597687406689",
+   "user": "canyong_1000000",
+   "created_utc": "2026-10-04T14:13:40Z",
+   "created_jst": "2026-10-04T23:13:40+09:00",
+   "ts": 1791123220,
+   "metrics": {
+    "impression_count": 5700883,
+    "like_count": 35885,
+    "retweet_count": null,
+    "reply_count": 116,
+    "quote_count": 132,
+    "bookmark_count": 1148
+   },
+   "text": "※大前提ゆいぴすは小顔です。\n\nその上で‼️もう一個エピソードがあって、\n「この写真加工する？」\nってゆいぴすにスマホ渡したら、\n自分の顔を加工した分、\n私の顔にも同じ加工してくれたの🥹🪄✨\n\n自分だけ可愛く見せようと\nするんじゃなくて、\n「2人で可愛く写ろ〜✌️ｲｪｰｲ⭐️」\nって感じだった。 https://t.co/hqZ6qeVmQ1",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "ゆいぴす"
    ],
    "is_watched": false
   },
@@ -11185,6 +12709,28 @@
     "bookmark_count": 366
    },
    "text": "神谷さんに唐突に「お前は経営者という肩書きが欲しいだけの嘘つき」とのdisり動画を投稿された私、にっこり() https://t.co/Ps7N9QtVnJ",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2106719169815388455",
+   "url": "https://x.com/rairaizero/status/2106719169815388455",
+   "user": "rairaizero",
+   "created_utc": "2026-10-04T12:12:45Z",
+   "created_jst": "2026-10-04T21:12:45+09:00",
+   "ts": 1791115965,
+   "metrics": {
+    "impression_count": 989131,
+    "like_count": 4141,
+    "retweet_count": null,
+    "reply_count": 7,
+    "quote_count": 54,
+    "bookmark_count": 331
+   },
+   "text": "ヤヴｧイ、全国にデカマライライが💦 https://t.co/k4HJWOhh3J",
    "categories": [
     "その他"
    ],
@@ -11415,6 +12961,30 @@
    ]
   },
   {
+   "id": "2106673552951034231",
+   "url": "https://x.com/_Kr829_/status/2106673552951034231",
+   "user": "_Kr829_",
+   "created_utc": "2026-10-04T09:11:29Z",
+   "created_jst": "2026-10-04T18:11:29+09:00",
+   "ts": 1791105089,
+   "metrics": {
+    "impression_count": 1462180,
+    "like_count": 5175,
+    "retweet_count": null,
+    "reply_count": 29,
+    "quote_count": 23,
+    "bookmark_count": 171
+   },
+   "text": "一条響に喧嘩売るのは流石すぎん？俺ですら怖い。",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "一条響"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2106656604741582943",
    "url": "https://x.com/bakausapipi2/status/2106656604741582943",
    "user": "bakausapipi2",
@@ -11431,7 +13001,8 @@
    },
    "text": "【六本木キャバ嬢ゆいぴすが開戦の狼煙をあげたと話題】 https://t.co/4aNEANhSdA",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "監視アカウント"
    ],
    "matched_terms": [
     "キャバ嬢",
@@ -11439,7 +13010,7 @@
     "六本木 キャバ",
     "ゆいぴす"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "photo",
@@ -11487,12 +13058,12 @@
    "created_jst": "2026-10-04T15:28:24+09:00",
    "ts": 1791095304,
    "metrics": {
-    "impression_count": 784937,
-    "like_count": 2087,
-    "retweet_count": 89,
+    "impression_count": 786170,
+    "like_count": 2086,
+    "retweet_count": null,
     "reply_count": 2,
     "quote_count": 103,
-    "bookmark_count": 166
+    "bookmark_count": 165
    },
    "text": "慰安旅行バカなことばっかしてるホストへ https://t.co/ZivdZ04gv0",
    "categories": [
@@ -11988,6 +13559,31 @@
    ]
   },
   {
+   "id": "2105653828775473425",
+   "url": "https://x.com/hostcall_world/status/2105653828775473425",
+   "user": "hostcall_world",
+   "created_utc": "2026-10-01T13:39:28Z",
+   "created_jst": "2026-10-01T22:39:28+09:00",
+   "ts": 1790861968,
+   "metrics": {
+    "impression_count": 505501,
+    "like_count": 636,
+    "retweet_count": null,
+    "reply_count": 18,
+    "quote_count": 97,
+    "bookmark_count": 160
+   },
+   "text": "「ほぼほぼ山田涼介でしょ」 審査員も絶賛する非の打ち所がない21歳の志願者\n↓ \nしかし、彼が静かに語り始めたのは 想像を絶する壮絶な家庭環境だった…\n↓ \n「自分にはホストしかありません」\n\nルックスと過去のギャップがエグい…。\n#HOSTCALL #ホストコール\n動画の続きはリプ欄のURLから👇 https://t.co/5XNEbOsa5l",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2105596174397055461",
    "url": "https://x.com/tkzwgrs/status/2105596174397055461",
    "user": "tkzwgrs",
@@ -12292,9 +13888,9 @@
    "created_jst": "2026-09-28T01:44:50+09:00",
    "ts": 1790527490,
    "metrics": {
-    "impression_count": 686405,
-    "like_count": 464,
-    "retweet_count": 19,
+    "impression_count": 690685,
+    "like_count": 465,
+    "retweet_count": null,
     "reply_count": 4,
     "quote_count": 10,
     "bookmark_count": 70
@@ -12409,6 +14005,31 @@
      "height": 640
     }
    ]
+  },
+  {
+   "id": "2103103358483804327",
+   "url": "https://x.com/hostcall_world/status/2103103358483804327",
+   "user": "hostcall_world",
+   "created_utc": "2026-09-24T12:44:49Z",
+   "created_jst": "2026-09-24T21:44:49+09:00",
+   "ts": 1790253889,
+   "metrics": {
+    "impression_count": 899999,
+    "like_count": 229,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 41,
+    "bookmark_count": 63
+   },
+   "text": "【衝撃】「ホストでテッペンになるために生まれてきた」 強気な発言でオーディションに挑む元メン地下アイドルの千秋。 \n↓ \n実は彼、過去にホストで“初月200万”を売り上げた実力者。 \n↓ \nしかし「ある理由」で一度ホストを引退。 アイドルを経て、再び彼がホストの世界に戻ってきた理由とは…？ https://t.co/HDL9NTAPhZ",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホストの",
+    "ホスト"
+   ],
+   "is_watched": false
   },
   {
    "id": "2103026229557510545",
@@ -12547,6 +14168,57 @@
      "height": 1393
     }
    ]
+  },
+  {
+   "id": "2099681174826467708",
+   "url": "https://x.com/at_navi/status/2099681174826467708",
+   "user": "at_navi",
+   "created_utc": "2026-09-15T02:06:16Z",
+   "created_jst": "2026-09-15T11:06:16+09:00",
+   "ts": 1789437976,
+   "metrics": {
+    "impression_count": 927942,
+    "like_count": 935,
+    "retweet_count": 50,
+    "reply_count": 28,
+    "quote_count": 18,
+    "bookmark_count": 359
+   },
+   "text": "エルコレ　#平良翔太 \nAIも読解不能謝罪文。\n\n---\n\n今回の件に関し、全ては俺の責任であります。\n［判読不能］\n\nだから、必ずまとめます。親父が［判読不能］\nそして、今回の事［判読不能］\n本当に良かったなと、そういう感じでいる\nものかと思います。\n\n山平先生を通じて、みーちゃんの気持ちを https://t.co/4ED5fe5Way",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "平良翔太",
+    "エルコレ",
+    "topic:平良翔太さんの退店・引退"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2099511303723504038",
+   "url": "https://x.com/me_LEXUS_/status/2099511303723504038",
+   "user": "me_LEXUS_",
+   "created_utc": "2026-09-14T14:51:16Z",
+   "created_jst": "2026-09-14T23:51:16+09:00",
+   "ts": 1789397476,
+   "metrics": {
+    "impression_count": 1275984,
+    "like_count": 3694,
+    "retweet_count": 171,
+    "reply_count": 22,
+    "quote_count": 20,
+    "bookmark_count": 552
+   },
+   "text": "平良翔太の件。\n軍神は一年前には彼の危うさを見抜いて指導していた。が、平良翔太はそれに対し全て言い返す我の強さ。\nDV味が滲み出てるしリアルタイムで見るとマジでサイコパス。 https://t.co/d6lAaegq49",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "平良翔太",
+    "topic:平良翔太さんの退店・引退"
+   ],
+   "is_watched": false
   },
   {
    "id": "2099020069695303844",
@@ -13420,6 +15092,32 @@
    ]
   },
   {
+   "id": "2075762584771592638",
+   "url": "https://x.com/mtgjdpa/status/2075762584771592638",
+   "user": "mtgjdpa",
+   "created_utc": "2026-07-11T02:02:20Z",
+   "created_jst": "2026-07-11T11:02:20+09:00",
+   "ts": 1783735340,
+   "metrics": {
+    "impression_count": 8042605,
+    "like_count": 3796,
+    "retweet_count": null,
+    "reply_count": 442,
+    "quote_count": 546,
+    "bookmark_count": 2024
+   },
+   "text": "ホストコール見て感じたけどピンピンの肌質になりたく無い人は踏んではならない地雷整形があるんよ\n\n・痩せ型インモード\n・目の下のクマ取りのナノリッチ\n・ジュベルック\n・人工真皮の貴族手術\n・人中短縮の引き攣れ\n・コラーゲン糸リフト\n・冷凍脂肪移植\n・肌育注射\n・ヒアルロン酸\n・ボトックス https://t.co/t796MwSB2H",
+   "categories": [
+    "ホスト",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール"
+   ],
+   "is_watched": true
+  },
+  {
    "id": "2072999668410388935",
    "url": "https://x.com/no1dayoooo/status/2072999668410388935",
    "user": "no1dayoooo",
@@ -13797,12 +15495,13 @@
    },
    "text": "【マッチングアプリで誘客したことで逮捕された元ホストが1億円で保釈＆ネタにし始めたと話題】 https://t.co/mISJtU6rYV",
    "categories": [
-    "ホスト"
+    "ホスト",
+    "監視アカウント"
    ],
    "matched_terms": [
     "ホスト"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "video",
@@ -14199,6 +15898,28 @@
    ]
   },
   {
+   "id": "1902199186885672985",
+   "url": "https://x.com/agakun11/status/1902199186885672985",
+   "user": "agakun11",
+   "created_utc": "2025-03-19T03:23:21Z",
+   "created_jst": "2025-03-19T12:23:21+09:00",
+   "ts": 1742354601,
+   "metrics": {
+    "impression_count": 668085,
+    "like_count": 85,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 4,
+    "bookmark_count": 36
+   },
+   "text": "外見の重要度ランキング、圧倒的1位は髪値。\n\n顔立ちやファッションよりも、髪があるかないかで印象は激変する。\n清潔感、若々しさ、オーラ——すべてに影響を与える髪こそ、最強の外見資産。 https://t.co/Yc8UKyjJS9",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "1899374649324241037",
    "url": "https://x.com/tkzwgrs/status/1899374649324241037",
    "user": "tkzwgrs",
@@ -14414,14 +16135,15 @@
    "text": "【6月20日(木)まとめ】\n\n・歌舞伎町TOHOシネマ横 通称〝トー横〟があいも変わらず地獄すぎて話題\n→〝この世の地獄が見たければトー横へ〟のキャッチフレーズで海外の観光客からも名スポットとして認定されているトー横\n→未成年淫行の児ポ犯罪者や立ちんぼを量産する工場としても現在絶賛稼働中 https://t.co/iJfUEALvFv",
    "categories": [
     "歌舞伎町",
-    "夜職その他"
+    "夜職その他",
+    "監視アカウント"
    ],
    "matched_terms": [
     "歌舞伎町",
     "トー横",
     "立ちんぼ"
    ],
-   "is_watched": false,
+   "is_watched": true,
    "media": [
     {
      "type": "video",
