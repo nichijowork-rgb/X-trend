@@ -81,7 +81,7 @@ export function defaultIntegrations(env, fetchImpl) {
 
 export function createApp(options = {}) {
   const env = options.env ?? process.env;
-  const dataDir = path.resolve(options.dataDir ?? env.DATA_DIR ?? './data');
+  const dataDir = path.resolve(options.dataDir ?? env.DATA_DIR ?? './storage');
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
   const clock = () => {
     const v = typeof options.now === 'function' ? options.now() : options.now;

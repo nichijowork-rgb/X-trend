@@ -16,7 +16,7 @@
 | 変数 | 用途 |
 |---|---|
 | `PORT` | 既定 8787 |
-| `DATA_DIR` | 既定 `./data`（SQLite: `x-trend.db`, 自動バックアップ: `backups/`） |
+| `DATA_DIR` | 既定 `./storage`（`data/` は静的ダッシュボード用JSON置き場のため使わない）（SQLite: `x-trend.db`, 自動バックアップ: `backups/`） |
 | `ADMIN_TOKEN` | 設定時：書き込みは管理者トークン必須、閲覧は共有トークン必須。未設定時：ローカルモード（全操作可） |
 | `X_BEARER_TOKEN` | X API v2（App-only）：最近の検索・投稿ID参照 |
 | `X_USER_ACCESS_TOKEN` / `X_USER_ID` | X API v2（OAuth2 ユーザー文脈）：ホームタイムライン（逆時系列。おすすめ欄ではない） |
