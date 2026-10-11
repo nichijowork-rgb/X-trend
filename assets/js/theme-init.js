@@ -1,10 +1,10 @@
-// テーマの初期適用（描画前に同期実行してちらつきを防ぐ）。
-// 保存値: 'light' | 'dark'。未保存なら OS 設定（prefers-color-scheme）に追従し、指定が無ければダーク。
+// テーマは OS 設定（prefers-color-scheme）に自動追従（指定が無ければダーク）。手動切替は廃止。
+// 以前の版で localStorage に保存した手動テーマ（dark/light）が残っていてもライト固定などにならないよう消す。
 (function () {
   try {
-    var t = window.localStorage.getItem('xreport-theme');
-    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    window.localStorage.removeItem('xreport-theme');
   } catch (e) {
-    /* localStorage が使えない環境（プライベートモード等）では OS 設定に追従 */
+    /* localStorage が使えない環境では何もしない */
   }
+  document.documentElement.removeAttribute('data-theme');
 })();

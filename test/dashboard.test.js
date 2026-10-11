@@ -561,12 +561,15 @@ test('グループ: 夜職すべて＝夜職4カテゴリ、一般のバズ＝�
   assert.equal(categoryLabel('ホスト'), 'ホスト');
 });
 
-test('normalizeCategorySelection: 旧 URL の cat=… を解釈し、空なら夜職すべて', () => {
+test('normalizeCategorySelection: モード（夜職／一般）と個別選択。旧 URL の cat=… / group=… も解釈', () => {
   const cats = ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他', '監視アカウント', 'その他', '新カテゴリ'];
-  assert.deepEqual(normalizeCategorySelection({ cats: ['ホスト', 'その他'], group: 'night' }, cats), { cats: ['ホスト'], group: '' });
+  assert.deepEqual(normalizeCategorySelection({ cats: ['ホスト', 'その他'], group: 'night' }, cats), { cats: ['ホスト'], group: 'night' });
   assert.deepEqual(normalizeCategorySelection({ cats: ['その他'], group: 'night' }, cats), { cats: [], group: 'general' });
   assert.deepEqual(normalizeCategorySelection({ cats: ['監視アカウント'], group: 'night' }, cats), { cats: [], group: 'night' });
   assert.deepEqual(normalizeCategorySelection({ cats: ['存在しない'], group: 'general' }, cats), { cats: [], group: 'general' });
   assert.deepEqual(normalizeCategorySelection({ cats: [], group: '' }, cats), { cats: [], group: 'night' });
-  assert.deepEqual(normalizeCategorySelection({ cats: ['新カテゴリ'], group: 'night' }, cats), { cats: ['新カテゴリ'], group: '' });
+  assert.deepEqual(normalizeCategorySelection({ cats: ['新カテゴリ'], group: 'night' }, cats), { cats: ['新カテゴリ'], group: 'night' });
+  // 一般のバズモードでは夜職の個別選択は外れ、未知カテゴリだけ選べる
+  assert.deepEqual(normalizeCategorySelection({ cats: ['ホスト', '新カテゴリ'], group: 'general' }, cats), { cats: ['新カテゴリ'], group: 'general' });
+  assert.equal(serializeState({ group: 'general', cats: ['新カテゴリ'] }), 'cat=%E6%96%B0%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA&group=general');
 });

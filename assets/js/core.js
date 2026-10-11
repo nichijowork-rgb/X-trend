@@ -409,18 +409,19 @@ export function categoryLabel(name) {
 }
 
 /**
- * カテゴリ選択の正規化（旧 URL の cat=… も解釈）。
- * - 選べるのは個別チップのカテゴリだけ（監視・一般は個別では選ばない）
- * - cat が一般のカテゴリだけなら「一般のバズ」グループに読み替え
- * - 何も選ばれていなければ「夜職すべて」
+ * カテゴリ選択の正規化（旧 URL の cat=… / group=… も解釈）。
+ * - group はモード（'night' ＝夜職 ／ 'general' ＝一般のバズ）。既定は夜職
+ * - cats はモード内の個別選択（夜職: 夜職4種＋未知カテゴリ、一般: 未知カテゴリのみ）。空ならモード全体
+ * - 旧 URL の cat=その他 だけなら一般のバズモードに読み替え
  */
 export function normalizeCategorySelection(state, categories) {
-  const selectable = new Set(individualChipCategories(categories));
-  const cats = (state.cats || []).filter((c) => selectable.has(c));
-  if (cats.length) return { cats, group: '' };
+  const individual = individualChipCategories(categories);
+  const unknown = individual.filter((c) => !NIGHT_CATEGORIES.includes(c));
   const raw = state.cats || [];
-  if (raw.length && raw.every((c) => GENERAL_CATEGORIES.includes(c))) return { cats: [], group: 'general' };
-  return { cats: [], group: groupCategories(state.group) ? state.group : 'night' };
+  let group = groupCategories(state.group) ? state.group : 'night';
+  if (raw.length && raw.every((c) => GENERAL_CATEGORIES.includes(c))) group = 'general';
+  const allowed = new Set(group === 'general' ? unknown : individual);
+  return { cats: raw.filter((c) => allowed.has(c)), group };
 }
 
 /** 並べ替え。欠損指標は末尾、同値は新しい順。伸びペース順は refTs が必要 */
@@ -746,7 +747,7 @@ export function serializeState(state) {
   const st = { ...DEFAULT_STATE, ...state };
   const sp = new URLSearchParams();
   for (const c of st.cats) sp.append('cat', c);
-  if (!st.cats.length && st.group && st.group !== DEFAULT_STATE.group) sp.set('group', st.group);
+  if (st.group && st.group !== DEFAULT_STATE.group) sp.set('group', st.group);
   if (st.period !== DEFAULT_STATE.period) sp.set('period', st.period);
   if (st.user) sp.set('user', st.user);
   if (st.q.trim()) sp.set('q', st.q.trim());

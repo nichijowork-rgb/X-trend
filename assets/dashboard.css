@@ -211,8 +211,6 @@ code { font-family: var(--mono); font-size: .9em; }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; box-shadow: var(--glow-accent); }
 .btn-primary:hover { background: var(--accent); filter: brightness(1.08); }
 .btn-ghost { background: transparent; }
-.theme-toggle { flex: none; padding: 0 14px; }
-.theme-icon { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(90deg, var(--text) 50%, transparent 50%); border: 1.5px solid var(--text); }
 
 /* ---------- 状態表示 ---------- */
 .state-box { margin: 48px auto; max-width: 560px; text-align: center; padding: 28px 20px; color: var(--text-2); }
@@ -740,8 +738,6 @@ main { padding-top: 12px; }
   .panel-toggle { order: 2; padding: 0 12px; }
   .toolbar-row #sort { order: 3; flex: 1 1 140px; min-width: 0; }
   #view-group { order: 4; }
-  .theme-toggle #theme-label { display: none; }
-  .theme-toggle { width: var(--tap); padding: 0; }
   .top-card .top-post-value { font-size: 20px; }
   .title { font-size: 18px; }
   .toolbar-row .segmented button { padding: 0 9px; }
@@ -781,4 +777,23 @@ main { padding-top: 12px; }
 @media (max-width: 639px) {
   .toolbar-row #sort { font-size: 11.5px; padding-left: 6px; padding-right: 20px; }
   #view-group button { padding: 0 5px; }
+}
+
+/* ---------- ヘッダー: タイトル＋「夜職／一般のバズ」スイッチを 1 行、更新表示は 2 行目 ---------- */
+.header-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; }
+.header-inner .brand { display: contents; }
+.header-inner .title { grid-column: 1; grid-row: 1; }
+.header-inner .meta-line { grid-column: 1 / -1; grid-row: 2; }
+.header-inner .delay-note { grid-column: 1 / -1; grid-row: 3; justify-self: start; }
+.mode-switch { grid-column: 2; grid-row: 1; padding: 2px; }
+.mode-switch button { flex: 0 0 auto; min-height: var(--tap); padding: 0 16px; font-size: 14px; font-weight: 600; }
+.mode-switch button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); box-shadow: var(--glow-accent); }
+@media (min-width: 640px) {
+  .header-inner { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .header-inner .meta-line { grid-column: 2; grid-row: 1; align-self: center; margin-top: 0; }
+  .header-inner .delay-note { grid-column: 1 / -1; grid-row: 2; }
+  .mode-switch { grid-column: 3; }
+}
+@media (max-width: 380px) {
+  .mode-switch button { padding: 0 11px; font-size: 13px; }
 }

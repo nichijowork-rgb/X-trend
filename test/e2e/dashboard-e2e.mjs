@@ -201,7 +201,10 @@ async function main() {
       assert((await page.$eval('#cat-chips .chip[aria-pressed="true"]', (b) => b.dataset.group)) === 'night', 'default group');
       assert((await page.evaluate(() => location.hash)) === '', 'no params in URL');
       const chipNames = await page.$$eval('#cat-chips .chip .chip-name', (l) => l.map((e) => e.textContent));
-      assert(chipNames[0] === '夜職すべて' && chipNames[chipNames.length - 1] === '一般のバズ' && !chipNames.includes('監視アカウント') && !chipNames.includes('すべて') && !chipNames.includes('その他'), chipNames.join());
+      assert(chipNames[0] === '夜職すべて' && !chipNames.includes('一般のバズ') && !chipNames.includes('監視アカウント') && !chipNames.includes('すべて') && !chipNames.includes('その他'), chipNames.join());
+      assert((await page.$eval('#mode-group button[aria-pressed="true"]', (b) => b.dataset.group)) === 'night', 'mode switch night');
+      assert(!(await page.$('#theme-toggle')), 'theme toggle removed');
+      assert(!(await page.$('.badge-watch')), 'watch badge hidden');
       assert(!(await page.$$eval('#post-list .badge', (l) => l.some((e) => e.textContent === '監視アカウント'))), 'watch badge duplicated');
       assert(await page.$('#chart-day svg'), 'day chart');
       await page.screenshot({ path: path.join(SHOTS, 'desktop-dark-sample.png'), fullPage: false });
@@ -365,7 +368,7 @@ async function main() {
       await ready(page);
       assert(await page.isVisible('#posts-empty'), 'empty msg');
       assert((await page.textContent('#stat-posts')) === '0', 'zero');
-      assert((await page.$$('#cat-chips .chip')).length === 3, 'chips');
+      assert((await page.$$('#cat-chips .chip')).length === 2, 'chips'); // 夜職すべて＋ホスト
       await page.screenshot({ path: path.join(SHOTS, 'empty.png') });
       allErrors.push(...con.errors);
       await ctx.close();
@@ -537,15 +540,25 @@ async function main() {
       await page.click('#cat-chips .chip[data-cat="ホスト"]');
       await page.click('#cat-chips .chip[data-cat="キャバクラ"]');
       assert((await page.$eval('#cat-chips .chip[aria-pressed="true"]', (b) => b.dataset.group)) === 'night', 'back to night');
-      // グループ「一般のバズ」
+      // ヘッダーのスイッチで「一般のバズ」へ（個別選択は解除、期間・並び替えは保持）
       await page.click('#cat-chips .chip[data-cat="ホスト"]');
-      await page.click('#cat-chips .chip[data-group="general"]');
+      await page.click('#mode-group button[data-group="general"]');
+      let st = await page.evaluate(() => window.__dashboard.state);
+      assert(st.group === 'general' && st.cats.length === 0 && st.period === 'all' && st.sort === 'new', JSON.stringify(st));
       assert(num(await count(page)) === sample.posts.filter((p) => p.categories.includes('その他')).length, 'general');
-      assert((await page.$$('#cat-chips .chip[aria-pressed="true"]')).length === 1, 'only group pressed');
       assert((await page.evaluate(() => location.hash)).includes('group=general'), 'group url');
+      // 一般モードでは夜職のチップは隠れ、どのグループにも入らない未知カテゴリのチップだけ残る
+      const visibleChips = await page.$$eval('#cat-chips .chip:not([hidden])', (l) => l.map((e) => e.dataset.cat || e.dataset.group));
+      assert(visibleChips.length === 1 && visibleChips[0] === 'テスト新カテゴリ', visibleChips.join());
       const badges = await page.$$eval('#post-list .badge', (l) => [...new Set(l.map((e) => e.textContent))]);
-      assert(badges.includes('一般のバズ') && !badges.includes('その他'), badges.join());
-      await page.click('#cat-chips .chip[data-group="night"]');
+      assert(badges.includes('一般のバズ') && !badges.includes('その他') && !badges.includes('監視アカウント'), badges.join());
+      await page.click('#cat-chips .chip[data-cat="テスト新カテゴリ"]');
+      assert(num(await count(page)) === 5, 'unknown in general mode');
+      await page.click('#cat-chips .chip[data-cat="テスト新カテゴリ"]');
+      assert(num(await count(page)) === sample.posts.filter((p) => p.categories.includes('その他')).length, 'back to general');
+      await page.click('#mode-group button[data-group="night"]');
+      st = await page.evaluate(() => window.__dashboard.state);
+      assert(st.group === 'night' && st.cats.length === 0, JSON.stringify(st));
       assert(num(await count(page)) === sample.posts.filter(inNight).length, 'night all-period');
       return `ホスト ${n('ホスト')} + キャバクラ → ${both}`;
     });
@@ -738,21 +751,21 @@ async function main() {
       return `画面内 ${done}/${total} 件のみ生成`;
     });
 
-    await check('ライト/ダーク切替（localStorage 保存）', async () => {
-      const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-      const dark = await bg();
-      await page.click('#theme-toggle'); // auto → dark
-      assert((await page.getAttribute('html', 'data-theme')) === 'dark', 'dark');
-      await page.click('#theme-toggle'); // dark → light
-      assert((await page.getAttribute('html', 'data-theme')) === 'light', 'light');
-      const light = await bg();
-      assert(light !== dark, 'bg unchanged');
-      await page.reload();
-      await ready(page);
-      assert((await page.getAttribute('html', 'data-theme')) === 'light', 'persist');
-      await page.screenshot({ path: path.join(SHOTS, 'desktop-light.png') });
-      await page.click('#theme-toggle'); // light → auto
-      assert((await page.getAttribute('html', 'data-theme')) === null, 'auto');
+    await check('テーマは OS 設定に自動追従（古い手動テーマの保存値は無視して削除）', async () => {
+      const { ctx: c2, page: p2, con: k2 } = await newPage({ colorScheme: 'dark' }, { data: { posts: null, summary: null } });
+      await p2.addInitScript(() => { try { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('xreport-theme', 'light'); sessionStorage.setItem('seeded', '1'); } } catch {} });
+      await p2.goto(base);
+      await ready(p2);
+      const bg = await p2.evaluate(() => getComputedStyle(document.body).backgroundColor);
+      assert(bg === 'rgb(10, 7, 18)', `dark expected, got ${bg}`);
+      assert((await p2.getAttribute('html', 'data-theme')) === null, 'no data-theme');
+      assert((await p2.evaluate(() => localStorage.getItem('xreport-theme'))) === null, 'old theme removed');
+      await p2.emulateMedia({ colorScheme: 'light' });
+      const bg2 = await p2.evaluate(() => getComputedStyle(document.body).backgroundColor);
+      assert(bg2 === 'rgb(246, 244, 251)', `light expected, got ${bg2}`);
+      await p2.screenshot({ path: path.join(SHOTS, 'desktop-light.png') });
+      allErrors.push(...k2.errors);
+      await c2.close();
     });
 
     allErrors.push(...con.errors);
@@ -792,7 +805,7 @@ async function main() {
         const sw = await p2.evaluate(() => document.documentElement.scrollWidth);
         assert(sw <= w, `scrollWidth ${sw}`);
         const small = await p2.evaluate(() => {
-          const sel = '#panel-toggle, .more-text, #rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #theme-toggle, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
+          const sel = '#panel-toggle, .more-text, #rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #mode-group button, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
           return [...document.querySelectorAll(sel)].filter((e) => e.offsetParent && e.getBoundingClientRect().height < 44).map((e) => `${e.className || e.id}:${Math.round(e.getBoundingClientRect().height)}`).slice(0, 5);
         });
         assert(small.length === 0, small.join(', '));

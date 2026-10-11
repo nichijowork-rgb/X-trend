@@ -70,19 +70,10 @@ async function load() {
 
 // ---------------------------------------------------------------- テーマ
 
-const THEME_KEY = 'xreport-theme';
-const THEME_ORDER = ['auto', 'dark', 'light'];
-const THEME_LABEL = { auto: '自動', dark: 'ダーク', light: 'ライト' };
-
-function currentTheme() {
-  const t = document.documentElement.getAttribute('data-theme');
-  return t === 'light' || t === 'dark' ? t : 'auto';
-}
+// テーマは OS 設定に自動追従（手動切替なし。theme-init.js 参照）
 
 /** 実際に表示中のテーマ（埋め込みの theme 指定用） */
 function resolvedTheme() {
-  const t = currentTheme();
-  if (t !== 'auto') return t;
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
@@ -101,29 +92,6 @@ function storageSet(k, v) {
   try { window.localStorage.setItem(k, v); } catch { /* 保存できない環境では無視 */ }
 }
 
-function setupTheme() {
-  const btn = $('theme-toggle');
-  const label = $('theme-label');
-  const sync = () => {
-    const t = currentTheme();
-    label.textContent = THEME_LABEL[t];
-    btn.setAttribute('aria-label', `表示テーマ: ${THEME_LABEL[t]}（クリックで切り替え）`);
-  };
-  btn.addEventListener('click', () => {
-    const next = THEME_ORDER[(THEME_ORDER.indexOf(currentTheme()) + 1) % THEME_ORDER.length];
-    if (next === 'auto') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme', next);
-    try {
-      if (next === 'auto') window.localStorage.removeItem(THEME_KEY);
-      else window.localStorage.setItem(THEME_KEY, next);
-    } catch {
-      /* 保存できなくても表示は切り替わる */
-    }
-    sync();
-  });
-  sync();
-}
-
 // ---------------------------------------------------------------- アプリ状態
 
 const app = {
@@ -140,6 +108,7 @@ const app = {
   lastDayCats: null,
   tooltip: null,
   embedder: null,
+  unknownCats: new Set(),
   noticeDismissed: false,
   perf: { lastRenderMs: 0, renders: 0 },
 };
@@ -191,6 +160,7 @@ function buildControls() {
     return b;
   };
   const [night, general] = CATEGORY_GROUPS;
+  app.unknownCats = new Set(individualChipCategories(ds.categories).filter((c) => !night.categories.includes(c)));
   chips.append(groupChip(night));
   for (const c of individualChipCategories(ds.categories)) {
     const b = el('button', 'chip');
@@ -204,13 +174,22 @@ function buildControls() {
       const set = new Set(app.state.cats);
       if (set.has(c)) set.delete(c); else set.add(c);
       const cats = ds.categories.filter((x) => set.has(x));
-      update(cats.length ? { cats, group: '' } : { cats: [], group: 'night' });
+      // 選択はモード（夜職／一般のバズ）の中で行う。全部外したらそのモードの全体に戻る
+      update({ cats });
     });
     chips.append(b);
   }
-  const sep = el('span', 'chip-sep');
-  sep.setAttribute('aria-hidden', 'true');
-  chips.append(sep, groupChip(general));
+  // ヘッダーの「夜職 ／ 一般のバズ」スイッチ（グループの切替。期間・並び替え・検索などは保持）
+  const mg = $('mode-group');
+  mg.replaceChildren();
+  for (const g of [night, general]) {
+    const b = el('button', null, g.key === 'night' ? '夜職' : g.label);
+    b.type = 'button';
+    b.dataset.group = g.key;
+    b.title = g.key === 'night' ? `夜職（${g.categories.join('・')}）` : g.label;
+    b.addEventListener('click', () => update({ group: g.key, cats: [] }));
+    mg.append(b);
+  }
 
   // 期間
   const pg = $('period-group');
@@ -330,9 +309,13 @@ function syncControls() {
   for (const b of $('cat-chips').querySelectorAll('.chip')) {
     const c = b.dataset.cat;
     b.setAttribute('aria-pressed', String(c ? st.cats.includes(c) : (!st.cats.length && st.group === b.dataset.group)));
+    // 一般のバズモードでは夜職のチップを隠し、どのグループにも入らない未知カテゴリのチップだけ残す
+    b.hidden = st.group === 'general' && !(c && app.unknownCats.has(c));
   }
   for (const b of $('period-group').children) b.setAttribute('aria-pressed', String(b.dataset.period === st.period));
   for (const b of $('acct-group').children) b.setAttribute('aria-pressed', String(b.dataset.acct === st.acct));
+  $('cat-chips').hidden = ![...$('cat-chips').querySelectorAll('.chip')].some((b) => !b.hidden);
+  for (const b of $('mode-group').children) b.setAttribute('aria-pressed', String(b.dataset.group === st.group));
   for (const b of $('view-group').children) b.setAttribute('aria-pressed', String(b.dataset.view === st.view));
   $('panel').hidden = !st.panel;
   $('panel-toggle').setAttribute('aria-expanded', String(st.panel));
@@ -522,7 +505,6 @@ function renderAccounts(agg) {
     b.setAttribute('aria-pressed', String(!!selected));
     const name = el('span', 'acc-name');
     name.append(el('span', null, `@${a.user}`));
-    if (a.is_watched) name.append(el('span', 'badge-watch', '監視'));
     const stats = el('span', 'acc-stats');
     const imp = formatCompact(a.impressions.sum) + (a.impressions.unknown ? '＋不明' : '');
     if (state.acct === 'imp') {
@@ -532,7 +514,7 @@ function renderAccounts(agg) {
     }
     stats.title = `投稿 ${formatExact(a.posts)}件 / インプレッション ${formatExact(a.impressions.sum)}${a.impressions.unknown ? `（${a.impressions.unknown}件不明）` : ''}`;
     b.append(el('span', 'acc-rank', String(i + 1)), name, stats);
-    b.setAttribute('aria-label', `@${a.user}${a.is_watched ? '（監視）' : ''} 投稿${a.posts}件、インプレッション${formatExact(a.impressions.sum)}。${selected ? '絞り込みを解除' : 'このアカウントで絞り込む'}`);
+    b.setAttribute('aria-label', `@${a.user} 投稿${a.posts}件、インプレッション${formatExact(a.impressions.sum)}。${selected ? '絞り込みを解除' : 'このアカウントで絞り込む'}`);
     b.addEventListener('click', () => update({ user: selected ? '' : a.user }));
     li.append(b);
     list.append(li);
@@ -613,7 +595,7 @@ function postHead(p) {
   user.title = `@${p.user} で絞り込む`;
   user.addEventListener('click', () => update({ user: p.user }, { scroll: true }));
   head.append(user);
-  if (p.is_watched || p.categories.includes(WATCH_CATEGORY)) head.append(el('span', 'badge-watch', '監視'));
+  // 「監視」小バッジは表示しない（データの is_watched と詳細パネルの「監視アカウントのみ」は残す）
   const time = el('time', 'post-time', formatDateTime(p.created_jst, p.ts, app.refYear));
   time.title = formatDateTimeFull(p.created_jst, p.ts);
   if (p.ts != null) time.dateTime = new Date(p.ts * 1000).toISOString();
@@ -640,7 +622,7 @@ function paceLine(p) {
 function postCats(p) {
   const cats = el('div', 'post-cats');
   for (const c of p.categories) {
-    if (c === WATCH_CATEGORY) continue; // 「監視」小バッジで表すので重複させない
+    if (c === WATCH_CATEGORY) continue; // 「監視アカウント」はカテゴリバッジに出さない
     const b = el('span', 'badge', categoryLabel(c));
     setCatColor(b, c);
     cats.append(b);
@@ -1100,7 +1082,6 @@ function showError(err) {
 }
 
 async function main() {
-  setupTheme();
   $('reload').addEventListener('click', () => location.reload());
   app.tooltip = createTooltip($('tooltip'));
   app.embedder = createEmbedder({ getTheme: resolvedTheme });
