@@ -4,6 +4,7 @@
 //   node tools/make-sample.mjs            # 既定 1,500 件 → sample/
 //   node tools/make-sample.mjs 3000 /tmp/out   # 件数と出力先を指定（性能確認用）
 //
+// reports.json（任意のレポート欄）も同時に生成する（posts の id を参照。posts に無い id も含む）。
 // Node 22 標準モジュールのみ使用。乱数はシード固定（mulberry32）なので何度実行しても同じ結果になる。
 // ユーザー名はすべて sample_ 始まりの架空、本文は「【サンプル】」で始まる。
 // 検証用に以下を意図的に混ぜている:
@@ -280,7 +281,79 @@ const summary = {
   top_posts: { by_impressions: topBy('impression_count'), by_likes: topBy('like_count') },
 };
 
+// ---- reports.json（任意。docs/DASHBOARD.md の形式どおり）
+// 条件ラベルは「データ側から渡す文字列」の例。サンプルなので【サンプル】付きの架空の条件名にしている。
+const COND = ['【サンプル】条件A（投稿から2時間以内）', '【サンプル】条件B（投稿から6時間以内）', '【サンプル】条件C（投稿から12時間以内）'];
+const genTs = Math.floor(Date.parse(GENERATED_AT) / 1000);
+function risingFor(refTs, n) {
+  return posts
+    .filter((p) => p.metrics && typeof p.metrics.impression_count === 'number' && p.ts <= refTs && refTs - p.ts <= 12 * 3600)
+    .map((p) => {
+      const hours = Math.round(((refTs - p.ts) / 3600) * 10) / 10;
+      return { p, hours, vph: Math.round(p.metrics.impression_count / Math.max(1, hours)) };
+    })
+    .sort((a, b) => b.vph - a.vph)
+    .slice(0, n)
+    .map(({ p, hours, vph }) => ({
+      id: p.id, views: p.metrics.impression_count, hours_since_post: hours, views_per_hour: vph,
+      condition_label: COND[hours <= 2 ? 0 : hours <= 6 ? 1 : 2],
+    }));
+}
+const prevRef = genTs - 86400;
+const risingPrev = risingFor(prevRef, 5);
+const risingToday = risingFor(genTs, 6);
+// posts.json に無い id（「Xで開く」だけ表示されることの確認用）
+risingToday.splice(2, 0, { id: '1999999999999999999', views: 412000, hours_since_post: 2.5, views_per_hour: 164800, condition_label: COND[1] });
+// XSS 文字列入りの条件名
+risingToday.push({ id: posts[40].id, views: posts[40].metrics.impression_count ?? 0, hours_since_post: 'x', views_per_hour: null, condition_label: '<img src=x onerror="alert(\'rep\')">条件名にタグ' });
+const review = risingPrev.map((r, i) => ({
+  id: r.id, before_views: r.views, after_views: r.views * 2 + (i % 2 === 0 ? 500000 : 0), crossed_500k: r.views * 2 + (i % 2 === 0 ? 500000 : 0) >= 500000,
+}));
+review.push({ id: '1999999999999999998', before_views: 301000, after_views: 655000, crossed_500k: true });
+review.push({ id: risingPrev[0] ? risingPrev[0].id : posts[0].id, before_views: 'abc', after_views: null, crossed_500k: 'yes', extra_unknown_field: 1 });
+const hit = (rows) => COND.map((c) => {
+  const list = rows.filter((r) => r.label === c);
+  return { condition_label: c, total: list.length, crossed: list.filter((r) => r.crossed).length };
+});
+const reports = {
+  generated_at: GENERATED_AT,
+  daily: [
+    { date: '2026-10-11', rising: risingToday, review, hit_rate: hit(risingPrev.map((r, i) => ({ label: r.condition_label, crossed: review[i].crossed_500k }))) },
+    { date: '2026-10-10', rising: risingPrev, review: [], hit_rate: [] },
+  ],
+  weekly: [
+    {
+      period: { from: '2026-10-03', to: '2026-10-10' },
+      generated_at: '2026-10-10T12:00:00+09:00',
+      hit_rate_by_condition: [
+        { condition_label: COND[0], total: 12, crossed: 7 },
+        { condition_label: COND[1], total: 9, crossed: 3 },
+        { condition_label: COND[2], total: 0, crossed: 0 },
+      ],
+      hit_rate_by_pace: [
+        { pace_label: '【サンプル】ペース速（1時間あたり上位）', total: 8, crossed: 6 },
+        { pace_label: '【サンプル】ペース中', total: 10, crossed: 3 },
+        { pace_label: '【サンプル】ペース遅', total: 'n/a', crossed: 1 },
+      ],
+      threshold_proposal: '【サンプル】条件Aの的中率が高いため据え置き。\n条件Bは見直しを検討。\n<script>alert("proposal")</script>（タグは文字として表示される）',
+      watch_candidates: [
+        { user: USERS[0].user, reason: '【サンプル】伸びている投稿に3回登場' },
+        { user: USERS[30].user, reason: '【サンプル】<img src=x onerror="alert(\'cand\')"> 理由にタグ' },
+        { user: 'sample_not_in_posts', reason: '【サンプル】posts.json に投稿が無いアカウント' },
+      ],
+    },
+    {
+      period: { from: '2026-09-26', to: '2026-10-03' },
+      hit_rate_by_condition: [{ condition_label: COND[0], total: 5, crossed: 2 }],
+      hit_rate_by_pace: [],
+      threshold_proposal: '',
+      watch_candidates: [],
+    },
+  ],
+};
+
 mkdirSync(OUT, { recursive: true });
 writeFileSync(path.join(OUT, 'posts.json'), JSON.stringify({ generated_at: GENERATED_AT, categories: CATEGORIES, posts }, null, 1) + '\n');
 writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1) + '\n');
+writeFileSync(path.join(OUT, 'reports.json'), JSON.stringify(reports, null, 1) + '\n');
 console.log(`wrote ${posts.length} posts → ${path.relative(process.cwd(), OUT) || OUT}`);

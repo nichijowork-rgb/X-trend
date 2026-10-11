@@ -552,3 +552,83 @@ mark.m-q { background: var(--mark-q-bg); color: var(--mark-q-fg); box-shadow: in
 .pace.unk { color: var(--muted); font-weight: 400; }
 .pace-note { margin-top: 6px; color: var(--muted); padding: 8px 12px; border-left: 2px solid var(--accent-3); background: var(--surface); border-radius: 0 8px 8px 0; }
 .embed-band .pace { margin-top: 0; }
+
+/* ---------- レポート ---------- */
+.report { margin-top: 14px; padding: 0; overflow: hidden; }
+.report > summary, .report-sub > summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; min-height: var(--tap);
+}
+.report > summary::-webkit-details-marker, .report-sub > summary::-webkit-details-marker { display: none; }
+.report > summary { padding: 10px 16px; }
+.report > summary::before, .report-sub > summary::before {
+  content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg); transition: transform .15s; flex: none; margin-right: 2px;
+}
+.report[open] > summary::before, .report-sub[open] > summary::before { transform: rotate(45deg); }
+.report-title { font-size: 16px; font-weight: 700; }
+.report-title .neon { color: var(--accent-ink); text-shadow: var(--glow-text); }
+.report-meta { font-size: 12px; color: var(--muted); margin-left: auto; text-align: right; }
+.report-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 0 16px 16px; }
+.rising-more { justify-self: center; }
+.report-sub { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); min-width: 0; }
+.report-sub > summary { padding: 6px 12px; flex-wrap: wrap; }
+.report-sub > summary h3 { font-size: 15px; font-weight: 700; }
+.report-sub-body { padding: 4px 12px 14px; display: grid; gap: 14px; min-width: 0; }
+.report-pick { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13px; color: var(--text-2); }
+.report-pick select { width: auto; min-width: 9em; max-width: 100%; flex: 0 1 auto; }
+.report-part { min-width: 0; }
+#report-daily-body, #report-weekly-body { display: grid; gap: 18px; min-width: 0; }
+.rising-item .pace { display: none; } /* 帯にデータ側の値を出すので重複させない */
+.report-part > h4 { font-size: 13px; font-weight: 700; color: var(--text-2); margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+.report-part > h4::before { content: ""; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); }
+.report-empty { font-size: 13px; color: var(--muted); padding: 10px 12px; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); }
+.rising-list { display: grid; gap: 10px; }
+.rising-item { min-width: 0; }
+.rising-band {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12px;
+  padding: 6px 12px; border: 1px solid var(--border); border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0; background: var(--surface-3);
+}
+.rising-band .rank { font-weight: 700; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.rising-band .cond { color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
+.rising-band .rpace { color: var(--text-2); font-variant-numeric: tabular-nums; }
+.rising-item > .post { border-top-left-radius: 0; border-top-right-radius: 0; }
+.post-missing { padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; color: var(--muted); font-size: 13px; }
+.report-table td.post-cell { text-align: left; white-space: normal; min-width: 12em; max-width: 28em; }
+.report-table .rt-user { background: none; border: 0; padding: 0; color: var(--text); font-weight: 700; cursor: pointer; min-height: var(--tap); }
+.report-table .rt-user:hover { color: var(--accent-ink); text-decoration: underline; }
+.report-table .rt-text { display: block; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 26em; }
+.report-table td a { display: inline-flex; align-items: center; min-height: var(--tap); }
+.cross { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border-strong); color: var(--muted); }
+.cross.yes { color: var(--text); border-color: var(--accent); background: var(--mark-term-bg); }
+.cross.yes::before { content: "✓"; font-weight: 700; color: var(--accent-ink); }
+.rate-list { display: grid; gap: 8px; }
+.rate-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(60px, 1fr) 8.5em; align-items: center; gap: 10px; min-height: 32px; }
+.rate-label { font-size: 13px; color: var(--text-2); overflow-wrap: anywhere; }
+.rate-meter { display: block; width: 100%; height: 10px; border-radius: 0 4px 4px 0; overflow: hidden; }
+.rate-track { fill: var(--surface-3); }
+.rate-fill { fill: var(--accent-2); }
+.rate-value { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text); }
+.proposal { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; padding: 10px 12px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.cand-list { display: grid; gap: 4px; list-style: none; margin: 0; padding: 0; }
+.cand-list button {
+  width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: 4px 12px; text-align: left;
+  min-height: var(--tap); padding: 6px 10px; border: 0; border-radius: 10px; background: var(--surface); color: var(--text); cursor: pointer;
+}
+.cand-list button:hover { background: var(--surface-3); }
+.cand-user { font-weight: 700; }
+.cand-reason { color: var(--text-2); font-size: 13px; overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  .rate-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .rate-row .rate-meter { grid-column: 1 / -1; grid-row: 2; }
+  .rate-row { row-gap: 6px; }
+  .report-body { padding: 0 8px 12px; }
+  .report-sub-body { padding: 4px 8px 12px; }
+  .report-sub .post { padding: 12px; }
+  .rate-list { gap: 14px; }
+  .cand-list button { grid-template-columns: minmax(0, 1fr); }
+  .report-pick { margin-left: 0; width: 100%; }
+  .report-pick select { flex: 1; }
+}
+@media (min-width: 960px) {
+  .report-body { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
+}

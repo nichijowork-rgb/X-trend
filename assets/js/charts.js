@@ -6,7 +6,7 @@
 //  - ホバー/フォーカスでツールチップ、値は「表で見る」でも読める
 //  - ラベルやカテゴリ名は textContent で挿入（innerHTML 不使用）
 
-import { formatCompact, formatExact, niceTicks, shortDate, categorySlot } from './core.js';
+import { formatCompact, formatExact, niceTicks, shortDate, categorySlot, hitRateText, hitRatio } from './core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -296,4 +296,38 @@ export function renderDayTable(container, days, categories) {
   }
   table.append(thead, tbody);
   container.append(table);
+}
+
+// ---------------------------------------------------------------- 的中率（メーター型の横棒）
+
+/**
+ * items: [{label, total, crossed}]。1 系列なので色は 1 色（凡例なし）。
+ * 値は「n件中m件（xx%）」を常に直接表示（ツールチップに頼らない）。total=0 は「対象なし」。
+ */
+export function renderRateBars(container, items, emptyText) {
+  container.replaceChildren();
+  container.classList.remove('is-empty');
+  if (!items.length) {
+    container.classList.add('is-empty');
+    container.textContent = emptyText;
+    return;
+  }
+  const list = el('div', 'rate-list');
+  list.setAttribute('role', 'list');
+  for (const it of items) {
+    const row = el('div', 'rate-row');
+    row.setAttribute('role', 'listitem');
+    const label = el('div', 'rate-label', it.label ?? '（条件名なし）');
+    const text = hitRateText(it.total, it.crossed);
+    const ratio = hitRatio(it.total, it.crossed);
+    const meter = svg('svg', { class: 'rate-meter', viewBox: '0 0 100 8', preserveAspectRatio: 'none', 'aria-hidden': 'true', focusable: 'false' });
+    meter.append(svg('rect', { class: 'rate-track', x: 0, y: 0, width: 100, height: 8, rx: 0 }));
+    if (ratio != null && ratio > 0) meter.append(svg('rect', { class: 'rate-fill', x: 0, y: 0, width: Math.max(0.8, ratio * 100), height: 8 }));
+    const value = el('div', ratio == null ? 'rate-value muted' : 'rate-value', text);
+    row.setAttribute('aria-label', `${it.label ?? '条件名なし'}: ${text}`);
+    row.title = `${it.label ?? ''} ${text}`.trim();
+    row.append(label, meter, value);
+    list.append(row);
+  }
+  container.append(list);
 }

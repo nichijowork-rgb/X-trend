@@ -311,7 +311,11 @@ export const VIEWS = [
 
 export const DEFAULT_STATE = Object.freeze({
   cats: [], period: 'all', user: '', q: '', watched: false, sort: 'new', acct: 'posts', view: 'card',
+  rdate: '', rweek: '', rclosed: [],
 });
+
+/** レポート欄の開閉キー（rclosed に入っているものは閉じている） */
+export const REPORT_SECTIONS = Object.freeze(['report', 'daily', 'weekly']);
 
 /** キーワードを空白（全角含む）で分割。AND 検索用 */
 export function parseKeywords(q) {
@@ -680,6 +684,9 @@ export function serializeState(state) {
   if (st.sort !== DEFAULT_STATE.sort) sp.set('sort', st.sort);
   if (st.acct !== DEFAULT_STATE.acct) sp.set('acct', st.acct);
   if (st.view !== DEFAULT_STATE.view) sp.set('view', st.view);
+  if (st.rdate) sp.set('rdate', st.rdate);
+  if (st.rweek) sp.set('rweek', st.rweek);
+  for (const k of REPORT_SECTIONS) if (st.rclosed.includes(k)) sp.append('rc', k);
   return sp.toString();
 }
 
@@ -703,7 +710,125 @@ export function parseState(str, fallbackView = null) {
     sort: SORTS.some((s) => s.key === sort) ? sort : DEFAULT_STATE.sort,
     acct: ACCOUNT_SORTS.some((s) => s.key === acct) ? acct : DEFAULT_STATE.acct,
     view: isView(view) ? view : (isView(fallbackView) ? fallbackView : DEFAULT_STATE.view),
+    rdate: DATE_RE.test(sp.get('rdate') || '') ? sp.get('rdate') : '',
+    rweek: WEEK_RE.test(sp.get('rweek') || '') ? sp.get('rweek') : '',
+    rclosed: REPORT_SECTIONS.filter((k) => sp.getAll('rc').includes(k)),
   };
+}
+
+// ---------------------------------------------------------------- レポート（reports.json・任意）
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const WEEK_RE = /^\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}$/;
+
+function strOrNull(v) {
+  return typeof v === 'string' && v.trim() ? v : null;
+}
+
+function idOrNull(v) {
+  if (typeof v === 'string' && v.trim()) return v.trim();
+  if (isNum(v) && Number.isSafeInteger(v)) return String(v);
+  return null;
+}
+
+function numField(v) {
+  return isNum(v) ? v : null;
+}
+
+function arr(v) {
+  return Array.isArray(v) ? v.filter((x) => x && typeof x === 'object' && !Array.isArray(x)) : [];
+}
+
+function hitRows(list, labelKey) {
+  return arr(list).map((h) => ({ label: strOrNull(h[labelKey]), total: numField(h.total), crossed: numField(h.crossed) }));
+}
+
+/** 週のキー（URL 用）: "2026-10-10_2026-10-17" */
+export function weekKey(period) {
+  return period && DATE_RE.test(period.from || '') && DATE_RE.test(period.to || '') ? `${period.from}_${period.to}` : null;
+}
+
+/**
+ * reports.json を正規化する。不正（オブジェクトでない）なら null。
+ * 未知フィールドは無視、型が違う値は null（画面では「不明」）。daily は date 降順、weekly は期間の新しい順。
+ * しきい値・条件の文言はすべてデータの文字列をそのまま使う（ここでは判定しない）。
+ */
+export function normalizeReports(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const daily = arr(raw.daily)
+    .filter((d) => typeof d.date === 'string' && DATE_RE.test(d.date))
+    .map((d) => ({
+      date: d.date,
+      rising: arr(d.rising).map((r) => ({
+        id: idOrNull(r.id),
+        views: numField(r.views),
+        hours: numField(r.hours_since_post),
+        perHour: numField(r.views_per_hour),
+        label: strOrNull(r.condition_label),
+      })),
+      review: arr(d.review).map((r) => ({
+        id: idOrNull(r.id),
+        before: numField(r.before_views),
+        after: numField(r.after_views),
+        crossed: typeof r.crossed_500k === 'boolean' ? r.crossed_500k : null,
+      })),
+      hitRate: hitRows(d.hit_rate, 'condition_label'),
+    }));
+  const seenD = new Set();
+  const dailyU = daily.filter((d) => (seenD.has(d.date) ? false : seenD.add(d.date)))
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
+  const weekly = arr(raw.weekly)
+    .map((w) => ({
+      key: weekKey(w.period && typeof w.period === 'object' ? w.period : null),
+      from: w.period && strOrNull(w.period.from),
+      to: w.period && strOrNull(w.period.to),
+      generated_at: strOrNull(w.generated_at),
+      byCondition: hitRows(w.hit_rate_by_condition, 'condition_label'),
+      byPace: hitRows(w.hit_rate_by_pace, 'pace_label'),
+      proposal: typeof w.threshold_proposal === 'string' ? w.threshold_proposal : null,
+      candidates: arr(w.watch_candidates)
+        .map((c) => ({ user: typeof c.user === 'string' ? c.user.replace(/^@/, '').trim() : '', reason: strOrNull(c.reason) }))
+        .filter((c) => c.user),
+    }))
+    .filter((w) => w.key);
+  const seenW = new Set();
+  const weeklyU = weekly.filter((w) => (seenW.has(w.key) ? false : seenW.add(w.key)))
+    .sort((a, b) => (a.key < b.key ? 1 : -1));
+  return { generated_at: strOrNull(raw.generated_at), daily: dailyU, weekly: weeklyU };
+}
+
+/** 選択値がリストにあればそれ、無ければ先頭（最新） */
+export function pickReport(list, key, keyOf) {
+  if (!list || !list.length) return null;
+  return list.find((x) => keyOf(x) === key) || list[0];
+}
+
+/** 「n件中m件（xx%）」。total=0 は「対象なし」、欠損は「不明」 */
+export function hitRateText(total, crossed) {
+  if (!isNum(total) || !isNum(crossed) || total < 0 || crossed < 0) return UNKNOWN;
+  if (total === 0) return '対象なし';
+  return `${formatExact(total)}件中${formatExact(crossed)}件（${Math.round((crossed / total) * 100)}%）`;
+}
+
+/** 的中率（0〜1）。計算できなければ null */
+export function hitRatio(total, crossed) {
+  if (!isNum(total) || !isNum(crossed) || total <= 0 || crossed < 0) return null;
+  return Math.min(1, crossed / total);
+}
+
+/**
+ * 伸びている投稿の帯:「投稿から3時間で38.2万表示（1時間あたり12.7万）」。
+ * 1時間あたりはデータの views_per_hour を優先し、無ければ views ÷ hours（1時間未満は1時間）。
+ */
+export function formatRisingPace(views, hours, perHour) {
+  if (!isNum(views) || !isNum(hours) || hours < 0) return `伸びペース：${UNKNOWN}`;
+  const ph = isNum(perHour) ? perHour : views / Math.max(1, hours);
+  return `投稿から${formatElapsed(hours)}で${formatCompact(views)}表示（1時間あたり${formatCompact(ph)}）`;
+}
+
+/** 前→後（万表記）。欠損は「不明」 */
+export function formatBeforeAfter(before, after) {
+  return `${formatCompact(before)}→${formatCompact(after)}`;
 }
 
 // ---------------------------------------------------------------- 添付メディア

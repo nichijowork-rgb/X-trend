@@ -9,8 +9,9 @@ import {
   categorySlot, hashString, KNOWN_CATEGORY_SLOTS, SPARE_SLOTS, isFilterActive, topAccounts, countByCategory,
   niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, CHART_MAX_DAYS,
   chooseRefTs, nextScheduledUpdate, isUpdateDelayed, viewsPerHour, formatPace, SORTS,
+  normalizeReports, pickReport, hitRateText, hitRatio, formatRisingPace, formatBeforeAfter, weekKey,
 } from '../assets/js/core.js';
-import { UPDATE_SCHEDULE, PACE_NOTE } from '../assets/js/config.js';
+import { UPDATE_SCHEDULE, PACE_NOTE, REPORT_TEXT } from '../assets/js/config.js';
 
 const ts = (iso) => Math.floor(Date.parse(iso) / 1000);
 
@@ -261,7 +262,7 @@ test('highlightSegments: 大文字小文字無視・長い語優先・重なり�
 
 test('serializeState / parseState: 往復で一致し、既定値は省略', () => {
   assert.equal(serializeState(DEFAULT_STATE), '');
-  const st = { cats: ['ホスト', 'テスト,カンマ'], period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed' };
+  const st = { cats: ['ホスト', 'テスト,カンマ'], period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'] };
   const s = serializeState(st);
   assert.deepEqual(parseState('#' + s), st);
   assert.deepEqual(parseState('?' + s), st);
@@ -417,4 +418,92 @@ test('sortPosts(pace): 1時間あたり表示の降順、不明は末尾', () =>
   ], undefined, '2026-10-11T23:59:00+09:00');
   assert.ok(SORTS.some((s) => s.key === 'pace'));
   assert.deepEqual(sortPosts(ds.posts, 'pace', ds.refTs).map((p) => p.id), ['b', 'a', 'c', 'd']);
+});
+
+// ---------------------------------------------------------------- レポート（reports.json）
+
+test('normalizeReports: 不正は null、未知フィールドは無視、型違いは null（不明）', () => {
+  assert.equal(normalizeReports(null), null);
+  assert.equal(normalizeReports([]), null);
+  assert.equal(normalizeReports('x'), null);
+  assert.deepEqual(normalizeReports({}), { generated_at: null, daily: [], weekly: [] });
+  assert.deepEqual(normalizeReports({ daily: 'x', weekly: null }), { generated_at: null, daily: [], weekly: [] });
+  const r = normalizeReports({
+    generated_at: '2026-10-12T23:59:00+09:00',
+    unknown_top: 1,
+    daily: [
+      { date: '2026-10-11', rising: [], review: [], hit_rate: [] },
+      { date: '2026-10-12', extra: true,
+        rising: [{ id: 123, views: 382000, hours_since_post: 3, views_per_hour: 127333, condition_label: '<b>条件</b>' }, { id: '9', views: 'abc', hours_since_post: null, condition_label: 5 }, 'bad'],
+        review: [{ id: '1', before_views: 382000, after_views: 625000, crossed_500k: true }, { id: '2', before_views: '1', after_views: 2, crossed_500k: 'yes' }],
+        hit_rate: [{ condition_label: 'A', total: 4, crossed: 3 }, { condition_label: 'B', total: '4', crossed: 1 }] },
+      { date: '10/12', rising: [] },
+      { date: '2026-10-12', rising: [] }, // 重複は先勝ち
+    ],
+    weekly: [
+      { period: { from: '2026-10-03', to: '2026-10-10' }, hit_rate_by_pace: [{ pace_label: '速', total: 2, crossed: 1 }], threshold_proposal: 'a\nb', watch_candidates: [{ user: '@u1', reason: 'r' }, { user: '' }, { reason: 'x' }] },
+      { period: { from: '2026-10-10', to: '2026-10-17' } },
+      { period: { from: 'x' } },
+    ],
+  });
+  assert.deepEqual(r.daily.map((d) => d.date), ['2026-10-12', '2026-10-11']);
+  const d = r.daily[0];
+  assert.deepEqual(d.rising, [
+    { id: '123', views: 382000, hours: 3, perHour: 127333, label: '<b>条件</b>' },
+    { id: '9', views: null, hours: null, perHour: null, label: null },
+  ]);
+  assert.deepEqual(d.review[1], { id: '2', before: null, after: 2, crossed: null });
+  assert.deepEqual(d.hitRate[1], { label: 'B', total: null, crossed: 1 });
+  assert.deepEqual(r.weekly.map((w) => w.key), ['2026-10-10_2026-10-17', '2026-10-03_2026-10-10']);
+  const w = r.weekly[1];
+  assert.deepEqual(w.byPace, [{ label: '速', total: 2, crossed: 1 }]);
+  assert.equal(w.proposal, 'a\nb');
+  assert.deepEqual(w.candidates, [{ user: 'u1', reason: 'r' }]);
+  assert.deepEqual(r.weekly[0].byCondition, []);
+  assert.equal(r.weekly[0].proposal, null);
+});
+
+test('pickReport / weekKey: 選択が無い・一覧に無ければ最新', () => {
+  const list = [{ date: '2026-10-12' }, { date: '2026-10-11' }];
+  assert.equal(pickReport(list, '2026-10-11', (x) => x.date).date, '2026-10-11');
+  assert.equal(pickReport(list, '', (x) => x.date).date, '2026-10-12');
+  assert.equal(pickReport(list, '2020-01-01', (x) => x.date).date, '2026-10-12');
+  assert.equal(pickReport([], 'x', (x) => x.date), null);
+  assert.equal(weekKey({ from: '2026-10-10', to: '2026-10-17' }), '2026-10-10_2026-10-17');
+  assert.equal(weekKey({ from: '10/10' }), null);
+});
+
+test('hitRateText / hitRatio: n件中m件（xx%）、total=0 は「対象なし」、欠損は「不明」', () => {
+  assert.equal(hitRateText(4, 3), '4件中3件（75%）');
+  assert.equal(hitRateText(3, 1), '3件中1件（33%）');
+  assert.equal(hitRateText(0, 0), '対象なし');
+  assert.equal(hitRateText(null, 1), '不明');
+  assert.equal(hitRateText(4, -1), '不明');
+  assert.equal(hitRatio(4, 3), 0.75);
+  assert.equal(hitRatio(0, 0), null);
+  assert.equal(hitRatio(2, 5), 1);
+});
+
+test('formatRisingPace / formatBeforeAfter: views と hours_since_post から表示', () => {
+  assert.equal(formatRisingPace(382000, 3, 127333), '投稿から3時間で38.2万表示（1時間あたり12.7万）');
+  assert.equal(formatRisingPace(382000, 3, null), '投稿から3時間で38.2万表示（1時間あたり12.7万）');
+  assert.equal(formatRisingPace(50000, 0.5, null), '投稿から1時間未満で5万表示（1時間あたり5万）');
+  assert.equal(formatRisingPace(null, 3, 1), '伸びペース：不明');
+  assert.equal(formatBeforeAfter(382000, 625000), '38.2万→62.5万');
+  assert.equal(formatBeforeAfter(null, 625000), '不明→62.5万');
+  assert.ok(REPORT_TEXT.dailyEmpty.length > 0 && REPORT_TEXT.weeklyEmpty.length > 0);
+});
+
+test('sample/reports.json: posts の id を参照し、posts に無い id・型違い・XSS 文字列を含む', () => {
+  const raw = JSON.parse(readFileSync(new URL('../sample/reports.json', import.meta.url), 'utf8'));
+  const posts = JSON.parse(readFileSync(new URL('../sample/posts.json', import.meta.url), 'utf8')).posts;
+  const ids = new Set(posts.map((p) => p.id));
+  const r = normalizeReports(raw);
+  assert.ok(r.daily.length >= 2 && r.weekly.length >= 1);
+  const rising = r.daily[0].rising;
+  assert.ok(rising.some((x) => ids.has(x.id)));
+  assert.ok(rising.some((x) => !ids.has(x.id)));
+  assert.ok(rising.some((x) => /<img/.test(x.label || '')));
+  assert.ok(r.daily[0].review.some((x) => x.crossed === null));
+  assert.ok(r.weekly[0].proposal.includes('<script>'));
 });

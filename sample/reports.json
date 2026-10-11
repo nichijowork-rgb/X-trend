@@ -1,0 +1,244 @@
+{
+ "generated_at": "2026-10-11T18:41:00+09:00",
+ "daily": [
+  {
+   "date": "2026-10-11",
+   "rising": [
+    {
+     "id": "1844674407368369637",
+     "views": 47613,
+     "hours_since_post": 0.3,
+     "views_per_hour": 47613,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407364850854",
+     "views": 56214,
+     "hours_since_post": 1.7,
+     "views_per_hour": 33067,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1999999999999999999",
+     "views": 412000,
+     "hours_since_post": 2.5,
+     "views_per_hour": 164800,
+     "condition_label": "【サンプル】条件B（投稿から6時間以内）"
+    },
+    {
+     "id": "1844674407360943461",
+     "views": 33276,
+     "hours_since_post": 1.5,
+     "views_per_hour": 22184,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407368752820",
+     "views": 15353,
+     "hours_since_post": 0.5,
+     "views_per_hour": 15353,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407369462701",
+     "views": 17334,
+     "hours_since_post": 1.5,
+     "views_per_hour": 11556,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407370952195",
+     "views": 7302,
+     "hours_since_post": 0.2,
+     "views_per_hour": 7302,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407370772632",
+     "views": 2259,
+     "hours_since_post": "x",
+     "views_per_hour": null,
+     "condition_label": "<img src=x onerror=\"alert('rep')\">条件名にタグ"
+    }
+   ],
+   "review": [
+    {
+     "id": "1844674407364384537",
+     "before_views": 44282,
+     "after_views": 588564,
+     "crossed_500k": true
+    },
+    {
+     "id": "1844674407365377285",
+     "before_views": 10050,
+     "after_views": 20100,
+     "crossed_500k": false
+    },
+    {
+     "id": "1844674407366359536",
+     "before_views": 12998,
+     "after_views": 525996,
+     "crossed_500k": true
+    },
+    {
+     "id": "1844674407366091239",
+     "before_views": 8357,
+     "after_views": 16714,
+     "crossed_500k": false
+    },
+    {
+     "id": "1844674407369456467",
+     "before_views": 6249,
+     "after_views": 512498,
+     "crossed_500k": true
+    },
+    {
+     "id": "1999999999999999998",
+     "before_views": 301000,
+     "after_views": 655000,
+     "crossed_500k": true
+    },
+    {
+     "id": "1844674407364384537",
+     "before_views": "abc",
+     "after_views": null,
+     "crossed_500k": "yes",
+     "extra_unknown_field": 1
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）",
+     "total": 5,
+     "crossed": 3
+    },
+    {
+     "condition_label": "【サンプル】条件B（投稿から6時間以内）",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "【サンプル】条件C（投稿から12時間以内）",
+     "total": 0,
+     "crossed": 0
+    }
+   ]
+  },
+  {
+   "date": "2026-10-10",
+   "rising": [
+    {
+     "id": "1844674407364384537",
+     "views": 44282,
+     "hours_since_post": 1.9,
+     "views_per_hour": 23306,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407365377285",
+     "views": 10050,
+     "hours_since_post": 0.8,
+     "views_per_hour": 10050,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407366359536",
+     "views": 12998,
+     "hours_since_post": 1.5,
+     "views_per_hour": 8665,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407366091239",
+     "views": 8357,
+     "hours_since_post": 0.7,
+     "views_per_hour": 8357,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407369456467",
+     "views": 6249,
+     "hours_since_post": 0.1,
+     "views_per_hour": 6249,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    }
+   ],
+   "review": [],
+   "hit_rate": []
+  }
+ ],
+ "weekly": [
+  {
+   "period": {
+    "from": "2026-10-03",
+    "to": "2026-10-10"
+   },
+   "generated_at": "2026-10-10T12:00:00+09:00",
+   "hit_rate_by_condition": [
+    {
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）",
+     "total": 12,
+     "crossed": 7
+    },
+    {
+     "condition_label": "【サンプル】条件B（投稿から6時間以内）",
+     "total": 9,
+     "crossed": 3
+    },
+    {
+     "condition_label": "【サンプル】条件C（投稿から12時間以内）",
+     "total": 0,
+     "crossed": 0
+    }
+   ],
+   "hit_rate_by_pace": [
+    {
+     "pace_label": "【サンプル】ペース速（1時間あたり上位）",
+     "total": 8,
+     "crossed": 6
+    },
+    {
+     "pace_label": "【サンプル】ペース中",
+     "total": 10,
+     "crossed": 3
+    },
+    {
+     "pace_label": "【サンプル】ペース遅",
+     "total": "n/a",
+     "crossed": 1
+    }
+   ],
+   "threshold_proposal": "【サンプル】条件Aの的中率が高いため据え置き。\n条件Bは見直しを検討。\n<script>alert(\"proposal\")</script>（タグは文字として表示される）",
+   "watch_candidates": [
+    {
+     "user": "sample_hostclub_jin01",
+     "reason": "【サンプル】伸びている投稿に3回登場"
+    },
+    {
+     "user": "sample_lounge_ten31",
+     "reason": "【サンプル】<img src=x onerror=\"alert('cand')\"> 理由にタグ"
+    },
+    {
+     "user": "sample_not_in_posts",
+     "reason": "【サンプル】posts.json に投稿が無いアカウント"
+    }
+   ]
+  },
+  {
+   "period": {
+    "from": "2026-09-26",
+    "to": "2026-10-03"
+   },
+   "hit_rate_by_condition": [
+    {
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）",
+     "total": 5,
+     "crossed": 2
+    }
+   ],
+   "hit_rate_by_pace": [],
+   "threshold_proposal": "",
+   "watch_candidates": []
+  }
+ ]
+}

@@ -107,7 +107,7 @@ async function setupRoutes(page, { data, widgets = 'fake' } = {}) {
     const url = new URL(route.request().url());
     if (url.hostname === '127.0.0.1') {
       if (data && url.pathname.startsWith('/data/')) {
-        const key = url.pathname === '/data/posts.json' ? 'posts' : url.pathname === '/data/summary.json' ? 'summary' : null;
+        const key = { '/data/posts.json': 'posts', '/data/summary.json': 'summary', '/data/reports.json': 'reports' }[url.pathname] || null;
         if (key && key in data) {
           const v = data[key];
           if (v == null) return route.fulfill({ status: 404, body: 'not found' });
@@ -270,6 +270,43 @@ async function main() {
       return lines[0];
     });
 
+    // ---- 2d. reports.json のケース
+    const sampleReports = JSON.parse(readFileSync(path.join(ROOT, 'sample/reports.json'), 'utf8'));
+    for (const [name, reports, expect] of [
+      ['ファイル無し（404）', undefined, 'hidden'],
+      ['不正 JSON', '{', 'hidden'],
+      ['空配列', { generated_at: '2026-10-12T23:59:00+09:00', daily: [], weekly: [] }, 'both-empty'],
+      ['daily のみ', { daily: sampleReports.daily }, 'daily-only'],
+    ]) {
+      await check(`reports.json ${name}`, async () => {
+        const data = { posts: sample, summary: sampleSummary };
+        if (reports !== undefined) data.reports = reports;
+        const { ctx, page, con } = await newPage({}, { data });
+        await page.goto(base);
+        await ready(page);
+        assert(await page.isHidden('#sample-banner'), 'no banner');
+        assert(num(await count(page)) === 1500, 'posts unaffected');
+        if (expect === 'hidden') {
+          assert(await page.isHidden('#report'), 'report should be hidden');
+        } else {
+          assert(await page.isVisible('#report'), 'report visible');
+          const d = await page.textContent('#report-daily-body');
+          const w = await page.textContent('#report-weekly-body');
+          if (expect === 'both-empty') {
+            assert(d.includes('10/12 23:59'), d);
+            assert(w.includes('10/17'), w);
+            await page.$eval('#report', (e) => e.scrollIntoView());
+            await page.screenshot({ path: path.join(SHOTS, 'report-empty.png') });
+          } else {
+            assert((await page.$$('#report-daily-body .rising-item')).length > 0, 'rising');
+            assert(w.includes('10/17'), w);
+          }
+        }
+        allErrors.push(...con.errors);
+        await ctx.close();
+      });
+    }
+
     // ---- 3. summary 無し
     await check('summary.json 無し → 投稿から集計', async () => {
       const { ctx, page, con } = await newPage({}, { data: { posts: sample, summary: null } });
@@ -325,6 +362,59 @@ async function main() {
     const { ctx, page, con, external } = await newPage({}, { data: { posts: null, summary: null } });
     await page.goto(base);
     await ready(page);
+
+    await check('レポート（サンプル）: 伸びている投稿・posts に無い id・答え合わせ・的中率・週間・XSS', async () => {
+      assert(await page.isVisible('#report'), 'report');
+      const today = sampleReports.daily[0];
+      assert((await page.$$('#report-daily-body .rising-item:not([hidden])')).length === 3, 'initial 3');
+      await page.click('#report-daily-body .rising-more');
+      const items = await page.$$('#report-daily-body .rising-item:not([hidden])');
+      assert(items.length === today.rising.length, `rising ${items.length}`);
+      const band0 = await page.textContent('#report-daily-body .rising-item .rising-band');
+      assert(band0.includes(today.rising[0].condition_label) && /投稿から.+で.+表示（1時間あたり.+）/.test(band0), band0);
+      const missing = await page.$$eval('#report-daily-body .post-missing', (l) => l.map((e) => ({ text: e.textContent, href: e.querySelector('a') && e.querySelector('a').href })));
+      assert(missing.length === 1 && missing[0].href === 'https://x.com/i/web/status/1999999999999999999', JSON.stringify(missing));
+      const html = await page.$eval('#report', (e) => e.innerHTML);
+      assert(!/<img[^>]*onerror/i.test(html) && !/<script/i.test(html), 'tag injected');
+      assert((await page.textContent('#report')).includes('<img src=x onerror='), 'tag shown as text');
+      assert((await page.textContent('#report-daily-body')).includes('伸びペース：不明'), 'unknown pace');
+      const rows = await page.$$eval('#report-daily-body .report-table tbody tr', (l) => l.length);
+      assert(rows === today.review.length, `review rows ${rows}`);
+      assert((await page.$$('#report-daily-body .cross.yes')).length === today.review.filter((r) => r.crossed_500k === true).length, 'crossed badges');
+      assert((await page.textContent('#report-daily-body .report-table')).includes('不明'), 'unknown in review');
+      const rates = await page.$$eval('#report-daily-body .rate-value', (l) => l.map((e) => e.textContent));
+      assert(rates.some((t) => /件中.+件（\d+%）/.test(t)) && rates.includes('対象なし'), rates.join());
+      const proposal = await page.$eval('#report-weekly-body .proposal', (e) => ({ t: e.textContent, ws: getComputedStyle(e).whiteSpace }));
+      assert(proposal.t.includes('\n') && proposal.ws === 'pre-wrap', JSON.stringify(proposal));
+      await page.$eval('#report', (e) => e.scrollIntoView());
+      await page.screenshot({ path: path.join(SHOTS, 'report-desktop.png') });
+      await page.screenshot({ path: path.join(SHOTS, 'report-desktop-full.png'), fullPage: true });
+      // 日付・週の切替と URL 保存、開閉
+      await page.selectOption('#rdate', '2026-10-10');
+      assert((await page.evaluate(() => location.hash)).includes('rdate=2026-10-10'), 'rdate url');
+      assert((await page.textContent('#report-daily-body')).includes('答え合わせは'), 'review empty guide');
+      await page.selectOption('#rweek', '2026-09-26_2026-10-03');
+      await page.click('#report-weekly > summary');
+      await page.waitForFunction(() => location.hash.includes('rc=weekly'));
+      await page.reload();
+      await ready(page);
+      assert((await page.inputValue('#rdate')) === '2026-10-10', 'rdate restore');
+      assert((await page.inputValue('#rweek')) === '2026-09-26_2026-10-03', 'rweek restore');
+      assert(!(await page.$eval('#report-weekly', (e) => e.open)), 'closed restore');
+      await page.click('#report-weekly > summary');
+      await page.selectOption('#rdate', '2026-10-11');
+      await page.selectOption('#rweek', '2026-10-03_2026-10-10');
+      // 見張り候補クリックでアカウント絞り込み
+      const cand = sampleReports.weekly[0].watch_candidates[0].user;
+      await page.click(`#report-weekly-body .cand-list button:has-text("@${cand}")`);
+      await page.waitForFunction((u) => window.__dashboard.state.user === u, cand);
+      assert(num(await count(page)) === sample.posts.filter((p) => p.user === cand).length, 'cand filter');
+      await page.click('#reset');
+      await page.fill('#user', '');
+      await page.press('#user', 'Enter');
+      await page.waitForFunction(() => window.__dashboard.state.user === '');
+      await page.evaluate(() => window.scrollTo(0, 0));
+    });
 
     await check('XSS 本文はテキストとして表示', async () => {
       await page.fill('#q', 'スクリプトタグ入り');
@@ -605,7 +695,7 @@ async function main() {
         const sw = await p2.evaluate(() => document.documentElement.scrollWidth);
         assert(sw <= w, `scrollWidth ${sw}`);
         const small = await p2.evaluate(() => {
-          const sel = '.chip, .segmented button, #sort, #q, #user, #reset, #more, #theme-toggle, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
+          const sel = '#rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #theme-toggle, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
           return [...document.querySelectorAll(sel)].filter((e) => e.offsetParent && e.getBoundingClientRect().height < 44).map((e) => `${e.className || e.id}:${Math.round(e.getBoundingClientRect().height)}`).slice(0, 5);
         });
         assert(small.length === 0, small.join(', '));
@@ -614,6 +704,12 @@ async function main() {
           await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-full.png'), fullPage: true });
           await p2.evaluate(() => document.getElementById('posts-heading').scrollIntoView());
           await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-posts.png') });
+          const rw = await p2.$eval('#report', (e) => [...e.querySelectorAll('*')].filter((x) => x.getBoundingClientRect().right > window.innerWidth + 1 && !x.closest('.table-scroll')).map((x) => x.className).slice(0, 3));
+          assert(rw.length === 0, `report overflow: ${rw.join()}`);
+          await p2.evaluate(() => document.getElementById('report').scrollIntoView());
+          await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-report.png') });
+          await p2.evaluate(() => document.getElementById('report-weekly').scrollIntoView());
+          await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-report-weekly.png') });
         }
         allErrors.push(...k2.errors);
         await c2.close();
@@ -647,7 +743,6 @@ async function main() {
     await check('コンソールエラー 0（想定内の 404/遮断ログを除く）', async () => {
       assert(allErrors.length === 0, allErrors.slice(0, 5).join(' / '));
     });
-    void sampleSummary;
   } finally {
     if (browser) await browser.close();
     server.kill();

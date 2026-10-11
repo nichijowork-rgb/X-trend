@@ -9,15 +9,17 @@ import {
   isSafeHttpUrl, isValidSummary, jstParts, linkifySegments, mergeSummary, normalizeDataset,
   parseKeywords, parseState, parseTimestamp, serializeState, sortPosts, topAccounts, CHART_MAX_DAYS,
   shortDate, VIEWS, embedTweetId, chooseRefTs, isUpdateDelayed, formatPace, viewsPerHour,
+  normalizeReports, pickReport, formatRisingPace, formatBeforeAfter, REPORT_SECTIONS,
 } from './js/core.js';
-import { UPDATE_SCHEDULE, PACE_NOTE } from './js/config.js';
+import { UPDATE_SCHEDULE, PACE_NOTE, REPORT_TEXT } from './js/config.js';
 import {
-  createTooltip, renderDayTable, renderHBars, renderLegend, renderStackedDays, setCatColor,
+  createTooltip, renderDayTable, renderHBars, renderLegend, renderStackedDays, setCatColor, renderRateBars,
 } from './js/charts.js';
 import { createEmbedder, resetWidgetsFailure } from './js/embed.js';
 import { renderMedia } from './js/media.js';
 
 const PAGE_SIZE = 50;
+const RISING_INITIAL = 3;
 const $ = (id) => document.getElementById(id);
 
 function el(tag, cls, text) {
@@ -41,12 +43,14 @@ async function getJson(path) {
 }
 
 async function loadFrom(dir) {
-  const [p, s] = await Promise.allSettled([getJson(`${dir}/posts.json`), getJson(`${dir}/summary.json`)]);
+  const [p, s, r] = await Promise.allSettled([getJson(`${dir}/posts.json`), getJson(`${dir}/summary.json`), getJson(`${dir}/reports.json`)]);
   if (p.status === 'rejected') throw p.reason;
+  // reports.json は任意。無い・壊れている場合はレポート欄を出さないだけ
+  const reports = r.status === 'fulfilled' ? normalizeReports(r.value) : null;
   const dataset = normalizeDataset(p.value); // 形式不正は例外
   const summary = s.status === 'fulfilled' && isValidSummary(s.value) ? s.value : null;
   const summaryNote = s.status === 'rejected' ? s.reason.message : (summary ? '' : `${dir}/summary.json: 形式が不正です`);
-  return { dataset, summary, summaryNote, dir };
+  return { dataset, summary, summaryNote, dir, reports };
 }
 
 async function load() {
@@ -345,6 +349,7 @@ function render() {
   app.sorted = sortPosts(filtered, state.sort, ds.refTs);
   renderPostsReset(filtered.length);
   renderActiveFilters();
+  renderReports();
 
   app.perf.lastRenderMs = performance.now() - t0;
   app.perf.renders += 1;
@@ -744,6 +749,193 @@ function postEmbedCard(p) {
   return li;
 }
 
+// ---------------------------------------------------------------- レポート（reports.json）
+
+function setupReports() {
+  const box = $('report');
+  if (!app.reports) { box.hidden = true; return; }
+  box.hidden = false;
+  const { daily, weekly, generated_at: gen } = app.reports;
+  if (gen) {
+    const t = parseTimestamp(gen);
+    $('report-meta').textContent = `更新 ${formatDateTime(gen, t, null)}`;
+    $('report-meta').title = formatDateTimeFull(gen, t);
+  }
+  const fill = (sel, items) => {
+    sel.replaceChildren(...items.map(([v, label]) => { const o = el('option', null, label); o.value = v; return o; }));
+  };
+  fill($('rdate'), daily.map((d) => [d.date, d.date.replace(/^(\d{4})-0?(\d+)-0?(\d+)$/, '$1/$2/$3')]));
+  fill($('rweek'), weekly.map((w) => [w.key, `${shortDate(w.from)}〜${shortDate(w.to)}`]));
+  $('rdate-wrap').hidden = daily.length === 0;
+  $('rweek-wrap').hidden = weekly.length === 0;
+  $('rdate').addEventListener('change', (e) => update({ rdate: e.target.value }));
+  $('rweek').addEventListener('change', (e) => update({ rweek: e.target.value }));
+  const sections = { report: $('report'), daily: $('report-daily'), weekly: $('report-weekly') };
+  for (const [k, node] of Object.entries(sections)) {
+    node.addEventListener('toggle', () => {
+      const closed = app.state.rclosed.includes(k);
+      if (node.open === !closed) return; // 状態どおり（プログラムからの変更）
+      const set = new Set(app.state.rclosed);
+      if (node.open) set.delete(k); else set.add(k);
+      update({ rclosed: REPORT_SECTIONS.filter((x) => set.has(x)) }, { push: false });
+    });
+  }
+}
+
+function reportEmpty(text) {
+  return el('p', 'report-empty', text);
+}
+
+function reportPart(title, ...children) {
+  const sec = el('section', 'report-part');
+  sec.append(el('h4', null, title), ...children);
+  return sec;
+}
+
+function statusUrl(id) {
+  return id && /^\d{1,25}$/.test(id) ? `https://x.com/i/web/status/${id}` : null;
+}
+
+function externalLink(href, text) {
+  const a = el('a', 'open-x', text);
+  a.href = href;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  return a;
+}
+
+function missingPostCard(id) {
+  const box = el('div', 'card post post-missing');
+  box.append(el('span', null, `${REPORT_TEXT.missingPost}（ID: ${id ?? '不明'}）`));
+  const href = statusUrl(id);
+  if (href) box.append(externalLink(href, 'Xで開く ↗'));
+  return box;
+}
+
+function renderReports() {
+  if (!app.reports) return;
+  const st = app.state;
+  const { daily, weekly } = app.reports;
+  const open = (k) => !st.rclosed.includes(k);
+  if ($('report').open !== open('report')) $('report').open = open('report');
+  if ($('report-daily').open !== open('daily')) $('report-daily').open = open('daily');
+  if ($('report-weekly').open !== open('weekly')) $('report-weekly').open = open('weekly');
+
+  // デイリー
+  const dBody = $('report-daily-body');
+  dBody.replaceChildren();
+  const d = pickReport(daily, st.rdate, (x) => x.date);
+  if (!d) {
+    dBody.append(reportEmpty(REPORT_TEXT.dailyEmpty));
+  } else {
+    $('rdate').value = d.date;
+    const byId = app.postsById;
+    // 伸びている投稿（データ側の並び順のまま）
+    const risingList = el('ol', 'rising-list');
+    risingList.setAttribute('aria-label', `伸びている投稿（${d.rising.length}件・データ側の並び順）`);
+    d.rising.forEach((r, i) => {
+      const li = el('li', 'rising-item');
+      const band = el('div', 'rising-band');
+      band.append(el('span', 'rank', `#${i + 1}`), el('span', 'cond', r.label ?? '条件：不明'), el('span', 'rpace', formatRisingPace(r.views, r.hours, r.perHour)));
+      band.title = PACE_NOTE;
+      const post = r.id ? byId.get(r.id) : null;
+      li.append(band, post ? postPlainCard(post) : missingPostCard(r.id));
+      risingList.append(li);
+    });
+    // 長くなりすぎないよう最初の RISING_INITIAL 件だけ表示し、残りはボタンで展開
+    const extra = [...risingList.children].slice(RISING_INITIAL);
+    let moreBtn = null;
+    if (extra.length) {
+      extra.forEach((li) => { li.hidden = true; });
+      moreBtn = el('button', 'btn btn-ghost rising-more', `残り ${extra.length}件を表示`);
+      moreBtn.type = 'button';
+      moreBtn.addEventListener('click', () => { extra.forEach((li) => { li.hidden = false; }); moreBtn.remove(); });
+    }
+    const risingPart = reportPart('伸びている投稿', d.rising.length ? risingList : reportEmpty(REPORT_TEXT.risingEmpty));
+    if (moreBtn) risingPart.append(moreBtn);
+    dBody.append(risingPart);
+    // 答え合わせ
+    let review;
+    if (!d.review.length) {
+      review = reportEmpty(REPORT_TEXT.reviewEmpty);
+    } else {
+      review = el('div', 'table-scroll');
+      const table = el('table', 'data-table report-table');
+      const hr = el('tr');
+      hr.append(el('th', null, '投稿'), el('th', null, '前→後'), el('th', null, REPORT_TEXT.crossedColumn));
+      const thead = el('thead');
+      thead.append(hr);
+      const tbody = el('tbody');
+      for (const r of d.review) {
+        const tr = el('tr');
+        const cell = el('td', 'post-cell');
+        const post = r.id ? byId.get(r.id) : null;
+        if (post) {
+          const u = el('button', 'rt-user', `@${post.user}`);
+          u.type = 'button';
+          u.addEventListener('click', () => update({ user: post.user }, { scroll: true }));
+          cell.append(u, el('span', 'rt-text', post.text.replace(/\s+/g, ' ').trim()));
+        } else {
+          cell.append(el('span', 'muted', `ID: ${r.id ?? '不明'} `));
+          const href = statusUrl(r.id);
+          if (href) cell.append(externalLink(href, 'Xで開く ↗'));
+        }
+        const ba = el('td', null, formatBeforeAfter(r.before, r.after));
+        ba.title = `${formatExact(r.before)} → ${formatExact(r.after)}`;
+        const cr = el('td');
+        const badge = el('span', r.crossed === true ? 'cross yes' : 'cross', r.crossed === true ? REPORT_TEXT.crossedYes : r.crossed === false ? REPORT_TEXT.crossedNo : '不明');
+        cr.append(badge);
+        tr.append(cell, ba, cr);
+        tbody.append(tr);
+      }
+      table.append(thead, tbody);
+      review.append(table);
+    }
+    dBody.append(reportPart('答え合わせ', review));
+    // 的中率
+    const rate = el('div', 'chart');
+    renderRateBars(rate, d.hitRate, REPORT_TEXT.hitRateEmpty);
+    dBody.append(reportPart('条件ごとの的中率', rate));
+  }
+
+  // 週間
+  const wBody = $('report-weekly-body');
+  wBody.replaceChildren();
+  const w = pickReport(weekly, st.rweek, (x) => x.key);
+  if (!w) {
+    wBody.append(reportEmpty(REPORT_TEXT.weeklyEmpty));
+  } else {
+    $('rweek').value = w.key;
+    const r1 = el('div', 'chart');
+    renderRateBars(r1, w.byCondition, REPORT_TEXT.weeklyHitEmpty);
+    const r2 = el('div', 'chart');
+    renderRateBars(r2, w.byPace, REPORT_TEXT.weeklyHitEmpty);
+    const prop = w.proposal && w.proposal.trim() ? el('p', 'proposal', w.proposal) : reportEmpty(REPORT_TEXT.proposalEmpty);
+    let cands;
+    if (!w.candidates.length) {
+      cands = reportEmpty(REPORT_TEXT.candidatesEmpty);
+    } else {
+      cands = el('ul', 'cand-list');
+      for (const c of w.candidates) {
+        const li = el('li');
+        const b = el('button');
+        b.type = 'button';
+        b.append(el('span', 'cand-user', `@${c.user}`), el('span', 'cand-reason', c.reason ?? '理由：不明'));
+        b.setAttribute('aria-label', `@${c.user} で絞り込む。${c.reason ?? ''}`);
+        b.addEventListener('click', () => update({ user: c.user }, { scroll: true }));
+        li.append(b);
+        cands.append(li);
+      }
+    }
+    wBody.append(
+      reportPart('条件ごとの的中率', r1),
+      reportPart('ペース別の的中率', r2),
+      reportPart('基準の見直し案', prop),
+      reportPart('見張りアカウントの追加候補', cands),
+    );
+  }
+}
+
 // ---------------------------------------------------------------- ヘッダー
 
 function renderHeader(loaded) {
@@ -822,8 +1014,10 @@ async function main() {
       $('sample-reason').textContent = `理由: ${loaded.reason}`;
       document.title = '【サンプル】Xレポート ダッシュボード';
     }
+    app.reports = loaded.reports;
     renderHeader(loaded);
     buildControls();
+    setupReports();
     app.state = sanitizeState(parseState(location.hash, storageGet(VIEW_KEY)));
     writeUrl(false); // 保存済みの表示切替を URL にも反映
     $('loading').hidden = true;
