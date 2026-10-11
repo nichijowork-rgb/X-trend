@@ -36,7 +36,10 @@ export const REPORT_TEXT = Object.freeze({
   risingTitle: '伸びている投稿',
   risingButton: '伸びている',
   risingWatchTitle: '補足：伸びそうな投稿',
-  risingNightOnly: '夜職関連のみ表示（夜職／一般のバズの切替やカテゴリ絞り込みとは連動しません）',
+  risingLead: '投稿から短い時間で表示回数が急に伸びている、夜職関連の投稿です。',
+  risingCondLead: '次のどれかを満たす投稿を、1時間あたりの伸びが速い順に並べています。',
+  risingWatchLead: '上の条件には届かないものの、伸び始めている夜職関連の投稿です。',
+  risingAsOf: (t) => `数値は ${t} 時点のものです。`,
 });
 
 /**

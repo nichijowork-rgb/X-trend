@@ -480,7 +480,8 @@ async function main() {
       const missing = await page.$$eval('#rising-body .post-missing', (l) => l.map((e) => e.querySelector('a') && e.querySelector('a').href));
       assert(missing.length === 1 && missing[0] === 'https://x.com/i/web/status/1999999999999999999', JSON.stringify(missing));
       const note = await page.textContent('#rising-note');
-      assert(note.includes(`一般のバズ ${excluded}件を除外`), note);
+      assert(note.includes('夜職関連の投稿です') && note.includes(shownRising[0].condition_label) && note.includes('時点のものです'), note);
+      assert((await page.getAttribute('#rising-note', 'title')).includes(`一般のバズ ${excluded}件`), 'excluded in title');
       assert(await page.isVisible('#rising-watch'), 'rising_watch shown');
       assert((await page.textContent('#rising-watch-title')) === '補足：伸びそうな投稿', 'watch title');
       assert((await page.$$('#rising-watch .rising-item')).length === shownWatch.length, 'watch items');

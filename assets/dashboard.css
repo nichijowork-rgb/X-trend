@@ -810,7 +810,11 @@ main { padding-top: 12px; }
 .rising-panel .section-head { margin: 0; }
 .rising-panel .section-title .neon { color: var(--accent-ink); text-shadow: var(--glow-text); }
 .rising-panel .report-pick { margin-left: auto; }
-.rising-panel #rising-note { margin: 0; }
+.rising-note { margin: 0 0 10px; color: var(--text-2); line-height: 1.6; }
+.rising-note p { margin: 0; }
+.rising-note .muted { margin-top: 2px; }
+.rising-conds { margin: 4px 0 4px; padding-left: 1.2em; }
+.rising-conds li { margin: 0; }
 .rising-watch { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--border-strong); }
 .rw-title { font-size: 14px; }
 .rising-band .reason { flex-basis: 100%; color: var(--text-2); overflow-wrap: anywhere; }

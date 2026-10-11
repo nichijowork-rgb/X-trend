@@ -905,6 +905,20 @@ function risingListEl(items, { withReason = false, initial = RISING_INITIAL, lab
   return wrap;
 }
 
+/** 説明文：導入文＋（データ側の条件名の一覧）＋時点。条件の数値は画面に持たず condition_label から作る */
+function risingNoteEls(items, lead, condLead, asOf) {
+  const firstNum = (t) => { const m = /\d+(?:\.\d+)?/.exec(t); return m ? Number(m[0]) : Infinity; };
+  const labels = [...new Set((items || []).map((r) => r.label).filter(Boolean))].sort((a, b) => firstNum(a) - firstNum(b));
+  const out = [el('p', null, lead + (labels.length && condLead ? condLead : ''))];
+  if (labels.length) {
+    const ul = el('ul', 'rising-conds');
+    labels.forEach((l) => ul.append(el('li', null, l)));
+    out.push(ul);
+  }
+  if (asOf) out.push(el('p', 'muted', asOf));
+  return out;
+}
+
 /** 伸びている投稿パネル（夜職関連のみ。夜職／一般の切替やカテゴリ絞り込みとは連動しない） */
 function renderRising() {
   if (!app.reports) return;
@@ -914,7 +928,7 @@ function renderRising() {
   const watchSec = $('rising-watch');
   if (!d) {
     body.append(reportEmpty(REPORT_TEXT.dailyEmpty));
-    $('rising-note').textContent = '';
+    $('rising-note').replaceChildren();
     watchSec.hidden = true;
     return;
   }
@@ -922,7 +936,10 @@ function renderRising() {
   const main = filterNightRising(d.rising, app.postsById);
   const watch = filterNightRising(d.risingWatch, app.postsById);
   const excluded = main.excluded + watch.excluded;
-  $('rising-note').textContent = `${REPORT_TEXT.risingNightOnly}${excluded ? `。一般のバズ ${formatExact(excluded)}件を除外` : ''}。${PACE_NOTE}`;
+  const asOf = app.reports.generated_at ? REPORT_TEXT.risingAsOf(formatDateTime(app.reports.generated_at, parseTimestamp(app.reports.generated_at), null)) : '';
+  $('rising-note').replaceChildren(...risingNoteEls(d.rising, REPORT_TEXT.risingLead, REPORT_TEXT.risingCondLead, asOf));
+  $('rising-watch-note').replaceChildren(...risingNoteEls(d.risingWatch, REPORT_TEXT.risingWatchLead, '', ''));
+  $('rising-note').title = excluded ? `一般のバズ ${formatExact(excluded)}件は表示していません` : '';
   body.append(main.items.length
     ? risingListEl(main.items, { label: `伸びている投稿（${main.items.length}件・データ側の並び順）` })
     : reportEmpty(REPORT_TEXT.risingEmpty));
