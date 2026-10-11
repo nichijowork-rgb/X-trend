@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T00:08:13+09:00",
+ "generated_at": "2026-10-12T00:17:51+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -1333,14 +1333,16 @@
    },
    "text": "【歌舞伎町有名ホスト平良翔太が自身の在籍退店を公表】 https://t.co/SKaHoIrf3i",
    "categories": [
-    "ホスト",
-    "歌舞伎町"
+    "ホスト"
    ],
    "matched_terms": [
     "ホスト 歌舞伎町",
     "ホスト",
+    "平良翔太",
+    "平良 ホスト",
     "歌舞伎町",
-    "report:ホスト"
+    "report:ホスト",
+    "topic:平良翔太さんの退店・引退"
    ],
    "is_watched": false,
    "media": [
@@ -1663,7 +1665,8 @@
     "ホスト"
    ],
    "matched_terms": [
-    "report:ホスト"
+    "report:ホスト",
+    "topic:平良翔太さんの退店・引退"
    ],
    "is_watched": false
   },
@@ -6014,7 +6017,11 @@
    "matched_terms": [
     "quote:姫 ホスト",
     "quote:ホスト",
-    "quote:姫 ホス"
+    "quote:姫 ホス",
+    "quote:平良翔太",
+    "quote:平良 ホスト",
+    "quote:エルコレ",
+    "topic:平良翔太さんの退店・引退"
    ],
    "is_watched": true,
    "media": [
@@ -6115,7 +6122,11 @@
    "matched_terms": [
     "姫 ホスト",
     "ホスト",
-    "姫 ホス"
+    "姫 ホス",
+    "平良翔太",
+    "平良 ホスト",
+    "エルコレ",
+    "topic:平良翔太さんの退店・引退"
    ],
    "is_watched": true,
    "media": [
@@ -12072,9 +12083,12 @@
    },
    "text": "明日やばいツイートするので消されるかもしれません消されたら全てgdとエルコレが隠蔽してるので僕ではありませんよろしくお願いします🙇",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "エルコレ",
+    "topic:平良翔太さんの退店・引退"
+   ],
    "is_watched": false
   },
   {
@@ -12336,7 +12350,9 @@
     "ホスト"
    ],
    "matched_terms": [
-    "売掛"
+    "売掛",
+    "平良翔太",
+    "topic:平良翔太さんの退店・引退"
    ],
    "is_watched": false
   },
