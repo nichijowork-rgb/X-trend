@@ -1,0 +1,83 @@
+{
+ "generated_at": "2026-10-12T00:08:13+09:00",
+ "daily": [
+  {
+   "date": "2026-10-11",
+   "rising": [
+    {
+     "id": "2109181333457244442",
+     "views": 488710,
+     "hours_since_post": 7.77,
+     "views_per_hour": 62859,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2109289637076422662",
+     "views": 167411,
+     "hours_since_post": 0.6,
+     "views_per_hour": 277989,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2109286282954461418",
+     "views": 221035,
+     "hours_since_post": 0.82,
+     "views_per_hour": 268192,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2109285178187428069",
+     "views": 232252,
+     "hours_since_post": 0.9,
+     "views_per_hour": 258777,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2109267791962571223",
+     "views": 412013,
+     "hours_since_post": 2.05,
+     "views_per_hour": 201091,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2109246677232324705",
+     "views": 492564,
+     "hours_since_post": 3.45,
+     "views_per_hour": 142887,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2109281328554467587",
+     "views": 154756,
+     "hours_since_post": 1.15,
+     "views_per_hour": 134279,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2109252832599904576",
+     "views": 401815,
+     "hours_since_post": 3.04,
+     "views_per_hour": 132188,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2109243295885062272",
+     "views": 458730,
+     "hours_since_post": 3.67,
+     "views_per_hour": 124957,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2109228263436366136",
+     "views": 351082,
+     "hours_since_post": 4.67,
+     "views_per_hour": 75232,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "review": [],
+   "hit_rate": []
+  }
+ ],
+ "weekly": []
+}
