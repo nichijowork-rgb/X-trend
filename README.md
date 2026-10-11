@@ -1,6 +1,6 @@
 # X-trend：Xレポート ダッシュボード
 
-別botが定期収集しているXの投稿（夜職・歌舞伎町まわり）を、カテゴリ別に見やすく閲覧する静的Webページです。GitHub Pages で公開します。
+別botが定期収集しているXの投稿（夜職・歌舞伎町まわり）を、カテゴリ別に見やすく閲覧する静的Webページです。GitHub Pages で公開します（**https://www.x-yoru-buzz.com/**）。
 
 - サーバー・API・DB は使いません（HTML / CSS / JavaScript のみ、ビルド不要）
 - データは収集botが `data/posts.json`・`data/summary.json` に push。ページは読むだけ

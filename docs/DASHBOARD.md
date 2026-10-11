@@ -28,6 +28,17 @@ repo/
 3. Branch に **`claude/x-scraper-nightlife-tool-sb26pq`**、フォルダに **`/ (root)`** を選んで **Save**
 4. 数分後に表示される URL（`https://<ユーザー名>.github.io/<リポジトリ名>/`）を開く
 
+### 独自ドメイン
+
+公開URL: **https://www.x-yoru-buzz.com/**（リポジトリ直下の `CNAME` ファイルで指定。消さないこと）
+
+| 種類 | ホスト名 | 値 |
+|---|---|---|
+| CNAME | `www` | `nichijowork-rgb.github.io` |
+| A | `@`（空欄） | `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`（任意。`x-yoru-buzz.com` を `www` へ転送するため） |
+
+GitHub の Settings → Pages → Custom domain に `www.x-yoru-buzz.com` を入れて Save し、DNS チェックが通ったら **Enforce HTTPS** を有効にする。旧URL（github.io）は自動で新URLへ転送される。
+
 - すべて相対パスで読むので、サブパス配下（`/<リポジトリ名>/`）でもそのまま動きます。
 - `data/` が push されるまでは、画面上部に **「サンプルデータを表示中（data/ が見つかりません）」** の黄色い帯が出ます（下記）。
 - Pages の反映・CDN キャッシュで更新が数分遅れることがあります。JSON は `?t=<時刻>` 付きで取得するのでブラウザキャッシュの影響は受けません。
