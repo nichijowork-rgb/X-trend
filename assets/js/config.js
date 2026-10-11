@@ -33,6 +33,10 @@ export const REPORT_TEXT = Object.freeze({
   crossedYes: '50万超え',
   crossedNo: '届かず',
   missingPost: 'この投稿は posts.json に含まれていません',
+  risingTitle: '伸びている投稿',
+  risingButton: '伸びている',
+  risingWatchTitle: '補足：伸びそうな投稿',
+  risingNightOnly: '夜職関連のみ表示（夜職／一般のバズの切替やカテゴリ絞り込みとは連動しません）',
 });
 
 /**

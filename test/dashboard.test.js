@@ -10,7 +10,7 @@ import {
   niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, CHART_MAX_DAYS,
   categoryMatcher, isUnclassified, inGroup, individualChipCategories, categoryLabel, normalizeCategorySelection, groupCategories,
   chooseRefTs, nextScheduledUpdate, isUpdateDelayed, viewsPerHour, formatPace, SORTS,
-  normalizeReports, pickReport, hitRateText, hitRatio, formatRisingPace, formatBeforeAfter, weekKey,
+  normalizeReports, filterNightRising, pickReport, hitRateText, hitRatio, formatRisingPace, formatBeforeAfter, weekKey,
 } from '../assets/js/core.js';
 import { UPDATE_SCHEDULE, PACE_NOTE, REPORT_TEXT } from '../assets/js/config.js';
 
@@ -263,7 +263,7 @@ test('highlightSegments: 大文字小文字無視・長い語優先・重なり�
 
 test('serializeState / parseState: 往復で一致し、既定値は省略', () => {
   assert.equal(serializeState(DEFAULT_STATE), '');
-  const st = { cats: ['ホスト', 'テスト,カンマ'], group: 'night', period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'], panel: true };
+  const st = { cats: ['ホスト', 'テスト,カンマ'], group: 'night', period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'], panel: true, rising: true, rsdate: '2026-10-12' };
   const s = serializeState(st);
   assert.deepEqual(parseState('#' + s), st);
   assert.deepEqual(parseState('?' + s), st);
@@ -272,6 +272,10 @@ test('serializeState / parseState: 往復で一致し、既定値は省略', () 
   assert.equal(parseState('view=card', 'embed').view, 'card'); // URL が優先
   assert.equal(parseState('', null, true).panel, true); // 詳細パネル: URL に無ければ保存値
   assert.equal(parseState('panel=0', null, true).panel, false);
+  assert.equal(parseState('', null, null, true).rising, true); // 伸びている投稿パネル: URL に無ければ保存値
+  assert.equal(parseState('rising=0', null, null, true).rising, false);
+  assert.equal(parseState('rsdate=10/11').rsdate, '');
+  assert.equal(isFilterActive({ period: 'all', rising: true }), false);
   // isFilterActive はカテゴリ以外（期間・アカウント・キーワード・監視のみ）を見る。初期状態は 24時間なので true
   assert.equal(isFilterActive(DEFAULT_STATE), true);
   assert.equal(isFilterActive({ period: 'all', panel: true }), false);
@@ -572,4 +576,26 @@ test('normalizeCategorySelection: モード（夜職／一般）と個別選択�
   // 一般のバズモードでは夜職の個別選択は外れ、未知カテゴリだけ選べる
   assert.deepEqual(normalizeCategorySelection({ cats: ['ホスト', '新カテゴリ'], group: 'general' }, cats), { cats: ['新カテゴリ'], group: 'general' });
   assert.equal(serializeState({ group: 'general', cats: ['新カテゴリ'] }), 'cat=%E6%96%B0%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA&group=general');
+});
+
+test('rising_watch（任意）と、伸びている投稿の夜職のみフィルタ（一般のバズのみは除外・posts に無い id は残す）', () => {
+  const r = normalizeReports({ daily: [
+    { date: '2026-10-12', rising: [{ id: '1' }],
+      rising_watch: [{ id: '2', views: 150000, hours_since_post: 2, views_per_hour: 75000, condition_label: '10万〜20万表示・伸び始め', reason: '<b>補足</b>', extra: 1 }, 'bad'] },
+    { date: '2026-10-11', rising: [] },
+  ] });
+  assert.deepEqual(r.daily[0].risingWatch, [{ id: '2', views: 150000, hours: 2, perHour: 75000, label: '10万〜20万表示・伸び始め', reason: '<b>補足</b>' }]);
+  assert.deepEqual(r.daily[1].risingWatch, []); // フィールドが無ければ空
+  const ds = dataset([
+    rawPost({ id: '1', categories: ['ホスト'] }),
+    rawPost({ id: '2', categories: ['その他'] }), // 一般のバズのみ → 除外
+    rawPost({ id: '3', categories: ['その他', 'キャバクラ'] }), // 夜職も持つ → 残す
+    rawPost({ id: '4', categories: ['監視アカウント', 'その他'] }), // 夜職を持たない → 除外
+  ], ['ホスト', 'キャバクラ', 'その他', '監視アカウント']);
+  const byId = new Map(ds.posts.map((p) => [p.id, p]));
+  const items = ['1', '2', '3', '4', '999'].map((id) => ({ id }));
+  const out = filterNightRising(items, byId);
+  assert.deepEqual(out.items.map((x) => x.id), ['1', '3', '999']); // 999 は posts に無いので判定できず残す（データ側の並び順のまま）
+  assert.equal(out.excluded, 2);
+  assert.deepEqual(filterNightRising(undefined, byId), { items: [], excluded: 0 });
 });

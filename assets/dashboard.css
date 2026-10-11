@@ -797,3 +797,34 @@ main { padding-top: 12px; }
 @media (max-width: 380px) {
   .mode-switch button { padding: 0 11px; font-size: 13px; }
 }
+
+/* ---------- 伸びている投稿（専用トグル・パネル） ---------- */
+.rising-toggle { margin-left: auto; }
+.rising-toggle + .panel-toggle { margin-left: 0; }
+.rising-toggle .flame { width: 15px; height: 15px; fill: var(--accent); flex: none; filter: drop-shadow(0 0 3px rgba(255, 59, 78, .5)); }
+.count-badge {
+  min-width: 20px; padding: 2px 6px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.2; text-align: center;
+  background: var(--surface-3); color: var(--text); font-variant-numeric: tabular-nums;
+}
+.rising-panel { margin-top: 12px; padding: 12px 14px; border-color: var(--accent); box-shadow: var(--shadow), 0 0 0 1px rgba(255, 59, 78, .15); display: grid; gap: 10px; }
+.rising-panel .section-head { margin: 0; }
+.rising-panel .section-title .neon { color: var(--accent-ink); text-shadow: var(--glow-text); }
+.rising-panel .report-pick { margin-left: auto; }
+.rising-panel #rising-note { margin: 0; }
+.rising-watch { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--border-strong); }
+.rw-title { font-size: 14px; }
+.rising-band .reason { flex-basis: 100%; color: var(--text-2); overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  .rising-toggle { order: 5; margin-left: 0; }
+  .rising-toggle + .panel-toggle { margin-left: auto; }
+}
+
+/* 伸びている／詳細ボタンはツールバー下段の右側 */
+.toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; }
+.toolbar-actions .rising-toggle, .toolbar-actions .panel-toggle { margin-left: 0; order: 0; }
+@media (max-width: 639px) {
+  .toolbar-row #sort { flex: 1 1 140px; }
+  .toolbar-foot { justify-content: space-between; }
+  .toolbar-actions { width: 100%; }
+  .toolbar-actions .rising-toggle, .toolbar-actions .panel-toggle { flex: 1 1 auto; }
+}

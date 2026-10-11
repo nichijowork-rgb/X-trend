@@ -59,6 +59,47 @@
      "hours_since_post": "x",
      "views_per_hour": null,
      "condition_label": "<img src=x onerror=\"alert('rep')\">条件名にタグ"
+    },
+    {
+     "id": "1844674407368925232",
+     "views": 1264,
+     "hours_since_post": 4,
+     "views_per_hour": 316,
+     "condition_label": "【サンプル】条件B（投稿から6時間以内）"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "1844674407365321560",
+     "views": 32988,
+     "hours_since_post": 4.9,
+     "views_per_hour": 6732,
+     "condition_label": "【サンプル】伸び始め（条件名はデータ側の文字列）",
+     "reason": "【サンプル】補足1：1時間あたりのペースが上がっている"
+    },
+    {
+     "id": "1844674407364520055",
+     "views": 33252,
+     "hours_since_post": 5.3,
+     "views_per_hour": 6274,
+     "condition_label": "【サンプル】伸び始め（条件名はデータ側の文字列）",
+     "reason": "【サンプル】補足2：1時間あたりのペースが上がっている"
+    },
+    {
+     "id": "1844674407368101109",
+     "views": 11333,
+     "hours_since_post": 2.3,
+     "views_per_hour": 4927,
+     "condition_label": "【サンプル】伸び始め（条件名はデータ側の文字列）",
+     "reason": "【サンプル】補足3：1時間あたりのペースが上がっている"
+    },
+    {
+     "id": "1844674407368925232",
+     "views": 1000,
+     "hours_since_post": 1,
+     "views_per_hour": 1000,
+     "condition_label": "【サンプル】伸び始め",
+     "reason": "一般のバズのみ（除外される）"
     }
    ],
    "review": [

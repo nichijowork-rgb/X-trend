@@ -314,7 +314,7 @@ export const VIEWS = [
 export const DEFAULT_STATE = Object.freeze({
   // 初期状態: 期間＝24時間、カテゴリ＝夜職すべて、並び＝インプレッションが多い順
   cats: [], group: 'night', period: '24h', user: '', q: '', watched: false, sort: 'imp', acct: 'posts', view: 'card',
-  rdate: '', rweek: '', rclosed: [], panel: false,
+  rdate: '', rweek: '', rclosed: [], panel: false, rising: false, rsdate: '',
 });
 
 /** レポート欄の開閉キー（rclosed に入っているものは閉じている） */
@@ -759,6 +759,8 @@ export function serializeState(state) {
   if (st.rweek) sp.set('rweek', st.rweek);
   for (const k of REPORT_SECTIONS) if (st.rclosed.includes(k)) sp.append('rc', k);
   if (st.panel) sp.set('panel', '1');
+  if (st.rising) sp.set('rising', '1');
+  if (st.rsdate) sp.set('rsdate', st.rsdate);
   return sp.toString();
 }
 
@@ -766,7 +768,7 @@ export function serializeState(state) {
  * クエリ文字列（先頭の # / ? 可）→ 状態。不正値は既定値。
  * fallbackView: URL に view が無いときに使う値（localStorage の保存値など）
  */
-export function parseState(str, fallbackView = null, fallbackPanel = null) {
+export function parseState(str, fallbackView = null, fallbackPanel = null, fallbackRising = null) {
   const sp = new URLSearchParams(String(str || '').replace(/^[#?]/, ''));
   const period = sp.get('period');
   const sort = sp.get('sort');
@@ -787,6 +789,8 @@ export function parseState(str, fallbackView = null, fallbackPanel = null) {
     rweek: WEEK_RE.test(sp.get('rweek') || '') ? sp.get('rweek') : '',
     rclosed: REPORT_SECTIONS.filter((k) => sp.getAll('rc').includes(k)),
     panel: sp.has('panel') ? sp.get('panel') === '1' : fallbackPanel === true,
+    rising: sp.has('rising') ? sp.get('rising') === '1' : fallbackRising === true,
+    rsdate: DATE_RE.test(sp.get('rsdate') || '') ? sp.get('rsdate') : '',
   };
 }
 
@@ -817,6 +821,32 @@ function hitRows(list, labelKey) {
   return arr(list).map((h) => ({ label: strOrNull(h[labelKey]), total: numField(h.total), crossed: numField(h.crossed) }));
 }
 
+function risingItem(r) {
+  return {
+    id: idOrNull(r.id),
+    views: numField(r.views),
+    hours: numField(r.hours_since_post),
+    perHour: numField(r.views_per_hour),
+    label: strOrNull(r.condition_label),
+  };
+}
+
+/**
+ * 伸びている投稿は夜職関連のみ（安全策）。posts.json で引けた投稿のうち NIGHT_CATEGORIES を 1 つも持たないもの
+ * （＝一般のバズのみ）は除外する。posts.json に無い id は判定できないので残す。
+ * 返り値: { items, excluded }
+ */
+export function filterNightRising(items, postsById) {
+  const kept = [];
+  let excluded = 0;
+  for (const r of items || []) {
+    const post = r.id && postsById ? postsById.get(r.id) : null;
+    if (post && !post.categories.some((c) => NIGHT_CATEGORIES.includes(c))) { excluded++; continue; }
+    kept.push(r);
+  }
+  return { items: kept, excluded };
+}
+
 /** 週のキー（URL 用）: "2026-10-10_2026-10-17" */
 export function weekKey(period) {
   return period && DATE_RE.test(period.from || '') && DATE_RE.test(period.to || '') ? `${period.from}_${period.to}` : null;
@@ -833,13 +863,9 @@ export function normalizeReports(raw) {
     .filter((d) => typeof d.date === 'string' && DATE_RE.test(d.date))
     .map((d) => ({
       date: d.date,
-      rising: arr(d.rising).map((r) => ({
-        id: idOrNull(r.id),
-        views: numField(r.views),
-        hours: numField(r.hours_since_post),
-        perHour: numField(r.views_per_hour),
-        label: strOrNull(r.condition_label),
-      })),
+      rising: arr(d.rising).map(risingItem),
+      // 補足「伸びそうな投稿」（任意）。reason は bot の補足文
+      risingWatch: arr(d.rising_watch).map((r) => ({ ...risingItem(r), reason: strOrNull(r.reason) })),
       review: arr(d.review).map((r) => ({
         id: idOrNull(r.id),
         before: numField(r.before_views),

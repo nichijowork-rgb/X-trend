@@ -10,7 +10,7 @@ import {
   parseKeywords, parseState, parseTimestamp, serializeState, sortPosts, topAccounts, CHART_MAX_DAYS,
   shortDate, VIEWS, embedTweetId, chooseRefTs, isUpdateDelayed, formatPace, viewsPerHour,
   normalizeReports, pickReport, formatRisingPace, formatBeforeAfter, REPORT_SECTIONS,
-  categoryMatcher, inGroup, isUnclassified, individualChipCategories, categoryLabel, normalizeCategorySelection,
+  categoryMatcher, inGroup, isUnclassified, filterNightRising, individualChipCategories, categoryLabel, normalizeCategorySelection,
 } from './js/core.js';
 import { UPDATE_SCHEDULE, PACE_NOTE, REPORT_TEXT, CATEGORY_GROUPS, WATCH_CATEGORY } from './js/config.js';
 import {
@@ -82,6 +82,8 @@ function resolvedTheme() {
 const VIEW_KEY = 'xreport-view';
 const PANEL_KEY = 'xreport-panel';
 const SEEN_KEY = 'xreport-report-seen';
+const RISING_KEY = 'xreport-rising';
+const RISING_SEEN_KEY = 'xreport-rising-seen';
 const NOTICE_KEY = 'xreport-embed-notice-dismissed';
 
 function storageGet(k) {
@@ -318,6 +320,11 @@ function syncControls() {
   for (const b of $('mode-group').children) b.setAttribute('aria-pressed', String(b.dataset.group === st.group));
   for (const b of $('view-group').children) b.setAttribute('aria-pressed', String(b.dataset.view === st.view));
   $('panel').hidden = !st.panel;
+  const risingOpen = st.rising && !!app.reports;
+  $('rising-panel').hidden = !risingOpen;
+  $('rising-toggle').setAttribute('aria-expanded', String(risingOpen));
+  $('rising-toggle').classList.toggle('is-open', risingOpen);
+  if (risingOpen) markRisingSeen();
   $('panel-toggle').setAttribute('aria-expanded', String(st.panel));
   $('panel-toggle').classList.toggle('is-open', st.panel);
   if (st.panel) markReportsSeen();
@@ -359,6 +366,7 @@ function render() {
   renderPostsReset(filtered.length);
   renderActiveFilters();
   renderReports();
+  renderRising();
 
   app.perf.lastRenderMs = performance.now() - t0;
   app.perf.renders += 1;
@@ -848,8 +856,102 @@ function markReportsSeen() {
   $('panel-toggle').setAttribute('aria-label', '詳細・レポート・グラフ');
 }
 
+/** 伸びている投稿がある最新の日付 */
+function latestRisingDate() {
+  if (!app.reports) return '';
+  const d = app.reports.daily.find((x) => x.rising.length || x.risingWatch.length);
+  return d ? d.date : '';
+}
+
+function updateRisingBadge() {
+  const latest = latestRisingDate();
+  const isNew = !!latest && latest > String(storageGet(RISING_SEEN_KEY) || '');
+  $('rising-new').hidden = !isNew;
+  const n = app.reports && app.reports.daily[0] ? filterNightRising(app.reports.daily[0].rising, app.postsById).items.length : 0;
+  $('rising-count').textContent = String(n);
+  $('rising-toggle').setAttribute('aria-label', `伸びている投稿 ${n}件${isNew ? '（新しいデータあり）' : ''}`);
+}
+
+function markRisingSeen() {
+  const latest = latestRisingDate();
+  if (latest) storageSet(RISING_SEEN_KEY, latest);
+  $('rising-new').hidden = true;
+}
+
+/** 伸びている投稿の一覧（帯＋投稿カード）。データ側の並び順のまま、最初の数件＋「残りN件」 */
+function risingListEl(items, { withReason = false, initial = RISING_INITIAL, label = '' } = {}) {
+  const wrap = el('div');
+  const list = el('ol', 'rising-list');
+  list.setAttribute('aria-label', label);
+  items.forEach((r, i) => {
+    const li = el('li', 'rising-item');
+    const band = el('div', 'rising-band');
+    band.append(el('span', 'rank', `#${i + 1}`), el('span', 'cond', r.label ?? '条件：不明'), el('span', 'rpace', formatRisingPace(r.views, r.hours, r.perHour)));
+    if (withReason && r.reason) band.append(el('span', 'reason', r.reason));
+    band.title = PACE_NOTE;
+    const post = r.id ? app.postsById.get(r.id) : null;
+    li.append(band, post ? postPlainCard(post) : missingPostCard(r.id));
+    list.append(li);
+  });
+  wrap.append(list);
+  const extra = [...list.children].slice(initial);
+  if (extra.length) {
+    extra.forEach((li) => { li.hidden = true; });
+    const more = el('button', 'btn btn-ghost rising-more', `残り ${extra.length}件を表示`);
+    more.type = 'button';
+    more.addEventListener('click', () => { extra.forEach((li) => { li.hidden = false; }); more.remove(); });
+    wrap.append(more);
+  }
+  return wrap;
+}
+
+/** 伸びている投稿パネル（夜職関連のみ。夜職／一般の切替やカテゴリ絞り込みとは連動しない） */
+function renderRising() {
+  if (!app.reports) return;
+  const body = $('rising-body');
+  body.replaceChildren();
+  const d = pickReport(app.reports.daily, app.state.rsdate, (x) => x.date);
+  const watchSec = $('rising-watch');
+  if (!d) {
+    body.append(reportEmpty(REPORT_TEXT.dailyEmpty));
+    $('rising-note').textContent = '';
+    watchSec.hidden = true;
+    return;
+  }
+  $('rsdate').value = d.date;
+  const main = filterNightRising(d.rising, app.postsById);
+  const watch = filterNightRising(d.risingWatch, app.postsById);
+  const excluded = main.excluded + watch.excluded;
+  $('rising-note').textContent = `${REPORT_TEXT.risingNightOnly}${excluded ? `。一般のバズ ${formatExact(excluded)}件を除外` : ''}。${PACE_NOTE}`;
+  body.append(main.items.length
+    ? risingListEl(main.items, { label: `伸びている投稿（${main.items.length}件・データ側の並び順）` })
+    : reportEmpty(REPORT_TEXT.risingEmpty));
+  // 補足「伸びそうな投稿」（任意フィールド rising_watch。無い・空なら見出しごと非表示）
+  watchSec.hidden = watch.items.length === 0;
+  $('rising-watch-title').textContent = REPORT_TEXT.risingWatchTitle;
+  $('rising-watch-body').replaceChildren(...(watch.items.length
+    ? [risingListEl(watch.items, { withReason: true, label: `${REPORT_TEXT.risingWatchTitle}（${watch.items.length}件）` })]
+    : []));
+}
+
+function setupRising() {
+  if (!app.reports) return;
+  $('rising-toggle').hidden = false;
+  const daily = app.reports.daily;
+  $('rsdate').replaceChildren(...daily.map((d) => { const o = el('option', null, d.date.replace(/^(\d{4})-0?(\d+)-0?(\d+)$/, '$1/$2/$3')); o.value = d.date; return o; }));
+  $('rsdate-wrap').hidden = daily.length === 0;
+  $('rsdate').addEventListener('change', (e) => update({ rsdate: e.target.value }));
+  $('rising-toggle').addEventListener('click', () => {
+    const next = !app.state.rising;
+    storageSet(RISING_KEY, next ? '1' : '0');
+    update({ rising: next });
+  });
+  updateRisingBadge();
+}
+
 function setupReports() {
   updateNewBadge();
+  setupRising();
   const box = $('report');
   if (!app.reports) { box.hidden = true; return; }
   box.hidden = false;
@@ -928,30 +1030,7 @@ function renderReports() {
   } else {
     $('rdate').value = d.date;
     const byId = app.postsById;
-    // 伸びている投稿（データ側の並び順のまま）
-    const risingList = el('ol', 'rising-list');
-    risingList.setAttribute('aria-label', `伸びている投稿（${d.rising.length}件・データ側の並び順）`);
-    d.rising.forEach((r, i) => {
-      const li = el('li', 'rising-item');
-      const band = el('div', 'rising-band');
-      band.append(el('span', 'rank', `#${i + 1}`), el('span', 'cond', r.label ?? '条件：不明'), el('span', 'rpace', formatRisingPace(r.views, r.hours, r.perHour)));
-      band.title = PACE_NOTE;
-      const post = r.id ? byId.get(r.id) : null;
-      li.append(band, post ? postPlainCard(post) : missingPostCard(r.id));
-      risingList.append(li);
-    });
-    // 長くなりすぎないよう最初の RISING_INITIAL 件だけ表示し、残りはボタンで展開
-    const extra = [...risingList.children].slice(RISING_INITIAL);
-    let moreBtn = null;
-    if (extra.length) {
-      extra.forEach((li) => { li.hidden = true; });
-      moreBtn = el('button', 'btn btn-ghost rising-more', `残り ${extra.length}件を表示`);
-      moreBtn.type = 'button';
-      moreBtn.addEventListener('click', () => { extra.forEach((li) => { li.hidden = false; }); moreBtn.remove(); });
-    }
-    const risingPart = reportPart('伸びている投稿', d.rising.length ? risingList : reportEmpty(REPORT_TEXT.risingEmpty));
-    if (moreBtn) risingPart.append(moreBtn);
-    dBody.append(risingPart);
+    // 「伸びている投稿」は専用パネル（renderRising）へ移動。ここは答え合わせ・的中率のみ
     // 答え合わせ
     let review;
     if (!d.review.length) {
@@ -1115,7 +1194,7 @@ async function main() {
     renderHeader(loaded);
     buildControls();
     setupReports();
-    app.state = sanitizeState(parseState(location.hash, storageGet(VIEW_KEY), storageGet(PANEL_KEY) === '1'));
+    app.state = sanitizeState(parseState(location.hash, storageGet(VIEW_KEY), storageGet(PANEL_KEY) === '1', storageGet(RISING_KEY) === '1'));
     writeUrl(false); // 保存済みの表示切替を URL にも反映
     $('loading').hidden = true;
     $('app').hidden = false;

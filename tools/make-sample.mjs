@@ -319,6 +319,13 @@ const risingToday = risingFor(genTs, 6);
 risingToday.splice(2, 0, { id: '1999999999999999999', views: 412000, hours_since_post: 2.5, views_per_hour: 164800, condition_label: COND[1] });
 // XSS 文字列入りの条件名
 risingToday.push({ id: posts[40].id, views: posts[40].metrics.impression_count ?? 0, hours_since_post: 'x', views_per_hour: null, condition_label: '<img src=x onerror="alert(\'rep\')">条件名にタグ' });
+// 一般のバズのみの投稿（画面側の安全策で除外されることの確認用）
+const generalOnly = posts.find((p) => p.categories.length === 1 && p.categories[0] === 'その他' && p.metrics && typeof p.metrics.impression_count === 'number');
+risingToday.push({ id: generalOnly.id, views: generalOnly.metrics.impression_count, hours_since_post: 4, views_per_hour: Math.round(generalOnly.metrics.impression_count / 4), condition_label: COND[1] });
+// 補足「伸びそうな投稿」（rising_watch。条件ラベル・理由はデータ側の文字列）
+const watchPool = risingFor(genTs, 12).slice(6, 9);
+const risingWatch = watchPool.map((r, i) => ({ ...r, condition_label: '【サンプル】伸び始め（条件名はデータ側の文字列）', reason: `【サンプル】補足${i + 1}：1時間あたりのペースが上がっている` }));
+risingWatch.push({ id: generalOnly.id, views: 1000, hours_since_post: 1, views_per_hour: 1000, condition_label: '【サンプル】伸び始め', reason: '一般のバズのみ（除外される）' });
 const review = risingPrev.map((r, i) => ({
   id: r.id, before_views: r.views, after_views: r.views * 2 + (i % 2 === 0 ? 500000 : 0), crossed_500k: r.views * 2 + (i % 2 === 0 ? 500000 : 0) >= 500000,
 }));
@@ -331,7 +338,7 @@ const hit = (rows) => COND.map((c) => {
 const reports = {
   generated_at: GENERATED_AT,
   daily: [
-    { date: '2026-10-11', rising: risingToday, review, hit_rate: hit(risingPrev.map((r, i) => ({ label: r.condition_label, crossed: review[i].crossed_500k }))) },
+    { date: '2026-10-11', rising: risingToday, rising_watch: risingWatch, review, hit_rate: hit(risingPrev.map((r, i) => ({ label: r.condition_label, crossed: review[i].crossed_500k }))) },
     { date: '2026-10-10', rising: risingPrev, review: [], hit_rate: [] },
   ],
   weekly: [

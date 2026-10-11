@@ -305,18 +305,25 @@ async function main() {
         if (expect === 'hidden') {
           assert(await page.isHidden('#report'), 'report should be hidden');
           assert(await page.isHidden('#new-badge'), 'no NEW without reports');
+          assert(await page.isHidden('#rising-toggle'), 'no rising toggle without reports');
         } else {
           await page.click('#panel-toggle');
           assert(await page.isVisible('#report'), 'report visible');
           const d = await page.textContent('#report-daily-body');
           const w = await page.textContent('#report-weekly-body');
+          await page.click('#rising-toggle');
+          assert(await page.isVisible('#rising-panel'), 'rising panel');
           if (expect === 'both-empty') {
+            assert((await page.textContent('#rising-body')).includes('10/12 23:59'), 'rising empty guide');
+            assert(await page.isHidden('#rising-watch'), 'rising_watch hidden');
+            assert((await page.textContent('#rising-count')) === '0', 'count 0');
             assert(d.includes('10/12 23:59'), d);
             assert(w.includes('10/17'), w);
             await page.$eval('#report', (e) => e.scrollIntoView());
             await page.screenshot({ path: path.join(SHOTS, 'report-empty.png') });
           } else {
-            assert((await page.$$('#report-daily-body .rising-item')).length > 0, 'rising');
+            assert((await page.$$('#rising-panel #rising-body .rising-item')).length > 0, 'rising');
+            assert(!(await page.$('#report-daily-body .rising-item')), 'rising not in detail panel');
             assert(w.includes('10/17'), w);
           }
         }
@@ -451,21 +458,64 @@ async function main() {
       assert(await page.isVisible('#q'), 'panel reopened');
     });
 
-    await check('レポート（サンプル）: 伸びている投稿・posts に無い id・答え合わせ・的中率・週間・XSS', async () => {
+    await check('伸びている投稿パネル: 開閉・URL/保存・NEW・夜職のみ（一般のバズ除外注記）・rising_watch・XSS', async () => {
+      const today = sampleReports.daily[0];
+      const isGeneralOnly = (id) => { const p = sample.posts.find((x) => x.id === id); return !!p && !p.categories.some((c) => NIGHT.includes(c)); };
+      const shownRising = today.rising.filter((r) => !isGeneralOnly(r.id));
+      const shownWatch = today.rising_watch.filter((r) => !isGeneralOnly(r.id));
+      const excluded = today.rising.length - shownRising.length + today.rising_watch.length - shownWatch.length;
+      assert(excluded >= 2, 'sample should contain general-only items');
+      assert(await page.isHidden('#rising-panel'), 'closed by default');
+      assert(await page.isVisible('#rising-new'), 'NEW before opening');
+      assert((await page.textContent('#rising-count')) === String(shownRising.length), 'count badge');
+      assert(!(await page.$('#report-daily-body .rising-item')), 'rising removed from detail panel');
+      await page.click('#rising-toggle');
+      assert(await page.isVisible('#rising-panel') && await page.isHidden('#rising-new'), 'open & NEW cleared');
+      assert((await page.evaluate(() => location.hash)).includes('rising=1'), 'url');
+      assert((await page.$$('#rising-body .rising-item:not([hidden])')).length === 3, 'initial 3');
+      await page.click('#rising-body .rising-more');
+      assert((await page.$$('#rising-body .rising-item:not([hidden])')).length === shownRising.length, 'all rising');
+      const band0 = await page.textContent('#rising-body .rising-item .rising-band');
+      assert(band0.includes('#1') && band0.includes(shownRising[0].condition_label) && /投稿から.+で.+表示（1時間あたり.+）/.test(band0), band0);
+      const missing = await page.$$eval('#rising-body .post-missing', (l) => l.map((e) => e.querySelector('a') && e.querySelector('a').href));
+      assert(missing.length === 1 && missing[0] === 'https://x.com/i/web/status/1999999999999999999', JSON.stringify(missing));
+      const note = await page.textContent('#rising-note');
+      assert(note.includes(`一般のバズ ${excluded}件を除外`), note);
+      assert(await page.isVisible('#rising-watch'), 'rising_watch shown');
+      assert((await page.textContent('#rising-watch-title')) === '補足：伸びそうな投稿', 'watch title');
+      assert((await page.$$('#rising-watch .rising-item')).length === shownWatch.length, 'watch items');
+      assert((await page.textContent('#rising-watch')).includes(shownWatch[0].reason), 'reason');
+      const html = await page.$eval('#rising-panel', (e) => e.innerHTML);
+      assert(!/<img[^>]*onerror/i.test(html) && !/<script/i.test(html), 'tag injected');
+      assert((await page.textContent('#rising-panel')).includes('<img src=x onerror='), 'tag shown as text');
+      assert((await page.textContent('#rising-body')).includes('伸びペース：不明'), 'unknown pace');
+      // 夜職／一般のバズの切替・カテゴリとは連動しない
+      const before = await page.$$eval('#rising-body .rising-item', (l) => l.length);
+      await page.click('#mode-group button[data-group="general"]');
+      assert((await page.$$eval('#rising-body .rising-item', (l) => l.length)) === before, 'independent of mode');
+      await page.click('#mode-group button[data-group="night"]');
+      await page.$eval('#rising-panel', (e) => e.scrollIntoView());
+      await page.screenshot({ path: path.join(SHOTS, 'rising-desktop.png') });
+      // 日付の切替（rising_watch が無い日は見出しごと非表示）
+      await page.selectOption('#rsdate', '2026-10-10');
+      assert((await page.evaluate(() => location.hash)).includes('rsdate=2026-10-10'), 'rsdate url');
+      assert(await page.isHidden('#rising-watch'), 'no rising_watch on 10/10');
+      await page.reload();
+      await ready(page);
+      assert(await page.isVisible('#rising-panel') && (await page.inputValue('#rsdate')) === '2026-10-10', 'restored');
+      await page.selectOption('#rsdate', '2026-10-11');
+      await page.click('#rising-toggle');
+      assert(await page.isHidden('#rising-panel'), 'closed');
+      assert(!(await page.evaluate(() => location.hash)).includes('rising=1'), 'url cleared');
+      return `表示 ${shownRising.length}件＋補足 ${shownWatch.length}件・除外 ${excluded}件`;
+    });
+
+    await check('レポート（サンプル）: 答え合わせ・的中率・週間・XSS', async () => {
       assert(await page.isVisible('#report'), 'report');
       const today = sampleReports.daily[0];
-      assert((await page.$$('#report-daily-body .rising-item:not([hidden])')).length === 3, 'initial 3');
-      await page.click('#report-daily-body .rising-more');
-      const items = await page.$$('#report-daily-body .rising-item:not([hidden])');
-      assert(items.length === today.rising.length, `rising ${items.length}`);
-      const band0 = await page.textContent('#report-daily-body .rising-item .rising-band');
-      assert(band0.includes(today.rising[0].condition_label) && /投稿から.+で.+表示（1時間あたり.+）/.test(band0), band0);
-      const missing = await page.$$eval('#report-daily-body .post-missing', (l) => l.map((e) => ({ text: e.textContent, href: e.querySelector('a') && e.querySelector('a').href })));
-      assert(missing.length === 1 && missing[0].href === 'https://x.com/i/web/status/1999999999999999999', JSON.stringify(missing));
       const html = await page.$eval('#report', (e) => e.innerHTML);
       assert(!/<img[^>]*onerror/i.test(html) && !/<script/i.test(html), 'tag injected');
       assert((await page.textContent('#report')).includes('<img src=x onerror='), 'tag shown as text');
-      assert((await page.textContent('#report-daily-body')).includes('伸びペース：不明'), 'unknown pace');
       const rows = await page.$$eval('#report-daily-body .report-table tbody tr', (l) => l.length);
       assert(rows === today.review.length, `review rows ${rows}`);
       assert((await page.$$('#report-daily-body .cross.yes')).length === today.review.filter((r) => r.crossed_500k === true).length, 'crossed badges');
@@ -805,7 +855,7 @@ async function main() {
         const sw = await p2.evaluate(() => document.documentElement.scrollWidth);
         assert(sw <= w, `scrollWidth ${sw}`);
         const small = await p2.evaluate(() => {
-          const sel = '#panel-toggle, .more-text, #rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #mode-group button, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
+          const sel = '#rising-toggle, #rsdate, .rising-more, #panel-toggle, .more-text, #rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #mode-group button, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
           return [...document.querySelectorAll(sel)].filter((e) => e.offsetParent && e.getBoundingClientRect().height < 44).map((e) => `${e.className || e.id}:${Math.round(e.getBoundingClientRect().height)}`).slice(0, 5);
         });
         assert(small.length === 0, small.join(', '));
@@ -815,6 +865,9 @@ async function main() {
           await p2.evaluate(() => document.getElementById('posts-heading').scrollIntoView());
           await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-posts.png') });
           await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-closed.png') });
+          await p2.click('#rising-toggle');
+          await p2.$eval('#rising-panel', (e) => e.scrollIntoView());
+          await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-rising.png') });
           await p2.click('#panel-toggle');
           const rw = await p2.$eval('#report', (e) => [...e.querySelectorAll('*')].filter((x) => x.getBoundingClientRect().right > window.innerWidth + 1 && !x.closest('.table-scroll')).map((x) => x.className).slice(0, 3));
           assert(rw.length === 0, `report overflow: ${rw.join()}`);

@@ -66,13 +66,19 @@
           <label class="sr-only" for="sort">並び替え</label>
           <select id="sort" class="input input-sm" title="並び替え"></select>
           <div class="segmented" id="view-group" role="group" aria-label="表示"></div>
-          <button type="button" id="panel-toggle" class="btn panel-toggle" aria-expanded="false" aria-controls="panel">
-            <span class="pt-long">詳細・レポート・グラフ</span><span class="pt-short" aria-hidden="true">詳細</span><span class="new-badge" id="new-badge" hidden>NEW</span>
-          </button>
         </div>
         <div class="toolbar-foot">
           <p class="result-count" id="result-count" aria-live="polite"></p>
           <div id="active-filters" class="active-filters"></div>
+          <div class="toolbar-actions">
+            <button type="button" id="rising-toggle" class="btn panel-toggle rising-toggle" aria-expanded="false" aria-controls="rising-panel" hidden>
+              <svg class="flame" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.5c.4 2.2-.9 3.3-1.9 4.4C5 7.1 4 8.3 4 10a4 4 0 0 0 8 0c0-1.6-.7-2.8-1.4-3.6-.1 1-.6 1.7-1.3 2 .3-2.4-.1-5-1.3-6.9Z"/></svg>
+              <span>伸びている</span><span class="count-badge" id="rising-count">0</span><span class="new-badge" id="rising-new" hidden>NEW</span>
+            </button>
+            <button type="button" id="panel-toggle" class="btn panel-toggle" aria-expanded="false" aria-controls="panel">
+              <span class="pt-long">詳細・レポート・グラフ</span><span class="pt-short" aria-hidden="true">詳細</span><span class="new-badge" id="new-badge" hidden>NEW</span>
+            </button>
+          </div>
         </div>
         <p class="embed-notice" id="embed-notice" hidden>
           <span>埋め込み表示はXのサーバーから読み込みます（X側のCookie等が使われる場合があります）</span>
@@ -189,6 +195,20 @@
           </div>
           <p class="muted small">クリックでそのアカウントに絞り込み</p>
           <ol class="acc-list" id="acc-list"></ol>
+        </section>
+      </section>
+
+      <!-- 伸びている投稿（専用パネル。既定は閉じる。夜職関連のみ・切替やカテゴリとは連動しない） -->
+      <section class="card rising-panel" id="rising-panel" aria-labelledby="rising-heading" hidden>
+        <div class="section-head">
+          <h2 id="rising-heading" class="section-title"><span class="neon">伸びている投稿</span></h2>
+          <label class="report-pick" id="rsdate-wrap">日付 <select id="rsdate" class="input input-sm"></select></label>
+        </div>
+        <p class="muted small" id="rising-note"></p>
+        <div id="rising-body"></div>
+        <section class="rising-watch" id="rising-watch" hidden>
+          <h3 class="section-title rw-title" id="rising-watch-title"></h3>
+          <div id="rising-watch-body"></div>
         </section>
       </section>
 
