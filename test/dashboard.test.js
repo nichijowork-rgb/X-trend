@@ -8,7 +8,9 @@ import {
   countBefore, linkifySegments, isSafeHttpUrl, highlightSegments, serializeState, parseState, DEFAULT_STATE,
   categorySlot, hashString, KNOWN_CATEGORY_SLOTS, SPARE_SLOTS, isFilterActive, topAccounts, countByCategory,
   niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, CHART_MAX_DAYS,
+  chooseRefTs, nextScheduledUpdate, isUpdateDelayed, viewsPerHour, formatPace, SORTS,
 } from '../assets/js/core.js';
+import { UPDATE_SCHEDULE, PACE_NOTE } from '../assets/js/config.js';
 
 const ts = (iso) => Math.floor(Date.parse(iso) / 1000);
 
@@ -22,8 +24,8 @@ function rawPost(over = {}) {
   };
 }
 
-function dataset(posts, categories = ['ホスト', 'キャバクラ', 'その他']) {
-  return normalizeDataset({ generated_at: '2026-10-11T18:41:00+09:00', categories, posts });
+function dataset(posts, categories = ['ホスト', 'キャバクラ', 'その他'], generatedAt = '2026-10-11T18:41:00+09:00') {
+  return normalizeDataset({ generated_at: generatedAt, categories, posts });
 }
 
 // ---------------------------------------------------------------- 数値
@@ -109,12 +111,13 @@ function sampleSet() {
     rawPost({ id: '2', ts: REF - 3600 * 30, text: '【サンプル】キャバクラ 同伴', categories: ['キャバクラ'], user: 'sample_b', is_watched: true, metrics: { impression_count: null, like_count: 50, bookmark_count: null } }),
     rawPost({ id: '3', ts: REF - 86400 * 10, text: '【サンプル】ホストとキャバクラ　指名', categories: ['ホスト', 'キャバクラ'], user: 'Sample_C', metrics: { impression_count: 2000, like_count: 1 } }),
     rawPost({ id: '4', ts: ts('2016-03-04T10:00:00+09:00'), text: '【サンプル】昔の投稿', categories: ['その他'], user: 'sample_a', metrics: { impression_count: 10 } }),
-  ]);
+  ], undefined, null); // generated_at なし → 最新投稿の ts が基準
 }
 
-test('filterPosts: 期間はデータ内の最新投稿時刻基準', () => {
+test('filterPosts: generated_at が無ければ最新投稿時刻が基準', () => {
   const ds = sampleSet();
   assert.equal(ds.refTs, REF);
+  assert.equal(ds.refSource, 'latest_post');
   const ids = (st) => filterPosts(ds.posts, st, ds.refTs).map((p) => p.id);
   assert.deepEqual(ids({ period: '24h' }), ['1']);
   assert.deepEqual(ids({ period: '7d' }), ['1', '2']);
@@ -350,4 +353,68 @@ test('sample/posts.json: 仕様どおりで検証ケースを含む', () => {
   const agg = aggregate(ds.posts, ds.categories);
   for (const c of agg.byCategory) assert.equal(summary.by_category[c.name].posts, c.posts, c.name);
   assert.equal(summary.total_accounts, agg.totalAccounts);
+});
+
+// ---------------------------------------------------------------- 基準時刻・更新スケジュール・伸びペース
+
+test('chooseRefTs / normalizeDataset: generated_at を優先し、無ければ最新投稿', () => {
+  assert.deepEqual(chooseRefTs('2026-10-11T23:59:00+09:00', 100), { refTs: ts('2026-10-11T23:59:00+09:00'), refSource: 'generated_at' });
+  assert.deepEqual(chooseRefTs(null, 100), { refTs: 100, refSource: 'latest_post' });
+  assert.deepEqual(chooseRefTs('壊れた値', 100), { refTs: 100, refSource: 'latest_post' });
+  assert.deepEqual(chooseRefTs(null, null), { refTs: null, refSource: null });
+  // 前日 23:59 更新のデータは、日中に見ても 23:59 基準で 24 時間を切る
+  const gen = '2026-10-11T23:59:00+09:00';
+  const ds = dataset([
+    rawPost({ id: '1', ts: ts('2026-10-11T12:00:00+09:00') }),
+    rawPost({ id: '2', ts: ts('2026-10-10T23:00:00+09:00') }),
+  ], undefined, gen);
+  assert.equal(ds.refTs, ts(gen));
+  assert.equal(ds.refSource, 'generated_at');
+  assert.equal(ds.latestPostTs, ts('2026-10-11T12:00:00+09:00'));
+  assert.deepEqual(filterPosts(ds.posts, { period: '24h' }, ds.refTs).map((p) => p.id), ['1']);
+});
+
+test('nextScheduledUpdate: generated_at の次の 23:59 JST（定時直前の生成はその回とみなす）', () => {
+  const d = UPDATE_SCHEDULE.daily;
+  assert.equal(nextScheduledUpdate(ts('2026-10-11T18:41:00+09:00'), d), ts('2026-10-11T23:59:00+09:00'));
+  assert.equal(nextScheduledUpdate(ts('2026-10-11T23:59:00+09:00'), d), ts('2026-10-12T23:59:00+09:00'));
+  assert.equal(nextScheduledUpdate(ts('2026-10-11T23:59:40+09:00'), d), ts('2026-10-12T23:59:00+09:00'));
+  assert.equal(nextScheduledUpdate(ts('2026-10-11T23:45:00+09:00'), d), ts('2026-10-12T23:59:00+09:00'));
+  assert.equal(nextScheduledUpdate(ts('2026-10-12T00:05:00+09:00'), d), ts('2026-10-12T23:59:00+09:00'));
+  assert.equal(nextScheduledUpdate(null, d), null);
+});
+
+test('isUpdateDelayed: 次の 23:59 から猶予 2 時間を過ぎたら true', () => {
+  const g = ts('2026-10-11T23:59:00+09:00');
+  assert.equal(isUpdateDelayed(g, ts('2026-10-12T15:00:00+09:00'), UPDATE_SCHEDULE), false);
+  assert.equal(isUpdateDelayed(g, ts('2026-10-13T01:59:00+09:00'), UPDATE_SCHEDULE), false);
+  assert.equal(isUpdateDelayed(g, ts('2026-10-13T02:00:00+09:00'), UPDATE_SCHEDULE), true);
+  assert.equal(isUpdateDelayed(null, ts('2026-10-13T02:00:00+09:00'), UPDATE_SCHEDULE), false);
+  assert.equal(UPDATE_SCHEDULE.dailyLabel, '毎日23:59（JST）');
+});
+
+test('viewsPerHour / formatPace: 表示 ÷ 経過時間（1時間未満は1時間）、不明は「不明」', () => {
+  const ref = ts('2026-10-11T23:59:00+09:00');
+  const p = { ts: ref - 3 * 3600, metrics: { impression_count: 382000 } };
+  assert.deepEqual(viewsPerHour(p, ref), { hours: 3, views: 382000, perHour: 382000 / 3 });
+  assert.equal(formatPace(p, ref), '投稿から3時間で38.2万表示（1時間あたり12.7万）');
+  const fresh = { ts: ref - 600, metrics: { impression_count: 5000 } };
+  assert.equal(viewsPerHour(fresh, ref).perHour, 5000);
+  assert.equal(formatPace(fresh, ref), '投稿から1時間未満で5,000表示（1時間あたり5,000）');
+  assert.equal(formatPace({ ts: ref - 5 * 86400, metrics: { impression_count: 120000 } }, ref), '投稿から5日で12万表示（1時間あたり1,000）');
+  assert.equal(viewsPerHour({ ts: ref, metrics: { impression_count: null } }, ref), null);
+  assert.equal(formatPace({ ts: ref, metrics: { impression_count: null } }, ref), '伸びペース：不明');
+  assert.ok(PACE_NOTE.includes('予測ではありません'));
+});
+
+test('sortPosts(pace): 1時間あたり表示の降順、不明は末尾', () => {
+  const ref = ts('2026-10-11T23:59:00+09:00');
+  const ds = dataset([
+    rawPost({ id: 'a', ts: ref - 2 * 3600, metrics: { impression_count: 100000 } }), // 5万/h
+    rawPost({ id: 'b', ts: ref - 10 * 3600, metrics: { impression_count: 600000 } }), // 6万/h
+    rawPost({ id: 'c', ts: ref - 1800, metrics: { impression_count: 30000 } }), // 3万/h（1時間扱い）
+    rawPost({ id: 'd', ts: ref - 3600, metrics: { impression_count: null } }),
+  ], undefined, '2026-10-11T23:59:00+09:00');
+  assert.ok(SORTS.some((s) => s.key === 'pace'));
+  assert.deepEqual(sortPosts(ds.posts, 'pace', ds.refTs).map((p) => p.id), ['b', 'a', 'c', 'd']);
 });

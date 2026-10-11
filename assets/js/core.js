@@ -256,13 +256,15 @@ export function chooseRefTs(generatedAt, latestPostTs) {
 
 /**
  * generatedTs の後に来る最初の定時更新（JST の hour:minute）の UNIX 秒。
- * 例: 10/11 18:41 → 10/11 23:59、10/11 23:59:30 → 10/12 23:59
+ * 例: 10/11 18:41 → 10/11 23:59、10/11 23:59:30 → 10/12 23:59、10/11 23:50（定時直前の生成）→ 10/12 23:59
  */
 export function nextScheduledUpdate(generatedTs, daily) {
   if (!isNum(generatedTs) || !daily) return null;
   const p = jstParts(generatedTs);
   let t = Math.floor(Date.UTC(p.y, p.m - 1, p.d, daily.hour, daily.minute) / 1000) - JST_OFFSET;
-  if (t <= generatedTs - (generatedTs % 60) + (generatedTs % 60 ? 0 : 0) && t <= generatedTs) t += 86400;
+  // 定時の少し前（earlyMinutes 以内）に生成されたものはその回の更新とみなし、次は翌日
+  const early = (daily.earlyMinutes ?? 30) * 60;
+  if (t - generatedTs < early) t += 86400;
   return t;
 }
 

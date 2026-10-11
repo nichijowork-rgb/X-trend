@@ -30,9 +30,11 @@
         <h1 class="title"><span class="title-neon">Xレポート</span> ダッシュボード</h1>
         <dl class="meta">
           <div><dt>最終更新</dt><dd id="meta-generated">—</dd></div>
+          <div><dt>次回更新</dt><dd id="meta-next">—</dd></div>
           <div><dt>データ期間</dt><dd id="meta-period">—</dd></div>
-          <div><dt>期間の基準</dt><dd id="meta-ref" title="期間フィルタ（24時間/7日/30日）はデータ内の最新投稿時刻を基準にしています">—</dd></div>
+          <div><dt>基準</dt><dd id="meta-ref">—</dd></div>
         </dl>
+        <p class="delay-note" id="meta-delay" role="status" hidden>更新が遅れている可能性があります</p>
       </div>
       <button type="button" id="theme-toggle" class="btn btn-ghost theme-toggle" aria-label="表示テーマを切り替え">
         <span class="theme-icon" aria-hidden="true"></span><span id="theme-label">自動</span>
@@ -166,6 +168,7 @@
             <h2 id="posts-heading" class="section-title" tabindex="-1">投稿</h2>
             <p class="muted small" id="posts-count"></p>
           </div>
+          <p class="pace-note small" id="pace-note" hidden></p>
           <div id="active-filters" class="active-filters"></div>
           <ol class="post-list" id="post-list"></ol>
           <p class="empty" id="posts-empty" hidden>条件に合う投稿はありません</p>

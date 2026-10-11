@@ -4,7 +4,7 @@
 /** データ（posts.json / summary.json）の更新スケジュール（JST） */
 export const UPDATE_SCHEDULE = Object.freeze({
   /** 毎日の更新時刻（JST） */
-  daily: Object.freeze({ hour: 23, minute: 59 }),
+  daily: Object.freeze({ hour: 23, minute: 59, earlyMinutes: 30 }), // earlyMinutes: 定時のこの分数前以降の生成は「その回」の更新とみなす
   /** 画面表示用の文字列 */
   dailyLabel: '毎日23:59（JST）',
   weeklyLabel: '毎週土曜 12:00（JST）',

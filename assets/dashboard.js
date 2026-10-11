@@ -8,8 +8,9 @@ import {
   formatCompact, formatDateTime, formatDateTimeFull, formatExact, highlightSegments, isFilterActive,
   isSafeHttpUrl, isValidSummary, jstParts, linkifySegments, mergeSummary, normalizeDataset,
   parseKeywords, parseState, parseTimestamp, serializeState, sortPosts, topAccounts, CHART_MAX_DAYS,
-  shortDate, VIEWS, embedTweetId,
+  shortDate, VIEWS, embedTweetId, chooseRefTs, isUpdateDelayed, formatPace, viewsPerHour,
 } from './js/core.js';
+import { UPDATE_SCHEDULE, PACE_NOTE } from './js/config.js';
 import {
   createTooltip, renderDayTable, renderHBars, renderLegend, renderStackedDays, setCatColor,
 } from './js/charts.js';
@@ -341,7 +342,7 @@ function render() {
   renderCharts(agg, filtered);
   renderAccounts(agg);
   app.terms = parseKeywords(state.q);
-  app.sorted = sortPosts(filtered, state.sort);
+  app.sorted = sortPosts(filtered, state.sort, ds.refTs);
   renderPostsReset(filtered.length);
   renderActiveFilters();
 
@@ -538,6 +539,9 @@ function renderPostsReset(count) {
   const total = app.ds.posts.length;
   $('result-count').textContent = `${formatExact(count)}件 / 全${formatExact(total)}件`;
   $('posts-count').textContent = `${formatExact(count)}件・${SORTS.find((s) => s.key === app.state.sort).label}`;
+  const paceNote = $('pace-note');
+  paceNote.hidden = app.state.sort !== 'pace';
+  paceNote.textContent = `伸びペース＝表示回数 ÷ 投稿からの経過時間（基準時刻まで・1時間未満は1時間）。${PACE_NOTE}`;
   $('post-list').replaceChildren();
   app.shown = 0;
   $('posts-empty').hidden = count > 0;
@@ -581,6 +585,14 @@ function postHead(p) {
   if (p.ts != null) time.dateTime = new Date(p.ts * 1000).toISOString();
   head.append(time);
   return head;
+}
+
+/** 伸びペース（常時小さく表示。伸びペース順のときは強調） */
+function paceLine(p) {
+  const v = viewsPerHour(p, app.ds.refTs);
+  const line = el('p', `pace${app.state.sort === 'pace' ? ' is-active' : ''}${v ? '' : ' unk'}`, formatPace(p, app.ds.refTs));
+  line.title = PACE_NOTE;
+  return line;
 }
 
 function postCats(p) {
@@ -664,6 +676,7 @@ function postPlainCard(p) {
   if (media) parts.push(media);
   const foot = el('div', 'post-foot');
   foot.append(metricsList(p));
+  parts.push(paceLine(p));
   const actions = el('div', 'post-actions');
   const id = embedTweetId(p);
   let slot = null;
@@ -705,7 +718,7 @@ function postEmbedCard(p) {
   const head = postHead(p);
   const x = openXLink(p);
   if (x) head.append(x);
-  band.append(head, postCats(p), metricsList(p));
+  band.append(head, postCats(p), metricsList(p), paceLine(p));
   if (p.matched_terms.length) {
     const t = el('p', 'terms');
     t.append(el('span', 'muted', '根拠語: '));
@@ -747,7 +760,7 @@ function renderHeader(loaded) {
     newest = summary.period.newest_jst;
   }
   const oTs = parseTimestamp(oldest) ?? ds.minTs;
-  const nTs = parseTimestamp(newest) ?? ds.refTs;
+  const nTs = parseTimestamp(newest) ?? ds.latestPostTs;
   if (oTs != null && nTs != null) {
     $('meta-period').textContent = `${formatDateTime(oldest, oTs, app.refYear)} 〜 ${formatDateTime(newest, nTs, app.refYear)}`;
     $('meta-period').title = `${formatDateTimeFull(oldest, oTs)} 〜 ${formatDateTimeFull(newest, nTs)}`;
@@ -755,11 +768,17 @@ function renderHeader(loaded) {
     $('meta-period').textContent = '—';
   }
   if (ds.refTs != null) {
-    $('meta-ref').textContent = `${formatDateTime(null, ds.refTs, null)}（データ内の最新投稿）`;
-    $('meta-ref').title = `期間フィルタ（24時間/7日/30日）は ${formatDateTimeFull(null, ds.refTs)} を基準にしています`;
+    $('meta-ref').textContent = `${formatDateTime(null, ds.refTs, null)} 時点`;
+    $('meta-ref').title = ds.refSource === 'generated_at'
+      ? `期間フィルタ（24時間/7日/30日）と伸びペースは、データの更新時刻（generated_at）${formatDateTimeFull(null, ds.refTs)} を基準にしています`
+      : `generated_at が無いため、最新投稿の時刻 ${formatDateTimeFull(null, ds.refTs)} を基準にしています`;
   } else {
     $('meta-ref').textContent = '—';
   }
+  $('meta-next').textContent = UPDATE_SCHEDULE.dailyLabel;
+  $('meta-next').title = `データは${UPDATE_SCHEDULE.dailyLabel}に1回更新されます（週間まとめは${UPDATE_SCHEDULE.weeklyLabel}）`;
+  // 現在時刻を使うのはこの「遅れ」判定だけ（サンプル表示中は判定しない）
+  $('meta-delay').hidden = loaded.isSample || genTs == null || !isUpdateDelayed(genTs, Math.floor(Date.now() / 1000), UPDATE_SCHEDULE);
 }
 
 // ---------------------------------------------------------------- 起動
@@ -787,6 +806,11 @@ async function main() {
   }
   try {
     app.ds = loaded.dataset;
+    // posts.json に generated_at が無ければ summary.json の generated_at を基準に使う
+    if (app.ds.refSource !== 'generated_at' && loaded.summary && typeof loaded.summary.generated_at === 'string') {
+      const r = chooseRefTs(loaded.summary.generated_at, app.ds.latestPostTs);
+      if (r.refSource === 'generated_at') Object.assign(app.ds, r);
+    }
     app.summary = loaded.summary;
     app.summaryNote = loaded.summaryNote;
     app.refYear = loaded.dataset.refTs != null ? jstParts(loaded.dataset.refTs).y : null;

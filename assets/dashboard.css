@@ -538,3 +538,17 @@ mark.m-q { background: var(--mark-q-bg); color: var(--mark-q-fg); box-shadow: in
 @media (forced-colors: active) {
   .chip[aria-pressed="true"], .segmented button[aria-pressed="true"] { outline: 2px solid CanvasText; }
 }
+
+/* ---------- 更新スケジュール・伸びペース ---------- */
+.delay-note {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
+  font-size: 12px; color: var(--text-2);
+  padding: 2px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2);
+}
+.delay-note::before { content: "!"; display: inline-grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: var(--muted); color: var(--surface); font-size: 10px; font-weight: 700; }
+.pace { margin-top: 6px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pace.is-active { color: var(--text-2); font-size: 13px; font-weight: 600; }
+.pace.is-active::before { content: ""; display: inline-block; width: 3px; height: .9em; margin-right: 6px; vertical-align: -1px; border-radius: 2px; background: var(--accent); }
+.pace.unk { color: var(--muted); font-weight: 400; }
+.pace-note { margin-top: 6px; color: var(--muted); padding: 8px 12px; border-left: 2px solid var(--accent-3); background: var(--surface); border-radius: 0 8px 8px 0; }
+.embed-band .pace { margin-top: 0; }

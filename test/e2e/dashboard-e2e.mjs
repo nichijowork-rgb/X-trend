@@ -230,6 +230,46 @@ async function main() {
       return `初回ロード ${loadMs}ms・初回描画 ${firstRender.toFixed(1)}ms / チップ ${f(chip)} / 期間 ${f(period)} / 並替 ${f(sort)} / 検索 ${f(kw)}（200msデバウンス込） / クリア ${f(reset)}`;
     });
 
+    // ---- 2b. 更新遅れ表示（現在時刻を固定）
+    for (const [now, expectDelay] of [['2026-10-11T20:00:00+09:00', false], ['2026-10-12T01:30:00+09:00', false], ['2026-10-12T02:30:00+09:00', true]]) {
+      await check(`更新遅れ表示: 現在 ${now} → ${expectDelay ? '表示' : '非表示'}`, async () => {
+        const { ctx, page, con } = await newPage({}, { data: { posts: big, summary: bigSummary } });
+        await page.clock.setFixedTime(new Date(now));
+        await page.goto(base);
+        await ready(page);
+        assert((await page.isVisible('#meta-delay')) === expectDelay, 'delay note');
+        if (expectDelay) {
+          assert((await page.textContent('#meta-delay')).includes('更新が遅れている可能性があります'), 'text');
+          await page.screenshot({ path: path.join(SHOTS, 'header-delay.png'), clip: { x: 0, y: 0, width: 1280, height: 200 } });
+        }
+        allErrors.push(...con.errors);
+        await ctx.close();
+      });
+    }
+
+    // ---- 2c. 伸びペース順
+    await check('伸びペース順（1時間あたり表示・先頭が最速・注記。不明は末尾は単体テストで確認）', async () => {
+      const { ctx, page, con } = await newPage({}, { data: { posts: big, summary: bigSummary } });
+      await page.goto(base + '#sort=pace');
+      await ready(page);
+      assert((await page.inputValue('#sort')) === 'pace', 'sort restored');
+      assert(await page.isVisible('#pace-note'), 'note');
+      assert((await page.textContent('#pace-note')).includes('今後の予測ではありません'), 'note text');
+      const lines = await page.$$eval('#post-list .pace.is-active', (l) => l.map((e) => e.textContent));
+      assert(lines.length === 50 && /^投稿から.+で.+表示（1時間あたり.+）$/.test(lines[0]), lines[0]);
+      const gen = Date.parse(big.generated_at) / 1000;
+      const rate = (p) => (p.metrics && typeof p.metrics.impression_count === 'number' ? p.metrics.impression_count / Math.max(1, (gen - p.ts) / 3600) : -1);
+      const best = big.posts.reduce((a, b) => (rate(b) > rate(a) ? b : a));
+      const firstUser = await page.$eval('#post-list .post-user', (e) => e.textContent);
+      assert(firstUser === '@' + best.user, `${firstUser} vs ${best.user}`);
+      await page.screenshot({ path: path.join(SHOTS, 'pace-sort.png') });
+      await page.evaluate(() => document.getElementById('posts-heading').scrollIntoView());
+      await page.screenshot({ path: path.join(SHOTS, 'pace-sort-list.png') });
+      allErrors.push(...con.errors);
+      await ctx.close();
+      return lines[0];
+    });
+
     // ---- 3. summary 無し
     await check('summary.json 無し → 投稿から集計', async () => {
       const { ctx, page, con } = await newPage({}, { data: { posts: sample, summary: null } });
@@ -381,7 +421,9 @@ async function main() {
 
     await check('期間フィルタ（基準時刻表示・日別グラフの範囲）', async () => {
       const ref = await page.textContent('#meta-ref');
-      assert(ref.includes('10/11 18:32'), ref);
+      assert(ref === '10/11 18:41 時点', ref); // generated_at 優先（最新投稿は 18:32）
+      assert((await page.textContent('#meta-next')) === '毎日23:59（JST）', 'next update');
+      assert(await page.isHidden('#meta-delay'), 'delay hidden in sample');
       const sub = await page.textContent('#chart-day-sub');
       assert(sub.includes('直近90日') && sub.includes('外れ値'), sub);
       await page.click('#period-group button[data-period="7d"]');
