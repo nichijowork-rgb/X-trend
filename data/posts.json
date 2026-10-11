@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-11T20:08:51+09:00",
+ "generated_at": "2026-10-11T21:02:21+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -31,8 +31,8 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": true,
    "media": [
@@ -151,7 +151,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "歌舞伎町"
+    "歌舞伎町",
+    "report:歌舞伎町"
    ],
    "is_watched": false,
    "media": [
@@ -572,9 +573,10 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "六本木 キャバ"
+    "キャバ",
+    "六本木 キャバ",
+    "report:キャバクラ"
    ],
    "is_watched": true,
    "media": [
@@ -618,9 +620,10 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "太客"
+    "キャバ",
+    "太客",
+    "report:キャバクラ"
    ],
    "is_watched": false,
    "media": [
@@ -952,9 +955,11 @@
    },
    "text": "坂口杏里また警察沙汰\n #坂口杏里 https://t.co/B9mFetSw6F",
    "categories": [
-    "その他"
+    "歌舞伎町"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:歌舞伎町"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -1176,9 +1181,10 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "卒業 キャバ"
+    "キャバ",
+    "卒業 キャバ",
+    "report:キャバクラ"
    ],
    "is_watched": true,
    "media": [
@@ -1352,12 +1358,16 @@
    "text": "ルナちゃん、10/31をもってCLUB NILSを卒業。『夜の街に「るな」の名前は置いていきます』って意味深すぎる。約8年間のキャバ嬢人生に幕を下ろすのか、本名「みみな」として新しい道に進むのか、それとも水揚げなのか。卒業イベントもなく、次の活動も未定。人気絶頂での決断、今後の動きが気になる。 https://t.co/uNGwQ2AmK1",
    "categories": [
     "キャバクラ",
+    "夜職その他",
     "監視アカウント"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "卒業 キャバ"
+    "キャバ",
+    "卒業 キャバ",
+    "club nils",
+    "夜の街",
+    "report:キャバクラ"
    ],
    "is_watched": true,
    "media": [
@@ -1414,11 +1424,13 @@
    },
    "text": "みみ、引退するのか...ルネと成立してるしキャバ嬢やりづらかったのかな..ルネも束縛強そうだから水商売止めそうだしな...🥲 https://t.co/7kUduAhSaR",
    "categories": [
-    "キャバクラ"
+    "キャバクラ",
+    "夜職その他"
    ],
    "matched_terms": [
+    "キャバ嬢",
     "キャバ",
-    "キャバ嬢"
+    "水商売"
    ],
    "is_watched": false,
    "media": [
@@ -1451,9 +1463,10 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバクラ",
-    "六本木 キャバ"
+    "キャバ",
+    "六本木 キャバ",
+    "report:キャバクラ"
    ],
    "is_watched": true,
    "media": [
@@ -1500,9 +1513,12 @@
    },
    "text": "TikTokで猪俣ホストしてるって書いてる人多いんだけどどこか気になり過ぎてやばい",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト",
+    "report:ホスト"
+   ],
    "is_watched": false
   },
   {
@@ -1522,9 +1538,15 @@
    },
    "text": "ルナちゃんのニルス卒業報告にルネもいいねしてる。もしや水揚げ…！？ https://t.co/j0hUU52CHW https://t.co/rDXtFoTtZ0",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "quote:卒業 キャバ",
+    "report:キャバクラ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -1583,9 +1605,10 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "卒業 キャバ"
+    "キャバ",
+    "卒業 キャバ",
+    "report:キャバクラ"
    ],
    "is_watched": true,
    "media": [
@@ -1837,9 +1860,13 @@
    },
    "text": "荻野目ちゃん、黒服にブチギレ姿が『ヘルタースケルター』のりりこすぎる。19歳で「侘び入れに来い」が出てくるの凄い。前にも、同じ店の女の子から未成年飲酒疑いで通報され、ブチギレ配信。敵を作ることを恐れない、この気の強さ。夜の世界、万人に好かれる女より、嫌われる覚悟がある女の方が強い。 https://t.co/Y61qFGGlQK",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "黒服",
+    "report:キャバクラ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -1899,9 +1926,12 @@
    },
    "text": "仁川国際空港にいるダウンタイム中のホスト\n\n#地味ハロウィン　#地味ハロ\n#地味ハロウィン2026 https://t.co/thSGpqVG3E",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト",
+    "report:ホスト"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -1982,7 +2012,8 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "夜職"
+    "夜職",
+    "report:夜職その他"
    ],
    "is_watched": false,
    "media": [
@@ -2254,8 +2285,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false
   },
@@ -2309,8 +2340,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバクラ"
+    "キャバクラ",
+    "キャバ"
    ],
    "is_watched": false
   },
@@ -2334,8 +2365,10 @@
     "キャバクラ"
    ],
    "matched_terms": [
+    "キャバ嬢",
     "キャバ",
-    "キャバ嬢"
+    "黒服",
+    "report:キャバクラ"
    ],
    "is_watched": false,
    "media": [
@@ -2534,8 +2567,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -2614,8 +2647,9 @@
     "監視アカウント"
    ],
    "matched_terms": [
+    "キャバクラ",
     "キャバ",
-    "キャバクラ"
+    "quote:ラウンジ勤務"
    ],
    "is_watched": true
   },
@@ -2705,9 +2739,12 @@
    },
    "text": "【悲報】\n再逮捕されたヤマトリノさん、一転して今さら焦る。\n\n「てへぺろポーズがプラスに働くことは1億パーセントありません。」\n\n当たり前だろすぎて草🌱🌱🌱 https://t.co/koWk9pwTVm https://t.co/jCDQLghAFX",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -2763,11 +2800,13 @@
    },
    "text": "キャバ嬢やホストやインフルエンサーの、加工ありなし画像の差が流布されていますが\n\n無加工でこれ\nカメラ位置や角度もレンズも光も調節せず、これ\nこれです、わかりますかこれです。 https://t.co/BLbhSDl45x",
    "categories": [
+    "ホスト",
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "ホスト",
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -2799,7 +2838,8 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "夜職"
+    "夜職",
+    "report:夜職その他"
    ],
    "is_watched": false
   },
@@ -2823,8 +2863,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバクラ"
+    "キャバクラ",
+    "キャバ"
    ],
    "is_watched": false
   },
@@ -2868,10 +2908,13 @@
    "text": "無能な二代目支えてるのが反社で元ホストの黒光り親父こと安藤陽彦と芸能界では谷口元一だろ。\n監禁・レ○プ・キ○セク・ハ○撮り・脅迫。クズを極めたようなのが芸能界で調子こいてる様じゃ芸能界に未来はないな。\n\n榎本加奈子シャブ漬けにしたり川田亜子を自○に追い込んだりしたのは有名な話だろ？ https://t.co/MMkUhhVqUI",
    "categories": [
     "ホスト",
+    "夜職その他",
     "監視アカウント"
    ],
    "matched_terms": [
-    "ホストの"
+    "ホストの",
+    "ホスト",
+    "quote:北新地"
    ],
    "is_watched": true
   },
@@ -2895,8 +2938,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "新宿 歌舞伎町",
-    "歌舞伎町"
+    "歌舞伎町",
+    "新宿 歌舞伎町"
    ],
    "is_watched": false,
    "media": [
@@ -3030,8 +3073,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバクラ"
+    "キャバクラ",
+    "キャバ"
    ],
    "is_watched": false
   },
@@ -3055,7 +3098,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "歌舞伎町"
+    "歌舞伎町",
+    "report:歌舞伎町"
    ],
    "is_watched": false,
    "media": [
@@ -3105,9 +3149,10 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "ラウンジ嬢"
+    "キャバ",
+    "ラウンジ嬢",
+    "quote:ラウンジ勤務"
    ],
    "is_watched": false,
    "media": [
@@ -3265,9 +3310,13 @@
    },
    "text": "ホストコールのホストさん達の実物とパッケージの比較。 https://t.co/bLqsKtPctd",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール",
+    "report:ホスト"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -3313,9 +3362,13 @@
    },
    "text": "ホストコールのホストさん達の実物とパッケージの比較。\n\n鼻整形＋貴族プロテ、目の下のクマ取り、オトガイ形成、フェイスリフト＋ベイザー脂肪吸引などの顔課金でよくある引き攣れがとても顕著だ。\n\n実物の方はよりミドル世代に親近感を得られるビジュアルだ。 https://t.co/AUUYi4lM8o",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール",
+    "report:ホスト"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -3364,7 +3417,9 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ"
+    "キャバ",
+    "指名 キャバ",
+    "report:キャバクラ"
    ],
    "is_watched": false,
    "media": [
@@ -3405,9 +3460,12 @@
    },
    "text": "【悲報】ホストコールのメンバーさん、パネマジ率100%で事故る\n\n鼻整形＋貴族手術、人中縮小、輪郭骨切り、糸リフト＋脂肪吸引の影響なのか、明るいスタジオで動いている様子に全員違和感を感じる。\n\n粗雑な美容外科でアプデしているのか、流石につっこまざるを得ない。 https://t.co/TqkFPER0Xb",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -3456,7 +3514,10 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "風俗"
+    "風俗",
+    "パパ活",
+    "メンエス",
+    "report:夜職その他"
    ],
    "is_watched": false
   },
@@ -3553,9 +3614,14 @@
    },
    "text": "【熱愛】\n\nハーレム　樹里\n真島なおみ\n\n説明\nハッカーの姫が発狂。\nジュッリジュリにされた模様。\n末長くお幸せにしてください。 https://t.co/u1BMhph8Ne https://t.co/TGU0nqRQXt",
    "categories": [
+    "ホスト",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:姫 ホスト",
+    "quote:ホスト",
+    "quote:姫 ホス"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -3653,7 +3719,9 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "姫 ホスト"
+    "姫 ホスト",
+    "ホスト",
+    "姫 ホス"
    ],
    "is_watched": true,
    "media": [
@@ -3698,9 +3766,11 @@
    },
    "text": "未成年飲酒で契約解除の今森茉耶がYouTube初投稿\n\n▼記事\nhttps://t.co/CFwXbiYmFP\n\n2025年9月に不倫疑惑が報じられ、11月に未成年飲酒が発覚。『ゴジュウジャー』を降板し、事務所が契約を解除していた\n↓\n初投稿で視聴者の疑問に回答\n・生活費は「ラウンジ勤務を4カ月くらいしていました」 https://t.co/gdbCjC1vqI",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ラウンジ勤務"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -3844,9 +3914,12 @@
    },
    "text": "【🔥悲報🔥】鈴音りん、一条響を《煽りまくる》⁉️\n\nさすがに喧嘩売ってるだろ….😅\n\n激サムだし共感性羞恥えぐい。\n本人たちは面白いと思ってるのかな😅\n\nゆいぴすといい、ネチネチしすぎでは😖\n\n響ちゃんからしたら、ただただ不快だと思うし、よく大先輩にこんなことできるなぁ…。 https://t.co/FeDSfhLjbe",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "ゆいぴす"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -3932,9 +4005,12 @@
    },
    "text": "ゆいぴす「溝口🫘⚫︎だほうがいい」\n↓\n溝口「陰湿。さすがに一線超えすぎ」\n\nまた、ミゾがヤマトリノに「説教する」って言ったポストのスクショ撮って、周りに送りまくったらしい。\n\nいつまでもネチネチ粘着しすぎだし、そういうことするから、またLINE晒されるんでしょ🤦‍♀️💫 https://t.co/nuKQ33qJmV",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす",
+    "ヤマトリノ"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -4110,9 +4186,14 @@
    },
    "text": "ジャングル東京るいちゃんが知らない男3人にボコられる事件発生‼️‼️‼️‼️\n\n如月れいちゃんに続きこれは全て令和の六本木で起きた出来事です… https://t.co/5qSDPkqSX2",
    "categories": [
+    "キャバクラ",
+    "夜職その他",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ジャングル東京",
+    "report:夜職その他"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -4319,9 +4400,11 @@
    },
    "text": "るな、ヤマトリノがコカインやってたの知ってたのかなぁ、それでラストコール降りたならリスク回避能力高すぎる https://t.co/FDLgR0GG4O",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -4390,9 +4473,11 @@
    ],
    "matched_terms": [
     "キャバ",
-    "コンカフェ",
     "夜職",
-    "風俗"
+    "風俗",
+    "コンカフェ",
+    "ホステス",
+    "report:夜職その他"
    ],
    "is_watched": false
   },
@@ -4413,9 +4498,11 @@
    },
    "text": "ハンター試験に出る溝口勇児とヒソカとイルミ。【終わった人 /ゆいぴす】\nhttps://t.co/S1NW7gEqRi",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -4933,9 +5020,13 @@
    },
    "text": "【続報】\nヤマトリノさん、再逮捕容疑について「弁護士と相談したい」\n\nここへ来て急に認否保留始めても時すでにおすし🍣\nキレッキレの発言が多かったから、もっと賢い人かと思ってたけどね… https://t.co/OnwJi1c1gk https://t.co/22xOPOc8eG",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ",
+    "report:キャバクラ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -4996,7 +5087,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "トー横"
+    "トー横",
+    "report:歌舞伎町"
    ],
    "is_watched": false,
    "media": [
@@ -5052,7 +5144,9 @@
    ],
    "matched_terms": [
     "ホスト 歌舞伎町",
-    "歌舞伎町"
+    "ホスト",
+    "歌舞伎町",
+    "report:ホスト"
    ],
    "is_watched": false,
    "media": [
@@ -5183,9 +5277,13 @@
    },
    "text": "一条響様、ちゃっかりインスタでステルス攻撃続いてて草🌱🌱🌱\nこの人たちはやり返さないと気が済まないんカナ…\nいい歳してこれは… https://t.co/MbLbLqas7i https://t.co/Bdd6AREqXh",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "quote:ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -5267,9 +5365,13 @@
    },
    "text": "なんか夜の友情って薄いなって感じた🙌\n保身に走らなきゃ自分も黒いのか？😂\n\nクリーン売りするといつかボロが出る\n星乃リア、ゆいぴす、ヤマトリノ\n全てめくれた\n\n今炎上逃れてるのがあっすん‥ https://t.co/5r63KAzvTF",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす",
+    "ヤマトリノ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -5369,9 +5471,13 @@
    },
    "text": "あっすん、リノちゃんの面会行ってきたんだ！さすが行動が早いよね。しかしあっすん後ろに下がりすぎだけど大丈夫かな… https://t.co/0HGoh5OtKy https://t.co/LypF6wQ366",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす",
+    "report:キャバクラ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -5420,9 +5526,12 @@
    },
    "text": "あっすん×ゆいぴす、リノさんの話で大盛り上がりwww 本音だらけのハロウィン女子会\nhttps://t.co/qqipLKEBSZ https://t.co/qyzd2ZOOhN",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす",
+    "report:キャバクラ"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -5450,9 +5559,11 @@
    },
    "text": "ハンター試験に出る溝口勇児とヒソカとイルミ。【終わった人 /ゆいぴす】\nhttps://t.co/S1NW7gEqRi https://t.co/bJjVhNy6d6",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -5481,11 +5592,14 @@
    "text": "荻野目ちゃんの好きなタイプは「40歳以上、月1000万貢いでくれて体の相性が良い人」らしい。清楚・クリーンに売りたいキャバ嬢が多い中で、オジさん好きを公言するの面白い。万人受けを狙わず、自分にハマる層を明確に狙う。19歳という年齢含め、自己ブランディングうますぎ。賢くて戦略的な子、好き。 https://t.co/2NKfFDOVA3 https://t.co/cWp9s38T9M",
    "categories": [
     "キャバクラ",
+    "夜職その他",
     "監視アカウント"
    ],
    "matched_terms": [
+    "キャバ嬢",
     "キャバ",
-    "キャバ嬢"
+    "quote:夜職",
+    "report:キャバクラ"
    ],
    "is_watched": true,
    "media": [
@@ -5613,9 +5727,11 @@
    },
    "text": "こいつワンチャン飲みそうだなって人に売る訳ないやん‼️ネタでこの飲みかけの水50万で買ったらおもしろくない？っていう気狂い金持ちおじさんの暇つぶしなんだから\nバースデーイベントの祝花集めてるんでよろしくお願いします\n出してくれる方いればDMください https://t.co/DUAFa1L9sX https://t.co/CZCBPQn7M0",
    "categories": [
-    "その他"
+    "夜職その他"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -5643,9 +5759,12 @@
    },
    "text": "【速報】\nヤマトリノさん、東京地検に起訴される。\n\nコカイン所持の疑いで逮捕され\nコカイン使用の疑いで再逮捕され\nケタミン所持の疑いで起訴される\n\n起訴されたので、被告人としての勾留となり、起訴日から原則2ヶ月の勾留に切り替わる模様。一定の要件で1ヶ月ずつさらに更新できて国家権力エグい。 https://t.co/kv21I3YH5M https://t.co/a2jgj3lT4D",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -6078,9 +6197,12 @@
    },
    "text": "ヤマトリノがいたジャングル東京って\n◯位なんだ… https://t.co/Zcv8N8MalT",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ",
+    "ジャングル東京"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -6213,9 +6335,13 @@
    },
    "text": "周防彰悟やべえ趣味持ってんな。\n何でレ○プ魔はみんなア◯ル好きなんだろうな。\nヤリ部屋まで用意してすげぇじゃん。\n被害者のDMめちゃくちゃ来てる。\n今まで色々揉み消して来たみたいだけど、こんなの氷山の一角だろ。引き続き被害のDM募集しまーす！！ https://t.co/a7yB9f7HID https://t.co/K6bb8w9f19",
    "categories": [
+    "ホスト",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ホストの",
+    "quote:ホスト"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -6283,9 +6409,11 @@
    },
    "text": "画角あってるかな？ https://t.co/raM6zvQXPP",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:キャバクラ"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -6316,8 +6444,9 @@
     "キャバクラ"
    ],
    "matched_terms": [
+    "キャバ嬢",
     "キャバ",
-    "キャバ嬢"
+    "ゆいぴす"
    ],
    "is_watched": false,
    "media": [
@@ -6408,9 +6537,13 @@
    },
    "text": "ゆいぴすめっちゃ根に持ってそうだな笑 https://t.co/qw5t002L3j https://t.co/r2gZrTu6vF",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:一条響",
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -6447,8 +6580,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -6534,9 +6667,13 @@
    },
    "text": "【速報】\n再逮捕で勾留延長されそうなヤマトリノさん、\n「袋を捨てるとバレてしまうと思って怖かった」\n\n送検時のポーズについて、\n「当時、精神的にとても不安定でやった」\n\nなどと述べており… https://t.co/F4SBLx9irw https://t.co/HJHKIcTTfD",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ",
+    "quote:ジャングル東京"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -6621,9 +6758,11 @@
    },
    "text": "嬉しい https://t.co/6MOAm2B5Yg",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -6643,10 +6782,16 @@
    },
    "text": "東海オンエアの嫁見てみ？\n元AKB・バンドマン・元看護師・YouTuber……夜職ゼロで奥様会までやってて平和すぎるwwwwww\n\nちなみに唯一揉めたしばゆーの元嫁は、ヒカルのチャンネルで「奥様会入りたかった」って泣いてた😂😂😂 https://t.co/yP9fpAxPGW https://t.co/ugQz3MqVTc",
    "categories": [
+    "キャバクラ",
     "夜職その他"
    ],
    "matched_terms": [
-    "夜職"
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "quote:ラウンジ嬢",
+    "夜職",
+    "quote:コンカフェ",
+    "report:夜職その他"
    ],
    "is_watched": false,
    "media": [
@@ -6697,10 +6842,16 @@
    "text": "【悲報】\nホストコールで活躍中のホストさん、\n「事あるたびにアフターをねだって来る」\nと特盛りツユダクツイートをするも、新幹線で迷惑行為をして遅延による同伴キャンセルを補うためにアフター要望をしていただけなのを姫にめくられてしまう。\nめくられたらツイ消し逃亡しててバカオモロイ🌱🌱🌱 https://t.co/OAnyBDaTGG",
    "categories": [
     "ホスト",
+    "キャバクラ",
     "監視アカウント"
    ],
    "matched_terms": [
-    "姫 ホスト"
+    "姫 ホスト",
+    "ホスト",
+    "ホストコール",
+    "姫 ホス",
+    "同伴 アフター",
+    "report:ホスト"
    ],
    "is_watched": true,
    "media": [
@@ -6738,8 +6889,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
+    "キャバ",
     "太客"
    ],
    "is_watched": false,
@@ -6769,9 +6920,13 @@
    },
    "text": "【悲報】\nSNSで口臭をうんこ呼ばわりされ、麻薬取締法違反容疑で逮捕されたヤマトリノさん、再逮捕の方針と報道される。\nまた、ジャングル東京六本木店は契約解除を決めているとのことで、泣きっ面にうんこすぎる。 https://t.co/ifOld5tPNX",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ",
+    "ジャングル東京"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -6841,9 +6996,11 @@
    },
    "text": "コラボしてあげたいな😯僕、隣いたら\n顔の大きさとかどうでも良くなるよ😮？ https://t.co/Gm20RWgTuu",
    "categories": [
-    "その他"
+    "夜職その他"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:夜職"
+   ],
    "is_watched": false
   },
   {
@@ -6929,9 +7086,12 @@
    },
    "text": "ゆいぴすがまた今回も権力者にXで喧嘩を売ってるんだけどSNSの立ち回り下手すぎない…？\n前回も匂わせツイ→即消しで謝罪動画で踊ってたけどまた同じ事の繰り返し。あまりにも地雷すぎる… https://t.co/uqwn6rDLZw https://t.co/rMYlMyxGd9",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -6991,9 +7151,12 @@
    },
    "text": "あっすんのバースデー豪華すぎ\nラストコールとラヴ上等メンバーが勢揃いしてる https://t.co/Fafsazq2SX https://t.co/bB1AdNGzM2",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -7136,7 +7299,9 @@
    ],
    "matched_terms": [
     "ホスト 歌舞伎町",
-    "歌舞伎町"
+    "ホスト",
+    "歌舞伎町",
+    "report:ホスト"
    ],
    "is_watched": false,
    "media": [
@@ -7183,9 +7348,12 @@
    },
    "text": "あっすんのバースデーに林社長とゆいぴすがいる https://t.co/hQiErzu63b https://t.co/rXiwAyE7tk",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -7243,7 +7411,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "歌舞伎町"
+    "歌舞伎町",
+    "report:歌舞伎町"
    ],
    "is_watched": false,
    "media": [
@@ -7297,11 +7466,12 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "コンカフェ",
+    "キャバ",
     "ラウンジ嬢",
-    "夜職"
+    "夜職",
+    "コンカフェ",
+    "report:夜職その他"
    ],
    "is_watched": false,
    "media": [
@@ -7348,9 +7518,12 @@
    },
    "text": "ゆいぴすの横の男性はこのお方？？？\nhttps://t.co/qKrWtK7Tkh https://t.co/jLLkqqPcDr https://t.co/Wuyqp0dDEQ",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -7390,9 +7563,11 @@
    },
    "text": "ゆいぴす×あっすん×星乃リアちゃんの石垣島での写真！！\n3人とも顔小さい、細い、かわいい https://t.co/IjZvdkDZfZ",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -7426,9 +7601,15 @@
    },
    "text": "ウルトラVVIPにいたゆいぴす普通に小顔だったけどな\nてかゆいぴすに飲ませてるこのイケメンは誰？😂 https://t.co/N6bwh1Mw7z https://t.co/DSYktwbIam",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "quote:一条響",
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -7477,9 +7658,12 @@
    },
    "text": "一条響さん、ゆいぴすさん、エンリケさんが小顔がとうだ画角がどうだと揉めてるけど\n\nたぶん一番ツーショット嫌がられるのは\n齋藤飛鳥さんで間違いなし！！ https://t.co/qMhqSwjKBg",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "ゆいぴす"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -7507,9 +7691,13 @@
    },
    "text": "待って、よく見たら、ゆいぴすの方は解像度もちょっと下げてないかコレ！？！？\n一条響様の方は自分だけ4Kにしててステルス攻撃エグくて草🌱🌱🌱 https://t.co/psjVNyyV1B",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "ゆいぴす"
+   ],
    "is_watched": true
   },
   {
@@ -7532,8 +7720,10 @@
     "キャバクラ"
    ],
    "matched_terms": [
+    "キャバ嬢",
     "キャバ",
-    "キャバ嬢"
+    "一条響",
+    "ゆいぴす"
    ],
    "is_watched": false,
    "media": [
@@ -7635,9 +7825,13 @@
    },
    "text": "一条響様の小顔に映りたい欲望は異常。\n自分だけテーブルが映るまで画角を引いて小顔に見せるテクニックはエグいけどバカオモロイ🌱🌱🌱\n大先輩なんだから、後輩を立ててあげた方が印象良くなるのに…\n相手にそのテクニック使ってあげたらいいのに🥲 https://t.co/jKbVyDwcCC https://t.co/hzX1qJB26X",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "quote:ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -7665,9 +7859,11 @@
    },
    "text": "はーーい\n\nおわりー！\n\n深夜にお騒がせしました！！！\n\nみんなおやすみ！\n明日もがんばろ！",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -7687,9 +7883,11 @@
    },
    "text": "@xxxx_mmm_nnn 2人が違う方向から撮影してます。\n頭の位置同じになるようにしていて、私が小さくなるような指示はしてないし、実際ゆいぴすちゃんはかなり顔が小さいですよ。",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7745,9 +7943,11 @@
    },
    "text": "私が何を言っても批判してくる人はいると思います。\n\nただ、私だけ画角を引いてほしいとお願いした事実はありませんし、投稿についても事前に確認し「問題ないです」とお返事をいただいています。",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -7767,9 +7967,11 @@
    },
    "text": "@ichijyo_hibiki 画角引いてたのは事実やろ。同じテーブル使ってんのに1人だけ見えてるし。当初は10歳上の怖い先輩にこの事指摘するわけにもいかないしとりあえず嫌々動画出すのOKしたけど、アンチコメにいいねついてたりコメ欄で貴方のファンが顔の大きさをバカにするコメントが多かったからこうなったんじゃないの？ https://t.co/dEPChwC1B4",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -7797,9 +7999,12 @@
    },
    "text": "@EQ121212 文句言えないなら尚更なんで特定されるような陰口公で公開するの？\n編集に関しては委託してる旨も伝えてるしちゃんと読んでから批判して欲しいです",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:一条響",
+    "quote:ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7819,9 +8024,12 @@
    },
    "text": "いやいやいやどう考えても一条響がおかしいでしょ\n\nゆいぴすからしたら一条響様様だよ、大先輩だよ、文句言えないでしょ\nそもそもあの動画の編集もコメント欄にいいねするのも悪意しかない https://t.co/aHfmytletx",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7841,9 +8049,11 @@
    },
    "text": "@_LISNS 断りづらかったのかな。。。\nこれからコラボ依頼誰にもしづらいww",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -7863,9 +8073,11 @@
    },
    "text": "@ichijyo_hibiki 粘り強く断ればよかったは一言多い\n最初からコラボしたくなかった感\n引き受けたのは自分なのに他責はあかん",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7885,9 +8097,11 @@
    },
    "text": "@_040211 んーーー。それは私からは何も言いにくい笑",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -7907,9 +8121,11 @@
    },
    "text": "@mukakin1203 SNSは難しいし、これでゆいぴすちゃんが叩かれるのも求めてない。\nだから公の場でいきなり晒して欲しくなかったのよね",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7929,9 +8145,11 @@
    },
    "text": "@poker8989 ご本人から希望があり素材を渡してます。\nそれで難しそうだったので私たちの方で編集をして、ご確認いただいた後に【投稿許可】をもらってます。",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -7951,9 +8169,11 @@
    },
    "text": "@ichijyo_hibiki 言わずに後からグチグチ言うのはなんだかなあ・・・",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7973,9 +8193,11 @@
    },
    "text": "@chie11sen そんなのわかりきってるよ",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -7995,9 +8217,11 @@
    },
    "text": "@ichijyo_hibiki ゆいぴすが爆美女なのは間違いない",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -8017,9 +8241,11 @@
    },
    "text": "@kusarep だよね。",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "manual"
+   ],
    "is_watched": false
   },
   {
@@ -8039,9 +8265,12 @@
    },
    "text": "【🔥速報🔥】一条響、ゆいぴすコラボ動画《非公開》に\n↓\n・非公開はゆいぴすの希望\n・「自分だけ画角を引いて小顔に見せた」のは事実無根\n・ゆいぴすに事前確認も行なっている（元素材提供、必要であればゆいぴすサイドで編集可と伝えた）\n\n響ちゃんは、きちんと順序踏んでいるように思えるけど……。 https://t.co/8SkjJ7RQFd",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "一条響",
+    "ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -8061,9 +8290,12 @@
    },
    "text": "私も人間だから言うけど\nコラボ動画出したくないなら出したくないって言って欲しいし\n電話やラインで済む出来事をわざわざ特定されるように公で言うのはかなり悪質だと思ってるよ\nこんなん言ったもん勝ちじゃん",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす",
+    "report:キャバクラ"
+   ],
    "is_watched": false
   },
   {
@@ -8083,9 +8315,11 @@
    },
    "text": "@ichijyo_hibiki なんか残念",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:ゆいぴす"
+   ],
    "is_watched": false
   },
   {
@@ -8105,9 +8339,12 @@
    },
    "text": "【ご報告】\n\n昨日投稿した、ゆいぴすさんとのコラボ動画について、一部ご意見をいただいております。\n\n本件については、ゆいぴすさんご本人からのご希望もあり、該当動画を速やかに非公開とさせていただきました。",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす",
+    "report:キャバクラ"
+   ],
    "is_watched": false
   },
   {
@@ -8149,9 +8386,12 @@
    },
    "text": "ゆいぴす、活動休止後もまた問題が起きてて不憫すぎる。マンジャロ関連や、今回のYouTubeコラボを見ても、誰と関わるかは本当に重要。自分に落ち度がなくても、周囲の行動ひとつで自分の印象まで悪くなる。夜の世界で生き残るには、実力以上に誰と組むかが大切。24歳、大人に負けず頑張ってほしい。 https://t.co/ZXeflNp8XO",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -8287,9 +8527,11 @@
    },
    "text": "俺が守る https://t.co/3hL7TM46mV",
    "categories": [
-    "その他"
+    "夜職その他"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:夜職"
+   ],
    "is_watched": false
   },
   {
@@ -8309,9 +8551,16 @@
    },
    "text": "ほんとだ、一条響自分だけ画角引いてる\nこれはゆいぴすに失礼すぎ https://t.co/v9amgpcux0 https://t.co/neG8CyVqAu",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ",
+    "quote:六本木 キャバ",
+    "一条響",
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -8363,9 +8612,10 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "六本木 キャバ"
+    "キャバ",
+    "六本木 キャバ",
+    "ゆいぴす"
    ],
    "is_watched": false,
    "media": [
@@ -8424,9 +8674,11 @@
    },
    "text": "慰安旅行バカなことばっかしてるホストへ https://t.co/ZivdZ04gv0",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -8514,7 +8766,8 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "ホストの"
+    "ホストの",
+    "ホスト"
    ],
    "is_watched": true,
    "media": [
@@ -8661,9 +8914,12 @@
    },
    "text": "ヤマトリノがいたジャングル東京って\n◯位なんだ… https://t.co/hNlzKMbl1W",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ヤマトリノ",
+    "ジャングル東京"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -8695,10 +8951,10 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "コンカフェ",
-    "ラウンジ嬢"
+    "キャバ",
+    "ラウンジ嬢",
+    "コンカフェ"
    ],
    "is_watched": false,
    "media": [
@@ -8800,7 +9056,8 @@
     "ホスト"
    ],
    "matched_terms": [
-    "ホストクラブ"
+    "ホストクラブ",
+    "ホスト"
    ],
    "is_watched": false,
    "media": [
@@ -9022,8 +9279,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
+    "キャバ",
     "太客"
    ],
    "is_watched": false,
@@ -9191,7 +9448,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "トー横"
+    "トー横",
+    "新宿 トー横"
    ],
    "is_watched": false,
    "media": [
@@ -9239,8 +9497,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false
   },
@@ -9376,6 +9634,7 @@
    ],
    "matched_terms": [
     "ホスト 歌舞伎町",
+    "ホスト",
     "歌舞伎町"
    ],
    "is_watched": false,
@@ -9426,11 +9685,13 @@
    },
    "text": "ラヴ上等（ラブ上等）2\n\nミミ(職業：キャバ嬢)がまるを断った理由\n\n「私自身がまるのお仕事（ホスト）の理解が\nできないって思ってて」\n↓\nまる「ファッ！？」 https://t.co/2Tl7l52GFj",
    "categories": [
+    "ホスト",
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "ホスト",
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -9767,12 +10028,12 @@
    },
    "text": "私も歌舞伎町でスカウトに\"パパ活紹介する\"と声をかけられ、無視してもしつこく付き纏われたので動画撮影したら殴られた。警察に被害届を出したが一向に逮捕されず。そもそもスカウト声掛け行為自体が違法なのに警察は野放し。\n犯人逮捕目的、公益性の為の撮影は撮影罪に当たらないので拡散して下さい https://t.co/CtZ5C8C78P https://t.co/mHXWDTiLEc",
    "categories": [
-    "ホスト",
-    "歌舞伎町"
+    "歌舞伎町",
+    "夜職その他"
    ],
    "matched_terms": [
-    "掛け",
-    "歌舞伎町"
+    "歌舞伎町",
+    "パパ活"
    ],
    "is_watched": false,
    "media": [
@@ -9832,11 +10093,11 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
-    "コンカフェ",
+    "キャバ",
     "ラウンジ嬢",
-    "夜職"
+    "夜職",
+    "コンカフェ"
    ],
    "is_watched": false,
    "media": [
@@ -9883,9 +10144,12 @@
    },
    "text": "華金。\n爆美女炎女王ゆいぴすと白金台のミシュランイタリアンでデートなう。\nこんなにも鴨肉を美しく食べる人おらんやろ！！！\n@yuipis18 https://t.co/aLr9Qc1zzu",
    "categories": [
+    "キャバクラ",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ゆいぴす"
+   ],
    "is_watched": true,
    "media": [
     {
@@ -10020,6 +10284,7 @@
    "matched_terms": [
     "ホスト 歌舞伎町",
     "ホストクラブ",
+    "ホスト",
     "歌舞伎町"
    ],
    "is_watched": false
@@ -10095,8 +10360,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -10146,9 +10411,13 @@
    },
    "text": "【続報】マチアプ色恋営業で逮捕のホスト、\n保釈後まさかのムーブ\n\n竹岡拓人(27)容疑者\n風営法違反などで逮捕\n(※構造はほぼ“恋愛詐欺”に近い) → 全国報道\n→ 保釈金1億円を払ってシャバに復帰\n即、自身の逮捕をネタ化しSNS投稿\nこいつは逮捕すら売名に使ってやがる。。。 https://t.co/PjhD7Xdb8w https://t.co/ipul3byAtJ",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト",
+    "色恋営業",
+    "色恋 ホスト"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -10209,9 +10478,11 @@
    },
    "text": "【マッチングアプリで誘客したことで逮捕された元ホストが1億円で保釈＆ネタにし始めたと話題】 https://t.co/mISJtU6rYV",
    "categories": [
-    "その他"
+    "ホスト"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "ホスト"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -10350,8 +10621,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -10412,6 +10683,7 @@
    "matched_terms": [
     "ホスト 歌舞伎町",
     "ホストクラブ",
+    "ホスト",
     "歌舞伎町"
    ],
    "is_watched": false,
@@ -10475,6 +10747,7 @@
    "matched_terms": [
     "ホスト 歌舞伎町",
     "ホストクラブ",
+    "ホスト",
     "歌舞伎町"
    ],
    "is_watched": false,
@@ -10534,8 +10807,8 @@
     "キャバクラ"
    ],
    "matched_terms": [
-    "キャバ",
-    "キャバ嬢"
+    "キャバ嬢",
+    "キャバ"
    ],
    "is_watched": false,
    "media": [
@@ -10726,8 +10999,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "キャバ",
     "キャバ嬢",
+    "キャバ",
     "ラウンジ嬢",
     "歌舞伎町"
    ],
@@ -10818,11 +11091,13 @@
    },
    "text": "【6月20日(木)まとめ】\n\n・歌舞伎町TOHOシネマ横 通称〝トー横〟があいも変わらず地獄すぎて話題\n→〝この世の地獄が見たければトー横へ〟のキャッチフレーズで海外の観光客からも名スポットとして認定されているトー横\n→未成年淫行の児ポ犯罪者や立ちんぼを量産する工場としても現在絶賛稼働中 https://t.co/iJfUEALvFv",
    "categories": [
-    "歌舞伎町"
+    "歌舞伎町",
+    "夜職その他"
    ],
    "matched_terms": [
+    "歌舞伎町",
     "トー横",
-    "歌舞伎町"
+    "立ちんぼ"
    ],
    "is_watched": false,
    "media": [
@@ -10946,7 +11221,8 @@
     "ホスト"
    ],
    "matched_terms": [
-    "シャンパンタワー"
+    "シャンパンタワー",
+    "ホスト"
    ],
    "is_watched": false,
    "media": [
@@ -10987,6 +11263,7 @@
    "matched_terms": [
     "ホスト 歌舞伎町",
     "ホストの",
+    "ホスト",
     "歌舞伎町"
    ],
    "is_watched": false,
@@ -11021,7 +11298,10 @@
    ],
    "matched_terms": [
     "キャバ",
-    "夜職"
+    "夜職",
+    "パパ活",
+    "メンエス",
+    "デリヘル"
    ],
    "is_watched": false
   },
@@ -11045,8 +11325,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "トー横",
-    "歌舞伎町"
+    "歌舞伎町",
+    "トー横"
    ],
    "is_watched": false,
    "media": [
@@ -11099,8 +11379,8 @@
     "歌舞伎町"
    ],
    "matched_terms": [
-    "トー横",
-    "歌舞伎町"
+    "歌舞伎町",
+    "トー横"
    ],
    "is_watched": false,
    "media": [
