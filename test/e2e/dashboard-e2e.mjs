@@ -149,6 +149,13 @@ async function ready(page) {
 
 const count = (page) => page.$eval('#result-count', (e) => e.textContent);
 const shown = (page) => page.$$eval('#post-list > li', (l) => l.length);
+// 初期状態（夜職すべて＝夜職4カテゴリ、期間 24 時間）の件数
+const NIGHT = ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他'];
+const inNight = (p) => p.categories.some((c) => NIGHT.includes(c));
+function defaultCount(json) {
+  const ref = Math.floor(Date.parse(json.generated_at) / 1000);
+  return json.posts.filter((p) => p.ts > ref - 86400 && inNight(p)).length;
+}
 const num = (s) => Number((/[\d,]+/.exec(String(s)) || ['NaN'])[0].replace(/,/g, ''));
 
 // ---------------------------------------------------------------- 本体
@@ -188,8 +195,14 @@ async function main() {
       assert(await page.isVisible('#sample-banner'), 'banner not visible');
       const banner = await page.textContent('#sample-banner');
       assert(banner.includes('サンプルデータを表示中（data/ が見つかりません）'), banner);
-      assert(num(await count(page)) === 1500, await count(page));
-      assert((await shown(page)) === 50, 'page size');
+      assert(num(await count(page)) === defaultCount(sample), `${await count(page)} vs ${defaultCount(sample)}`);
+      assert((await page.inputValue('#sort')) === 'imp', 'default sort');
+      assert((await page.$eval('#period-group button[aria-pressed="true"]', (b) => b.dataset.period)) === '24h', 'default period');
+      assert((await page.$eval('#cat-chips .chip[aria-pressed="true"]', (b) => b.dataset.group)) === 'night', 'default group');
+      assert((await page.evaluate(() => location.hash)) === '', 'no params in URL');
+      const chipNames = await page.$$eval('#cat-chips .chip .chip-name', (l) => l.map((e) => e.textContent));
+      assert(chipNames[0] === '夜職すべて' && chipNames[chipNames.length - 1] === '一般のバズ' && !chipNames.includes('監視アカウント') && !chipNames.includes('すべて') && !chipNames.includes('その他'), chipNames.join());
+      assert(!(await page.$$eval('#post-list .badge', (l) => l.some((e) => e.textContent === '監視アカウント'))), 'watch badge duplicated');
       assert(await page.$('#chart-day svg'), 'day chart');
       await page.screenshot({ path: path.join(SHOTS, 'desktop-dark-sample.png'), fullPage: false });
       await page.screenshot({ path: path.join(SHOTS, 'desktop-dark-sample-full.png'), fullPage: true });
@@ -208,9 +221,7 @@ async function main() {
       await ready(page);
       const loadMs = Date.now() - t0;
       assert(await page.isHidden('#sample-banner'), 'banner shown');
-      assert(num(await count(page)) === 3000, await count(page));
-      const note = await page.textContent('#source-note');
-      assert(note.includes('summary.json を使用'), note);
+      assert(num(await count(page)) === defaultCount(big), await count(page));
       const firstRender = await page.evaluate(() => window.__dashboard.perf.lastRenderMs);
       const timeOp = async (fn) => {
         const t = Date.now();
@@ -260,7 +271,8 @@ async function main() {
       assert(lines.length === 50 && /^投稿から.+で.+表示（1時間あたり.+）$/.test(lines[0]), lines[0]);
       const gen = Date.parse(big.generated_at) / 1000;
       const rate = (p) => (p.metrics && typeof p.metrics.impression_count === 'number' ? p.metrics.impression_count / Math.max(1, (gen - p.ts) / 3600) : -1);
-      const best = big.posts.reduce((a, b) => (rate(b) > rate(a) ? b : a));
+      const ref = Math.floor(Date.parse(big.generated_at) / 1000);
+      const best = big.posts.filter((p) => p.ts > ref - 86400 && inNight(p)).reduce((a, b) => (rate(b) > rate(a) ? b : a));
       const firstUser = await page.$eval('#post-list .post-user', (e) => e.textContent);
       assert(firstUser === '@' + best.user, `${firstUser} vs ${best.user}`);
       await page.screenshot({ path: path.join(SHOTS, 'pace-sort.png') });
@@ -286,7 +298,7 @@ async function main() {
         await page.goto(base);
         await ready(page);
         assert(await page.isHidden('#sample-banner'), 'no banner');
-        assert(num(await count(page)) === 1500, 'posts unaffected');
+        assert(num(await count(page)) === defaultCount(sample), 'posts unaffected');
         if (expect === 'hidden') {
           assert(await page.isHidden('#report'), 'report should be hidden');
           assert(await page.isHidden('#new-badge'), 'no NEW without reports');
@@ -316,8 +328,6 @@ async function main() {
       await page.goto(base);
       await ready(page);
       assert(await page.isHidden('#sample-banner'), 'banner');
-      const note = await page.textContent('#source-note');
-      assert(note.includes('投稿データから集計'), note);
       assert(num(await page.textContent('#stat-posts')) > 0, 'stat');
       assert((await page.textContent('#stat-imp-sub')).includes('一部不明'), 'unknown note');
       allErrors.push(...con.errors);
@@ -363,7 +373,17 @@ async function main() {
 
     // ---- 7. 機能一式（サンプル）
     const { ctx, page, con, external } = await newPage({}, { data: { posts: null, summary: null } });
-    await page.goto(base);
+    // 以降の確認はサンプル全期間・新しい順で行う（カテゴリは初期の「夜職すべて」）
+    const ALL = '#period=all&sort=new';
+    const resetAll = async () => {
+      await page.click('#reset');
+      await page.click('#period-group button[data-period="all"]');
+      await page.selectOption('#sort', 'new');
+      await page.fill('#user', '');
+      await page.press('#user', 'Enter');
+      await page.waitForFunction(() => window.__dashboard.state.user === '' && window.__dashboard.state.period === 'all');
+    };
+    await page.goto(base + ALL);
     await ready(page);
 
     await check('簡潔レイアウト: 詳細パネルは既定で閉じ、NEW バッジ→開くと既読・URL/保存', async () => {
@@ -383,8 +403,8 @@ async function main() {
       assert(await page.isHidden('#panel'), 'closed after reload');
       assert(await page.isHidden('#new-badge'), 'NEW stays cleared (localStorage)');
       await page.click('#panel-toggle');
-      await page.evaluate(() => { location.hash = ''; });
-      await page.goto(base);
+      await page.goto(base + ALL);
+      await page.reload(); // ハッシュだけの遷移では再読み込みされないため
       await ready(page);
       assert(await page.isVisible('#panel'), 'panel open restored from localStorage');
     });
@@ -473,11 +493,8 @@ async function main() {
       const cand = sampleReports.weekly[0].watch_candidates[0].user;
       await page.click(`#report-weekly-body .cand-list button:has-text("@${cand}")`);
       await page.waitForFunction((u) => window.__dashboard.state.user === u, cand);
-      assert(num(await count(page)) === sample.posts.filter((p) => p.user === cand).length, 'cand filter');
-      await page.click('#reset');
-      await page.fill('#user', '');
-      await page.press('#user', 'Enter');
-      await page.waitForFunction(() => window.__dashboard.state.user === '');
+      assert(num(await count(page)) === sample.posts.filter((p) => p.user === cand && inNight(p)).length, 'cand filter');
+      await resetAll();
       await page.evaluate(() => window.scrollTo(0, 0));
     });
 
@@ -516,14 +533,27 @@ async function main() {
       assert(num(await count(page)) === both, `${await count(page)} vs ${both}`);
       const hash = await page.evaluate(() => decodeURIComponent(location.hash));
       assert(hash.includes('cat=ホスト') && hash.includes('cat=キャバクラ'), hash);
-      await page.click('#cat-chips .chip-all');
+      // 最後の 1 つを外すと「夜職すべて」に戻る
+      await page.click('#cat-chips .chip[data-cat="ホスト"]');
+      await page.click('#cat-chips .chip[data-cat="キャバクラ"]');
+      assert((await page.$eval('#cat-chips .chip[aria-pressed="true"]', (b) => b.dataset.group)) === 'night', 'back to night');
+      // グループ「一般のバズ」
+      await page.click('#cat-chips .chip[data-cat="ホスト"]');
+      await page.click('#cat-chips .chip[data-group="general"]');
+      assert(num(await count(page)) === sample.posts.filter((p) => p.categories.includes('その他')).length, 'general');
+      assert((await page.$$('#cat-chips .chip[aria-pressed="true"]')).length === 1, 'only group pressed');
+      assert((await page.evaluate(() => location.hash)).includes('group=general'), 'group url');
+      const badges = await page.$$eval('#post-list .badge', (l) => [...new Set(l.map((e) => e.textContent))]);
+      assert(badges.includes('一般のバズ') && !badges.includes('その他'), badges.join());
+      await page.click('#cat-chips .chip[data-group="night"]');
+      assert(num(await count(page)) === sample.posts.filter(inNight).length, 'night all-period');
       return `ホスト ${n('ホスト')} + キャバクラ → ${both}`;
     });
 
     await check('AND 検索・ハイライト', async () => {
       await page.fill('#q', '指名 歌舞伎町');
       await page.waitForTimeout(350);
-      const expected = sample.posts.filter((p) => { const t = (p.text + '\n' + p.user).toLowerCase(); return t.includes('指名') && t.includes('歌舞伎町'); }).length;
+      const expected = sample.posts.filter((p) => { const t = (p.text + '\n' + p.user).toLowerCase(); return inNight(p) && t.includes('指名') && t.includes('歌舞伎町'); }).length;
       assert(num(await count(page)) === expected, `${await count(page)} vs ${expected}`);
       assert(await page.$('#post-list mark.m-q'), 'q highlight');
       assert(await page.$('#post-list mark.m-term'), 'term highlight');
@@ -535,7 +565,7 @@ async function main() {
 
     await check('監視アカウントのみ', async () => {
       await page.check('#watched');
-      const exp = sample.posts.filter((p) => p.is_watched).length;
+      const exp = sample.posts.filter((p) => p.is_watched && inNight(p)).length;
       assert(num(await count(page)) === exp, 'watched');
       await page.uncheck('#watched');
     });
@@ -545,7 +575,7 @@ async function main() {
       await page.click('#acct-group button[data-acct="imp"]');
       const firstImp = await page.$eval('#acc-list button', (b) => b.dataset.user);
       await page.click('#acc-list button');
-      const exp = sample.posts.filter((p) => p.user === firstImp).length;
+      const exp = sample.posts.filter((p) => p.user === firstImp && inNight(p)).length;
       assert(num(await count(page)) === exp, 'acct filter');
       assert((await page.inputValue('#user')) === firstImp, 'input sync');
       assert((await page.$eval('#acc-list button[aria-pressed="true"]', (b) => b.dataset.user)) === firstImp, 'pressed');
@@ -569,9 +599,11 @@ async function main() {
       await page.waitForFunction(() => document.querySelector('#period-group button[aria-pressed="true"]').dataset.period === 'all');
       await page.goForward();
       await page.waitForFunction(() => document.querySelector('#period-group button[aria-pressed="true"]').dataset.period === '30d');
+      // 「条件をクリア」は初期状態（24時間・夜職すべて・インプレッションが多い順）に戻す
       await page.click('#reset');
-      await page.evaluate(() => { document.getElementById('user').value = ''; });
-      await page.selectOption('#sort', 'new');
+      const st = await page.evaluate(() => window.__dashboard.state);
+      assert(st.period === '24h' && st.group === 'night' && st.sort === 'imp' && !st.cats.length && !st.user, JSON.stringify(st));
+      await resetAll();
     });
 
     await check('期間フィルタ（基準時刻表示・日別グラフの範囲）', async () => {
@@ -818,7 +850,7 @@ async function main() {
         await p2.goto(base);
         await ready(p2);
         assert(await p2.isHidden('#sample-banner'), 'banner');
-        assert(num(await count(p2)) === 3000, await count(p2));
+        assert(num(await count(p2)) === defaultCount(big), await count(p2));
         await p2.screenshot({ path: path.join(SHOTS, 'desktop-dark-data.png') });
         allErrors.push(...k2.errors);
         await c2.close();

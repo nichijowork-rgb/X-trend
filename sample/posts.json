@@ -3646,8 +3646,8 @@
   },
   {
    "id": "1844674407369998682",
-   "url": "https://x.com/sample_cabajo_jin32/status/1844674407369998682",
-   "user": "sample_cabajo_jin32",
+   "url": "https://x.com/sample_watch_04/status/1844674407369998682",
+   "user": "sample_watch_04",
    "created_jst": "2026-10-10T11:58:43+09:00",
    "ts": 1791601123,
    "metrics": {
@@ -3658,14 +3658,12 @@
     "quote_count": 1,
     "bookmark_count": 14
    },
-   "text": "【サンプル】今日の同伴の話題をまとめてみた 詳細はリンク先へ",
+   "text": "【サンプル】監視アカウントの投稿（カテゴリ: 監視アカウント）",
    "categories": [
-    "キャバクラ"
+    "監視アカウント"
    ],
-   "matched_terms": [
-    "同伴"
-   ],
-   "is_watched": false
+   "matched_terms": [],
+   "is_watched": true
   },
   {
    "id": "1844674407361451503",
@@ -3856,8 +3854,8 @@
   },
   {
    "id": "1844674407370753953",
-   "url": "https://x.com/sample_host_ryu09/status/1844674407370753953",
-   "user": "sample_host_ryu09",
+   "url": "https://x.com/sample_watch_02/status/1844674407370753953",
+   "user": "sample_watch_02",
    "created_jst": "2026-10-10T08:48:21+09:00",
    "ts": 1791589701,
    "metrics": {
@@ -3868,14 +3866,13 @@
     "quote_count": 5,
     "bookmark_count": 11
    },
-   "text": "【サンプル】最近のホストの話題をまとめてみた\n\nPS.また書きます",
+   "text": "【サンプル】監視アカウントの投稿（カテゴリ: その他・監視アカウント）",
    "categories": [
-    "ホスト"
+    "その他",
+    "監視アカウント"
    ],
-   "matched_terms": [
-    "ホスト"
-   ],
-   "is_watched": false
+   "matched_terms": [],
+   "is_watched": true
   },
   {
    "id": "1844674407369952275",
@@ -14925,8 +14922,8 @@
   },
   {
    "id": "1844674407370748110",
-   "url": "https://x.com/sample_misc_09/status/1844674407370748110",
-   "user": "sample_misc_09",
+   "url": "https://x.com/sample_watch_03/status/1844674407370748110",
+   "user": "sample_watch_03",
    "created_jst": "2026-09-25T01:05:12+09:00",
    "ts": 1790265912,
    "metrics": {
@@ -14937,12 +14934,13 @@
     "quote_count": 1,
     "bookmark_count": 11
    },
-   "text": "【サンプル】今日は雨",
+   "text": "【サンプル】監視アカウントの投稿（カテゴリ: ホスト・監視アカウント）",
    "categories": [
-    "その他"
+    "ホスト",
+    "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": true
   },
   {
    "id": "1844674407361101263",
@@ -24642,8 +24640,8 @@
   },
   {
    "id": "1844674407370764759",
-   "url": "https://x.com/sample_night_yuna84/status/1844674407370764759",
-   "user": "sample_night_yuna84",
+   "url": "https://x.com/sample_watch_01/status/1844674407370764759",
+   "user": "sample_watch_01",
    "created_jst": "2026-09-03T23:00:45+09:00",
    "ts": 1788444045,
    "metrics": {
@@ -24654,14 +24652,13 @@
     "quote_count": 6,
     "bookmark_count": 86
    },
-   "text": "【サンプル】月末の夜職界隈のニュースを見かけた",
+   "text": "【サンプル】監視アカウントの投稿（カテゴリ: その他・監視アカウント）",
    "categories": [
-    "夜職その他"
+    "その他",
+    "監視アカウント"
    ],
-   "matched_terms": [
-    "夜職"
-   ],
-   "is_watched": false
+   "matched_terms": [],
+   "is_watched": true
   },
   {
    "id": "1844674407367951239",

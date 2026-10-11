@@ -2,6 +2,8 @@
 // ブラウザ（ES module）と Node（node:test）の両方から import される。
 // ここには document / window / fetch を一切書かないこと。
 
+import { CATEGORY_GROUPS, CATEGORY_DISPLAY_NAMES, NIGHT_CATEGORIES, WATCH_CATEGORY, GENERAL_CATEGORIES } from './config.js';
+
 export const METRIC_KEYS = [
   'impression_count', 'like_count', 'retweet_count', 'reply_count', 'quote_count', 'bookmark_count',
 ];
@@ -24,7 +26,7 @@ export const PERIODS = [
 
 export const SORTS = [
   { key: 'new', label: '新しい順', metric: null },
-  { key: 'imp', label: '表示回数が多い順', metric: 'impression_count' },
+  { key: 'imp', label: 'インプレッションが多い順', metric: 'impression_count' },
   { key: 'like', label: 'いいねが多い順', metric: 'like_count' },
   { key: 'bookmark', label: 'ブックマークが多い順', metric: 'bookmark_count' },
   { key: 'pace', label: '伸びペースが速い順（1時間あたり表示）', metric: null, pace: true },
@@ -310,12 +312,16 @@ export const VIEWS = [
 ];
 
 export const DEFAULT_STATE = Object.freeze({
-  cats: [], period: 'all', user: '', q: '', watched: false, sort: 'new', acct: 'posts', view: 'card',
+  // 初期状態: 期間＝24時間、カテゴリ＝夜職すべて、並び＝インプレッションが多い順
+  cats: [], group: 'night', period: '24h', user: '', q: '', watched: false, sort: 'imp', acct: 'posts', view: 'card',
   rdate: '', rweek: '', rclosed: [], panel: false,
 });
 
 /** レポート欄の開閉キー（rclosed に入っているものは閉じている） */
 export const REPORT_SECTIONS = Object.freeze(['report', 'daily', 'weekly']);
+
+/** filterPosts で条件を省略したときの値（何も絞らない） */
+const NEUTRAL_FILTER = Object.freeze({ ...DEFAULT_STATE, period: 'all', group: '', cats: [] });
 
 /** キーワードを空白（全角含む）で分割。AND 検索用 */
 export function parseKeywords(q) {
@@ -333,9 +339,9 @@ export function periodSeconds(key) {
  * opts.ignoreCategories=true でカテゴリ条件だけ外す（チップの件数表示用）。
  */
 export function filterPosts(posts, state, refTs, opts = {}) {
-  const st = { ...DEFAULT_STATE, ...state };
+  const st = { ...NEUTRAL_FILTER, ...state }; // 指定の無い条件は「絞らない」
   const terms = parseKeywords(st.q);
-  const cats = opts.ignoreCategories ? null : (st.cats.length ? new Set(st.cats) : null);
+  const matchCat = opts.ignoreCategories ? null : categoryMatcher(st);
   const user = st.user ? st.user.replace(/^@/, '').toLowerCase() : '';
   const sec = periodSeconds(st.period);
   const since = sec != null && refTs != null ? refTs - sec : null;
@@ -344,7 +350,7 @@ export function filterPosts(posts, state, refTs, opts = {}) {
     if (since != null && (p.ts == null || p.ts <= since)) continue;
     if (st.watched && !p.is_watched) continue;
     if (user && p._userKey !== user) continue;
-    if (cats && !p.categories.some((c) => cats.has(c))) continue; // OR
+    if (matchCat && !matchCat(p)) continue; // 個別は OR、グループは inGroup
     if (terms.length) {
       let ok = true;
       for (const t of terms) if (!p._search.includes(t)) { ok = false; break; } // AND
@@ -353,6 +359,68 @@ export function filterPosts(posts, state, refTs, opts = {}) {
     out.push(p);
   }
   return out;
+}
+
+/** グループ定義（未知のキーは null） */
+function groupDef(key) {
+  return CATEGORY_GROUPS.find((x) => x.key === key) || null;
+}
+
+/** グループのカテゴリ（未知のキーは null） */
+export function groupCategories(key) {
+  const g = groupDef(key);
+  return g ? g.categories : null;
+}
+
+const TOPIC_CATEGORIES = new Set([...NIGHT_CATEGORIES, ...GENERAL_CATEGORIES]);
+
+/** 話題カテゴリ（夜職4種・その他）を 1 つも持たない投稿か（＝どのグループにも入らない） */
+export function isUnclassified(post) {
+  return !post.categories.some((c) => TOPIC_CATEGORIES.has(c));
+}
+
+/** 投稿がグループに入るか */
+export function inGroup(post, key) {
+  const g = groupDef(key);
+  return !!g && post.categories.some((c) => g.categories.includes(c));
+}
+
+/**
+ * 状態からカテゴリ条件の判定関数を作る。
+ * 個別選択（cats）があればそれ（OR）、無ければグループ。どちらも無ければ null（全件）。
+ */
+export function categoryMatcher(state) {
+  if (state.cats && state.cats.length) {
+    const set = new Set(state.cats);
+    return (p) => p.categories.some((c) => set.has(c));
+  }
+  return groupDef(state.group) ? (p) => inGroup(p, state.group) : null;
+}
+
+/** チップ表示用: 個別チップにするカテゴリ（夜職の 4 つ＋未知カテゴリ。監視・一般は除く） */
+export function individualChipCategories(categories) {
+  const known = new Set([...NIGHT_CATEGORIES, WATCH_CATEGORY, ...GENERAL_CATEGORIES]);
+  return [...NIGHT_CATEGORIES.filter((c) => categories.includes(c)), ...categories.filter((c) => !known.has(c))];
+}
+
+/** カテゴリの表示名（「その他」→「一般のバズ」など。データ上の値は変えない） */
+export function categoryLabel(name) {
+  return Object.prototype.hasOwnProperty.call(CATEGORY_DISPLAY_NAMES, name) ? CATEGORY_DISPLAY_NAMES[name] : name;
+}
+
+/**
+ * カテゴリ選択の正規化（旧 URL の cat=… も解釈）。
+ * - 選べるのは個別チップのカテゴリだけ（監視・一般は個別では選ばない）
+ * - cat が一般のカテゴリだけなら「一般のバズ」グループに読み替え
+ * - 何も選ばれていなければ「夜職すべて」
+ */
+export function normalizeCategorySelection(state, categories) {
+  const selectable = new Set(individualChipCategories(categories));
+  const cats = (state.cats || []).filter((c) => selectable.has(c));
+  if (cats.length) return { cats, group: '' };
+  const raw = state.cats || [];
+  if (raw.length && raw.every((c) => GENERAL_CATEGORIES.includes(c))) return { cats: [], group: 'general' };
+  return { cats: [], group: groupCategories(state.group) ? state.group : 'night' };
 }
 
 /** 並べ替え。欠損指標は末尾、同値は新しい順。伸びペース順は refTs が必要 */
@@ -375,9 +443,10 @@ export function sortPosts(posts, sortKey, refTs = null) {
   });
 }
 
+/** カテゴリ以外の絞り込み（期間・アカウント・キーワード・監視のみ）が掛かっているか。カテゴリは件数で判定する */
 export function isFilterActive(state) {
   const st = { ...DEFAULT_STATE, ...state };
-  return st.cats.length > 0 || st.period !== 'all' || !!st.user || !!st.q.trim() || st.watched;
+  return st.period !== 'all' || !!st.user || !!st.q.trim() || st.watched;
 }
 
 // ---------------------------------------------------------------- 集計
@@ -677,6 +746,7 @@ export function serializeState(state) {
   const st = { ...DEFAULT_STATE, ...state };
   const sp = new URLSearchParams();
   for (const c of st.cats) sp.append('cat', c);
+  if (!st.cats.length && st.group && st.group !== DEFAULT_STATE.group) sp.set('group', st.group);
   if (st.period !== DEFAULT_STATE.period) sp.set('period', st.period);
   if (st.user) sp.set('user', st.user);
   if (st.q.trim()) sp.set('q', st.q.trim());
@@ -704,6 +774,7 @@ export function parseState(str, fallbackView = null, fallbackPanel = null) {
   const view = sp.get('view');
   return {
     cats: [...new Set(sp.getAll('cat').map((c) => c.trim()).filter(Boolean))],
+    group: groupCategories(sp.get('group')) ? sp.get('group') : DEFAULT_STATE.group,
     period: PERIODS.some((p) => p.key === period) ? period : DEFAULT_STATE.period,
     user: (sp.get('user') || '').replace(/^@/, '').trim(),
     q: sp.get('q') || '',

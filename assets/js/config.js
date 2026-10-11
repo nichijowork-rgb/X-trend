@@ -34,3 +34,23 @@ export const REPORT_TEXT = Object.freeze({
   crossedNo: '届かず',
   missingPost: 'この投稿は posts.json に含まれていません',
 });
+
+/**
+ * カテゴリのグループ（ツールバーのグループチップ）。
+ * - 夜職すべて: NIGHT_CATEGORIES のいずれかを持つ投稿
+ * - 一般のバズ: GENERAL_CATEGORIES を持つ投稿（両方持つ投稿は両方に出る）
+ * データ側botは全投稿に話題カテゴリ（夜職4種 or その他）を 1 つ以上付ける（2026-10-11 21:31 生成分から）。
+ * 「監視アカウント」カテゴリだけではどのグループにも入らない（is_watched と「監視」バッジで表す）。
+ * 話題カテゴリを持たない投稿（想定外）はどのグループにも入らず、詳細パネルに「分類なし n件」と注記する。
+ * データに未知の新カテゴリが来たら個別チップとして表示し、どのグループにも含めない。
+ */
+export const NIGHT_CATEGORIES = Object.freeze(['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他']);
+export const WATCH_CATEGORY = '監視アカウント';
+export const GENERAL_CATEGORIES = Object.freeze(['その他']);
+export const CATEGORY_GROUPS = Object.freeze([
+  Object.freeze({ key: 'night', label: '夜職すべて', categories: NIGHT_CATEGORIES }),
+  Object.freeze({ key: 'general', label: '一般のバズ', categories: GENERAL_CATEGORIES }),
+]);
+
+/** 画面での表示名（データ上の値はそのまま） */
+export const CATEGORY_DISPLAY_NAMES = Object.freeze({ 'その他': '一般のバズ' });

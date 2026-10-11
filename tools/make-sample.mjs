@@ -196,6 +196,14 @@ special(14, { metrics: {} });
 delete posts[17].metrics; // metrics 自体なし
 for (let i = 30; i < COUNT; i += 97) posts[i].metrics.impression_count = null;
 for (let i = 45; i < COUNT; i += 131) delete posts[i].metrics.bookmark_count;
+// 監視アカウントの投稿（話題カテゴリ＋「監視アカウント」。一般のバズ側の監視投稿と、話題カテゴリなし＝想定外の 1 件も含む）
+const watchUsers = USERS.filter((u) => u.watched);
+[[24, ['その他', '監視アカウント']], [25, ['その他', '監視アカウント']], [26, ['ホスト', '監視アカウント']], [120, ['監視アカウント']]].forEach(([idx, cats], k) => {
+  special(idx, {
+    user: watchUsers[k % watchUsers.length].user, is_watched: true, categories: cats, matched_terms: [],
+    text: `【サンプル】監視アカウントの投稿（カテゴリ: ${cats.join('・')}）`,
+  });
+});
 // 長文（「続きを読む」の折りたたみ確認用。ハイライト語とリンクを末尾付近にも含める）
 special(21, {
   text: '【サンプル】長文の投稿です。' + '歌舞伎町の夜の様子を細かく書いた架空のレポート。'.repeat(6) + '\n\n2行目以降も続きます。\n3行目。\n4行目。\n5行目：最後に指名の話題と ' + 'https://t.co/LongSample1',

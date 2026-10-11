@@ -6,7 +6,7 @@
 //  - ホバー/フォーカスでツールチップ、値は「表で見る」でも読める
 //  - ラベルやカテゴリ名は textContent で挿入（innerHTML 不使用）
 
-import { formatCompact, formatExact, niceTicks, shortDate, categorySlot, hitRateText, hitRatio } from './core.js';
+import { formatCompact, formatExact, niceTicks, shortDate, categorySlot, hitRateText, hitRatio, categoryLabel } from './core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -94,8 +94,9 @@ export function renderHBars(container, items, opts) {
     row.tabIndex = 0;
     setCatColor(row, it.name);
     const label = el('div', 'hbar-label');
-    label.append(el('i', 'dot'), el('span', null, it.name));
-    label.title = it.name;
+    const name = categoryLabel(it.name);
+    label.append(el('i', 'dot'), el('span', null, name));
+    label.title = name;
     const track = el('div', 'hbar-track');
     const fill = el('div', 'hbar-fill');
     const pct = (it.value / max) * 100;
@@ -111,13 +112,13 @@ export function renderHBars(container, items, opts) {
     }
     track.append(fill, val);
     row.append(label, track);
-    const aria = `${it.name}: ${formatExact(it.value)}${opts.unit || ''}${it.unknown > 0 ? `（${it.unknown}件は不明）` : ''}`;
+    const aria = `${name}: ${formatExact(it.value)}${opts.unit || ''}${it.unknown > 0 ? `（${it.unknown}件は不明）` : ''}`;
     row.setAttribute('aria-label', aria);
     const rows = [{ label: opts.valueLabel || '値', value: formatExact(it.value) + (opts.unit || ''), cat: it.name }];
     if (it.unknown > 0) rows.push({ label: '値が不明な投稿', value: `${formatExact(it.unknown)}件` });
-    row.addEventListener('pointermove', (e) => opts.tooltip.show(it.name, rows, e.clientX, e.clientY));
+    row.addEventListener('pointermove', (e) => opts.tooltip.show(name, rows, e.clientX, e.clientY));
     row.addEventListener('pointerleave', () => opts.tooltip.hide());
-    row.addEventListener('focus', () => { const [x, y] = anchorPoint(fill); opts.tooltip.show(it.name, rows, x, y); });
+    row.addEventListener('focus', () => { const [x, y] = anchorPoint(fill); opts.tooltip.show(name, rows, x, y); });
     row.addEventListener('blur', () => opts.tooltip.hide());
     list.append(row);
   }
@@ -131,7 +132,7 @@ export function renderLegend(container, categories) {
   for (const c of categories) {
     const item = el('span', 'legend-item');
     setCatColor(item, c);
-    item.append(el('i', 'sw'), el('span', null, c));
+    item.append(el('i', 'sw'), el('span', null, categoryLabel(c)));
     container.append(item);
   }
 }
@@ -231,7 +232,7 @@ export function renderStackedDays(container, days, categories, opts) {
     const rows = [{ label: '投稿数', value: `${formatExact(d.posts)}件` }];
     for (const c of categories) {
       const v = d.categories[c] || 0;
-      if (v > 0) rows.push({ label: c, value: `${formatExact(v)}件`, cat: c });
+      if (v > 0) rows.push({ label: categoryLabel(c), value: `${formatExact(v)}件`, cat: c });
     }
     return rows;
   }
@@ -280,7 +281,7 @@ export function renderDayTable(container, days, categories) {
   const thead = el('thead');
   const hr = el('tr');
   hr.append(el('th', null, '日付'), el('th', null, '投稿数'));
-  for (const c of categories) hr.append(el('th', null, c));
+  for (const c of categories) hr.append(el('th', null, categoryLabel(c)));
   hr.append(el('th', null, 'インプレッション'));
   thead.append(hr);
   const tbody = el('tbody');

@@ -10,8 +10,9 @@ import {
   parseKeywords, parseState, parseTimestamp, serializeState, sortPosts, topAccounts, CHART_MAX_DAYS,
   shortDate, VIEWS, embedTweetId, chooseRefTs, isUpdateDelayed, formatPace, viewsPerHour,
   normalizeReports, pickReport, formatRisingPace, formatBeforeAfter, REPORT_SECTIONS,
+  categoryMatcher, inGroup, isUnclassified, individualChipCategories, categoryLabel, normalizeCategorySelection,
 } from './js/core.js';
-import { UPDATE_SCHEDULE, PACE_NOTE, REPORT_TEXT } from './js/config.js';
+import { UPDATE_SCHEDULE, PACE_NOTE, REPORT_TEXT, CATEGORY_GROUPS, WATCH_CATEGORY } from './js/config.js';
 import {
   createTooltip, renderDayTable, renderHBars, renderLegend, renderStackedDays, setCatColor, renderRateBars,
 } from './js/charts.js';
@@ -144,8 +145,7 @@ const app = {
 };
 
 function sanitizeState(st) {
-  const known = new Set(app.ds.categories);
-  return { ...st, cats: st.cats.filter((c) => known.has(c)) };
+  return { ...st, ...normalizeCategorySelection(st, app.ds.categories) };
 }
 
 function writeUrl(push) {
@@ -180,26 +180,37 @@ function buildControls() {
   // カテゴリチップ（データから動的生成）
   const chips = $('cat-chips');
   chips.replaceChildren();
-  const all = el('button', 'chip chip-all');
-  all.type = 'button';
-  all.dataset.cat = '';
-  all.append(el('span', 'chip-name', 'すべて'), el('span', 'count', ''));
-  all.addEventListener('click', () => update({ cats: [] }));
-  chips.append(all);
-  for (const c of ds.categories) {
+  const groupChip = (g) => {
+    const b = el('button', 'chip chip-group');
+    b.type = 'button';
+    b.dataset.group = g.key;
+    b.append(el('span', 'chip-name', g.label), el('span', 'count', ''));
+    b.title = g.key === 'night' ? `${g.label}（${g.categories.join('・')}）` : g.label;
+    // グループを押すとそのグループのみ（個別選択は解除）
+    b.addEventListener('click', () => update({ group: g.key, cats: [] }));
+    return b;
+  };
+  const [night, general] = CATEGORY_GROUPS;
+  chips.append(groupChip(night));
+  for (const c of individualChipCategories(ds.categories)) {
     const b = el('button', 'chip');
     b.type = 'button';
     b.dataset.cat = c;
     setCatColor(b, c);
-    b.append(el('i', 'dot'), el('span', 'chip-name', c), el('span', 'count', ''));
-    b.title = c;
+    b.append(el('i', 'dot'), el('span', 'chip-name', categoryLabel(c)), el('span', 'count', ''));
+    b.title = categoryLabel(c);
     b.addEventListener('click', () => {
+      // 個別チップを押すとグループ選択は解除。最後の 1 つを外したら「夜職すべて」に戻す
       const set = new Set(app.state.cats);
       if (set.has(c)) set.delete(c); else set.add(c);
-      update({ cats: ds.categories.filter((x) => set.has(x)) });
+      const cats = ds.categories.filter((x) => set.has(x));
+      update(cats.length ? { cats, group: '' } : { cats: [], group: 'night' });
     });
     chips.append(b);
   }
+  const sep = el('span', 'chip-sep');
+  sep.setAttribute('aria-hidden', 'true');
+  chips.append(sep, groupChip(general));
 
   // 期間
   const pg = $('period-group');
@@ -285,7 +296,8 @@ function buildControls() {
   user.addEventListener('change', () => { applyUser.cancel(); update({ user: user.value.replace(/^@/, '').trim() }); });
 
   $('watched').addEventListener('change', (e) => update({ watched: e.target.checked }));
-  $('reset').addEventListener('click', () => update({ cats: [], period: 'all', user: '', q: '', watched: false }));
+  // 初期状態（夜職すべて・24時間・インプレッションが多い順）に戻す。表示切替・パネル等は維持
+  $('reset').addEventListener('click', () => update({ cats: [], group: DEFAULT_STATE.group, period: DEFAULT_STATE.period, sort: DEFAULT_STATE.sort, user: '', q: '', watched: false }));
 
   // さらに表示 / 無限スクロール
   $('more').addEventListener('click', () => appendPosts());
@@ -315,9 +327,9 @@ function buildControls() {
 
 function syncControls() {
   const st = app.state;
-  for (const b of $('cat-chips').children) {
+  for (const b of $('cat-chips').querySelectorAll('.chip')) {
     const c = b.dataset.cat;
-    b.setAttribute('aria-pressed', String(c ? st.cats.includes(c) : st.cats.length === 0));
+    b.setAttribute('aria-pressed', String(c ? st.cats.includes(c) : (!st.cats.length && st.group === b.dataset.group)));
   }
   for (const b of $('period-group').children) b.setAttribute('aria-pressed', String(b.dataset.period === st.period));
   for (const b of $('acct-group').children) b.setAttribute('aria-pressed', String(b.dataset.acct === st.acct));
@@ -344,15 +356,18 @@ function render() {
   const t0 = performance.now();
   const { ds, state } = app;
   const base = filterPosts(ds.posts, state, ds.refTs, { ignoreCategories: true });
-  let filtered = base;
-  if (state.cats.length) {
-    const set = new Set(state.cats);
-    filtered = base.filter((p) => p.categories.some((c) => set.has(c)));
-  }
-  const active = isFilterActive(state);
+  const match = categoryMatcher(state);
+  const filtered = match ? base.filter(match) : base;
+  // 全件と同じ（カテゴリも期間等も絞っていない）ときだけ summary.json の値を使う
+  const active = isFilterActive(state) || filtered.length !== ds.posts.length;
   const agg = active ? aggregate(filtered, ds.categories) : app.allAgg;
 
-  renderChipCounts(countByCategory(base), base.length);
+  renderChipCounts(countByCategory(base), base);
+  // 話題カテゴリ（夜職4種・その他）を持たない投稿はどのグループにも入らないので件数だけ注記
+  let unclassified = 0;
+  for (const p of base) if (isUnclassified(p)) unclassified++;
+  $('unclassified-note').hidden = unclassified === 0;
+  $('unclassified-note').textContent = `分類なし ${formatExact(unclassified)}件（話題カテゴリが無く「夜職すべて」「一般のバズ」のどちらにも入らない投稿。現在の期間・検索条件で集計）`;
   renderSummary(agg, active, filtered.length);
   renderCharts(agg, filtered);
   renderAccounts(agg);
@@ -366,14 +381,18 @@ function render() {
   app.perf.renders += 1;
 }
 
-function renderChipCounts(counts, baseTotal) {
-  for (const b of $('cat-chips').children) {
+function renderChipCounts(counts, base) {
+  for (const b of $('cat-chips').querySelectorAll('.chip')) {
     const c = b.dataset.cat;
-    const n = c ? counts.get(c) || 0 : baseTotal;
+    const g = b.dataset.group;
+    let n = 0;
+    if (c) n = counts.get(c) || 0;
+    else for (const p of base) if (inGroup(p, g)) n++;
     const cnt = b.querySelector('.count');
     cnt.textContent = formatCompact(n);
     b.classList.toggle('is-zero', n === 0);
-    b.setAttribute('aria-label', `${c || 'すべてのカテゴリ'}（${formatExact(n)}件）`);
+    const name = c ? categoryLabel(c) : b.querySelector('.chip-name').textContent;
+    b.setAttribute('aria-label', `${name}（${formatExact(n)}件）`);
   }
 }
 
@@ -594,7 +613,7 @@ function postHead(p) {
   user.title = `@${p.user} で絞り込む`;
   user.addEventListener('click', () => update({ user: p.user }, { scroll: true }));
   head.append(user);
-  if (p.is_watched) head.append(el('span', 'badge-watch', '監視'));
+  if (p.is_watched || p.categories.includes(WATCH_CATEGORY)) head.append(el('span', 'badge-watch', '監視'));
   const time = el('time', 'post-time', formatDateTime(p.created_jst, p.ts, app.refYear));
   time.title = formatDateTimeFull(p.created_jst, p.ts);
   if (p.ts != null) time.dateTime = new Date(p.ts * 1000).toISOString();
@@ -621,7 +640,8 @@ function paceLine(p) {
 function postCats(p) {
   const cats = el('div', 'post-cats');
   for (const c of p.categories) {
-    const b = el('span', 'badge', c);
+    if (c === WATCH_CATEGORY) continue; // 「監視」小バッジで表すので重複させない
+    const b = el('span', 'badge', categoryLabel(c));
     setCatColor(b, c);
     cats.append(b);
   }

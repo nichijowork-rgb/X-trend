@@ -8,6 +8,7 @@ import {
   countBefore, linkifySegments, isSafeHttpUrl, highlightSegments, serializeState, parseState, DEFAULT_STATE,
   categorySlot, hashString, KNOWN_CATEGORY_SLOTS, SPARE_SLOTS, isFilterActive, topAccounts, countByCategory,
   niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, CHART_MAX_DAYS,
+  categoryMatcher, isUnclassified, inGroup, individualChipCategories, categoryLabel, normalizeCategorySelection, groupCategories,
   chooseRefTs, nextScheduledUpdate, isUpdateDelayed, viewsPerHour, formatPace, SORTS,
   normalizeReports, pickReport, hitRateText, hitRatio, formatRisingPace, formatBeforeAfter, weekKey,
 } from '../assets/js/core.js';
@@ -262,7 +263,7 @@ test('highlightSegments: 大文字小文字無視・長い語優先・重なり�
 
 test('serializeState / parseState: 往復で一致し、既定値は省略', () => {
   assert.equal(serializeState(DEFAULT_STATE), '');
-  const st = { cats: ['ホスト', 'テスト,カンマ'], period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'], panel: true };
+  const st = { cats: ['ホスト', 'テスト,カンマ'], group: 'night', period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'], panel: true };
   const s = serializeState(st);
   assert.deepEqual(parseState('#' + s), st);
   assert.deepEqual(parseState('?' + s), st);
@@ -271,11 +272,12 @@ test('serializeState / parseState: 往復で一致し、既定値は省略', () 
   assert.equal(parseState('view=card', 'embed').view, 'card'); // URL が優先
   assert.equal(parseState('', null, true).panel, true); // 詳細パネル: URL に無ければ保存値
   assert.equal(parseState('panel=0', null, true).panel, false);
-  assert.equal(isFilterActive({ panel: true }), false);
-  assert.equal(isFilterActive(DEFAULT_STATE), false);
-  assert.equal(isFilterActive({ view: 'embed' }), false); // 表示切替は絞り込みではない
-  assert.equal(isFilterActive({ q: '  ' }), false);
-  assert.equal(isFilterActive({ watched: true }), true);
+  // isFilterActive はカテゴリ以外（期間・アカウント・キーワード・監視のみ）を見る。初期状態は 24時間なので true
+  assert.equal(isFilterActive(DEFAULT_STATE), true);
+  assert.equal(isFilterActive({ period: 'all', panel: true }), false);
+  assert.equal(isFilterActive({ period: 'all', view: 'embed' }), false); // 表示切替は絞り込みではない
+  assert.equal(isFilterActive({ period: 'all', q: '  ' }), false);
+  assert.equal(isFilterActive({ period: 'all', watched: true }), true);
 });
 
 // ---------------------------------------------------------------- カテゴリ色
@@ -511,4 +513,60 @@ test('sample/reports.json: posts の id を参照し、posts に無い id・型�
   assert.ok(rising.some((x) => /<img/.test(x.label || '')));
   assert.ok(r.daily[0].review.some((x) => x.crossed === null));
   assert.ok(r.weekly[0].proposal.includes('<script>'));
+});
+
+// ---------------------------------------------------------------- カテゴリのグループ・初期状態
+
+test('初期状態: 24時間・夜職すべて・インプレッションが多い順。URL には既定と違うものだけ', () => {
+  assert.equal(DEFAULT_STATE.period, '24h');
+  assert.equal(DEFAULT_STATE.group, 'night');
+  assert.equal(DEFAULT_STATE.sort, 'imp');
+  assert.equal(SORTS.find((x) => x.key === 'imp').label, 'インプレッションが多い順');
+  assert.equal(serializeState(DEFAULT_STATE), '');
+  assert.equal(serializeState({ group: 'general' }), 'group=general');
+  assert.equal(serializeState({ period: 'all', sort: 'new' }), 'period=all&sort=new');
+  assert.deepEqual(parseState(''), { ...DEFAULT_STATE, cats: [], rclosed: [] });
+  assert.equal(parseState('group=general').group, 'general');
+  assert.equal(parseState('group=zzz').group, 'night');
+});
+
+test('グループ: 夜職すべて＝夜職4カテゴリ、一般のバズ＝その他、話題カテゴリなしはどちらにも入らない', () => {
+  assert.deepEqual(groupCategories('night'), ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他']);
+  assert.deepEqual(groupCategories('general'), ['その他']);
+  const ds = dataset([
+    rawPost({ id: '1', categories: ['ホスト'] }),
+    rawPost({ id: '2', categories: ['監視アカウント'] }), // 話題カテゴリなし → どちらにも入らない
+    rawPost({ id: '3', categories: ['その他'] }),
+    rawPost({ id: '4', categories: ['テスト新カテゴリ'] }), // 未知のみ → どちらにも入らない
+    rawPost({ id: '5', categories: ['ホスト', '監視アカウント'] }), // 監視＋ホスト → 夜職のみ
+    rawPost({ id: '6', categories: ['監視アカウント', 'その他'] }), // 監視＋その他 → 一般のみ
+    rawPost({ id: '7', categories: ['キャバクラ', 'その他'] }), // 両方 → 両方
+  ], ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他', '監視アカウント', 'その他']);
+  const ids = (st) => filterPosts(ds.posts, st, ds.refTs).map((p) => p.id).sort();
+  assert.deepEqual(ids({ group: 'night' }), ['1', '5', '7']);
+  assert.deepEqual(ids({ group: 'general' }), ['3', '6', '7']);
+  assert.deepEqual(ids({ group: 'night', cats: ['テスト新カテゴリ'] }), ['4']); // 個別選択が優先
+  assert.deepEqual(ids({}), ['1', '2', '3', '4', '5', '6', '7']); // 省略時は絞らない
+  const byId = (id) => ds.posts.find((p) => p.id === id);
+  assert.equal(inGroup(byId('6'), 'night'), false); // 監視＋その他 → 一般のみ
+  assert.equal(inGroup(byId('6'), 'general'), true);
+  assert.equal(inGroup(byId('5'), 'night'), true); // 監視＋ホスト → 夜職のみ
+  assert.equal(inGroup(byId('5'), 'general'), false);
+  assert.equal(inGroup(byId('2'), 'night') || inGroup(byId('2'), 'general'), false); // 話題カテゴリなし
+  assert.deepEqual(ds.posts.filter(isUnclassified).map((p) => p.id).sort(), ['2', '4']);
+  assert.equal(categoryMatcher({ cats: [], group: '' }), null);
+  // 個別チップ: 夜職4つ＋未知カテゴリ（監視・その他は出さない）
+  assert.deepEqual(individualChipCategories(ds.categories), ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他', 'テスト新カテゴリ']);
+  assert.equal(categoryLabel('その他'), '一般のバズ');
+  assert.equal(categoryLabel('ホスト'), 'ホスト');
+});
+
+test('normalizeCategorySelection: 旧 URL の cat=… を解釈し、空なら夜職すべて', () => {
+  const cats = ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他', '監視アカウント', 'その他', '新カテゴリ'];
+  assert.deepEqual(normalizeCategorySelection({ cats: ['ホスト', 'その他'], group: 'night' }, cats), { cats: ['ホスト'], group: '' });
+  assert.deepEqual(normalizeCategorySelection({ cats: ['その他'], group: 'night' }, cats), { cats: [], group: 'general' });
+  assert.deepEqual(normalizeCategorySelection({ cats: ['監視アカウント'], group: 'night' }, cats), { cats: [], group: 'night' });
+  assert.deepEqual(normalizeCategorySelection({ cats: ['存在しない'], group: 'general' }, cats), { cats: [], group: 'general' });
+  assert.deepEqual(normalizeCategorySelection({ cats: [], group: '' }, cats), { cats: [], group: 'night' });
+  assert.deepEqual(normalizeCategorySelection({ cats: ['新カテゴリ'], group: 'night' }, cats), { cats: ['新カテゴリ'], group: '' });
 });

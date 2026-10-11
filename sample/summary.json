@@ -9,13 +9,13 @@
  "by_category": {
   "ホスト": {
    "posts": 458,
-   "impressions": 3307446,
-   "likes": 77908
+   "impressions": 3317520,
+   "likes": 77863
   },
   "キャバクラ": {
-   "posts": 420,
-   "impressions": 3504857,
-   "likes": 89254
+   "posts": 419,
+   "impressions": 3501283,
+   "likes": 89113
   },
   "歌舞伎町": {
    "posts": 461,
@@ -23,19 +23,19 @@
    "likes": 120682
   },
   "夜職その他": {
-   "posts": 494,
-   "impressions": 3465492,
-   "likes": 92473
+   "posts": 493,
+   "impressions": 3455341,
+   "likes": 92201
   },
   "監視アカウント": {
-   "posts": 158,
-   "impressions": 4856465,
-   "likes": 120149
+   "posts": 162,
+   "impressions": 4886880,
+   "likes": 120773
   },
   "その他": {
-   "posts": 41,
-   "impressions": 1340154,
-   "likes": 16780
+   "posts": 42,
+   "impressions": 1340231,
+   "likes": 17097
   },
   "テスト新カテゴリ": {
    "posts": 5,
@@ -59,13 +59,6 @@
    "likes": 3146
   },
   {
-   "user": "sample_host_ryu09",
-   "is_watched": false,
-   "posts": 34,
-   "impressions": 173038,
-   "likes": 3901
-  },
-  {
    "user": "sample_kabuki_jin60",
    "is_watched": false,
    "posts": 34,
@@ -73,11 +66,11 @@
    "likes": 2921
   },
   {
-   "user": "sample_night_yuna84",
+   "user": "sample_host_ryu09",
    "is_watched": false,
-   "posts": 32,
-   "impressions": 256139,
-   "likes": 5015
+   "posts": 33,
+   "impressions": 169730,
+   "likes": 3773
   },
   {
    "user": "sample_host_emi15",
@@ -85,6 +78,13 @@
    "posts": 32,
    "impressions": 253849,
    "likes": 7854
+  },
+  {
+   "user": "sample_night_yuna84",
+   "is_watched": false,
+   "posts": 31,
+   "impressions": 245988,
+   "likes": 4743
   },
   {
    "user": "sample_cabajo_luna52",
@@ -192,11 +192,18 @@
    "likes": 2943
   },
   {
-   "user": "sample_cabajo_jin32",
-   "is_watched": false,
+   "user": "sample_watch_01",
+   "is_watched": true,
    "posts": 23,
-   "impressions": 114157,
-   "likes": 3195
+   "impressions": 599697,
+   "likes": 12859
+  },
+  {
+   "user": "sample_watch_02",
+   "is_watched": true,
+   "posts": 23,
+   "impressions": 489149,
+   "likes": 10623
   },
   {
    "user": "sample_hostclub_mio04",
@@ -227,18 +234,11 @@
    "likes": 2358
   },
   {
-   "user": "sample_watch_01",
-   "is_watched": true,
+   "user": "sample_cabajo_jin32",
+   "is_watched": false,
    "posts": 22,
-   "impressions": 589546,
-   "likes": 12587
-  },
-  {
-   "user": "sample_watch_02",
-   "is_watched": true,
-   "posts": 22,
-   "impressions": 485841,
-   "likes": 10495
+   "impressions": 110583,
+   "likes": 3054
   },
   {
    "user": "sample_shinjuku_aoi61",
@@ -269,18 +269,18 @@
    "likes": 3575
   },
   {
+   "user": "sample_watch_03",
+   "is_watched": true,
+   "posts": 19,
+   "impressions": 766896,
+   "likes": 18338
+  },
+  {
    "user": "sample_night_hikaru93",
    "is_watched": false,
    "posts": 19,
    "impressions": 170442,
    "likes": 5419
-  },
-  {
-   "user": "sample_watch_03",
-   "is_watched": true,
-   "posts": 18,
-   "impressions": 753514,
-   "likes": 18255
   },
   {
    "user": "sample_hostclub_nana25",
@@ -402,6 +402,13 @@
    "likes": 1406
   },
   {
+   "user": "sample_watch_04",
+   "is_watched": true,
+   "posts": 12,
+   "impressions": 424581,
+   "likes": 5473
+  },
+  {
    "user": "sample_girlsbar_sakura100",
    "is_watched": false,
    "posts": 12,
@@ -421,13 +428,6 @@
    "posts": 12,
    "impressions": 23225,
    "likes": 470
-  },
-  {
-   "user": "sample_watch_04",
-   "is_watched": true,
-   "posts": 11,
-   "impressions": 421007,
-   "likes": 5332
   },
   {
    "user": "sample_player_rei24",
@@ -745,13 +745,6 @@
    "likes": 53
   },
   {
-   "user": "sample_misc_09",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 13980,
-   "likes": 101
-  },
-  {
    "user": "sample_concafe_ryu97",
    "is_watched": false,
    "posts": 2,
@@ -822,6 +815,13 @@
    "likes": 26
   },
   {
+   "user": "sample_misc_09",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 598,
+   "likes": 18
+  },
+  {
    "user": "sample_shinjuku_sora75",
    "is_watched": false,
    "posts": 1,
@@ -863,12 +863,12 @@
    "impressions": 266141,
    "likes": 6109,
    "categories": {
-    "キャバクラ": 19,
+    "キャバクラ": 18,
     "歌舞伎町": 20,
-    "監視アカウント": 6,
-    "ホスト": 15,
+    "監視アカウント": 8,
+    "ホスト": 14,
     "夜職その他": 18,
-    "その他": 2
+    "その他": 3
    }
   },
   {
@@ -1067,12 +1067,11 @@
    "impressions": 129004,
    "likes": 1972,
    "categories": {
-    "ホスト": 5,
+    "ホスト": 6,
     "キャバクラ": 3,
     "歌舞伎町": 4,
     "夜職その他": 4,
-    "監視アカウント": 1,
-    "その他": 1
+    "監視アカウント": 2
    }
   },
   {
@@ -1363,7 +1362,9 @@
    "likes": 1566,
    "categories": {
     "歌舞伎町": 5,
-    "夜職その他": 6,
+    "その他": 1,
+    "監視アカウント": 1,
+    "夜職その他": 5,
     "ホスト": 6,
     "キャバクラ": 3
    }
