@@ -27,6 +27,7 @@ export const SORTS = [
   { key: 'imp', label: 'インプレッション', metric: 'impression_count' },
   { key: 'like', label: 'いいね', metric: 'like_count' },
   { key: 'bookmark', label: 'ブックマーク', metric: 'bookmark_count' },
+  { key: 'pace', label: '伸びペース（1時間あたり表示）', metric: null, pace: true },
 ];
 
 export const ACCOUNT_SORTS = [
@@ -186,7 +187,7 @@ export function normalizeDataset(raw) {
   if (Array.isArray(raw.categories)) raw.categories.forEach(addCat);
 
   const posts = [];
-  let refTs = null;
+  let latestPostTs = null;
   let minTs = null;
   for (const p of raw.posts) {
     if (!p || typeof p !== 'object') continue;
@@ -223,7 +224,7 @@ export function normalizeDataset(raw) {
       _day: dateKeyFromTs(ts),
     };
     if (ts != null) {
-      if (refTs == null || ts > refTs) refTs = ts;
+      if (latestPostTs == null || ts > latestPostTs) latestPostTs = ts;
       if (minTs == null || ts < minTs) minTs = ts;
     }
     posts.push(post);
@@ -234,9 +235,69 @@ export function normalizeDataset(raw) {
     generated_at: typeof raw.generated_at === 'string' ? raw.generated_at : null,
     categories,
     posts,
-    refTs,
+    ...chooseRefTs(typeof raw.generated_at === 'string' ? raw.generated_at : null, latestPostTs),
+    latestPostTs,
     minTs,
   };
+}
+
+/**
+ * 期間フィルタ・伸びペースの基準時刻。generated_at を優先し、無ければ最新投稿の ts。
+ * 返り値: { refTs, refSource: 'generated_at' | 'latest_post' | null }
+ */
+export function chooseRefTs(generatedAt, latestPostTs) {
+  const g = parseTimestamp(generatedAt);
+  if (g != null) return { refTs: g, refSource: 'generated_at' };
+  if (isNum(latestPostTs)) return { refTs: latestPostTs, refSource: 'latest_post' };
+  return { refTs: null, refSource: null };
+}
+
+// ---------------------------------------------------------------- 更新スケジュール
+
+/**
+ * generatedTs の後に来る最初の定時更新（JST の hour:minute）の UNIX 秒。
+ * 例: 10/11 18:41 → 10/11 23:59、10/11 23:59:30 → 10/12 23:59
+ */
+export function nextScheduledUpdate(generatedTs, daily) {
+  if (!isNum(generatedTs) || !daily) return null;
+  const p = jstParts(generatedTs);
+  let t = Math.floor(Date.UTC(p.y, p.m - 1, p.d, daily.hour, daily.minute) / 1000) - JST_OFFSET;
+  if (t <= generatedTs - (generatedTs % 60) + (generatedTs % 60 ? 0 : 0) && t <= generatedTs) t += 86400;
+  return t;
+}
+
+/** 次の定時更新＋猶予を過ぎても更新されていなければ true（nowTs は呼び出し側が現在時刻を渡す） */
+export function isUpdateDelayed(generatedTs, nowTs, schedule) {
+  const next = nextScheduledUpdate(generatedTs, schedule && schedule.daily);
+  if (next == null || !isNum(nowTs)) return false;
+  return nowTs > next + (schedule.delayGraceHours || 0) * 3600;
+}
+
+// ---------------------------------------------------------------- 伸びペース
+
+/**
+ * 1時間あたりの表示数 = impression_count ÷ (基準時刻 − ts の時間数)。経過1時間未満は1時間として計算。
+ * 不明（impression_count や ts が無い）なら null。
+ */
+export function viewsPerHour(post, refTs) {
+  const imp = post && post.metrics ? post.metrics.impression_count : null;
+  if (!isNum(imp) || !isNum(post.ts) || !isNum(refTs)) return null;
+  const hours = Math.max(1, (refTs - post.ts) / 3600);
+  return { hours, views: imp, perHour: imp / hours };
+}
+
+function formatElapsed(hours) {
+  if (hours < 1) return '1時間未満';
+  if (hours < 48) return `${Math.floor(hours)}時間`;
+  return `${Math.floor(hours / 24)}日`;
+}
+
+/** 「投稿から3時間で38.2万表示（1時間あたり12.7万）」。不明なら「伸びペース：不明」 */
+export function formatPace(post, refTs) {
+  const v = viewsPerHour(post, refTs);
+  if (!v) return `伸びペース：${UNKNOWN}`;
+  const elapsed = isNum(refTs) && isNum(post.ts) ? (refTs - post.ts) / 3600 : v.hours;
+  return `投稿から${formatElapsed(elapsed)}で${formatCompact(v.views)}表示（1時間あたり${formatCompact(v.perHour)}）`;
 }
 
 // ---------------------------------------------------------------- フィルタ・並べ替え
@@ -262,7 +323,7 @@ export function periodSeconds(key) {
 }
 
 /**
- * 絞り込み。期間はデータ内の最新投稿時刻 refTs 基準。
+ * 絞り込み。期間は基準時刻 refTs（generated_at 優先、無ければ最新投稿）基準。
  * opts.ignoreCategories=true でカテゴリ条件だけ外す（チップの件数表示用）。
  */
 export function filterPosts(posts, state, refTs, opts = {}) {
@@ -288,16 +349,19 @@ export function filterPosts(posts, state, refTs, opts = {}) {
   return out;
 }
 
-/** 並べ替え。欠損指標は末尾、同値は新しい順 */
-export function sortPosts(posts, sortKey) {
+/** 並べ替え。欠損指標は末尾、同値は新しい順。伸びペース順は refTs が必要 */
+export function sortPosts(posts, sortKey, refTs = null) {
   const s = SORTS.find((x) => x.key === sortKey) || SORTS[0];
   const arr = posts.slice();
   const byTs = (a, b) => (b.ts ?? -Infinity) - (a.ts ?? -Infinity) || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0);
-  if (!s.metric) return arr.sort(byTs);
+  if (!s.metric && !s.pace) return arr.sort(byTs);
   const k = s.metric;
+  const val = s.pace
+    ? (() => { const m = new Map(); for (const p of arr) { const v = viewsPerHour(p, refTs); m.set(p, v ? v.perHour : null); } return (p) => m.get(p); })()
+    : (p) => p.metrics[k];
   return arr.sort((a, b) => {
-    const va = a.metrics[k];
-    const vb = b.metrics[k];
+    const va = val(a);
+    const vb = val(b);
     if (va == null && vb == null) return byTs(a, b);
     if (va == null) return 1;
     if (vb == null) return -1;

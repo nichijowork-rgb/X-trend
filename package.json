@@ -1,13 +1,13 @@
 {
   "name": "x-trend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Xの情報を集め、夜職の業界把握と投稿ネタ探しに使うツール",
+  "description": "Xの投稿（夜職・歌舞伎町まわり）をカテゴリ別に見られる静的ダッシュボード（GitHub Pages）",
   "type": "module",
-  "engines": { "node": ">=22.13" },
+  "engines": { "node": ">=22" },
   "scripts": {
-    "start": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/server.js",
-    "dev": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning --watch src/server.js",
-    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+    "start": "python3 -m http.server 8000",
+    "sample": "node tools/make-sample.mjs",
+    "test": "node --test test/*.test.js"
   }
 }

@@ -19,7 +19,6 @@ repo/
 └── data/                    … データ側botが自動更新（フロントは触らない）
 ```
 
-別途ある Node サーバー版（`src/`・`public/`）とは独立しています。
 
 ## GitHub Pages での公開手順
 
