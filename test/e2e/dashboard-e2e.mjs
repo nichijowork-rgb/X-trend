@@ -219,6 +219,7 @@ async function main() {
         await page.waitForFunction((b) => window.__dashboard.perf.renders > b, before);
         return { wall: Date.now() - t, render: await page.evaluate(() => window.__dashboard.perf.lastRenderMs) };
       };
+      await page.click('#panel-toggle'); // 検索欄は詳細パネル内
       const chip = await timeOp(() => page.click('#cat-chips .chip[data-cat="ホスト"]'));
       const period = await timeOp(() => page.click('#period-group button[data-period="7d"]'));
       const sort = await timeOp(() => page.selectOption('#sort', 'imp'));
@@ -273,14 +274,14 @@ async function main() {
     // ---- 2d. reports.json のケース
     const sampleReports = JSON.parse(readFileSync(path.join(ROOT, 'sample/reports.json'), 'utf8'));
     for (const [name, reports, expect] of [
-      ['ファイル無し（404）', undefined, 'hidden'],
+      ['ファイル無し（404）', null, 'hidden'],
       ['不正 JSON', '{', 'hidden'],
       ['空配列', { generated_at: '2026-10-12T23:59:00+09:00', daily: [], weekly: [] }, 'both-empty'],
       ['daily のみ', { daily: sampleReports.daily }, 'daily-only'],
     ]) {
       await check(`reports.json ${name}`, async () => {
         const data = { posts: sample, summary: sampleSummary };
-        if (reports !== undefined) data.reports = reports;
+        data.reports = reports;
         const { ctx, page, con } = await newPage({}, { data });
         await page.goto(base);
         await ready(page);
@@ -288,7 +289,9 @@ async function main() {
         assert(num(await count(page)) === 1500, 'posts unaffected');
         if (expect === 'hidden') {
           assert(await page.isHidden('#report'), 'report should be hidden');
+          assert(await page.isHidden('#new-badge'), 'no NEW without reports');
         } else {
+          await page.click('#panel-toggle');
           assert(await page.isVisible('#report'), 'report visible');
           const d = await page.textContent('#report-daily-body');
           const w = await page.textContent('#report-weekly-body');
@@ -363,6 +366,68 @@ async function main() {
     await page.goto(base);
     await ready(page);
 
+    await check('簡潔レイアウト: 詳細パネルは既定で閉じ、NEW バッジ→開くと既読・URL/保存', async () => {
+      assert(await page.isHidden('#panel'), 'panel closed by default');
+      for (const sel of ['#q', '#user', '#watched', '#reset', '#acc-list', '#chart-day', '#report', '#stat-posts']) assert(await page.isHidden(sel), `${sel} should be hidden`);
+      for (const sel of ['#stat-top', '#cat-chips', '#period-group', '#sort', '#view-group', '#post-list']) assert(await page.isVisible(sel), `${sel} should be visible`);
+      assert(await page.isVisible('#new-badge'), 'NEW badge');
+      assert((await page.getAttribute('#panel-toggle', 'aria-expanded')) === 'false', 'aria');
+      await page.screenshot({ path: path.join(SHOTS, 'desktop-dark-sample.png') });
+      await page.click('#panel-toggle');
+      assert(await page.isVisible('#panel') && await page.isVisible('#q') && await page.isVisible('#report'), 'panel open');
+      assert(await page.isHidden('#new-badge'), 'NEW cleared');
+      assert((await page.evaluate(() => location.hash)).includes('panel=1'), 'panel in URL');
+      await page.click('#panel-toggle');
+      await page.reload();
+      await ready(page);
+      assert(await page.isHidden('#panel'), 'closed after reload');
+      assert(await page.isHidden('#new-badge'), 'NEW stays cleared (localStorage)');
+      await page.click('#panel-toggle');
+      await page.evaluate(() => { location.hash = ''; });
+      await page.goto(base);
+      await ready(page);
+      assert(await page.isVisible('#panel'), 'panel open restored from localStorage');
+    });
+
+    await check('長文の折りたたみ（続きを読む／閉じる・ハイライトとリンクは維持）', async () => {
+      const long = sample.posts.find((p) => p.text.startsWith('【サンプル】長文の投稿です。'));
+      await page.fill('#user', long.user);
+      await page.press('#user', 'Enter');
+      await page.waitForFunction((u) => window.__dashboard.state.user === u, long.user);
+      const card = page.locator('#post-list > li', { hasText: '長文の投稿です' }).first();
+      const btn = card.locator('.more-text');
+      assert((await btn.getAttribute('aria-expanded')) === 'false', 'collapsed');
+      const h1 = await card.locator('.post-text').evaluate((e) => e.getBoundingClientRect().height);
+      assert(await card.locator('.post-text mark').count() > 0 && await card.locator('.post-text a[href="https://t.co/LongSample1"]').count() === 1, 'marks/link kept');
+      await card.screenshot({ path: path.join(SHOTS, 'long-collapsed.png') });
+      await btn.focus();
+      await page.keyboard.press('Enter');
+      assert((await btn.getAttribute('aria-expanded')) === 'true' && (await btn.textContent()) === '閉じる', 'expanded');
+      const h2 = await card.locator('.post-text').evaluate((e) => e.getBoundingClientRect().height);
+      assert(h2 > h1 + 20, `height ${h1} -> ${h2}`);
+      await btn.click();
+      assert((await btn.getAttribute('aria-expanded')) === 'false', 'collapsed again');
+      await page.fill('#user', '');
+      await page.press('#user', 'Enter');
+      await page.waitForFunction(() => window.__dashboard.state.user === '');
+      return `高さ ${Math.round(h1)}px → ${Math.round(h2)}px`;
+    });
+
+    await check('詳細側の条件（検索・アカウント・監視のみ）はツールバーにチップ表示され解除できる', async () => {
+      await page.fill('#q', '指名');
+      await page.waitForFunction(() => window.__dashboard.state.q === '指名');
+      await page.check('#watched');
+      await page.click('#panel-toggle'); // 閉じても見える
+      const chips = await page.$$eval('#active-filters .af', (l) => l.map((e) => e.textContent));
+      assert(chips.some((t) => t.includes('キーワード: 指名')) && chips.some((t) => t.includes('監視アカウントのみ')), chips.join());
+      await page.click('#active-filters .af:has-text("キーワード") button');
+      await page.waitForFunction(() => window.__dashboard.state.q === '');
+      await page.click('#active-filters .af:has-text("監視") button');
+      await page.waitForFunction(() => !window.__dashboard.state.watched);
+      await page.click('#panel-toggle');
+      assert(await page.isVisible('#q'), 'panel reopened');
+    });
+
     await check('レポート（サンプル）: 伸びている投稿・posts に無い id・答え合わせ・的中率・週間・XSS', async () => {
       assert(await page.isVisible('#report'), 'report');
       const today = sampleReports.daily[0];
@@ -425,7 +490,7 @@ async function main() {
       await page.fill('#q', '画像タグ入り');
       await page.waitForFunction(() => document.querySelectorAll('#post-list > li').length === 1);
       assert(!(await page.$('#post-list img[src="x"]')), 'img injected');
-      assert(!(await page.$('#post-list svg')), 'svg injected');
+      assert(!(await page.$('#post-list .post-text svg, #post-list svg[onload]')), 'svg injected');
       assert(!(await page.$('#post-list a[href^="javascript"]')), 'javascript link');
       await page.screenshot({ path: path.join(SHOTS, 'xss.png') });
       await page.fill('#q', '');
@@ -695,7 +760,7 @@ async function main() {
         const sw = await p2.evaluate(() => document.documentElement.scrollWidth);
         assert(sw <= w, `scrollWidth ${sw}`);
         const small = await p2.evaluate(() => {
-          const sel = '#rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #theme-toggle, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
+          const sel = '#panel-toggle, .more-text, #rdate, #rweek, .report > summary, .report-sub > summary, .cand-list button, .rt-user, .chip, .segmented button, #sort, #q, #user, #reset, #more, #theme-toggle, .open-x, .embed-toggle, .acc-item button, .check, .media-thumb, .post-user, .af button, .table-view summary, .notice-close';
           return [...document.querySelectorAll(sel)].filter((e) => e.offsetParent && e.getBoundingClientRect().height < 44).map((e) => `${e.className || e.id}:${Math.round(e.getBoundingClientRect().height)}`).slice(0, 5);
         });
         assert(small.length === 0, small.join(', '));
@@ -704,6 +769,8 @@ async function main() {
           await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-full.png'), fullPage: true });
           await p2.evaluate(() => document.getElementById('posts-heading').scrollIntoView());
           await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-posts.png') });
+          await p2.screenshot({ path: path.join(SHOTS, 'mobile-375-closed.png') });
+          await p2.click('#panel-toggle');
           const rw = await p2.$eval('#report', (e) => [...e.querySelectorAll('*')].filter((x) => x.getBoundingClientRect().right > window.innerWidth + 1 && !x.closest('.table-scroll')).map((x) => x.className).slice(0, 3));
           assert(rw.length === 0, `report overflow: ${rw.join()}`);
           await p2.evaluate(() => document.getElementById('report').scrollIntoView());
@@ -715,6 +782,27 @@ async function main() {
         await c2.close();
         return `scrollWidth=${sw}`;
       });
+    }
+
+    // ---- 10b. リポジトリに data/ がある場合は実データでも表示確認（読むだけ。data/ は変更しない）
+    if (existsSync(path.join(ROOT, 'data', 'posts.json'))) {
+      for (const [w, h, scheme] of [[1280, 800, 'dark'], [1280, 800, 'light'], [375, 812, 'dark'], [375, 812, 'light']]) {
+        await check(`実データ data/ ${w}px ${scheme}`, async () => {
+          const { ctx: c2, page: p2, con: k2 } = await newPage({ viewport: { width: w, height: h }, colorScheme: scheme, deviceScaleFactor: w < 500 ? 2 : 1, isMobile: w < 500, hasTouch: w < 500 }, {});
+          await p2.goto(base);
+          await ready(p2);
+          assert(await p2.isHidden('#sample-banner'), 'sample banner shown with real data');
+          const sw = await p2.evaluate(() => document.documentElement.scrollWidth);
+          assert(sw <= w, `scrollWidth ${sw}`);
+          await p2.screenshot({ path: path.join(SHOTS, `real-${w}-${scheme}.png`) });
+          await p2.click('#panel-toggle');
+          await p2.waitForTimeout(200);
+          await p2.screenshot({ path: path.join(SHOTS, `real-${w}-${scheme}-panel.png`) });
+          allErrors.push(...k2.errors);
+          await c2.close();
+          return `scrollWidth=${sw}`;
+        });
+      }
     }
 
     // ---- 11. 実ファイルとして data/ を一時配置

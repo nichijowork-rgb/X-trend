@@ -88,6 +88,8 @@ function resolvedTheme() {
 // ---------------------------------------------------------------- 保存値（localStorage は失敗しても動く）
 
 const VIEW_KEY = 'xreport-view';
+const PANEL_KEY = 'xreport-panel';
+const SEEN_KEY = 'xreport-report-seen';
 const NOTICE_KEY = 'xreport-embed-notice-dismissed';
 
 function storageGet(k) {
@@ -244,6 +246,11 @@ function buildControls() {
     });
     vg.append(b);
   }
+  $('panel-toggle').addEventListener('click', () => {
+    const next = !app.state.panel;
+    storageSet(PANEL_KEY, next ? '1' : '0');
+    update({ panel: next });
+  });
   $('embed-notice-close').addEventListener('click', () => {
     app.noticeDismissed = true;
     storageSet(NOTICE_KEY, '1');
@@ -315,6 +322,10 @@ function syncControls() {
   for (const b of $('period-group').children) b.setAttribute('aria-pressed', String(b.dataset.period === st.period));
   for (const b of $('acct-group').children) b.setAttribute('aria-pressed', String(b.dataset.acct === st.acct));
   for (const b of $('view-group').children) b.setAttribute('aria-pressed', String(b.dataset.view === st.view));
+  $('panel').hidden = !st.panel;
+  $('panel-toggle').setAttribute('aria-expanded', String(st.panel));
+  $('panel-toggle').classList.toggle('is-open', st.panel);
+  if (st.panel) markReportsSeen();
   if (st.view === 'embed') showEmbedNotice();
   $('sort').value = st.sort;
   if (document.activeElement !== $('q')) $('q').value = st.q;
@@ -395,15 +406,15 @@ function renderSummary(agg, active, filteredCount) {
     const time = el('span', 'post-time', formatDateTime(p.created_jst, p.ts, app.refYear));
     time.title = formatDateTimeFull(p.created_jst, p.ts);
     head.append(v, u, time);
-    const text = el('p', 'top-post-text', p.text.replace(/\s+/g, ' ').trim() || '（本文なし）');
-    wrap.append(head, text);
     if (isSafeHttpUrl(p.url)) {
-      const a = el('a', 'top-post-link', 'Xで開く ↗');
+      const a = el('a', 'open-x top-post-link', 'Xで開く ↗');
       a.href = p.url;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
-      wrap.append(a);
+      head.append(a);
     }
+    const text = el('p', 'top-post-text', p.text.replace(/\s+/g, ' ').trim() || '（本文なし）');
+    wrap.append(head, text);
     box.append(wrap);
   }
 
@@ -527,8 +538,7 @@ function renderActiveFilters() {
     s.append(x);
     box.append(s);
   };
-  for (const c of st.cats) add(`カテゴリ: ${c}`, { cats: st.cats.filter((x) => x !== c) });
-  if (st.period !== 'all') add(`期間: ${PERIODS.find((p) => p.key === st.period).label}`, { period: 'all' });
+  // カテゴリ・期間はツールバーに常に見えているので、ここでは詳細パネル側の条件だけをチップにする
   if (st.user) add(`アカウント: @${st.user}`, { user: '' });
   if (st.q.trim()) add(`キーワード: ${st.q.trim()}`, { q: '' });
   if (st.watched) add('監視アカウントのみ', { watched: false });
@@ -592,6 +602,14 @@ function postHead(p) {
   return head;
 }
 
+/** カード上部: ユーザー・日時・カテゴリを 1 行（収まらなければ折り返し） */
+function postTop(p) {
+  const head = postHead(p);
+  const cats = postCats(p);
+  head.append(cats);
+  return head;
+}
+
 /** 伸びペース（常時小さく表示。伸びペース順のときは強調） */
 function paceLine(p) {
   const v = viewsPerHour(p, app.ds.refTs);
@@ -608,6 +626,29 @@ function postCats(p) {
     cats.append(b);
   }
   return cats;
+}
+
+const CLAMP_CHARS = 140;
+const CLAMP_LINES = 4;
+let clampSeq = 0;
+
+/** 長文は折りたたみ（約4行または約140字超）。ハイライト・リンクは DOM のまま CSS で隠すだけ */
+function postBodyWithToggle(p) {
+  const body = postBody(p);
+  const long = p.text.length > CLAMP_CHARS || p.text.split('\n').length > CLAMP_LINES;
+  if (!long) return [body];
+  body.id = `pt-${++clampSeq}`;
+  body.classList.add('is-clamped');
+  const b = el('button', 'more-text', '続きを読む');
+  b.type = 'button';
+  b.setAttribute('aria-expanded', 'false');
+  b.setAttribute('aria-controls', body.id);
+  b.addEventListener('click', () => {
+    const open = body.classList.toggle('is-clamped') === false;
+    b.textContent = open ? '閉じる' : '続きを読む';
+    b.setAttribute('aria-expanded', String(open));
+  });
+  return [body, b];
 }
 
 function postBody(p) {
@@ -628,15 +669,39 @@ function postBody(p) {
   return body;
 }
 
+// 指標アイコン（装飾。意味は sr-only のラベルと title で伝える）
+const METRIC_ICONS = {
+  impression_count: 'M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
+  like_count: 'M8 13.5S2 10 2 6a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7.5-6 7.5Z',
+  retweet_count: 'M4 12V5h7M9 3l2 2-2 2 M12 4v7H5M7 13l-2-2 2-2',
+  reply_count: 'M2.5 3.5h11v7h-6l-3.5 3v-3h-1.5Z',
+  quote_count: 'M3 4.5h4v4H5c0 1.5.7 2.5 2 3 M9 4.5h4v4h-2c0 1.5.7 2.5 2 3',
+  bookmark_count: 'M4 2.5h8v11l-4-3-4 3Z',
+};
+
+function metricIcon(k) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = document.createElementNS(NS, 'svg');
+  svgEl.setAttribute('viewBox', '0 0 16 16');
+  svgEl.setAttribute('aria-hidden', 'true');
+  svgEl.setAttribute('focusable', 'false');
+  svgEl.setAttribute('class', 'mi');
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('d', METRIC_ICONS[k]);
+  svgEl.append(path);
+  return svgEl;
+}
+
+/** 数値 6 種を 1 行に（アイコン＋値。ラベルはスクリーンリーダー用と title） */
 function metricsList(p) {
   const ul = el('ul', 'metrics');
   ul.setAttribute('aria-label', '指標');
   for (const k of METRIC_KEYS) {
     const v = p.metrics[k];
     const item = el('li');
-    item.append(el('span', null, METRIC_LABELS[k]));
+    item.title = `${METRIC_LABELS[k]} ${v == null ? '不明' : formatExact(v)}`;
+    item.append(metricIcon(k), el('span', 'sr-only', METRIC_LABELS[k]));
     const val = el('span', v == null ? 'v unk' : 'v', formatCompact(v));
-    val.title = v == null ? '値なし（不明）' : formatExact(v);
     item.append(val);
     ul.append(item);
   }
@@ -676,12 +741,14 @@ function postCard(p) {
 /** カード表示 */
 function postPlainCard(p) {
   const li = el('li', 'card post');
-  const parts = [postHead(p), postCats(p), postBody(p)];
+  const parts = [postTop(p), ...postBodyWithToggle(p)];
   const media = renderMedia(p.media, p.url);
   if (media) parts.push(media);
+  // 伸びペース＋数値（左）とボタン（右）を 1 つの行に。幅が足りなければボタンだけ折り返す
+  const stats = el('div', 'post-stats');
+  stats.append(paceLine(p), metricsList(p));
   const foot = el('div', 'post-foot');
-  foot.append(metricsList(p));
-  parts.push(paceLine(p));
+  foot.append(stats);
   const actions = el('div', 'post-actions');
   const id = embedTweetId(p);
   let slot = null;
@@ -723,7 +790,8 @@ function postEmbedCard(p) {
   const head = postHead(p);
   const x = openXLink(p);
   if (x) head.append(x);
-  band.append(head, postCats(p), metricsList(p), paceLine(p));
+  head.append(postCats(p));
+  band.append(head, paceLine(p), metricsList(p));
   if (p.matched_terms.length) {
     const t = el('p', 'terms');
     t.append(el('span', 'muted', '根拠語: '));
@@ -737,7 +805,7 @@ function postEmbedCard(p) {
   const id = embedTweetId(p);
   const fallback = (err) => {
     const box = el('div', 'embed-fallback');
-    box.append(embedFailNote(err), postBody(p));
+    box.append(embedFailNote(err), ...postBodyWithToggle(p));
     const media = renderMedia(p.media, p.url);
     if (media) box.append(media);
     host.replaceWith(box);
@@ -751,7 +819,35 @@ function postEmbedCard(p) {
 
 // ---------------------------------------------------------------- レポート（reports.json）
 
+/** レポートの最新キー（デイリーの date と週の key） */
+function latestReportKeys() {
+  if (!app.reports) return null;
+  return { d: app.reports.daily[0] ? app.reports.daily[0].date : '', w: app.reports.weekly[0] ? app.reports.weekly[0].key : '' };
+}
+
+function readSeen() {
+  try { const v = JSON.parse(storageGet(SEEN_KEY) || 'null'); return v && typeof v === 'object' ? v : null; } catch { return null; }
+}
+
+/** 前回見たものより新しいレポートがあれば「NEW」バッジ */
+function updateNewBadge() {
+  const latest = latestReportKeys();
+  const seen = readSeen() || { d: '', w: '' };
+  const isNew = !!latest && ((latest.d && latest.d > String(seen.d || '')) || (latest.w && latest.w > String(seen.w || '')));
+  $('new-badge').hidden = !isNew;
+  $('panel-toggle').setAttribute('aria-label', `詳細・レポート・グラフ${isNew ? '（新しいレポートあり）' : ''}`);
+}
+
+function markReportsSeen() {
+  const latest = latestReportKeys();
+  if (!latest) return;
+  storageSet(SEEN_KEY, JSON.stringify(latest));
+  $('new-badge').hidden = true;
+  $('panel-toggle').setAttribute('aria-label', '詳細・レポート・グラフ');
+}
+
 function setupReports() {
+  updateNewBadge();
   const box = $('report');
   if (!app.reports) { box.hidden = true; return; }
   box.hidden = false;
@@ -1018,7 +1114,7 @@ async function main() {
     renderHeader(loaded);
     buildControls();
     setupReports();
-    app.state = sanitizeState(parseState(location.hash, storageGet(VIEW_KEY)));
+    app.state = sanitizeState(parseState(location.hash, storageGet(VIEW_KEY), storageGet(PANEL_KEY) === '1'));
     writeUrl(false); // 保存済みの表示切替を URL にも反映
     $('loading').hidden = true;
     $('app').hidden = false;

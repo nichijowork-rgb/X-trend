@@ -311,7 +311,7 @@ export const VIEWS = [
 
 export const DEFAULT_STATE = Object.freeze({
   cats: [], period: 'all', user: '', q: '', watched: false, sort: 'new', acct: 'posts', view: 'card',
-  rdate: '', rweek: '', rclosed: [],
+  rdate: '', rweek: '', rclosed: [], panel: false,
 });
 
 /** レポート欄の開閉キー（rclosed に入っているものは閉じている） */
@@ -687,6 +687,7 @@ export function serializeState(state) {
   if (st.rdate) sp.set('rdate', st.rdate);
   if (st.rweek) sp.set('rweek', st.rweek);
   for (const k of REPORT_SECTIONS) if (st.rclosed.includes(k)) sp.append('rc', k);
+  if (st.panel) sp.set('panel', '1');
   return sp.toString();
 }
 
@@ -694,7 +695,7 @@ export function serializeState(state) {
  * クエリ文字列（先頭の # / ? 可）→ 状態。不正値は既定値。
  * fallbackView: URL に view が無いときに使う値（localStorage の保存値など）
  */
-export function parseState(str, fallbackView = null) {
+export function parseState(str, fallbackView = null, fallbackPanel = null) {
   const sp = new URLSearchParams(String(str || '').replace(/^[#?]/, ''));
   const period = sp.get('period');
   const sort = sp.get('sort');
@@ -713,6 +714,7 @@ export function parseState(str, fallbackView = null) {
     rdate: DATE_RE.test(sp.get('rdate') || '') ? sp.get('rdate') : '',
     rweek: WEEK_RE.test(sp.get('rweek') || '') ? sp.get('rweek') : '',
     rclosed: REPORT_SECTIONS.filter((k) => sp.getAll('rc').includes(k)),
+    panel: sp.has('panel') ? sp.get('panel') === '1' : fallbackPanel === true,
   };
 }
 
@@ -907,7 +909,9 @@ export function embedTweetId(post) {
 /**
  * 既知カテゴリは固定スロット、未知カテゴリは名前のハッシュで予備スロットへ（決定的）。
  * スロット番号は CSS 変数 --cat-N に対応（dashboard.css 参照）。0 は「その他」用のニュートラル。
- * パレットは dataviz の検証済み 8 色（隣接 CVD ΔE≥8）を使用。
+ * パレットは dataviz の検証済み 8 色から、アクセントの赤と紛れる赤・マゼンタを既知カテゴリに使わない並び
+ * （紫・黄・アクア・青・緑。隣接 CVD ΔE≥8／通常視 ΔE≥15 をライト・ダーク両方で検証済み）。
+ * 予備（未知カテゴリ）はオレンジ・ピンク。必ずラベルを併記するので色だけには頼らない。
  */
 export const KNOWN_CATEGORY_SLOTS = Object.freeze({
   'ホスト': 1,
@@ -918,7 +922,7 @@ export const KNOWN_CATEGORY_SLOTS = Object.freeze({
   'その他': 0,
 });
 
-export const SPARE_SLOTS = Object.freeze([6, 7, 8]);
+export const SPARE_SLOTS = Object.freeze([6, 7]);
 
 /** FNV-1a 32bit */
 export function hashString(s) {

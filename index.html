@@ -9,9 +9,11 @@
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0a0712" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f6f4fb" media="(prefers-color-scheme: light)">
   <title>Xレポート ダッシュボード</title>
   <meta name="description" content="X の夜職・歌舞伎町まわりの投稿をカテゴリ別に閲覧する静的ダッシュボード">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0712'/%3E%3Cpath d='M8 22l5-7 4 4 7-10' fill='none' stroke='%23ff4fae' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0712'/%3E%3Cpath d='M8 22l5-7 4 4 7-10' fill='none' stroke='%23ff3b4e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/dashboard.css">
   <script src="assets/js/theme-init.js"></script>
   <script type="module" src="assets/dashboard.js"></script>
@@ -27,13 +29,12 @@
   <header class="site-header">
     <div class="wrap header-inner">
       <div class="brand">
-        <h1 class="title"><span class="title-neon">Xレポート</span> ダッシュボード</h1>
-        <dl class="meta">
-          <div><dt>最終更新</dt><dd id="meta-generated">—</dd></div>
-          <div><dt>次回更新</dt><dd id="meta-next">—</dd></div>
-          <div><dt>データ期間</dt><dd id="meta-period">—</dd></div>
-          <div><dt>基準</dt><dd id="meta-ref">—</dd></div>
-        </dl>
+        <h1 class="title"><span class="title-neon">Xレポート</span></h1>
+        <p class="meta-line">
+          <span>最終更新 <strong id="meta-generated">—</strong></span>
+          <span class="sep" aria-hidden="true">・</span>
+          <span>次回 <span id="meta-next">—</span></span>
+        </p>
         <p class="delay-note" id="meta-delay" role="status" hidden>更新が遅れている可能性があります</p>
       </div>
       <button type="button" id="theme-toggle" class="btn btn-ghost theme-toggle" aria-label="表示テーマを切り替え">
@@ -52,33 +53,89 @@
     </section>
 
     <div id="app" hidden>
-      <!-- サマリー -->
-      <section class="cards" aria-labelledby="summary-heading">
-        <h2 id="summary-heading" class="sr-only">サマリー</h2>
-        <article class="card stat">
-          <h3 class="stat-label">総投稿数</h3>
-          <p class="stat-value" id="stat-posts">—</p>
-          <p class="stat-sub" id="stat-posts-sub"></p>
-        </article>
-        <article class="card stat">
-          <h3 class="stat-label">アカウント数</h3>
-          <p class="stat-value" id="stat-accounts">—</p>
-          <p class="stat-sub" id="stat-accounts-sub"></p>
-        </article>
-        <article class="card stat">
-          <h3 class="stat-label">合計インプレッション</h3>
-          <p class="stat-value" id="stat-imp">—</p>
-          <p class="stat-sub" id="stat-imp-sub"></p>
-        </article>
-        <article class="card stat stat-top">
-          <h3 class="stat-label">最大インプレッションの投稿</h3>
-          <div id="stat-top"></div>
-        </article>
+      <!-- 最大インプレッションの投稿（常時表示） -->
+      <section class="card top-card" aria-labelledby="top-heading">
+        <h2 id="top-heading" class="top-label">最大インプレッションの投稿</h2>
+        <div id="stat-top"></div>
       </section>
-      <p class="source-note muted" id="source-note"></p>
 
-      <!-- レポート（data/reports.json・任意。無ければ非表示） -->
-      <details class="card report" id="report" open hidden>
+      <!-- ツールバー（常時表示） -->
+      <section class="card toolbar" aria-labelledby="filter-heading">
+        <h2 id="filter-heading" class="sr-only">絞り込み・並び替え</h2>
+        <div class="chips" id="cat-chips" role="group" aria-label="カテゴリで絞り込み（複数選択でOR）"></div>
+        <div class="toolbar-row">
+          <div class="segmented" id="period-group" role="group" aria-label="期間"></div>
+          <label class="sr-only" for="sort">並び替え</label>
+          <select id="sort" class="input input-sm" title="並び替え"></select>
+          <div class="segmented" id="view-group" role="group" aria-label="表示"></div>
+          <button type="button" id="panel-toggle" class="btn panel-toggle" aria-expanded="false" aria-controls="panel">
+            <span class="pt-long">詳細・レポート・グラフ</span><span class="pt-short" aria-hidden="true">詳細</span><span class="new-badge" id="new-badge" hidden>NEW</span>
+          </button>
+        </div>
+        <div class="toolbar-foot">
+          <p class="result-count" id="result-count" aria-live="polite"></p>
+          <div id="active-filters" class="active-filters"></div>
+        </div>
+        <p class="embed-notice" id="embed-notice" hidden>
+          <span>埋め込み表示はXのサーバーから読み込みます（X側のCookie等が使われる場合があります）</span>
+          <button type="button" class="notice-close" id="embed-notice-close" aria-label="この注記を閉じる">×</button>
+        </p>
+      </section>
+
+      <!-- 詳細パネル（既定は閉じる） -->
+      <section class="panel" id="panel" aria-label="詳細・レポート・グラフ" hidden>
+        <section class="card panel-sec search-sec" aria-labelledby="search-heading">
+          <h2 id="search-heading" class="section-title">検索・絞り込み</h2>
+          <div class="filter-grid">
+            <div class="field">
+              <label class="filter-label" for="q">キーワード<span class="hint">（スペース区切りでAND）</span></label>
+              <input id="q" class="input" type="search" inputmode="search" autocomplete="off" placeholder="例: 指名 歌舞伎町">
+            </div>
+            <div class="field">
+              <label class="filter-label" for="user">アカウント</label>
+              <input id="user" class="input" type="search" list="user-list" autocomplete="off" placeholder="ユーザー名（@なし）" spellcheck="false">
+              <datalist id="user-list"></datalist>
+            </div>
+            <div class="field field-check">
+              <label class="check">
+                <input id="watched" type="checkbox">
+                <span>監視アカウントのみ</span>
+              </label>
+            </div>
+            <div class="field field-reset">
+              <button type="button" id="reset" class="btn btn-ghost">条件をクリア</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card panel-sec" aria-labelledby="summary-heading">
+          <h2 id="summary-heading" class="section-title">サマリー</h2>
+          <div class="cards">
+            <article class="stat">
+              <h3 class="stat-label">総投稿数</h3>
+              <p class="stat-value" id="stat-posts">—</p>
+              <p class="stat-sub" id="stat-posts-sub"></p>
+            </article>
+            <article class="stat">
+              <h3 class="stat-label">アカウント数</h3>
+              <p class="stat-value" id="stat-accounts">—</p>
+              <p class="stat-sub" id="stat-accounts-sub"></p>
+            </article>
+            <article class="stat">
+              <h3 class="stat-label">合計インプレッション</h3>
+              <p class="stat-value" id="stat-imp">—</p>
+              <p class="stat-sub" id="stat-imp-sub"></p>
+            </article>
+          </div>
+          <dl class="meta">
+            <div><dt>データ期間</dt><dd id="meta-period">—</dd></div>
+            <div><dt>基準</dt><dd id="meta-ref">—</dd></div>
+          </dl>
+          <p class="source-note muted" id="source-note"></p>
+        </section>
+
+        <!-- レポート（data/reports.json・任意。無ければ非表示） -->
+        <details class="card report panel-sec" id="report" open hidden>
         <summary>
           <h2 class="report-title"><span class="neon">レポート</span></h2>
           <span class="report-meta" id="report-meta"></span>
@@ -101,59 +158,9 @@
         </div>
       </details>
 
-      <!-- フィルタ -->
-      <section class="card filters" aria-labelledby="filter-heading">
-        <div class="filters-head">
-          <h2 id="filter-heading" class="section-title">絞り込み</h2>
-          <p class="result-count" id="result-count" aria-live="polite"></p>
-        </div>
-
-        <div class="filter-row">
-          <span class="filter-label" id="cat-label">カテゴリ<span class="hint">（複数選択でOR）</span></span>
-          <div class="chips" id="cat-chips" role="group" aria-labelledby="cat-label"></div>
-        </div>
-
-        <div class="filter-grid">
-          <div class="field">
-            <span class="filter-label" id="period-label">期間</span>
-            <div class="segmented" id="period-group" role="group" aria-labelledby="period-label"></div>
-          </div>
-          <div class="field">
-            <label class="filter-label" for="q">キーワード<span class="hint">（スペース区切りでAND）</span></label>
-            <input id="q" class="input" type="search" inputmode="search" autocomplete="off" placeholder="例: 指名 歌舞伎町">
-          </div>
-          <div class="field">
-            <label class="filter-label" for="user">アカウント</label>
-            <input id="user" class="input" type="search" list="user-list" autocomplete="off" placeholder="ユーザー名（@なし）" spellcheck="false">
-            <datalist id="user-list"></datalist>
-          </div>
-          <div class="field">
-            <label class="filter-label" for="sort">並び替え</label>
-            <select id="sort" class="input"></select>
-          </div>
-          <div class="field">
-            <span class="filter-label" id="view-label">表示</span>
-            <div class="segmented" id="view-group" role="group" aria-labelledby="view-label"></div>
-          </div>
-          <div class="field field-check">
-            <label class="check">
-              <input id="watched" type="checkbox">
-              <span>監視アカウントのみ</span>
-            </label>
-          </div>
-          <div class="field field-reset">
-            <button type="button" id="reset" class="btn btn-ghost">条件をクリア</button>
-          </div>
-        </div>
-        <p class="embed-notice" id="embed-notice" hidden>
-          <span>埋め込み表示はXのサーバーから読み込みます（X側のCookie等が使われる場合があります）</span>
-          <button type="button" class="notice-close" id="embed-notice-close" aria-label="この注記を閉じる">×</button>
-        </p>
-      </section>
-
       <!-- グラフ -->
-      <section class="charts" aria-labelledby="charts-heading">
-        <h2 id="charts-heading" class="sr-only">グラフ</h2>
+      <section class="charts panel-sec" aria-labelledby="charts-heading">
+        <h2 id="charts-heading" class="section-title">グラフ</h2>
         <article class="card chart-card">
           <h3 class="chart-title">カテゴリ別の件数</h3>
           <p class="chart-sub muted">複数カテゴリの投稿は各カテゴリに計上</p>
@@ -176,9 +183,7 @@
         </article>
       </section>
 
-      <!-- 一覧 -->
-      <div class="lower">
-        <section class="card accounts" aria-labelledby="acc-heading">
+        <section class="card accounts panel-sec" aria-labelledby="acc-heading">
           <div class="section-head">
             <h2 id="acc-heading" class="section-title">上位アカウント</h2>
             <div class="segmented segmented-sm" id="acct-group" role="group" aria-label="上位アカウントの並び順"></div>
@@ -186,22 +191,22 @@
           <p class="muted small">クリックでそのアカウントに絞り込み</p>
           <ol class="acc-list" id="acc-list"></ol>
         </section>
+      </section>
 
-        <section class="posts" aria-labelledby="posts-heading">
-          <div class="section-head">
-            <h2 id="posts-heading" class="section-title" tabindex="-1">投稿</h2>
-            <p class="muted small" id="posts-count"></p>
-          </div>
-          <p class="pace-note small" id="pace-note" hidden></p>
-          <div id="active-filters" class="active-filters"></div>
-          <ol class="post-list" id="post-list"></ol>
-          <p class="empty" id="posts-empty" hidden>条件に合う投稿はありません</p>
-          <div class="more-wrap">
-            <button type="button" id="more" class="btn btn-ghost" hidden>さらに表示</button>
-            <div id="sentinel" aria-hidden="true"></div>
-          </div>
-        </section>
-      </div>
+      <!-- 投稿一覧（常時表示） -->
+      <section class="posts" aria-labelledby="posts-heading">
+        <div class="section-head">
+          <h2 id="posts-heading" class="section-title" tabindex="-1">投稿</h2>
+          <p class="muted small" id="posts-count"></p>
+        </div>
+        <p class="pace-note small" id="pace-note" hidden></p>
+        <ol class="post-list" id="post-list"></ol>
+        <p class="empty" id="posts-empty" hidden>条件に合う投稿はありません</p>
+        <div class="more-wrap">
+          <button type="button" id="more" class="btn btn-ghost" hidden>さらに表示</button>
+          <div id="sentinel" aria-hidden="true"></div>
+        </div>
+      </section>
     </div>
   </main>
 

@@ -196,6 +196,11 @@ special(14, { metrics: {} });
 delete posts[17].metrics; // metrics 自体なし
 for (let i = 30; i < COUNT; i += 97) posts[i].metrics.impression_count = null;
 for (let i = 45; i < COUNT; i += 131) delete posts[i].metrics.bookmark_count;
+// 長文（「続きを読む」の折りたたみ確認用。ハイライト語とリンクを末尾付近にも含める）
+special(21, {
+  text: '【サンプル】長文の投稿です。' + '歌舞伎町の夜の様子を細かく書いた架空のレポート。'.repeat(6) + '\n\n2行目以降も続きます。\n3行目。\n4行目。\n5行目：最後に指名の話題と ' + 'https://t.co/LongSample1',
+  matched_terms: ['歌舞伎町', '指名'],
+});
 // created_jst が null（ts から表示）
 special(20, { created_jst: null });
 // 数値表記確認用

@@ -262,13 +262,16 @@ test('highlightSegments: 大文字小文字無視・長い語優先・重なり�
 
 test('serializeState / parseState: 往復で一致し、既定値は省略', () => {
   assert.equal(serializeState(DEFAULT_STATE), '');
-  const st = { cats: ['ホスト', 'テスト,カンマ'], period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'] };
+  const st = { cats: ['ホスト', 'テスト,カンマ'], period: '7d', user: 'sample_a', q: '指名 歌舞伎町', watched: true, sort: 'imp', acct: 'imp', view: 'embed', rdate: '2026-10-12', rweek: '2026-10-10_2026-10-17', rclosed: ['daily', 'weekly'], panel: true };
   const s = serializeState(st);
   assert.deepEqual(parseState('#' + s), st);
   assert.deepEqual(parseState('?' + s), st);
   assert.deepEqual(parseState('period=xx&sort=yy&view=zz'), { ...DEFAULT_STATE, cats: [] });
   assert.equal(parseState('', 'embed').view, 'embed'); // URL に無ければ保存値
   assert.equal(parseState('view=card', 'embed').view, 'card'); // URL が優先
+  assert.equal(parseState('', null, true).panel, true); // 詳細パネル: URL に無ければ保存値
+  assert.equal(parseState('panel=0', null, true).panel, false);
+  assert.equal(isFilterActive({ panel: true }), false);
   assert.equal(isFilterActive(DEFAULT_STATE), false);
   assert.equal(isFilterActive({ view: 'embed' }), false); // 表示切替は絞り込みではない
   assert.equal(isFilterActive({ q: '  ' }), false);
@@ -278,6 +281,8 @@ test('serializeState / parseState: 往復で一致し、既定値は省略', () 
 // ---------------------------------------------------------------- カテゴリ色
 
 test('categorySlot: 既知は固定、未知はハッシュで決定的に予備スロットへ', () => {
+  // アクセントの赤と紛れないよう、既知カテゴリは赤・ピンク系スロット（6=オレンジ, 7=ピンク）を使わない
+  for (const slot of Object.values(KNOWN_CATEGORY_SLOTS)) assert.ok(!SPARE_SLOTS.includes(slot));
   for (const [name, slot] of Object.entries(KNOWN_CATEGORY_SLOTS)) assert.equal(categorySlot(name), slot);
   const a = categorySlot('テスト新カテゴリ');
   assert.ok(SPARE_SLOTS.includes(a));
