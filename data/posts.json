@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T00:17:51+09:00",
+ "generated_at": "2026-10-12T00:32:31+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -10,6 +10,200 @@
   "その他"
  ],
  "posts": [
+  {
+   "id": "2109289637076422662",
+   "url": "https://x.com/SAK_SAK_SAKUMA/status/2109289637076422662",
+   "user": "SAK_SAK_SAKUMA",
+   "created_utc": "2026-10-11T14:26:52Z",
+   "created_jst": "2026-10-11T23:26:52+09:00",
+   "ts": 1791728812,
+   "metrics": {
+    "impression_count": 167411,
+    "like_count": 17756,
+    "retweet_count": null,
+    "reply_count": 662,
+    "quote_count": 216,
+    "bookmark_count": 508
+   },
+   "text": "パパの膝の上でくつろいでるツナくん https://t.co/FJFEBDfkRu",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWzsFMaYAA9WGl.jpg",
+     "width": 1536,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWzsFLasAAkVwZ.jpg",
+     "width": 2048,
+     "height": 1372
+    }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
+   ],
+   "below_threshold": true
+  },
+  {
+   "id": "2109286282954461418",
+   "url": "https://x.com/SAK_SAK_SAKUMA/status/2109286282954461418",
+   "user": "SAK_SAK_SAKUMA",
+   "created_utc": "2026-10-11T14:13:33Z",
+   "created_jst": "2026-10-11T23:13:33+09:00",
+   "ts": 1791728013,
+   "metrics": {
+    "impression_count": 221035,
+    "like_count": 18615,
+    "retweet_count": null,
+    "reply_count": 1005,
+    "quote_count": 395,
+    "bookmark_count": 435
+   },
+   "text": "初めてのホルモンカレー作り。\n成功！\n\n#佐久間のドタバタクッキング https://t.co/L7H4WNSsZj",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWwmsvaYAA7hQc.jpg",
+     "width": 1536,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWwmslaoAA0XBB.jpg",
+     "width": 2048,
+     "height": 1536
+    }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
+   ],
+   "below_threshold": true
+  },
+  {
+   "id": "2109285178187428069",
+   "url": "https://x.com/sora__ra00/status/2109285178187428069",
+   "user": "sora__ra00",
+   "created_utc": "2026-10-11T14:09:09Z",
+   "created_jst": "2026-10-11T23:09:09+09:00",
+   "ts": 1791727749,
+   "metrics": {
+    "impression_count": 232252,
+    "like_count": 7429,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 46,
+    "bookmark_count": 656
+   },
+   "text": "和田さん登場🥲🥲🥲\n認知されてて喜ぶ山本しぬWWWWWWW\n\n#VIVANT #悪役会議室 https://t.co/xkjHzzumKB",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109285152451080192/img/NhkHvRcNK-SENaKA.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109285152451080192/vid/avc1/480x270/fpYQOu2t7j4v0Md_.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109285152451080192/vid/avc1/640x360/USuWNZDPnLSaBSVl.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109285152451080192/vid/avc1/886x498/wmoHigE-2cf7U5FR.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109285152451080192/pl/-QeZZ4X_qg_ChnOs.m3u8?v=f0b"
+      }
+     ],
+     "width": 886,
+     "height": 498
+    }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
+   ],
+   "below_threshold": true
+  },
+  {
+   "id": "2109281328554467587",
+   "url": "https://x.com/GoalJP_Official/status/2109281328554467587",
+   "user": "GoalJP_Official",
+   "created_utc": "2026-10-11T13:53:51Z",
+   "created_jst": "2026-10-11T22:53:51+09:00",
+   "ts": 1791726831,
+   "metrics": {
+    "impression_count": 154756,
+    "like_count": 3180,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 16,
+    "bookmark_count": 88
+   },
+   "text": "🇯🇵 鎌田大地に待望のプレミア初ゴール！⚽\n\nノッティンガム・フォレスト戦の41分、日本代表 MF 鎌田大地のゴールでクリスタル・パレスが同点に追いつく！\n\nゴール前で細かくパスをつなぐと、最後は鎌田が左足で上手く押し込みネットを揺らした！\n\n🎥：@UNEXT_football https://t.co/EpzA5iGe0i",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/media/HUWrw1ZWkAABUjZ.jpg",
+     "variants": [
+      {
+       "bit_rate": 288000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109280858368516096/vid/avc1/480x270/UX3pkbjw3mE_YxnT.mp4?tag=14"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109280858368516096/vid/avc1/640x360/0VS4BYQlJg6Gqg9m.mp4?tag=14"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109280858368516096/vid/avc1/1280x720/_7DMMgilWWIM8NG2.mp4?tag=14"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109280858368516096/pl/EwpIUpLUjGDEFZ9a.m3u8?tag=14&v=d91"
+      }
+     ],
+     "width": 1920,
+     "height": 1080
+    }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
+   ],
+   "below_threshold": true
+  },
   {
    "id": "2109280936441282798",
    "url": "https://x.com/UNEXT_football/status/2109280936441282798",
@@ -219,6 +413,10 @@
      "width": 1920,
      "height": 1080
     }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
    ]
   },
   {
@@ -595,7 +793,11 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "in_reports": true,
+   "report_refs": [
+    "rising"
+   ]
   },
   {
    "id": "2109246677232324705",
@@ -625,6 +827,10 @@
      "width": 1200,
      "height": 906
     }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
    ]
   },
   {
@@ -655,6 +861,10 @@
      "width": 1536,
      "height": 2048
     }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
    ]
   },
   {
@@ -685,6 +895,10 @@
      "width": 1199,
      "height": 742
     }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
    ]
   },
   {
@@ -1051,6 +1265,10 @@
      "width": 1125,
      "height": 411
     }
+   ],
+   "in_reports": true,
+   "report_refs": [
+    "rising"
    ]
   },
   {

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T00:08:13+09:00",
+ "generated_at": "2026-10-12T00:32:31+09:00",
  "daily": [
   {
    "date": "2026-10-11",
@@ -75,6 +75,7 @@
      "condition_label": "投稿から6時間以内で30万表示以上"
     }
    ],
+   "rising_watch": [],
    "review": [],
    "hit_rate": []
   }
