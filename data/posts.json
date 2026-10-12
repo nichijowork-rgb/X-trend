@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T06:45:21+09:00",
+ "generated_at": "2026-10-12T19:16:08+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -10,6 +10,39 @@
   "その他"
  ],
  "posts": [
+  {
+   "id": "2109481126347882529",
+   "url": "https://x.com/bakusokuhochan/status/2109481126347882529",
+   "user": "bakusokuhochan",
+   "created_utc": "2026-10-12T03:07:47Z",
+   "created_jst": "2026-10-12T12:07:47+09:00",
+   "ts": 1791774467,
+   "metrics": {
+    "impression_count": 156303,
+    "like_count": 449,
+    "retweet_count": 51,
+    "reply_count": 29,
+    "quote_count": 7,
+    "bookmark_count": 87
+   },
+   "text": "平良翔太退店で話題のエルコレを舞台にした物語\n\n【山本裕典、ホストになる。】\n\n最初はただのホスト体験企画だったのに、気づけば毎回クセの強すぎるホストたちと大乱闘🔥\n\n歴代の因縁ホストを振り返ると…\n\n① Lillion → 軍神（心湊一希）\n② GO → 大阪ホスト軍団\n③ LiTA → 爆撃竜馬・JIN\n④ https://t.co/JOXOYUvXMB",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "平良翔太",
+    "平良 ホスト",
+    "エルコレ",
+    "topic:平良翔太さんの退店・引退"
+   ],
+   "is_watched": false,
+   "in_reports": true,
+   "report_refs": [
+    "rising_watch"
+   ],
+   "below_threshold": true
+  },
   {
    "id": "2109315682173427863",
    "url": "https://x.com/tkzwgrs/status/2109315682173427863",
