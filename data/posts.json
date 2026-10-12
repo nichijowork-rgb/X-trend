@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-13T00:24:48+09:00",
+ "generated_at": "2026-10-13T00:29:49+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -1281,7 +1281,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109255816838815744/img/_uNoW0meJbi9zGqz.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109255816838815744/vid/avc1/488x270/4dmDrDjwz8WOp7uo.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109255816838815744/vid/avc1/650x360/_IqQQtWNJdxxLSI7.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109255816838815744/vid/avc1/1206x666/2QxPKU1OJJsnVTj1.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109255816838815744/pl/c4vWkgrHcoNBeISl.m3u8"
+      }
+     ],
+     "width": 1206,
+     "height": 666
+    }
+   ]
   },
   {
    "id": "2109252832599904576",
@@ -1400,7 +1429,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWCVH8aUAA4Brx.jpg",
+     "width": 1158,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWCVH_bEAAoUNu.jpg",
+     "width": 1158,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWCVHyboAAX9cH.jpg",
+     "width": 1154,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUWCVHxaUAApSh1.jpg",
+     "width": 1158,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2109228263436366136",
@@ -1527,7 +1582,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109219773695619073/img/xXYOvnmqdPDaUs6z.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109219773695619073/vid/avc1/320x426/1L2sHvA9XtG9L0M0.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109219773695619073/vid/avc1/480x640/1Xm06-o-UC56yrYJ.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109219773695619073/vid/avc1/720x960/T1X-QvNiY4UJFok0.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109219773695619073/pl/poFsJl8HhzJh8nhS.m3u8?v=cfc"
+      }
+     ],
+     "width": 720,
+     "height": 960
+    }
+   ]
   },
   {
    "id": "2109217785901715681",
@@ -1549,7 +1633,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109217741018370048/img/n4WAv_ILAQeI5B5O.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109217741018370048/vid/avc1/480x270/Jl5K8DtJxW7FI8XX.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109217741018370048/vid/avc1/640x360/GNgcXe6Ms4n8AoZE.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109217741018370048/vid/avc1/1280x720/EcskzmH3NbgYknou.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109217741018370048/pl/90UKtrQl4Kks72HT.m3u8"
+      }
+     ],
+     "width": 1280,
+     "height": 720
+    }
+   ]
   },
   {
    "id": "2109214523215446179",
@@ -1704,7 +1817,63 @@
    "matched_terms": [
     "トー横"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109191926801121280/img/FJU3bP1TjFlFuDF4.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109191926801121280/vid/avc1/320x568/ILqAUt50MxYUG_3P.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109191926801121280/vid/avc1/480x852/sWo4Fc6-xYA9wqqH.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109191926801121280/vid/avc1/720x1280/Ue_1N07N0x8yYGz_.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109191926801121280/pl/JY69E7qQyZceYn-c.m3u8"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109191926792798208/img/ruASTnBgomY_LMY_.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109191926792798208/vid/avc1/320x568/tAXH4CN8uOOlJeBj.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109191926792798208/vid/avc1/480x852/78qLIrAI7Ta4a5--.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109191926792798208/vid/avc1/720x1280/ru-0K7MLQM07Ccqr.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109191926792798208/pl/GXd59yVsVwbFrviF.m3u8"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2109189955344093598",
@@ -2269,7 +2438,27 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUO_LweaMAA8BHi.jpg",
+     "width": 1169,
+     "height": 1624
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUO_MZ2bAAAYYlQ.jpg",
+     "width": 1169,
+     "height": 1560
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUO_NDzbYAAzx7d.jpg",
+     "width": 1170,
+     "height": 1470
+    }
+   ]
   },
   {
    "id": "2109161984919023737",
@@ -2800,7 +2989,15 @@
     "キャバ嬢",
     "キャバ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUUReOTaAAAjDEv.jpg",
+     "width": 1448,
+     "height": 1086
+    }
+   ]
   },
   {
    "id": "2109105817635131791",
@@ -3414,7 +3611,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109051712216739840/img/ljZfhRwQUbxNAHix.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109051712216739840/vid/avc1/488x270/zFM3L8VFQx6rEsbm.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109051712216739840/vid/avc1/650x360/qUs1QCUbL_CXycXf.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109051712216739840/vid/avc1/886x490/MYyb3dt_Lp5TWuAV.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109051712216739840/pl/piUGw4EH_7HBAq6E.m3u8"
+      }
+     ],
+     "width": 886,
+     "height": 490
+    }
+   ]
   },
   {
    "id": "2109049430574034964",
@@ -4704,7 +4930,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HURS_bKbIAAuj8j.jpg",
+     "width": 786,
+     "height": 470
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HURS_a8bAAAhW_X.jpg",
+     "width": 786,
+     "height": 1402
+    }
+   ]
   },
   {
    "id": "2108900111782994317",
@@ -5042,7 +5282,41 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2108877485370990592/img/yDV1vpbStztAHl7I.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108877485370990592/vid/avc1/320x568/KjqNwzLsHN3huz-I.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108877485370990592/vid/avc1/1080x1920/SrVnYrgCUNpKpFRn.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108877485370990592/vid/avc1/480x852/GOgVlSzHaTDj17Aw.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108877485370990592/vid/avc1/720x1280/K9YFbQa9khPZDtCi.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2108877485370990592/pl/17zk_3Vp8QHCJVbz.m3u8"
+      }
+     ],
+     "width": 1080,
+     "height": 1920
+    }
+   ]
   },
   {
    "id": "2108877462105137385",
@@ -5509,7 +5783,36 @@
     "ホスト",
     "ホストコール"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2108834084445380608/img/ZeDu9GuTB66NnMv8.jpg",
+     "variants": [
+      {
+       "bit_rate": 288000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108834084445380608/vid/avc1/480x270/KCvhSGH6Xn6lF1QT.mp4?tag=14"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108834084445380608/vid/avc1/640x360/7XclXiEKtKQQVoRC.mp4?tag=14"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108834084445380608/vid/avc1/1280x720/l85Snoh51HLmYvxx.mp4?tag=14"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2108834084445380608/pl/8DmkPgq3lLawxe1k.m3u8?tag=14&v=f34"
+      }
+     ],
+     "width": 1920,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2108832343087849579",
@@ -5721,7 +6024,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUQIPBkbEAANtui.jpg",
+     "width": 1206,
+     "height": 1383
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUQIPBhbYAACxji.jpg",
+     "width": 1206,
+     "height": 1595
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUQIPBgaUAAKS4D.jpg",
+     "width": 1206,
+     "height": 686
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUQIPBfbYAAws0v.jpg",
+     "width": 1206,
+     "height": 1232
+    }
+   ]
   },
   {
    "id": "2108819058443649451",
@@ -5814,7 +6143,15 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUP4vzWaEAAtTuF.jpg",
+     "width": 1125,
+     "height": 407
+    }
+   ]
   },
   {
    "id": "2108799691118747704",
@@ -5909,7 +6246,21 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUPsiLsbQAA4Vg-.jpg",
+     "width": 1125,
+     "height": 1798
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUPsiLtakAA61v-.jpg",
+     "width": 1125,
+     "height": 2011
+    }
+   ]
   },
   {
    "id": "2108774165620883505",
@@ -6006,7 +6357,21 @@
    "matched_terms": [
     "夜職"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUPO2fUa4AA2WMd.jpg",
+     "width": 1152,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUPO2fVb0AAr28K.jpg",
+     "width": 1152,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2108756112573083798",
@@ -6050,7 +6415,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUPDKs8b0AAe1po.jpg",
+     "width": 745,
+     "height": 1067
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUPDKsybUAAYaPM.jpg",
+     "width": 1206,
+     "height": 735
+    }
+   ]
   },
   {
    "id": "2108740845331747137",
@@ -6119,7 +6498,21 @@
     "quote:ホスト",
     "quote:ホストコール"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUOvUOibUAATFd_.jpg",
+     "width": 1206,
+     "height": 1222
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUOvUOhaQAAmC8Q.jpg",
+     "width": 1206,
+     "height": 1049
+    }
+   ]
   },
   {
    "id": "2108719776403194174",
@@ -6552,7 +6945,15 @@
    "matched_terms": [
     "キャバ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUNGdf4bAAAwT42.jpg",
+     "width": 567,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2108600387964129436",
@@ -6949,7 +7350,15 @@
     "ホスト",
     "ホストコール"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HULuwKSaYAArW09.jpg",
+     "width": 1126,
+     "height": 1453
+    }
+   ]
   },
   {
    "id": "2108502816394502153",
@@ -7022,7 +7431,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HULkjfGbkAAIJVc.jpg",
+     "width": 1536,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2108486183584166341",
@@ -7200,7 +7617,27 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HULHeHKaYAAdKgO.jpg",
+     "width": 1170,
+     "height": 715
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HULHgKTakAAr4Ws.jpg",
+     "width": 1170,
+     "height": 1127
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HULHihnbQAAGcNh.jpg",
+     "width": 1169,
+     "height": 985
+    }
+   ]
   },
   {
    "id": "2108457934812557572",
@@ -7473,7 +7910,36 @@
    "matched_terms": [
     "ゆいぴす"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107870647733170177/img/9trmGl3tWh-9M1Ce.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107870647733170177/vid/avc1/480x270/vbOcwWz3WLtiplg8.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107870647733170177/vid/avc1/640x360/NcRj6JOvS6ZW29N-.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107870647733170177/vid/avc1/1280x720/5xr65Ydb_LQZvWg_.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107870647733170177/pl/zchjtNUxbI40UGhk.m3u8?v=196"
+      }
+     ],
+     "width": 1280,
+     "height": 720
+    }
+   ]
   },
   {
    "id": "2108419607241646280",
@@ -7495,7 +7961,54 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2108419572198154240/img/xEgyJflX7cWUssrE.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108419572198154240/vid/avc1/480x270/A7D0XAyns0_BnOKc.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108419572198154240/vid/avc1/640x360/Qlcf3R0wNRj9HZlA.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108419572198154240/vid/avc1/960x540/9XpTTY9MDkNY09nN.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2108419572198154240/pl/gg3HYEjROFRa5wME.m3u8?v=e21"
+      }
+     ],
+     "width": 960,
+     "height": 540
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUKcbhJaIAADbGX.jpg",
+     "width": 1024,
+     "height": 1536
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUKcbhKbgAAEO5H.jpg",
+     "width": 1024,
+     "height": 1536
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUKcbhJaoAAKEfo.jpg",
+     "width": 1024,
+     "height": 1536
+    }
+   ]
   },
   {
    "id": "2108406932411502901",
@@ -8125,7 +8638,41 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2108191936591126528/img/rXRB4v4E37giGj1d.jpg",
+     "variants": [
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2108191936591126528/pl/urFslYPpUYtaWPB9.m3u8"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108191936591126528/vid/avc1/1080x1080/pHkQFBcSw743kjgM.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108191936591126528/vid/avc1/720x720/tdGMWs7cTBBHdRD8.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108191936591126528/vid/avc1/540x540/sMhfNnOk6qBtuuAG.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108191936591126528/vid/avc1/320x320/suyDagIWE9fb4K7t.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2108191753966903777",
@@ -8149,7 +8696,41 @@
    "matched_terms": [
     "quote:ホスト"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2108190446451339264/img/Yt2Wfi_zO88EpRF-.jpg",
+     "variants": [
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2108190446451339264/pl/M7gMOTWm-IdjUyCR.m3u8?v=649"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108190446451339264/vid/avc1/540x540/EHlnVHbO7oJBGtam.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108190446451339264/vid/avc1/320x320/zZMx3tHI3lLxhMbp.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108190446451339264/vid/avc1/720x720/GTWSbWWQp775K55v.mp4"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2108190446451339264/vid/avc1/1080x1080/4UHCCpoHfipiON7p.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2108191484096954428",
@@ -8266,7 +8847,21 @@
    "matched_terms": [
     "ジャングル東京"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUG_84TbwAA6Ryj.jpg",
+     "width": 1081,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUG_829akAAerM1.jpg",
+     "width": 1067,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2108175266157830505",
@@ -8353,7 +8948,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUG5Q8HbQAAh6-j.jpg",
+     "width": 567,
+     "height": 423
+    }
+   ]
   },
   {
    "id": "2108159430223441978",
@@ -9606,7 +10209,21 @@
     "キャバ",
     "嬢 シャンパン"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUBxCP3aMAAoGk1.jpg",
+     "width": 1179,
+     "height": 1904
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUBxCPzbEAA1lEs.jpg",
+     "width": 1179,
+     "height": 1402
+    }
+   ]
   },
   {
    "id": "2107795149174796613",
@@ -10820,7 +11437,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT8Lco8aIAAsB4l.jpg",
+     "width": 1536,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2107415768967024982",
@@ -11024,7 +11649,36 @@
    "matched_terms": [
     "ヤマトリノ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107375928632647680/img/P10yb1ZMLgc25f8a.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107375928632647680/vid/avc1/494x270/XBVkhBBA8TdF8mxQ.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107375928632647680/vid/avc1/658x360/awPeQloOsdv_dlNq.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107375928632647680/vid/avc1/1206x658/WWrvJDmXRnJlQJUs.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107375928632647680/pl/Ep4JkRwuHWRnPhmG.m3u8"
+      }
+     ],
+     "width": 1206,
+     "height": 658
+    }
+   ]
   },
   {
    "id": "2107369374885839197",
@@ -11047,7 +11701,33 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT7hRtraMAAK6XU.jpg",
+     "width": 1125,
+     "height": 1393
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT7hRt1bYAA_MwG.jpg",
+     "width": 1125,
+     "height": 1765
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT7hRtubYAAKqQS.jpg",
+     "width": 1124,
+     "height": 1758
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT7hRtzbUAAEsgk.jpg",
+     "width": 1124,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2107359899487486004",
@@ -11166,7 +11846,21 @@
     "キャバ",
     "ゆいぴす"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT2GmNmbcAApzxD.jpg",
+     "width": 1111,
+     "height": 1942
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT2Gm80aUAAQY-z.jpg",
+     "width": 1119,
+     "height": 1962
+    }
+   ]
   },
   {
    "id": "2107336404980392300",
@@ -11274,7 +11968,36 @@
     "ホストの",
     "ホスト"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107322001526554624/img/Y1bjXaUEsy6QxlyR.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107322001526554624/vid/avc1/582x270/jl6TnO7aIS4uMrbR.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107322001526554624/vid/avc1/778x360/xD6YQDvwIiqx5Ou-.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107322001526554624/vid/avc1/1280x592/yEPJLxdiuMSKYd_2.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107322001526554624/pl/bMs7ljjMqkgi6rck.m3u8?v=1cc"
+      }
+     ],
+     "width": 1280,
+     "height": 592
+    }
+   ]
   },
   {
    "id": "2107319945029702105",
@@ -11300,7 +12023,21 @@
     "キャバ嬢",
     "キャバ"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT2DcM2a8AAe5LH.jpg",
+     "width": 1129,
+     "height": 1249
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT2DeECbUAA1Wu2.jpg",
+     "width": 970,
+     "height": 1804
+    }
+   ]
   },
   {
    "id": "2107314851471368331",
@@ -11372,7 +12109,36 @@
     "ホスト",
     "歌舞伎町"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107310520735014912/img/5xBKk1ZyOBckR-ny.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107310520735014912/vid/avc1/320x568/yKHQHvRObRcy8Zwr.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107310520735014912/vid/avc1/480x852/fPTD9Y3kBlVggBA6.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107310520735014912/vid/avc1/720x1280/FFv-e9QzSKrBbDEQ.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107310520735014912/pl/i2aATnLsBvmr1tb9.m3u8?v=0d6"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2107304852170682526",
@@ -11477,7 +12243,15 @@
    "matched_terms": [
     "同伴 アフター"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT6YcIWakAAwjKV.jpg",
+     "width": 942,
+     "height": 1724
+    }
+   ]
   },
   {
    "id": "2107270130229289468",
@@ -11589,7 +12363,33 @@
     "quote:キャバ",
     "ゆいぴす"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT504N3bgAA3bjc.jpg",
+     "width": 480,
+     "height": 640
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT504N9bUAA6hiV.jpg",
+     "width": 415,
+     "height": 739
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT504N4bsAAYmtV.jpg",
+     "width": 400,
+     "height": 599
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT504OCbYAAvQgC.jpg",
+     "width": 415,
+     "height": 739
+    }
+   ]
   },
   {
    "id": "2107141158870888862",
@@ -11996,7 +12796,117 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107070677367115777/img/PFmAIcJjwv71fVLu.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677367115777/vid/avc1/320x568/oOK8Bu6i-d_C_db5.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677367115777/vid/avc1/480x852/ptViYH031BL3pE4x.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677367115777/vid/avc1/720x1280/zvKPecd7U4lS1qAl.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107070677367115777/pl/G7ehlNts5zrrI0s7.m3u8?v=cfc"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107070677358706688/img/rfd-B75ee8HVzdxz.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677358706688/vid/avc1/320x568/o34o8elpsgGfojm_.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677358706688/vid/avc1/480x852/Z8NfS0FUu63cSz4_.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677358706688/vid/avc1/720x1280/4nSsvTsrmXdup8nG.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107070677358706688/pl/oU7_ireYwizTrJFq.m3u8?v=cfc"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107070677367046144/img/LeMl0Yrt-HZs4vU3.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677367046144/vid/avc1/320x568/TgE43wyI_-o1LM3u.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677367046144/vid/avc1/480x852/Mt0sLVR8jbEIWdBh.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677367046144/vid/avc1/720x1280/rwIkTH_5WEiQeUtm.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107070677367046144/pl/AaCqjnS7eZyDMXpj.m3u8?v=dfe"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107070677383852032/img/qfelopC-PhyuqAf3.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677383852032/vid/avc1/320x568/vGjnZy1WiB0_ISIS.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677383852032/vid/avc1/480x852/zBn1C3_77CDz6xLJ.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107070677383852032/vid/avc1/720x1280/X1m7dLJkXyryxtHP.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107070677383852032/pl/R0mZjK6ZUZsxvf07.m3u8"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2107067411245703182",
@@ -12133,7 +13043,41 @@
     "quote:キャバ嬢",
     "キャバ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107024553021255680/img/6w_jVfq75H6mZ97i.jpg",
+     "variants": [
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107024553021255680/pl/BzNlaSuaakmU-ceL.m3u8?v=c37"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107024553021255680/vid/avc1/1080x1080/aH2GkUECb3rNSNCG.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107024553021255680/vid/avc1/540x540/z_Huchynvaeuyg_u.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107024553021255680/vid/avc1/720x720/Vk2p-C8XU_msjsZT.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107024553021255680/vid/avc1/320x320/q7piT7Ot5uIfjfgV.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2107011645310701719",
@@ -12159,7 +13103,41 @@
     "キャバ嬢",
     "キャバ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2107010962662592512/img/iViJHH7cW1lWCu25.jpg",
+     "variants": [
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107010962662592512/vid/avc1/1080x1080/lx6uwtaT6UD7xipw.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107010962662592512/vid/avc1/720x720/iEhstwJO88IAO--H.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107010962662592512/vid/avc1/540x540/CGgavM4N_Tw-NU-u.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2107010962662592512/vid/avc1/320x320/7Sj858KoQfPoUE59.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2107010962662592512/pl/ps-ww30wrFrjcSS-.m3u8?v=b26"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2107009721869984182",
@@ -12290,7 +13268,21 @@
     "キャバ",
     "ゆいぴす"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT19-JMbsAA8Uoo.jpg",
+     "width": 400,
+     "height": 599
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT19-JNbMAAbpG1.jpg",
+     "width": 515,
+     "height": 559
+    }
+   ]
   },
   {
    "id": "2106967164595159394",
@@ -12543,7 +13535,21 @@
     "キャバ",
     "六本木 キャバ"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT0Uk-gboAAIwsA.jpg",
+     "width": 1179,
+     "height": 1273
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HT0Uk-gbUAAW-af.jpg",
+     "width": 1179,
+     "height": 1160
+    }
+   ]
   },
   {
    "id": "2106853768293929069",
@@ -12771,7 +13777,41 @@
     "quote:嬢 シャンパン",
     "歌舞伎町"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2106756231335710720/img/ce3vc8It_XFqIG2w.jpg",
+     "variants": [
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106756231335710720/vid/avc1/720x720/6l8eOKEp8JJYQNPS.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106756231335710720/vid/avc1/320x320/pOXM6vvVIrJtHyvo.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2106756231335710720/pl/2cWCs7BEQxByFUeZ.m3u8?v=464"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106756231335710720/vid/avc1/1080x1080/OeDXaZajNVDOhPpk.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106756231335710720/vid/avc1/540x540/YpEENB-sjB3I3b8N.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2106760115278012450",
@@ -13113,7 +14153,41 @@
     "キャバ",
     "嬢 シャンパン"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2106751629299261440/img/EH1yS9QfnZ_7UmiL.jpg",
+     "variants": [
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106751629299261440/vid/avc1/1080x1080/aR6LA1OkA7bs1nMv.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2106751629299261440/pl/e-FaUs-1kuyHLEyl.m3u8?v=1a5"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106751629299261440/vid/avc1/320x320/g_26NmfVgw620JsE.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106751629299261440/vid/avc1/720x720/wnfeoqjRRyYxF8AY.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2106751629299261440/vid/avc1/540x540/xo44eWhy2jcyVH41.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2106751210695057915",
@@ -14052,7 +15126,41 @@
     "ホスト",
     "ホストコール"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2105652768325427200/img/Rl4FMSNiFbpu5Qzo.jpg",
+     "variants": [
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2105652768325427200/vid/avc1/720x720/tktaPVOVQFzb3YKp.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2105652768325427200/pl/gPOzN6u2PrdcHDhd.m3u8?v=155"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2105652768325427200/vid/avc1/1080x1080/EZCIQDVGYyOjBjt5.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2105652768325427200/vid/avc1/320x320/EHIXy7QR_fchkHf5.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2105652768325427200/vid/avc1/540x540/ckzYoMUMz8C_pxKh.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2105596174397055461",
@@ -14500,7 +15608,41 @@
     "ホストの",
     "ホスト"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2103102045528227841/img/cnCs7fa1kRdWNu3Y.jpg",
+     "variants": [
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2103102045528227841/vid/avc1/540x540/5wQCjiSStIuHu3D7.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2103102045528227841/vid/avc1/320x320/QEbViIQ08X45zCuP.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2103102045528227841/vid/avc1/720x720/0aQBySZPD1P9dzoL.mp4"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2103102045528227841/vid/avc1/1080x1080/VaqG-zaEXxskLbdS.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2103102045528227841/pl/iSbhvRFUsf1F4ITs.m3u8?v=0ab"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2103026229557510545",
@@ -14664,7 +15806,27 @@
     "エルコレ",
     "topic:平良翔太さんの退店・引退"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSOQ5XfbEAAz40u.jpg",
+     "width": 1206,
+     "height": 1570
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSOQ5XTaUAADbYu.jpg",
+     "width": 1206,
+     "height": 1429
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSOQ5XSbgAAVqPv.jpg",
+     "width": 1206,
+     "height": 1454
+    }
+   ]
   },
   {
    "id": "2099511303723504038",
@@ -14689,7 +15851,33 @@
     "平良翔太",
     "topic:平良翔太さんの退店・引退"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSL2ZuXa4AAbvwI.jpg",
+     "width": 1170,
+     "height": 646
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSL2ZuZaAAAtSUz.jpg",
+     "width": 1170,
+     "height": 660
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSL2ZutaoAA9Q0c.jpg",
+     "width": 1169,
+     "height": 651
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HSL2ZuiawAEUfdg.jpg",
+     "width": 1170,
+     "height": 660
+    }
+   ]
   },
   {
    "id": "2099020069695303844",
@@ -15586,7 +16774,33 @@
     "ホスト",
     "ホストコール"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HM6XEccaYAEeMd2.jpg",
+     "width": 785,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HM6XEcaaQAAZJGR.jpg",
+     "width": 704,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HM6XEcXbkAEV7ya.jpg",
+     "width": 651,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HM6XEdmbEAA9kgY.jpg",
+     "width": 898,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2072999668410388935",
