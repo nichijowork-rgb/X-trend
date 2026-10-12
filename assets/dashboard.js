@@ -4,10 +4,10 @@
 
 import {
   ACCOUNT_SORTS, DEFAULT_STATE, METRIC_KEYS, METRIC_LABELS, PERIODS, SORTS,
-  aggregate, chartDayRange, countBefore, countByCategory, debounce, fillDays, filterPosts,
+  aggregate, chartDayRange, countByCategory, debounce, fillDays, filterPosts,
   formatCompact, formatDateTime, formatDateTimeFull, formatExact, highlightSegments, isFilterActive,
   isSafeHttpUrl, isValidSummary, jstParts, linkifySegments, mergeSummary, normalizeDataset,
-  parseKeywords, parseState, parseTimestamp, serializeState, sortPosts, topAccounts, CHART_MAX_DAYS,
+  parseKeywords, parseState, parseTimestamp, serializeState, sortPosts, topAccounts,
   shortDate, VIEWS, embedTweetId, chooseRefTs, isUpdateDelayed, formatPace, viewsPerHour,
   normalizeReports, pickReport, formatRisingPace, formatBeforeAfter, REPORT_SECTIONS,
   categoryMatcher, inGroup, isUnclassified, filterNightRising, individualChipCategories, categoryLabel, normalizeCategorySelection,
@@ -469,12 +469,7 @@ function renderCharts(agg, filtered) {
   const cats = [...ds.categories.filter((c) => used.has(c)), ...[...used].filter((c) => !ds.categories.includes(c))];
   app.lastDays = days;
   app.lastDayCats = cats;
-  let text = `${shortDate(range.startKey)}〜${shortDate(range.endKey)}（JST・0件の日も表示）`;
-  if (state.period === 'all') {
-    const excluded = countBefore(agg.byDay, range.startKey);
-    text = `直近${CHART_MAX_DAYS}日 ${text}`;
-    if (excluded > 0) text += `。それ以前の古い投稿 ${formatExact(excluded)}件は外れ値としてグラフから除外`;
-  }
+  const text = `${shortDate(range.startKey)}〜${shortDate(range.endKey)}（JST・0件の日も表示）`;
   sub.textContent = text + '。複数カテゴリの投稿は各カテゴリに計上';
   renderLegend($('chart-day-legend'), cats);
   renderDayTable($('chart-day-table'), days, cats);

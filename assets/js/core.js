@@ -19,10 +19,13 @@ export const METRIC_LABELS = {
 
 export const PERIODS = [
   { key: '24h', label: '24時間', seconds: 86400 },
+  { key: '3d', label: '3日', seconds: 3 * 86400 }, // 72 時間
   { key: '7d', label: '7日', seconds: 7 * 86400 },
   { key: '30d', label: '30日', seconds: 30 * 86400 },
-  { key: 'all', label: 'すべて', seconds: null },
 ];
+
+/** 旧版の「すべて」（URL・保存値の period=all）は最大の期間（30日）として扱う */
+export const LEGACY_PERIOD_ALIASES = Object.freeze({ all: '30d' });
 
 export const SORTS = [
   { key: 'new', label: '新しい順', metric: null },
@@ -37,8 +40,6 @@ export const ACCOUNT_SORTS = [
   { key: 'imp', label: 'インプレッション順' },
 ];
 
-/** 「すべて」選択時に日別グラフへ載せる日数 */
-export const CHART_MAX_DAYS = 90;
 
 export const UNKNOWN = '不明';
 
@@ -321,6 +322,7 @@ export const DEFAULT_STATE = Object.freeze({
 export const REPORT_SECTIONS = Object.freeze(['report', 'daily', 'weekly']);
 
 /** filterPosts で条件を省略したときの値（何も絞らない） */
+// period: 'all' は PERIODS に無いので periodSeconds が null を返し、期間で絞らない（UI 状態としては使わない）
 const NEUTRAL_FILTER = Object.freeze({ ...DEFAULT_STATE, period: 'all', group: '', cats: [] });
 
 /** キーワードを空白（全角含む）で分割。AND 検索用 */
@@ -444,10 +446,14 @@ export function sortPosts(posts, sortKey, refTs = null) {
   });
 }
 
-/** カテゴリ以外の絞り込み（期間・アカウント・キーワード・監視のみ）が掛かっているか。カテゴリは件数で判定する */
+/**
+ * アカウント・キーワード・監視のみの絞り込みが掛かっているか。
+ * 期間は常に何か（24時間〜30日）掛かっており、カテゴリもモードで常に掛かるので、
+ * それらは呼び出し側で「絞り込み後の件数が全件と同じか」で判定する（summary.json を使うかどうか）。
+ */
 export function isFilterActive(state) {
   const st = { ...DEFAULT_STATE, ...state };
-  return st.period !== 'all' || !!st.user || !!st.q.trim() || st.watched;
+  return !!st.user || !!st.q.trim() || st.watched;
 }
 
 // ---------------------------------------------------------------- 集計
@@ -614,15 +620,14 @@ export function topAccounts(byAccount, mode = 'posts', limit = 20) {
 // ---------------------------------------------------------------- 日別
 
 /**
- * 日別グラフの表示範囲。endKey は refTs の日。
- * 期間指定時はその期間が掛かる日、「すべて」は直近 CHART_MAX_DAYS 日。
+ * 日別グラフの表示範囲。endKey は refTs の日、startKey は期間が掛かる最初の日（最大は 30 日）。
+ * 期間が不明な値なら 30 日。
  */
 export function chartDayRange(period, refTs) {
   if (refTs == null) return null;
   const endKey = dateKeyFromTs(refTs);
-  const sec = periodSeconds(period);
-  const startKey = sec != null ? dateKeyFromTs(refTs - sec + 1) : addDays(endKey, -(CHART_MAX_DAYS - 1));
-  return { startKey, endKey };
+  const sec = periodSeconds(period) ?? periodSeconds('30d');
+  return { startKey: dateKeyFromTs(refTs - sec + 1), endKey };
 }
 
 /** by_day を startKey〜endKey で 0 埋めする（範囲外は捨てる） */
@@ -637,13 +642,6 @@ export function fillDays(byDay, startKey, endKey) {
       : { date: k, posts: 0, impressions: 0, likes: 0, categories: {} });
   }
   return out;
-}
-
-/** 範囲より前の日の投稿数（外れ値として除外した件数） */
-export function countBefore(byDay, startKey) {
-  let n = 0;
-  for (const d of byDay) if (d.date < startKey) n += d.posts || 0;
-  return n;
 }
 
 /** 軸の目盛り（0 を含むきれいな値） */
@@ -778,7 +776,7 @@ export function parseState(str, fallbackView = null, fallbackPanel = null, fallb
   return {
     cats: [...new Set(sp.getAll('cat').map((c) => c.trim()).filter(Boolean))],
     group: groupCategories(sp.get('group')) ? sp.get('group') : DEFAULT_STATE.group,
-    period: PERIODS.some((p) => p.key === period) ? period : DEFAULT_STATE.period,
+    period: PERIODS.some((p) => p.key === period) ? period : (LEGACY_PERIOD_ALIASES[period] || DEFAULT_STATE.period),
     user: (sp.get('user') || '').replace(/^@/, '').trim(),
     q: sp.get('q') || '',
     watched: sp.get('watched') === '1',

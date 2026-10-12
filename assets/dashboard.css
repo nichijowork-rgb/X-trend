@@ -832,3 +832,8 @@ main { padding-top: 12px; }
   .toolbar-actions { width: 100%; }
   .toolbar-actions .rising-toggle, .toolbar-actions .panel-toggle { flex: 1 1 auto; }
 }
+@media (max-width: 639px) {
+  /* 1 行目: 期間＋表示切替、2 行目: 並び替え（全幅で文言が切れないように） */
+  #view-group { order: 2; margin-left: auto; }
+  .toolbar-row #sort { order: 3; flex: 1 1 100%; font-size: 14px; padding-left: 10px; }
+}

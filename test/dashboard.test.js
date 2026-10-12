@@ -5,9 +5,9 @@ import { readFileSync } from 'node:fs';
 import {
   formatCompact, formatExact, formatDateTime, formatDateTimeFull, parseTimestamp, dateKeyFromTs, addDays,
   normalizeDataset, filterPosts, sortPosts, parseKeywords, aggregate, mergeSummary, fillDays, chartDayRange,
-  countBefore, linkifySegments, isSafeHttpUrl, highlightSegments, serializeState, parseState, DEFAULT_STATE,
+  linkifySegments, isSafeHttpUrl, highlightSegments, serializeState, parseState, DEFAULT_STATE,
   categorySlot, hashString, KNOWN_CATEGORY_SLOTS, SPARE_SLOTS, isFilterActive, topAccounts, countByCategory,
-  niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, CHART_MAX_DAYS,
+  niceTicks, isAllowedMediaUrl, sanitizeMedia, bestMp4, embedTweetId, PERIODS, LEGACY_PERIOD_ALIASES,
   categoryMatcher, isUnclassified, inGroup, individualChipCategories, categoryLabel, normalizeCategorySelection, groupCategories,
   chooseRefTs, nextScheduledUpdate, isUpdateDelayed, viewsPerHour, formatPace, SORTS,
   normalizeReports, filterNightRising, pickReport, hitRateText, hitRatio, formatRisingPace, formatBeforeAfter, weekKey,
@@ -124,7 +124,8 @@ test('filterPosts: generated_at が無ければ最新投稿時刻が基準', () 
   assert.deepEqual(ids({ period: '24h' }), ['1']);
   assert.deepEqual(ids({ period: '7d' }), ['1', '2']);
   assert.deepEqual(ids({ period: '30d' }), ['1', '2', '3']);
-  assert.deepEqual(ids({ period: 'all' }), ['1', '2', '3', '4']);
+  assert.deepEqual(ids({ period: '3d' }), ['1', '2']);
+  assert.deepEqual(ids({}), ['1', '2', '3', '4']); // 期間を省略したときは絞らない（内部用）
 });
 
 test('filterPosts: カテゴリ OR・キーワード AND（全角スペース可）・アカウント・監視のみ', () => {
@@ -209,16 +210,33 @@ test('fillDays: 投稿のない日を 0 埋め、範囲外は捨てる', () => {
   ], '2026-10-08', '2026-10-11');
   assert.deepEqual(days.map((d) => [d.date, d.posts]), [['2026-10-08', 0], ['2026-10-09', 2], ['2026-10-10', 0], ['2026-10-11', 1]]);
   assert.deepEqual(days[2].categories, {});
-  assert.equal(countBefore([{ date: '2016-01-01', posts: 9 }, { date: '2026-10-09', posts: 2 }], '2026-10-08'), 9);
 });
 
-test('chartDayRange: 期間に合わせ、「すべて」は直近90日', () => {
+test('chartDayRange: 期間に合わせる（最大 30 日）', () => {
   const ref = ts('2026-10-11T18:00:00+09:00');
-  assert.deepEqual(chartDayRange('all', ref), { startKey: addDays('2026-10-11', -(CHART_MAX_DAYS - 1)), endKey: '2026-10-11' });
+  assert.deepEqual(chartDayRange('30d', ref), { startKey: '2026-09-11', endKey: '2026-10-11' });
   assert.deepEqual(chartDayRange('7d', ref), { startKey: '2026-10-04', endKey: '2026-10-11' });
+  assert.deepEqual(chartDayRange('3d', ref), { startKey: '2026-10-08', endKey: '2026-10-11' });
   assert.deepEqual(chartDayRange('24h', ref), { startKey: '2026-10-10', endKey: '2026-10-11' });
-  assert.equal(fillDays([], ...Object.values(chartDayRange('all', ref))).length, 90);
-  assert.equal(chartDayRange('all', null), null);
+  assert.deepEqual(chartDayRange('all', ref), chartDayRange('30d', ref)); // 不明な値は 30 日
+  assert.equal(chartDayRange('30d', null), null);
+});
+
+test('期間: 24時間／3日（72時間）／7日／30日。「すべて」は無く、旧 period=all は 30 日として扱う', () => {
+  assert.deepEqual(PERIODS.map((p) => [p.key, p.label, p.seconds]), [['24h', '24時間', 86400], ['3d', '3日', 259200], ['7d', '7日', 604800], ['30d', '30日', 2592000]]);
+  assert.equal(LEGACY_PERIOD_ALIASES.all, '30d');
+  assert.equal(parseState('period=all').period, '30d');
+  assert.equal(parseState('#period=all&sort=new').period, '30d');
+  assert.equal(serializeState(parseState('period=all')), 'period=30d'); // all は書き出さない
+  assert.equal(parseState('period=3d').period, '3d');
+  // 3日の境界: 基準時刻からちょうど 72 時間前は含まない（24時間等と同じく「より新しい」）、72 時間未満は含む
+  const ref = ts('2026-10-11T23:59:00+09:00');
+  const ds = dataset([
+    rawPost({ id: 'in', ts: ref - 72 * 3600 + 1 }),
+    rawPost({ id: 'edge', ts: ref - 72 * 3600 }),
+    rawPost({ id: 'out', ts: ref - 72 * 3600 - 1 }),
+  ], undefined, '2026-10-11T23:59:00+09:00');
+  assert.deepEqual(filterPosts(ds.posts, { period: '3d' }, ds.refTs).map((p) => p.id), ['in']);
 });
 
 test('niceTicks: 0 を含む切りのよい目盛り', () => {
@@ -275,13 +293,13 @@ test('serializeState / parseState: 往復で一致し、既定値は省略', () 
   assert.equal(parseState('', null, null, true).rising, true); // 伸びている投稿パネル: URL に無ければ保存値
   assert.equal(parseState('rising=0', null, null, true).rising, false);
   assert.equal(parseState('rsdate=10/11').rsdate, '');
-  assert.equal(isFilterActive({ period: 'all', rising: true }), false);
-  // isFilterActive はカテゴリ以外（期間・アカウント・キーワード・監視のみ）を見る。初期状態は 24時間なので true
-  assert.equal(isFilterActive(DEFAULT_STATE), true);
-  assert.equal(isFilterActive({ period: 'all', panel: true }), false);
-  assert.equal(isFilterActive({ period: 'all', view: 'embed' }), false); // 表示切替は絞り込みではない
-  assert.equal(isFilterActive({ period: 'all', q: '  ' }), false);
-  assert.equal(isFilterActive({ period: 'all', watched: true }), true);
+  // isFilterActive はアカウント・キーワード・監視のみを見る（期間・カテゴリは常に掛かるので件数で判定）
+  assert.equal(isFilterActive(DEFAULT_STATE), false);
+  assert.equal(isFilterActive({ period: '30d', rising: true, panel: true, view: 'embed' }), false);
+  assert.equal(isFilterActive({ q: '  ' }), false);
+  assert.equal(isFilterActive({ q: '指名' }), true);
+  assert.equal(isFilterActive({ user: 'a' }), true);
+  assert.equal(isFilterActive({ watched: true }), true);
 });
 
 // ---------------------------------------------------------------- カテゴリ色
@@ -528,7 +546,7 @@ test('初期状態: 24時間・夜職すべて・インプレッションが多�
   assert.equal(SORTS.find((x) => x.key === 'imp').label, 'インプレッションが多い順');
   assert.equal(serializeState(DEFAULT_STATE), '');
   assert.equal(serializeState({ group: 'general' }), 'group=general');
-  assert.equal(serializeState({ period: 'all', sort: 'new' }), 'period=all&sort=new');
+  assert.equal(serializeState({ period: '30d', sort: 'new' }), 'period=30d&sort=new');
   assert.deepEqual(parseState(''), { ...DEFAULT_STATE, cats: [], rclosed: [] });
   assert.equal(parseState('group=general').group, 'general');
   assert.equal(parseState('group=zzz').group, 'night');

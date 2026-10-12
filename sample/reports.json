@@ -5,17 +5,17 @@
    "date": "2026-10-11",
    "rising": [
     {
-     "id": "1844674407368369637",
-     "views": 47613,
-     "hours_since_post": 0.3,
-     "views_per_hour": 47613,
+     "id": "1844674407364850854",
+     "views": 56214,
+     "hours_since_post": 0.8,
+     "views_per_hour": 56214,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
-     "id": "1844674407364850854",
-     "views": 56214,
-     "hours_since_post": 1.7,
-     "views_per_hour": 33067,
+     "id": "1844674407368369637",
+     "views": 47613,
+     "hours_since_post": 0.2,
+     "views_per_hour": 47613,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
@@ -28,34 +28,34 @@
     {
      "id": "1844674407360943461",
      "views": 33276,
-     "hours_since_post": 1.5,
-     "views_per_hour": 22184,
-     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
-    },
-    {
-     "id": "1844674407368752820",
-     "views": 15353,
-     "hours_since_post": 0.5,
-     "views_per_hour": 15353,
+     "hours_since_post": 0.8,
+     "views_per_hour": 33276,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
      "id": "1844674407369462701",
      "views": 17334,
-     "hours_since_post": 1.5,
-     "views_per_hour": 11556,
+     "hours_since_post": 0.7,
+     "views_per_hour": 17334,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
-     "id": "1844674407370952195",
-     "views": 7302,
-     "hours_since_post": 0.2,
-     "views_per_hour": 7302,
+     "id": "1844674407365321560",
+     "views": 32988,
+     "hours_since_post": 2,
+     "views_per_hour": 16494,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
-     "id": "1844674407370772632",
-     "views": 2259,
+     "id": "1844674407368752820",
+     "views": 15353,
+     "hours_since_post": 0.4,
+     "views_per_hour": 15353,
+     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+    },
+    {
+     "id": "1844674407370462515",
+     "views": 2515,
      "hours_since_post": "x",
      "views_per_hour": null,
      "condition_label": "<img src=x onerror=\"alert('rep')\">条件名にタグ"
@@ -70,26 +70,26 @@
    ],
    "rising_watch": [
     {
-     "id": "1844674407365321560",
-     "views": 32988,
-     "hours_since_post": 4.9,
-     "views_per_hour": 6732,
+     "id": "1844674407364520055",
+     "views": 33252,
+     "hours_since_post": 2.2,
+     "views_per_hour": 15115,
      "condition_label": "【サンプル】伸び始め（条件名はデータ側の文字列）",
      "reason": "【サンプル】補足1：1時間あたりのペースが上がっている"
     },
     {
-     "id": "1844674407364520055",
-     "views": 33252,
-     "hours_since_post": 5.3,
-     "views_per_hour": 6274,
+     "id": "1844674407359479189",
+     "views": 76567,
+     "hours_since_post": 6.1,
+     "views_per_hour": 12552,
      "condition_label": "【サンプル】伸び始め（条件名はデータ側の文字列）",
      "reason": "【サンプル】補足2：1時間あたりのペースが上がっている"
     },
     {
      "id": "1844674407368101109",
      "views": 11333,
-     "hours_since_post": 2.3,
-     "views_per_hour": 4927,
+     "hours_since_post": 1,
+     "views_per_hour": 11333,
      "condition_label": "【サンプル】伸び始め（条件名はデータ側の文字列）",
      "reason": "【サンプル】補足3：1時間あたりのペースが上がっている"
     },
@@ -104,33 +104,33 @@
    ],
    "review": [
     {
-     "id": "1844674407364384537",
-     "before_views": 44282,
-     "after_views": 588564,
+     "id": "1844674407366719633",
+     "before_views": 137784,
+     "after_views": 775568,
      "crossed_500k": true
     },
     {
-     "id": "1844674407365377285",
-     "before_views": 10050,
-     "after_views": 20100,
+     "id": "1844674407364293888",
+     "before_views": 41117,
+     "after_views": 82234,
      "crossed_500k": false
     },
     {
-     "id": "1844674407366359536",
-     "before_views": 12998,
-     "after_views": 525996,
+     "id": "1844674407370101790",
+     "before_views": 18442,
+     "after_views": 536884,
      "crossed_500k": true
     },
     {
-     "id": "1844674407366091239",
-     "before_views": 8357,
-     "after_views": 16714,
+     "id": "1844674407367527259",
+     "before_views": 48038,
+     "after_views": 96076,
      "crossed_500k": false
     },
     {
-     "id": "1844674407369456467",
-     "before_views": 6249,
-     "after_views": 512498,
+     "id": "1844674407368729366",
+     "before_views": 11191,
+     "after_views": 522382,
      "crossed_500k": true
     },
     {
@@ -140,7 +140,7 @@
      "crossed_500k": true
     },
     {
-     "id": "1844674407364384537",
+     "id": "1844674407366719633",
      "before_views": "abc",
      "after_views": null,
      "crossed_500k": "yes",
@@ -150,12 +150,12 @@
    "hit_rate": [
     {
      "condition_label": "【サンプル】条件A（投稿から2時間以内）",
-     "total": 5,
+     "total": 4,
      "crossed": 3
     },
     {
      "condition_label": "【サンプル】条件B（投稿から6時間以内）",
-     "total": 0,
+     "total": 1,
      "crossed": 0
     },
     {
@@ -169,38 +169,38 @@
    "date": "2026-10-10",
    "rising": [
     {
-     "id": "1844674407364384537",
-     "views": 44282,
-     "hours_since_post": 1.9,
-     "views_per_hour": 23306,
+     "id": "1844674407366719633",
+     "views": 137784,
+     "hours_since_post": 0.5,
+     "views_per_hour": 137784,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
-     "id": "1844674407365377285",
-     "views": 10050,
-     "hours_since_post": 0.8,
-     "views_per_hour": 10050,
+     "id": "1844674407364293888",
+     "views": 41117,
+     "hours_since_post": 1.7,
+     "views_per_hour": 24186,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
-     "id": "1844674407366359536",
-     "views": 12998,
-     "hours_since_post": 1.5,
-     "views_per_hour": 8665,
+     "id": "1844674407370101790",
+     "views": 18442,
+     "hours_since_post": 0.6,
+     "views_per_hour": 18442,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     },
     {
-     "id": "1844674407366091239",
-     "views": 8357,
-     "hours_since_post": 0.7,
-     "views_per_hour": 8357,
-     "condition_label": "【サンプル】条件A（投稿から2時間以内）"
+     "id": "1844674407367527259",
+     "views": 48038,
+     "hours_since_post": 6,
+     "views_per_hour": 8006,
+     "condition_label": "【サンプル】条件B（投稿から6時間以内）"
     },
     {
-     "id": "1844674407369456467",
-     "views": 6249,
-     "hours_since_post": 0.1,
-     "views_per_hour": 6249,
+     "id": "1844674407368729366",
+     "views": 11191,
+     "hours_since_post": 1.7,
+     "views_per_hour": 6583,
      "condition_label": "【サンプル】条件A（投稿から2時間以内）"
     }
    ],

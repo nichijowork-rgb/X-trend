@@ -176,6 +176,10 @@ async function main() {
     const big = JSON.parse(readFileSync(path.join(tmp, 'posts.json'), 'utf8'));
     const bigSummary = JSON.parse(readFileSync(path.join(tmp, 'summary.json'), 'utf8'));
     const sample = JSON.parse(readFileSync(path.join(ROOT, 'sample/posts.json'), 'utf8'));
+    // 期間の最大は 30 日。基準時刻（generated_at）から 30 日より新しい投稿だけが見える
+    const sampleRef = Math.floor(Date.parse(sample.generated_at) / 1000);
+    const in30 = (p) => p.ts > sampleRef - 30 * 86400;
+    const S = sample.posts.filter(in30);
     const sampleSummary = JSON.parse(readFileSync(path.join(ROOT, 'sample/summary.json'), 'utf8'));
 
     const newPage = async (opts = {}, routeOpts = {}) => {
@@ -384,14 +388,14 @@ async function main() {
     // ---- 7. 機能一式（サンプル）
     const { ctx, page, con, external } = await newPage({}, { data: { posts: null, summary: null } });
     // 以降の確認はサンプル全期間・新しい順で行う（カテゴリは初期の「夜職すべて」）
-    const ALL = '#period=all&sort=new';
+    const ALL = '#period=30d&sort=new';
     const resetAll = async () => {
       await page.click('#reset');
-      await page.click('#period-group button[data-period="all"]');
+      await page.click('#period-group button[data-period="30d"]');
       await page.selectOption('#sort', 'new');
       await page.fill('#user', '');
       await page.press('#user', 'Enter');
-      await page.waitForFunction(() => window.__dashboard.state.user === '' && window.__dashboard.state.period === 'all');
+      await page.waitForFunction(() => window.__dashboard.state.user === '' && window.__dashboard.state.period === '30d');
     };
     await page.goto(base + ALL);
     await ready(page);
@@ -547,7 +551,7 @@ async function main() {
       const cand = sampleReports.weekly[0].watch_candidates[0].user;
       await page.click(`#report-weekly-body .cand-list button:has-text("@${cand}")`);
       await page.waitForFunction((u) => window.__dashboard.state.user === u, cand);
-      assert(num(await count(page)) === sample.posts.filter((p) => p.user === cand && inNight(p)).length, 'cand filter');
+      assert(num(await count(page)) === S.filter((p) => p.user === cand && inNight(p)).length, 'cand filter');
       await resetAll();
       await page.evaluate(() => window.scrollTo(0, 0));
     });
@@ -579,11 +583,11 @@ async function main() {
     });
 
     await check('複数カテゴリ OR', async () => {
-      const n = (cat) => sample.posts.filter((p) => p.categories.includes(cat)).length;
+      const n = (cat) => S.filter((p) => p.categories.includes(cat)).length;
       await page.click('#cat-chips .chip[data-cat="ホスト"]');
       assert(num(await count(page)) === n('ホスト'), 'host');
       await page.click('#cat-chips .chip[data-cat="キャバクラ"]');
-      const both = sample.posts.filter((p) => p.categories.includes('ホスト') || p.categories.includes('キャバクラ')).length;
+      const both = S.filter((p) => p.categories.includes('ホスト') || p.categories.includes('キャバクラ')).length;
       assert(num(await count(page)) === both, `${await count(page)} vs ${both}`);
       const hash = await page.evaluate(() => decodeURIComponent(location.hash));
       assert(hash.includes('cat=ホスト') && hash.includes('cat=キャバクラ'), hash);
@@ -595,8 +599,8 @@ async function main() {
       await page.click('#cat-chips .chip[data-cat="ホスト"]');
       await page.click('#mode-group button[data-group="general"]');
       let st = await page.evaluate(() => window.__dashboard.state);
-      assert(st.group === 'general' && st.cats.length === 0 && st.period === 'all' && st.sort === 'new', JSON.stringify(st));
-      assert(num(await count(page)) === sample.posts.filter((p) => p.categories.includes('その他')).length, 'general');
+      assert(st.group === 'general' && st.cats.length === 0 && st.period === '30d' && st.sort === 'new', JSON.stringify(st));
+      assert(num(await count(page)) === S.filter((p) => p.categories.includes('その他')).length, 'general');
       assert((await page.evaluate(() => location.hash)).includes('group=general'), 'group url');
       // 一般モードでは夜職のチップは隠れ、どのグループにも入らない未知カテゴリのチップだけ残る
       const visibleChips = await page.$$eval('#cat-chips .chip:not([hidden])', (l) => l.map((e) => e.dataset.cat || e.dataset.group));
@@ -606,18 +610,18 @@ async function main() {
       await page.click('#cat-chips .chip[data-cat="テスト新カテゴリ"]');
       assert(num(await count(page)) === 5, 'unknown in general mode');
       await page.click('#cat-chips .chip[data-cat="テスト新カテゴリ"]');
-      assert(num(await count(page)) === sample.posts.filter((p) => p.categories.includes('その他')).length, 'back to general');
+      assert(num(await count(page)) === S.filter((p) => p.categories.includes('その他')).length, 'back to general');
       await page.click('#mode-group button[data-group="night"]');
       st = await page.evaluate(() => window.__dashboard.state);
       assert(st.group === 'night' && st.cats.length === 0, JSON.stringify(st));
-      assert(num(await count(page)) === sample.posts.filter(inNight).length, 'night all-period');
+      assert(num(await count(page)) === S.filter(inNight).length, 'night all-period');
       return `ホスト ${n('ホスト')} + キャバクラ → ${both}`;
     });
 
     await check('AND 検索・ハイライト', async () => {
       await page.fill('#q', '指名 歌舞伎町');
       await page.waitForTimeout(350);
-      const expected = sample.posts.filter((p) => { const t = (p.text + '\n' + p.user).toLowerCase(); return inNight(p) && t.includes('指名') && t.includes('歌舞伎町'); }).length;
+      const expected = S.filter((p) => { const t = (p.text + '\n' + p.user).toLowerCase(); return inNight(p) && t.includes('指名') && t.includes('歌舞伎町'); }).length;
       assert(num(await count(page)) === expected, `${await count(page)} vs ${expected}`);
       assert(await page.$('#post-list mark.m-q'), 'q highlight');
       assert(await page.$('#post-list mark.m-term'), 'term highlight');
@@ -629,7 +633,7 @@ async function main() {
 
     await check('監視アカウントのみ', async () => {
       await page.check('#watched');
-      const exp = sample.posts.filter((p) => p.is_watched && inNight(p)).length;
+      const exp = S.filter((p) => p.is_watched && inNight(p)).length;
       assert(num(await count(page)) === exp, 'watched');
       await page.uncheck('#watched');
     });
@@ -639,7 +643,7 @@ async function main() {
       await page.click('#acct-group button[data-acct="imp"]');
       const firstImp = await page.$eval('#acc-list button', (b) => b.dataset.user);
       await page.click('#acc-list button');
-      const exp = sample.posts.filter((p) => p.user === firstImp && inNight(p)).length;
+      const exp = S.filter((p) => p.user === firstImp && inNight(p)).length;
       assert(num(await count(page)) === exp, 'acct filter');
       assert((await page.inputValue('#user')) === firstImp, 'input sync');
       assert((await page.$eval('#acc-list button[aria-pressed="true"]', (b) => b.dataset.user)) === firstImp, 'pressed');
@@ -648,21 +652,21 @@ async function main() {
     });
 
     await check('URL 状態の復元（再読込・戻る/進む）', async () => {
-      await page.click('#period-group button[data-period="30d"]');
+      await page.click('#period-group button[data-period="7d"]');
       await page.selectOption('#sort', 'like');
       const c1 = await count(page);
       await page.reload();
       await ready(page);
       assert((await count(page)) === c1, 'count after reload');
-      assert((await page.$eval('#period-group button[aria-pressed="true"]', (b) => b.dataset.period)) === '30d', 'period');
+      assert((await page.$eval('#period-group button[aria-pressed="true"]', (b) => b.dataset.period)) === '7d', 'period');
       assert((await page.inputValue('#sort')) === 'like', 'sort');
       assert((await page.inputValue('#user')) !== '', 'user');
       await page.goBack(); // sort 変更前
       await page.waitForFunction(() => document.getElementById('sort').value === 'new');
-      await page.goBack(); // 30d 変更前
-      await page.waitForFunction(() => document.querySelector('#period-group button[aria-pressed="true"]').dataset.period === 'all');
-      await page.goForward();
+      await page.goBack(); // 7d 変更前
       await page.waitForFunction(() => document.querySelector('#period-group button[aria-pressed="true"]').dataset.period === '30d');
+      await page.goForward();
+      await page.waitForFunction(() => document.querySelector('#period-group button[aria-pressed="true"]').dataset.period === '7d');
       // 「条件をクリア」は初期状態（24時間・夜職すべて・インプレッションが多い順）に戻す
       await page.click('#reset');
       const st = await page.evaluate(() => window.__dashboard.state);
@@ -675,13 +679,25 @@ async function main() {
       assert(ref === '10/11 18:41 時点', ref); // generated_at 優先（最新投稿は 18:32）
       assert((await page.textContent('#meta-next')) === '毎日23:59（JST）', 'next update');
       assert(await page.isHidden('#meta-delay'), 'delay hidden in sample');
+      const labels = await page.$$eval('#period-group button', (l) => l.map((b) => b.textContent));
+      assert(labels.join('/') === '24時間/3日/7日/30日', labels.join('/'));
       const sub = await page.textContent('#chart-day-sub');
-      assert(sub.includes('直近90日') && sub.includes('外れ値'), sub);
+      assert(sub.startsWith('9/11〜10/11') && !sub.includes('90日'), sub);
+      assert((await page.$$eval('#chart-day svg .col', (l) => l.length)) === 31, '30d bars');
+      // 2016 年などの古い投稿は 30 日では出ない
+      await page.fill('#q', '昔の投稿');
+      await page.waitForFunction(() => window.__dashboard.state.q === '昔の投稿');
+      assert(num(await count(page)) === 0, 'old posts hidden in 30d');
+      await page.fill('#q', '');
+      await page.waitForFunction(() => window.__dashboard.state.q === '');
+      await page.click('#period-group button[data-period="3d"]');
+      const ref3 = sampleRef - 3 * 86400;
+      assert(num(await count(page)) === sample.posts.filter((p) => p.ts > ref3 && inNight(p)).length, '3d count');
+      assert((await page.evaluate(() => location.hash)).includes('period=3d'), '3d url');
+      assert((await page.$$eval('#chart-day svg .col', (l) => l.length)) === 4, '3d bars');
       await page.click('#period-group button[data-period="7d"]');
-      const bars = await page.$$eval('#chart-day svg .col', (l) => l.length);
-      assert(bars === 8, `bars ${bars}`);
-      await page.click('#period-group button[data-period="all"]');
-      assert((await page.$$eval('#chart-day svg .col', (l) => l.length)) === 90, '90 days');
+      assert((await page.$$eval('#chart-day svg .col', (l) => l.length)) === 8, '7d bars');
+      await page.click('#period-group button[data-period="30d"]');
       return sub;
     });
 

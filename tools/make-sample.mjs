@@ -136,8 +136,8 @@ let idBase = 1844674407370955161n; // 2^53 を超える 19 桁 → 必ず文字�
 const posts = [];
 for (let i = 0; i < COUNT; i++) {
   const u = pickUser();
-  // 直近ほど多い分布（約 75 日）
-  const ageSec = Math.floor((rnd() ** 1.8) * 75 * 86400) + (i === 0 ? 0 : int(0, 600));
+  // 直近ほど多い分布（約 29 日。期間ボタンの最大が 30 日のため。古い投稿は下で別途数件だけ混ぜる）
+  const ageSec = Math.floor((rnd() ** 1.8) * 29 * 86400) + (i === 0 ? 0 : int(0, 600));
   const ts = NEWEST_TS - (i === 0 ? 0 : ageSec);
   let cats = [];
   let terms = [];
