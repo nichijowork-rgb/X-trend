@@ -942,7 +942,7 @@ function renderRising() {
   $('rising-note').title = excluded ? `一般のバズ ${formatExact(excluded)}件は表示していません` : '';
   body.append(main.items.length
     ? risingListEl(main.items, { label: `伸びている投稿（${main.items.length}件・データ側の並び順）` })
-    : reportEmpty(REPORT_TEXT.risingEmpty));
+    : reportEmpty(main.excluded ? REPORT_TEXT.risingAllGeneral(formatExact(main.excluded)) : REPORT_TEXT.risingEmpty));
   // 補足「伸びそうな投稿」（任意フィールド rising_watch。無い・空なら見出しごと非表示）
   watchSec.hidden = watch.items.length === 0;
   $('rising-watch-title').textContent = REPORT_TEXT.risingWatchTitle;
