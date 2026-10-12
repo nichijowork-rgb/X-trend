@@ -275,7 +275,7 @@ async function main() {
       assert(await page.isVisible('#pace-note'), 'note');
       assert((await page.textContent('#pace-note')).includes('今後の予測ではありません'), 'note text');
       const lines = await page.$$eval('#post-list .pace.is-active', (l) => l.map((e) => e.textContent));
-      assert(lines.length === 50 && /^投稿から.+で.+表示（1時間あたり.+）$/.test(lines[0]), lines[0]);
+      assert(lines.length === 20 && /^投稿から.+で.+表示（1時間あたり.+）$/.test(lines[0]), lines[0]);
       const gen = Date.parse(big.generated_at) / 1000;
       const rate = (p) => (p.metrics && typeof p.metrics.impression_count === 'number' ? p.metrics.impression_count / Math.max(1, (gen - p.ts) / 3600) : -1);
       const ref = Math.floor(Date.parse(big.generated_at) / 1000);
@@ -318,10 +318,10 @@ async function main() {
           await page.click('#rising-toggle');
           assert(await page.isVisible('#rising-panel'), 'rising panel');
           if (expect === 'both-empty') {
-            assert((await page.textContent('#rising-body')).includes('10/12 23:59'), 'rising empty guide');
-            assert(await page.isHidden('#rising-watch'), 'rising_watch hidden');
+            assert((await page.textContent('#rising-body')).includes('該当なし'), 'rising empty guide');
+            assert(await page.isHidden('#rising-watch'), 'rising_watch hidden（daily 自体が無い）');
             assert((await page.textContent('#rising-count')) === '0', 'count 0');
-            assert(d.includes('10/12 23:59'), d);
+            assert(d.includes('該当なし'), d);
             assert(w.includes('10/17'), w);
             await page.$eval('#report', (e) => e.scrollIntoView());
             await page.screenshot({ path: path.join(SHOTS, 'report-empty.png') });
@@ -501,10 +501,10 @@ async function main() {
       await page.click('#mode-group button[data-group="night"]');
       await page.$eval('#rising-panel', (e) => e.scrollIntoView());
       await page.screenshot({ path: path.join(SHOTS, 'rising-desktop.png') });
-      // 日付の切替（rising_watch が無い日は見出しごと非表示）
+      // 日付の切替（rising_watch が無い日は「該当なし」）
       await page.selectOption('#rsdate', '2026-10-10');
       assert((await page.evaluate(() => location.hash)).includes('rsdate=2026-10-10'), 'rsdate url');
-      assert(await page.isHidden('#rising-watch'), 'no rising_watch on 10/10');
+      assert((await page.textContent('#rising-watch-body')).includes('該当なし'), 'no rising_watch on 10/10');
       await page.reload();
       await ready(page);
       assert(await page.isVisible('#rising-panel') && (await page.inputValue('#rsdate')) === '2026-10-10', 'restored');
@@ -535,7 +535,7 @@ async function main() {
       // 日付・週の切替と URL 保存、開閉
       await page.selectOption('#rdate', '2026-10-10');
       assert((await page.evaluate(() => location.hash)).includes('rdate=2026-10-10'), 'rdate url');
-      assert((await page.textContent('#report-daily-body')).includes('答え合わせは'), 'review empty guide');
+      assert((await page.textContent('#report-daily-body')).includes('該当なし'), 'review empty guide');
       await page.selectOption('#rweek', '2026-09-26_2026-10-03');
       await page.click('#report-weekly > summary');
       await page.waitForFunction(() => location.hash.includes('rc=weekly'));
@@ -569,7 +569,7 @@ async function main() {
       assert(!(await page.$('#post-list a[href^="javascript"]')), 'javascript link');
       await page.screenshot({ path: path.join(SHOTS, 'xss.png') });
       await page.fill('#q', '');
-      await page.waitForFunction(() => document.querySelectorAll('#post-list > li').length === 50);
+      await page.waitForFunction(() => document.querySelectorAll('#post-list > li').length === 20);
     });
 
     await check('未知カテゴリのチップ・色・バッジ', async () => {
@@ -716,10 +716,11 @@ async function main() {
       await page.keyboard.press('Tab');
     });
 
-    await check('さらに表示（50件ずつ）', async () => {
+    await check('さらに表示（20件ずつ）', async () => {
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.click('#more');
-      assert((await shown(page)) === 100, 'more');
+      assert((await shown(page)) === 40, 'more');
+      for (let n = 60; n <= 100; n += 20) { await page.click('#more'); await page.waitForFunction((x) => document.querySelectorAll('#post-list > li').length >= x, n); }
     });
 
     await check('欠損指標は「不明」', async () => {

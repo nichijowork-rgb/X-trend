@@ -617,3 +617,13 @@ test('rising_watch（任意）と、伸びている投稿の夜職のみフィ�
   assert.equal(out.excluded, 2);
   assert.deepEqual(filterNightRising(undefined, byId), { items: [], excluded: 0 });
 });
+
+test('sizedImageUrl: pbs.twimg.com の画像だけサイズ指定 URL に変える', async () => {
+  globalThis.document ??= undefined;
+  const { sizedImageUrl } = await import('../assets/js/media.js');
+  assert.equal(sizedImageUrl('https://pbs.twimg.com/media/ABC.jpg', 'small'), 'https://pbs.twimg.com/media/ABC?format=jpg&name=small');
+  assert.equal(sizedImageUrl('https://pbs.twimg.com/media/ABC?format=png&name=orig', 'large'), 'https://pbs.twimg.com/media/ABC?format=png&name=large');
+  assert.equal(sizedImageUrl('https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/X.jpeg', 'small'), 'https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/X?format=jpg&name=small');
+  assert.equal(sizedImageUrl('https://video.twimg.com/a.mp4', 'small'), 'https://video.twimg.com/a.mp4');
+  assert.equal(sizedImageUrl('not a url', 'small'), 'not a url');
+});

@@ -19,7 +19,7 @@ import {
 import { createEmbedder, resetWidgetsFailure } from './js/embed.js';
 import { renderMedia } from './js/media.js';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
 const RISING_INITIAL = 3;
 const $ = (id) => document.getElementById(id);
 
@@ -938,12 +938,12 @@ function renderRising() {
   body.append(main.items.length
     ? risingListEl(main.items, { label: `伸びている投稿（${main.items.length}件・データ側の並び順）` })
     : reportEmpty(main.excluded ? REPORT_TEXT.risingAllGeneral(formatExact(main.excluded)) : REPORT_TEXT.risingEmpty));
-  // 補足「伸びそうな投稿」（任意フィールド rising_watch。無い・空なら見出しごと非表示）
-  watchSec.hidden = watch.items.length === 0;
+  // 補足「伸びそうな投稿」（任意フィールド rising_watch。空なら「該当なし」）
+  watchSec.hidden = false;
   $('rising-watch-title').textContent = REPORT_TEXT.risingWatchTitle;
   $('rising-watch-body').replaceChildren(...(watch.items.length
     ? [risingListEl(watch.items, { withReason: true, label: `${REPORT_TEXT.risingWatchTitle}（${watch.items.length}件）` })]
-    : []));
+    : [reportEmpty(watch.excluded ? REPORT_TEXT.risingAllGeneral(formatExact(watch.excluded)) : REPORT_TEXT.risingEmpty)]));
 }
 
 function setupRising() {
@@ -1045,8 +1045,10 @@ function renderReports() {
     // 「伸びている投稿」は専用パネル（renderRising）へ移動。ここは答え合わせ・的中率のみ
     // 答え合わせ
     let review;
-    if (!d.review.length) {
-      review = reportEmpty(REPORT_TEXT.reviewEmpty);
+    // 伸びている投稿と同じく夜職関連のみ（一般のバズのみの投稿は対象外）
+    const reviewNight = filterNightRising(d.review, byId);
+    if (!reviewNight.items.length) {
+      review = reportEmpty(reviewNight.excluded ? REPORT_TEXT.risingAllGeneral(formatExact(reviewNight.excluded)) : REPORT_TEXT.reviewEmpty);
     } else {
       review = el('div', 'table-scroll');
       const table = el('table', 'data-table report-table');
@@ -1055,7 +1057,7 @@ function renderReports() {
       const thead = el('thead');
       thead.append(hr);
       const tbody = el('tbody');
-      for (const r of d.review) {
+      for (const r of reviewNight.items) {
         const tr = el('tr');
         const cell = el('td', 'post-cell');
         const post = r.id ? byId.get(r.id) : null;

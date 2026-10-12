@@ -49,6 +49,20 @@ export function openLightbox(url, alt) {
 
 // ---------------------------------------------------------------- 描画
 
+/** pbs.twimg.com の画像を指定サイズ（small≒680px / large≒2048px）で取得する URL に変える。それ以外はそのまま */
+export function sizedImageUrl(url, size) {
+  try {
+    const u = new URL(url);
+    if (u.hostname !== 'pbs.twimg.com') return url;
+    const ext = /\.(jpe?g|png|webp)$/i.exec(u.pathname);
+    if (ext) { u.pathname = u.pathname.slice(0, -ext[0].length); u.searchParams.set('format', ext[1].toLowerCase() === 'jpeg' ? 'jpg' : ext[1].toLowerCase()); }
+    u.searchParams.set('name', size);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 function photoThumb(m, i, total) {
   const b = el('button', 'media-thumb');
   b.type = 'button';
@@ -66,9 +80,9 @@ function photoThumb(m, i, total) {
     b.setAttribute('aria-label', '画像を読み込めませんでした');
     img.replaceWith(placeholder('画像を読み込めませんでした'));
   }, { once: true });
-  img.src = m.url;
+  img.src = sizedImageUrl(m.url, 'small');
   b.append(img);
-  b.addEventListener('click', () => { if (!b.classList.contains('is-broken')) openLightbox(m.url, m.alt); });
+  b.addEventListener('click', () => { if (!b.classList.contains('is-broken')) openLightbox(sizedImageUrl(m.url, 'large'), m.alt); });
   return b;
 }
 
@@ -84,7 +98,7 @@ function videoBlock(m, postUrl) {
     img.alt = m.alt || `${label}のプレビュー`;
     img.referrerPolicy = 'no-referrer';
     img.addEventListener('error', () => img.replaceWith(placeholder(`${label}のプレビューを読み込めませんでした`)), { once: true });
-    img.src = m.preview;
+    img.src = sizedImageUrl(m.preview, 'small');
     return img;
   };
   if (!m.video) {
