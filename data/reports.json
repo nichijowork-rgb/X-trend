@@ -1,6 +1,119 @@
 {
- "generated_at": "2026-10-13T00:24:48+09:00",
+ "generated_at": "2026-10-14T00:19:15+09:00",
  "daily": [
+  {
+   "date": "2026-10-13",
+   "rising": [
+    {
+     "id": "2109973370549015019",
+     "views": 334618,
+     "hours_since_post": 3.24,
+     "views_per_hour": 103375,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2109946803512889372",
+     "views": 439066,
+     "hours_since_post": 5.0,
+     "views_per_hour": 87877,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2109909927720624392",
+     "views": 424339,
+     "hours_since_post": 7.44,
+     "views_per_hour": 57045,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2109880874326237663",
+     "views": 439591,
+     "hours_since_post": 9.36,
+     "views_per_hour": 46951,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2109879732447936768",
+     "views": 431449,
+     "hours_since_post": 9.44,
+     "views_per_hour": 45712,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2109852486710501784",
+     "views": 458212,
+     "hours_since_post": 11.24,
+     "views_per_hour": 40756,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2109991854150394035",
+     "views": 173975,
+     "hours_since_post": 2.01,
+     "views_per_hour": 86435,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ひめかさん・るなさん・にじほさんの件をまとめた投稿。投稿から2時間をわずかに過ぎたため4の条件からは外れた"
+    },
+    {
+     "id": "2109989376184975668",
+     "views": 142785,
+     "hours_since_post": 2.18,
+     "views_per_hour": 65590,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "みゆさんのハワイ入国禁止の投稿へのリプライ"
+    },
+    {
+     "id": "2109955751636795428",
+     "views": 281826,
+     "hours_since_post": 4.4,
+     "views_per_hour": 63995,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "ホストをネタにしたイラスト"
+    },
+    {
+     "id": "2109973047973457978",
+     "views": 162324,
+     "hours_since_post": 3.26,
+     "views_per_hour": 49818,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "番組「ラストコール」出演者の整形前後比較"
+    },
+    {
+     "id": "2109981219031249107",
+     "views": 121493,
+     "hours_since_post": 2.72,
+     "views_per_hour": 44712,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストを題材にしたボツ漫画"
+    },
+    {
+     "id": "2109981976195387476",
+     "views": 114246,
+     "hours_since_post": 2.67,
+     "views_per_hour": 42838,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "みゆさんのハワイ入国禁止の投稿へのリプライ"
+    }
+   ],
+   "review": [
+    {
+     "id": "2109627926723330208",
+     "before_views": 183194,
+     "after_views": 464901,
+     "crossed_500k": false,
+     "source": "rising"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-10-12",
    "rising": [
