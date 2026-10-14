@@ -1,6 +1,186 @@
 {
- "generated_at": "2026-10-14T00:19:15+09:00",
+ "generated_at": "2026-10-15T00:07:50+09:00",
  "daily": [
+  {
+   "date": "2026-10-14",
+   "rising": [
+    {
+     "id": "2110337388564410476",
+     "views": 446956,
+     "hours_since_post": 2.58,
+     "views_per_hour": 173556,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2110336819137282340",
+     "views": 321404,
+     "hours_since_post": 2.61,
+     "views_per_hour": 122999,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2110309790752883071",
+     "views": 440882,
+     "hours_since_post": 4.4,
+     "views_per_hour": 100131,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2110318725534720344",
+     "views": 310827,
+     "hours_since_post": 3.81,
+     "views_per_hour": 81552,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2110308784983920970",
+     "views": 352293,
+     "hours_since_post": 4.47,
+     "views_per_hour": 78818,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2110272099625664796",
+     "views": 473716,
+     "hours_since_post": 6.9,
+     "views_per_hour": 68663,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2110221412678131887",
+     "views": 455543,
+     "hours_since_post": 10.26,
+     "views_per_hour": 44417,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2110336353850576964",
+     "views": 181412,
+     "hours_since_post": 2.64,
+     "views_per_hour": 68616,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "感じるコンカフェ嬢と虚無ニートの対比ネタ"
+    },
+    {
+     "id": "2110303796199145762",
+     "views": 179280,
+     "hours_since_post": 4.8,
+     "views_per_hour": 37350,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "鈴音りんさんと一条響さんの関係を振り返る投稿"
+    }
+   ],
+   "review": [
+    {
+     "id": "2109973370549015019",
+     "before_views": 334618,
+     "after_views": 897292,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2109946803512889372",
+     "before_views": 439066,
+     "after_views": 1024520,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2109909927720624392",
+     "before_views": 424339,
+     "after_views": 440149,
+     "crossed_500k": false,
+     "source": "rising"
+    },
+    {
+     "id": "2109880874326237663",
+     "before_views": 439591,
+     "after_views": 518507,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2109879732447936768",
+     "before_views": 431449,
+     "after_views": 779524,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2109852486710501784",
+     "before_views": 458212,
+     "after_views": 745910,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2109991854150394035",
+     "before_views": 173975,
+     "after_views": 1135978,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2109989376184975668",
+     "before_views": 142785,
+     "after_views": 772618,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2109955751636795428",
+     "before_views": 281826,
+     "after_views": 1699887,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2109973047973457978",
+     "before_views": 162324,
+     "after_views": 768640,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2109981219031249107",
+     "before_views": 121493,
+     "after_views": 1040620,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2109981976195387476",
+     "before_views": 114246,
+     "after_views": 149620,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 4,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 4,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-13",
    "rising": [
