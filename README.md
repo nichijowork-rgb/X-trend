@@ -5,8 +5,10 @@
 - サーバー・API・DB は使いません（HTML / CSS / JavaScript のみ、ビルド不要）
 - データは収集botが `data/posts.json`・`data/summary.json` に push。ページは読むだけ
 - `data/` が無い間は `sample/` のサンプルを「サンプル表示中」と明示して表示
-- 歌舞伎町ネオン調のダーク（ライト切替あり）、PC・スマホ対応
+- 歌舞伎町ネオン調（アクセント赤、ダーク/ライトはOS設定に自動追従）、PC・スマホ対応
 - カード表示 / ブログやnoteと同じ **X公式埋め込み表示** の切替、写真・動画表示
+
+**別のAI・開発者への引き継ぎは [docs/HANDOFF.md](docs/HANDOFF.md) から。**
 
 詳しくは [docs/DASHBOARD.md](docs/DASHBOARD.md)（公開手順・データ仕様・収集botへの依頼文）。
 
