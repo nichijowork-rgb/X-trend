@@ -1,6 +1,131 @@
 {
- "generated_at": "2026-10-15T00:07:50+09:00",
+ "generated_at": "2026-10-16T00:09:03+09:00",
  "daily": [
+  {
+   "date": "2026-10-15",
+   "rising": [
+    {
+     "id": "2110622031704363369",
+     "views": 421670,
+     "hours_since_post": 7.7,
+     "views_per_hour": 54760,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2110675180062441776",
+     "views": 256506,
+     "hours_since_post": 4.18,
+     "views_per_hour": 61360,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "趣味ランキングでキャバクラを低い趣味に挙げた投稿"
+    },
+    {
+     "id": "2110708201620742617",
+     "views": 108008,
+     "hours_since_post": 1.99,
+     "views_per_hour": 54177,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "元カレ×浮気相手×太客が激突するホストコール番組ネタ"
+    },
+    {
+     "id": "2110704810316173808",
+     "views": 109586,
+     "hours_since_post": 2.22,
+     "views_per_hour": 49406,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "明日花キララさんと桐生レイラさんの告白エピソード"
+    }
+   ],
+   "review": [
+    {
+     "id": "2110337388564410476",
+     "before_views": 446956,
+     "after_views": 2167886,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110336819137282340",
+     "before_views": 321404,
+     "after_views": 1173240,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110309790752883071",
+     "before_views": 440882,
+     "after_views": 1292410,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110318725534720344",
+     "before_views": 310827,
+     "after_views": 608651,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110308784983920970",
+     "before_views": 352293,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising"
+    },
+    {
+     "id": "2110272099625664796",
+     "before_views": 473716,
+     "after_views": 899290,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110221412678131887",
+     "before_views": 455543,
+     "after_views": 587883,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110336353850576964",
+     "before_views": 181412,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2110303796199145762",
+     "before_views": 179280,
+     "after_views": 499372,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 5,
+     "crossed": 4
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-10-14",
    "rising": [
