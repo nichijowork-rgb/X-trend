@@ -2,7 +2,7 @@
 import { computeTimer, formatClock, cornerDef, cueStates } from '../logic.js';
 import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
-import { cueColor, leadFor, scriptFor, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
+import { cueColor, leadFor, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
 
@@ -70,21 +70,18 @@ function cueContent(app, cue, wk) {
   if (cue.kind === 'topic') {
     const t = app.topicsById.get(cue.topicId);
     if (!t) { box.append(h('p', {}, '話題が見つかりません')); return box; }
-    const sc = scriptFor(app, t.id);
     box.append(h('div', { class: 'live-tags' }, genreSticker(t.genre), topicMarks(app, t)));
     box.append(h('h2', { class: 'live-headline' }, t.name));
     box.append(h('p', { class: 'stats stats-lg' }, statsLine(t)));
     box.append(h('p', { class: 'live-lead' }, leadFor(app, t)));
-    const notesBox = h('div', { class: 'live-notes' },
-      h('h3', {}, '話すポイント'), h('p', { class: 'pre' }, sc.points || '（未入力）'),
-      h('h3', {}, '視聴者への質問'), h('p', { class: 'pre' }, sc.question || '（未入力）'),
-      notes ? [h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)] : null);
+    // 話すポイント・視聴者への質問の欄は表示しない（オーナー指定）。コーナーのメモは書いてあるときだけ
+    const notesBox = notes ? h('div', { class: 'live-notes' }, h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)) : null;
     // 代表投稿は X 埋め込みが既定（「カード表示」のときと、埋め込めなかったときは自前のカード）
     const repId = t.stats.topPostId || t.linkId || (t.linkIds && t.linkIds[0]) || null;
     const own = repPostCard(app, t);
     const rep = app.ui.view !== 'card' && repId ? h('div', { dataset: { keep: 'rep' } }, embedHost(repId, own, 'live-embed')) : own;
     const related = topicPosts(app, t).filter((p) => p.id !== t.stats.topPostId).slice(0, 3);
-    box.append(h('div', { class: 'live-two', dataset: { keep: 'two' } },
+    box.append(h('div', { class: notesBox ? 'live-two' : 'live-two is-single', dataset: { keep: 'two' } },
       h('div', { dataset: { keep: 'left' } }, h('h3', { class: 'live-h3' }, '代表投稿'), rep || h('p', { class: 'muted' }, '該当なし'),
         related.length ? h('div', {}, h('h3', { class: 'live-h3' }, `関連投稿（${topicPosts(app, t).length - 1}件中 ${related.length}件）`),
           related.map((p) => postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: app.embedder, compact: true, bm: bmInfo(app, p.id) }))) : null),

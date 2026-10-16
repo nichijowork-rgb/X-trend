@@ -351,6 +351,7 @@ main { padding: 18px 0 40px; }
 .live-kicker-dark { font-weight: 800; color: var(--text-2); }
 .live-lead { font-size: 20px; line-height: 1.6; margin-top: 12px; font-weight: 600; }
 .live-two { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; margin-top: 16px; }
+.live-two.is-single { grid-template-columns: minmax(0, 720px); }
 .live-h3 { font-size: 15px; font-weight: 800; margin-top: 14px; color: var(--text-2); }
 .live-notes { background: var(--g-general); color: var(--ink); border-radius: 20px; padding: 14px 16px; margin-top: 14px; }
 .live-notes h3 { font-size: 14px; font-weight: 800; }

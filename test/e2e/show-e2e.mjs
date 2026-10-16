@@ -303,7 +303,7 @@ async function main() {
       const oaText = await oaPage.textContent('#oa-stage');
       assert(!oaText.includes('ヒミツの話すポイント') && !oaText.includes('みんなはどう？'), 'メモは映さない');
       const liveText = await page.textContent('.live-main');
-      assert(liveText.includes('ヒミツの話すポイント'), '進行にはメモを出す');
+      assert(!liveText.includes('ヒミツの話すポイント') && !liveText.includes('視聴者への質問'), '進行には話すポイント・質問の欄を出さない');
       // 代表投稿は埋め込み（モック）が既定。映す用も埋め込みを試す（失敗時は自前の表示）
       await page.waitForSelector('.live-main .live-embed.is-loaded, .live-main .live-embed.is-failed', { timeout: 8000 });
       await oaPage.waitForSelector('.oa-embed.is-loaded, .oa-embed.is-failed', { timeout: 8000 });
