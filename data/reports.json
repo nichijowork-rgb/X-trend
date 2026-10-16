@@ -1,6 +1,106 @@
 {
- "generated_at": "2026-10-16T00:09:03+09:00",
+ "generated_at": "2026-10-17T00:03:52+09:00",
  "daily": [
+  {
+   "date": "2026-10-16",
+   "rising": [
+    {
+     "id": "2111013540459114939",
+     "views": 446221,
+     "hours_since_post": 5.88,
+     "views_per_hour": 75856,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2111007924525097319",
+     "views": 419208,
+     "hours_since_post": 6.25,
+     "views_per_hour": 67026,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2111071756614295697",
+     "views": 133946,
+     "hours_since_post": 2.03,
+     "views_per_hour": 66083,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿。前日話題の黒崎みささん×天使ニアさん（元キャバ嬢・元ホスト）の投稿を本人が引用"
+    },
+    {
+     "id": "2111063894974492695",
+     "views": 163085,
+     "hours_since_post": 2.55,
+     "views_per_hour": 64011,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "「風俗に行った人とは同棲できない」と言われた後の日常投稿"
+    },
+    {
+     "id": "2111041261897699770",
+     "views": 258181,
+     "hours_since_post": 4.05,
+     "views_per_hour": 63801,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "猫がキャバクラで働いたら、というネタ投稿"
+    },
+    {
+     "id": "2111033518004535746",
+     "views": 223997,
+     "hours_since_post": 4.56,
+     "views_per_hour": 49128,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "障害者の性処理と風俗をめぐる議論の元投稿者による続投稿"
+    }
+   ],
+   "review": [
+    {
+     "id": "2110622031704363369",
+     "before_views": 421670,
+     "after_views": 582664,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2110675180062441776",
+     "before_views": 256506,
+     "after_views": 497573,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2110708201620742617",
+     "before_views": 108008,
+     "after_views": 633543,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2110704810316173808",
+     "before_views": 109586,
+     "after_views": 417655,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-15",
    "rising": [
