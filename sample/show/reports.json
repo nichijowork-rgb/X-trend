@@ -1,0 +1,67 @@
+{
+ "generated_at": "2026-10-16T00:09:00+09:00",
+ "daily": [
+  {
+   "date": "2026-10-15",
+   "rising": [
+    {
+     "id": "2110001792062730007",
+     "views": 382000,
+     "hours_since_post": 3,
+     "views_per_hour": 127333,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "review": [
+    {
+     "id": "2110001792060945077",
+     "before_views": 320000,
+     "after_views": 610000,
+     "crossed_500k": true
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 4,
+     "crossed": 3
+    }
+   ]
+  }
+ ],
+ "weekly": [
+  {
+   "period": {
+    "from": "2026-10-10",
+    "to": "2026-10-16"
+   },
+   "generated_at": "2026-10-16T00:09:00+09:00",
+   "hit_rate_by_condition": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 12,
+     "crossed": 8
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 20,
+     "crossed": 7
+    }
+   ],
+   "hit_rate_by_pace": [
+    {
+     "pace_label": "1時間あたり10万以上",
+     "total": 6,
+     "crossed": 5
+    }
+   ],
+   "threshold_proposal": "（サンプル）3時間以内の基準を10万→12万に上げる案",
+   "watch_candidates": [
+    {
+     "user": "sample_host_kai10",
+     "reason": "（サンプル）コール動画が連続で伸びている"
+    }
+   ]
+  }
+ ]
+}

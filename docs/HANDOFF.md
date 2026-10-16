@@ -49,6 +49,7 @@
 | `test/e2e/dashboard-e2e.mjs` | E2E（Playwright。リポジトリに依存は入れない） |
 | `CNAME` | 独自ドメイン `www.x-yoru-buzz.com`。**消さない** |
 | `data/` | 収集botの管轄。読むだけ |
+| `show/` | **配信番組サイト**（台本・進行・映す用。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
 
 ## 4. データ（収集botとの取り決め）
 
@@ -124,3 +125,10 @@ PW_DIR=/tmp/qa/node_modules node test/e2e/dashboard-e2e.mjs
 - 的中率（hit_rate）は bot の集計をそのまま表示しており、一般のバズを含む場合がある。
 - 週間レポートは 10/17（土）が初回。届いたら表示確認が必要。
 - ドメイン（ムームードメイン）は自動更新。2年目以降 年 約2,200円。
+
+## 10. 配信番組サイト（/show/）
+
+- 公開URL: https://www.x-yoru-buzz.com/show/ 。ダッシュボードとはヘッダー上部の［ダッシュボード｜番組］タブで行き来（ダッシュボード側の変更は `index.html` のタブと `dashboard.css` 末尾のスタイルだけ）。
+- 週1回（土 1:00、約90分）のニュース形式トーク配信の台本・進行サイト。画面は ①編成 `#plan` ②進行 `#live` ③映す用 `#onair`（1920×1080・OBS 用）④振り返り `#review`。
+- データは `data/posts.json`・`reports.json`・`bookmarks.json` を読むだけ。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
+- 仕様・ファイル構成・保存データの形・使い方は [SHOW_SPEC.md](SHOW_SPEC.md) の「実装メモ」。テストは `npm test`（`test/show.test.js` を含む）と `PW_DIR=… node test/e2e/show-e2e.mjs`。サンプルは `sample/show/`（`node tools/make-show-sample.mjs`）。

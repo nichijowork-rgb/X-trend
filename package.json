@@ -8,6 +8,7 @@
   "scripts": {
     "start": "python3 -m http.server 8000",
     "sample": "node tools/make-sample.mjs",
+    "sample:show": "node tools/make-show-sample.mjs",
     "test": "node --test test/*.test.js"
   }
 }

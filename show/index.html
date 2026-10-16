@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- 通信先は自サイトのみ。例外は「埋め込みで見る」を押したときの platform.twitter.com、X の画像・動画（pbs/video.twimg.com）、
+       見出しフォント（fonts.googleapis.com / fonts.gstatic.com。読めなければシステムの太字で表示）。
+       widgets.js が iframe に style 属性を付けるため style-src に 'unsafe-inline' を許可（本文は常に textContent で挿入） -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>番組｜週刊ヨルニュース</title>
+  <meta name="description" content="週1回のニュース形式トーク配信の台本・進行サイト">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23e02a1b'/%3E%3Cpath d='M16 5l3 7 7 .6-5.4 4.6 1.7 7.3L16 20.6l-6.3 3.9 1.7-7.3L6 12.6l7-.6z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&amp;display=swap">
+  <link rel="stylesheet" href="show.css">
+  <script type="module" src="show.js"></script>
+</head>
+<body data-route="plan">
+  <a class="skip-link" href="#view">本文へスキップ</a>
+
+  <div id="sample-banner" class="sample-banner" role="status" hidden>
+    <strong>サンプル表示中</strong>
+    <span id="sample-reason" class="sample-reason"></span>
+  </div>
+
+  <header class="sh-header">
+    <div class="wrap sh-top">
+      <p class="sh-brand"><span class="sh-brand-mark" aria-hidden="true">★</span><span>番組の台本・進行</span></p>
+      <nav class="page-tabs" aria-label="ページ切替">
+        <a href="../">ダッシュボード</a>
+        <a href="./" aria-current="page">番組</a>
+      </nav>
+    </div>
+    <div class="wrap sh-sub">
+      <nav class="screen-tabs" aria-label="画面">
+        <a href="#plan" data-route="plan">編成</a>
+        <a href="#live" data-route="live">進行</a>
+        <a href="#onair" data-route="onair" target="_blank" rel="noopener" title="配信画面用（別タブで開きます）">映す用</a>
+        <a href="#review" data-route="review">振り返り</a>
+      </nav>
+      <div class="week-box">
+        <label for="week-select" class="week-label">番組週</label>
+        <select id="week-select" class="input input-sm"></select>
+        <span id="week-range" class="week-range"></span>
+      </div>
+      <p class="sh-meta"><span id="data-time"></span> <span id="save-status" class="save-status" role="status"></span></p>
+    </div>
+  </header>
+
+  <main id="main" aria-busy="true">
+    <div id="loading" class="state-box" role="status">読み込み中…</div>
+    <section id="error" class="state-box state-error" hidden>
+      <h2>データを読み込めませんでした</h2>
+      <p id="error-detail"></p>
+      <button type="button" class="btn" id="reload">再読み込み</button>
+    </section>
+    <div id="app" hidden>
+      <div id="view" tabindex="-1"></div>
+    </div>
+  </main>
+</body>
+</html>

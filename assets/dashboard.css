@@ -837,3 +837,13 @@ main { padding-top: 12px; }
   #view-group { order: 2; margin-left: auto; }
   .toolbar-row #sort { order: 3; flex: 1 1 100%; font-size: 14px; padding-left: 10px; }
 }
+
+/* ---------- ページ切替タブ（ダッシュボード｜番組）。番組サイトは /show/ ---------- */
+.page-tabs { display: flex; gap: 4px; padding-top: 8px; }
+.page-tabs a {
+  display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 14px; border-radius: 10px 10px 0 0;
+  font-size: 14px; font-weight: 600; color: var(--text-2); text-decoration: none; border-bottom: 2px solid transparent;
+}
+.page-tabs a:hover { color: var(--text); }
+.page-tabs a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); }
+.page-tabs + .header-inner { padding-top: 4px; }
