@@ -11,7 +11,7 @@ import {
   defaultRundown, assignTopic, removeTopic, moveInCorner, replaceTopicId, buildCues, defaultLive, liveReduce, carriedTopicIds,
   cueStates, computeTimer, formatClock, recordCheckpoint, newSince, defaultWeek, defaultSaved, parseSaved, serializeSaved,
   pruneWeeks, syncCarriedOut, togglePlanCarry, isCarriedOut, reviewLists, scriptText, indexTopics, compareIds, pickWeeklyReport,
-  bookmarkList, usedPostIdsOf, pastUsedIds,
+  bookmarkList, usedPostIdsOf, pastUsedIds, topicPhrase, isGroupedTopic, scorePoints,
 } from '../show/js/logic.js';
 
 const ts = (iso) => Math.floor(Date.parse(iso) / 1000);
@@ -610,4 +610,60 @@ test('show 用サンプル: bookmarks.json と in_bookmarks / below_threshold', 
   const flagged = raw.posts.filter((p) => p.in_bookmarks === true);
   assert.ok(flagged.length >= 4);
   assert.ok(flagged.some((p) => p.below_threshold === true));
+});
+
+// ---------------------------------------------------------------- 2026-10-16 調整（おすすめ・単発・話題名・辞書）
+
+test('話題性スコアは対数: 単発の巨大インプレより、まとまった話題が勝つ', () => {
+  const single = topicScore({ count: 1, totalImp: 60_000_000, maxPace: null });
+  const group = topicScore({ count: 20, totalImp: 35_000_000, maxPace: null });
+  assert.ok(group > single, `${group} > ${single}`);
+  assert.ok(topicScore({ count: 2, totalImp: 1000 }) > topicScore({ count: 1, totalImp: 1000 }));
+  assert.ok(topicScore({ count: 1, totalImp: 1000 }, undefined, 1) > topicScore({ count: 1, totalImp: 1000 }));
+  assert.equal(scorePoints(9.74), 97);
+  assert.equal(scorePoints(null), null);
+});
+
+test('メインのおすすめ: 夜職で2件以上 → 夜職の単発 → 一般のバズ', () => {
+  const t = (id, genre, count, score) => ({ id, genre, score, stats: { count, maxImp: 0 }, postIds: [] });
+  const topics = [t('g1', 'general', 1, 99), t('g2', 'general', 3, 98), t('n1', 'host', 1, 50), t('n2', 'kyaba', 2, 10), t('n3', 'night', 5, 20), t('x', 'host', 4, null)];
+  assert.deepEqual(suggestMain(topics, [], 3).map((x) => x.id), ['n3', 'n2', 'n1']);
+  assert.deepEqual(suggestMain(topics, ['n3', 'n2'], 3).map((x) => x.id), ['n1', 'g2', 'g1']);
+});
+
+test('まとまった話題（2件以上・持ち越し・手動・自分で貼った）と単発', () => {
+  assert.equal(isGroupedTopic({ kind: 'single', stats: { count: 1 }, postIds: ['1'] }), false);
+  assert.equal(isGroupedTopic({ kind: 'cluster', stats: { count: 2 }, postIds: ['1', '2'] }), true);
+  assert.equal(isGroupedTopic({ kind: 'link', stats: { count: 0 }, postIds: [] }), true);
+  assert.equal(isGroupedTopic({ kind: 'single', stats: { count: 1 }, postIds: ['1'], personalPaste: true }), true);
+});
+
+test('話題名: 先頭の【…】・URL・絵文字・記号を除いた最初の句（最大20字）', () => {
+  assert.equal(topicPhrase('【害悪度S】\n医誠会国際総合病院 https://t.co/x'), '医誠会国際総合病院');
+  assert.equal(topicPhrase('【害悪度S】 https://t.co/x'), '害悪度S');
+  assert.equal(topicPhrase('【setlog流行 日常を切り取るリスク】\nhttps://t.co/e2'), 'setlog流行 日常を切り取るリスク');
+  assert.equal(topicPhrase('43年ぶりにリニューアル❗️\nオリジナルチキン'), '43年ぶりにリニューアル');
+  assert.equal(topicPhrase('『こころの余韻診断』を公開しました。'), 'こころの余韻診断を公開しました');
+  assert.equal(topicPhrase('@abc お席どこかわかりますか？'), 'お席どこかわかりますか');
+  assert.equal(topicPhrase('とても長い本文がここにずっと続いていて終わらない感じのテキストです'), 'とても長い本文がここにずっと続いていて終…');
+  assert.equal(topicPhrase('💫 https://t.co/8n'), '（本文なし）');
+  // 話題名は辞書・topic: が優先、本文が URL だけなら「@user の投稿（本文なし）」
+  const d = ds([post({ user: 'sample_url', text: 'https://t.co/abc', categories: ['その他'] })]);
+  const t = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs });
+  assert.equal(t[0].name, '@sample_url の投稿（本文なし）');
+});
+
+test('辞書の「夜職のみ」: 一般のバズの「卒業」「引退」は入れない・旧保存値は初期値を引き継ぐ', () => {
+  const d = ds([
+    post({ text: 'キャバ嬢を卒業します', categories: ['キャバクラ'] }),
+    post({ text: '大学を卒業しました', categories: ['その他'] }),
+    post({ text: '野球選手が引退を発表', categories: ['その他'] }),
+  ]);
+  const topics = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs });
+  assert.equal(topics.find((t) => t.id === 'd:d-retire').postIds.length, 1);
+  const loose = DEFAULT_DICT.map((e) => ({ ...e, nightOnly: false }));
+  assert.equal(buildTopics({ posts: d.posts, dict: loose, refTs: d.refTs }).find((t) => t.id === 'd:d-retire').postIds.length, 3);
+  const old = parseSaved({ v: 1, dict: [{ id: 'd-retire', name: '卒業・引退', genre: 'night', words: ['卒業'] }, { id: 'u-1', name: '自作', words: ['x'] }] }).state;
+  assert.equal(old.dict[0].nightOnly, true);
+  assert.equal(old.dict[1].nightOnly, false);
 });

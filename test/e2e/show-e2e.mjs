@@ -198,13 +198,25 @@ async function main() {
       const title = await page.inputValue('[data-key="title"]');
       assert(title === `【週刊ヨルニュース】${names.join('／')}`, title);
       // カテゴリ別へ 2 件、雑談へ 1 件
-      const cands = await page.$$eval('.cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
+      const cands = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
       let n = 0;
       for (const id of cands) { if (n >= 2) break; const b = await page.$(`[data-key="to-category-${id}"]`); if (b) { await b.click(); n++; } }
       await page.click('[data-filter="general"]');
-      const gen = await page.$$eval('.cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
+      if (!(await page.$('.singles[open]'))) await page.click('[data-key="singles-toggle"]');
+      const gen = await page.$$eval('.candidates .tcard', (l) => l.map((e) => e.dataset.topic));
       for (const id of gen) { const b = await page.$(`[data-key="to-chat-${id}"]`); if (b) { await b.click(); break; } }
       await page.click('[data-filter="all"]');
+      // 単発の投稿は折りたたみ（件数表示・展開・検索）
+      const cnt = await page.textContent('.cand-count');
+      assert(/まとまった話題 \d+件・単発の投稿 \d+件/.test(cnt), cnt);
+      const singleNames = await page.$$eval('.singles .tcard-name', (l) => l.map((e) => e.textContent));
+      assert(singleNames.length > 0, 'singles listed');
+      assert(await page.$('.singles[open]'), 'singles open state kept');
+      await page.fill('[data-key="topic-search"]', singleNames[0].slice(0, 6));
+      await page.waitForFunction((q) => { const n = [...document.querySelectorAll('.singles .tcard-name')]; return n.length > 0 && n.every((e) => e.textContent.includes(q)); }, singleNames[0].slice(0, 6));
+      await page.fill('[data-key="topic-search"]', '');
+      await page.waitForTimeout(300);
+      await page.click('[data-key="singles-toggle"]');
       const cat = await page.$$eval('.corner[data-corner="category"] .item', (l) => l.length);
       const chat = await page.$$eval('.corner[data-corner="chat"] .item', (l) => l.length);
       assert(cat === 2 && chat === 1, `category ${cat} chat ${chat}`);
@@ -232,7 +244,7 @@ async function main() {
     });
 
     await check('編成: 話題の編集（名前・結合）・同じ話題かも？（まとめる/バラす）・個人URL', async () => {
-      const sug = await page.$$eval('.tcard .suggest-row', (l) => l.map((e) => e.closest('.tcard').dataset.topic));
+      const sug = await page.$$eval('.candidates > .cand-grid .tcard .suggest-row', (l) => l.map((e) => e.closest('.tcard').dataset.topic));
       assert(sug.length >= 2, `suggestions ${sug.length}`);
       await page.click(`[data-key="accept-${sug[0]}"]`);
       assert(!(await page.$(`.tcard[data-topic="${sug[0]}"] .suggest-row`)), 'accepted');

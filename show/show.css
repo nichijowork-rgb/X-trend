@@ -135,6 +135,7 @@ textarea.input { resize: vertical; line-height: 1.55; }
 .sticker {
   display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 4px; min-height: 34px;
   border-radius: 999px; border: 3px solid var(--ink); font-weight: 900; font-size: 13px; box-shadow: 2px 2px 0 var(--ink);
+  white-space: nowrap; flex: none;
 }
 .sticker .icon { width: 24px; height: 24px; padding: 4px; border-radius: 50%; background: var(--ink); color: #fff; }
 .sticker.is-small { min-height: 30px; font-size: 12px; }
@@ -276,9 +277,16 @@ main { padding: 18px 0 40px; }
 .bm-list li.is-used { opacity: .75; }
 .bm-in { font-size: 13px; font-weight: 700; color: var(--text-2); }
 .bm-when { font-size: 12px; }
-.dict-head, .dict-row { display: grid; grid-template-columns: 28px minmax(0, 1.2fr) minmax(0, .9fr) minmax(0, 2fr) minmax(0, 1.5fr) auto; gap: 8px; align-items: center; }
+.dict-head, .dict-row { display: grid; grid-template-columns: 28px minmax(0, 1.2fr) minmax(0, .9fr) minmax(0, 2fr) minmax(0, 1.5fr) auto auto; gap: 8px; align-items: center; }
 .dict-head { font-size: 13px; color: var(--text-2); font-weight: 700; margin-top: 10px; }
 .dict-list { display: grid; gap: 8px; margin-top: 6px; }
+.dict-night { display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.dict-night input { width: 20px; height: 20px; accent-color: var(--g-main); }
+.singles { margin-top: 18px; background: var(--surface); border-radius: var(--radius); padding: 6px 16px 16px; }
+.singles > summary { cursor: pointer; min-height: var(--tap); display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-weight: 900; font-size: 17px; }
+.singles > summary .muted { font-weight: 400; font-size: 13px; }
+.tcard.is-compact { padding: 12px 14px; gap: 6px; }
+.tcard.is-compact .tcard-name { font-size: 16px; }
 .dict-no { font-weight: 900; color: var(--text-2); text-align: center; }
 
 /* 投稿カード */
@@ -494,7 +502,8 @@ body[data-route="onair"] { overflow: hidden; }
   .dict-head { display: none; }
   .dict-row { grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr); padding: 8px; background: var(--surface-2); border-radius: 12px; }
   .dict-row > :nth-child(4), .dict-row > :nth-child(5) { grid-column: 2 / -1; }
-  .dict-row > :last-child { grid-column: 2 / -1; justify-self: start; }
+  .dict-row > .dict-night { grid-column: 2; }
+  .dict-row > :last-child { grid-column: 3; justify-self: start; }
   .live { padding: 0 12px 170px; }
   .live-bar { grid-template-columns: minmax(0, 1fr); padding: 14px 16px; }
   .live-start { justify-self: start; }

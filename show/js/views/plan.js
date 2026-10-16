@@ -1,10 +1,10 @@
 // ① 編成（準備）画面。
-import { formatDateTime, formatCompact, hitRateText } from '../../../assets/js/core.js';
+import { formatDateTime, hitRateText } from '../../../assets/js/core.js';
 import { CHECKPOINTS, GENRES, SCORE_NOTE, DEFAULT_DICT, SHOW_DEFAULTS } from '../config.js';
 import {
   assignTopic, removeTopic, moveInCorner, replaceTopicId, usedTopicIds, suggestMain, cornerDef, totalMinutes,
   leadText, extractStatusIds, recordCheckpoint, togglePlanCarry, isCarriedOut, parseSaved, serializeSaved,
-  autoTitle, weekLabel, genreLabel, statusUrl, pickWeeklyReport, bookmarkList, pastUsedIds,
+  autoTitle, weekLabel, genreLabel, statusUrl, pickWeeklyReport, bookmarkList, pastUsedIds, isGroupedTopic, scorePoints,
 } from '../logic.js';
 import { h, btn, badge, field, postCard, linkCard, downloadText, genreSticker } from '../dom.js';
 import { genreIcon } from '../icons.js';
@@ -132,7 +132,7 @@ function mainSlots(app, wk) {
   const sec = h('section', { class: 'main-slots', attrs: { 'aria-labelledby': 'h-main' } });
   const head = h('div', { class: 'sec-head' },
     h('h2', { id: 'h-main', class: 'sec-title' }, 'メイン3トピック'),
-    h('p', { class: 'sec-note' }, 'スコア上位（全ジャンル）からおすすめを出しています。'),
+    h('p', { class: 'sec-note' }, '夜職のまとまった話題（2件以上）を優先して、話題性の高い順におすすめしています。'),
     main.items.length < def.maxItems && sugg.length
       ? btn('おすすめで埋める', () => app.update((w) => {
         let r = w.rundown;
@@ -165,7 +165,7 @@ function mainSlots(app, wk) {
       grid.append(h('article', { class: 'slot is-empty' },
         h('span', { class: 'slot-no', attrs: { 'aria-hidden': 'true' } }, String(i + 1)),
         h('h3', { class: 'slot-name' }, `メイン${i + 1}：空き`),
-        sg ? h('p', { class: 'slot-lead' }, 'おすすめ：', h('b', {}, sg.name), `（話題性 ${formatCompact(sg.score)}）`) : h('p', { class: 'slot-lead' }, '下の候補から「メインへ」で入れてください'),
+        sg ? h('p', { class: 'slot-lead' }, 'おすすめ：', h('b', {}, sg.name), `（${sg.stats.count}件・話題性 ${scorePoints(sg.score)}点）`) : h('p', { class: 'slot-lead' }, '下の候補から「メインへ」で入れてください'),
         sg ? btn('おすすめを入れる', () => app.update((w) => { w.rundown = assignTopic(w.rundown, sg.id, 'main') || w.rundown; }), 'btn btn-small', { 'data-key': `sugg-${i}` }) : null));
     }
   }
@@ -303,22 +303,44 @@ function candidatesSection(app, wk) {
     const pressed = app.ui.filter === f.key;
     chips.append(h('button', {
       type: 'button', class: `chip${f.genre ? ` chip-${f.genre}` : ''}`, attrs: { 'aria-pressed': String(pressed) }, dataset: { key: `filter-${f.key}`, filter: f.key },
-      on: { click: () => { app.ui.filter = f.key; app.ui.shown = PAGE; app.render(); } },
+      on: { click: () => { app.ui.filter = f.key; app.ui.shown = PAGE; app.ui.singlesShown = PAGE; app.render(); } },
     }, f.label));
   }
   const search = h('input', { class: 'input input-sm', type: 'search', value: app.ui.query, placeholder: '話題名で探す', dataset: { key: 'topic-search' }, attrs: { 'aria-label': '話題名で探す' } });
   search.addEventListener('input', () => { app.ui.query = search.value; app.ui.shown = PAGE; clearTimeout(search._t); search._t = setTimeout(() => app.render(), 200); });
   sec.append(h('div', { class: 'cand-tools' }, chips, search));
   const list = filterTopics(app, wk);
-  sec.append(h('p', { class: 'muted cand-count', attrs: { role: 'status' } }, `${list.length}件${list.length > app.ui.shown ? `（上位 ${app.ui.shown}件を表示）` : ''}`));
   if (!list.length) {
-    sec.append(h('p', { class: 'empty' }, '該当なし'));
+    sec.append(h('p', { class: 'muted cand-count', attrs: { role: 'status' } }, '0件'), h('p', { class: 'empty' }, '該当なし'));
     return sec;
   }
-  const grid = h('div', { class: 'cand-grid' });
-  for (const t of list.slice(0, app.ui.shown)) grid.append(topicCard(app, wk, t));
-  sec.append(grid);
-  if (list.length > app.ui.shown) sec.append(h('div', { class: 'more-row' }, btn(`さらに表示（残り ${list.length - app.ui.shown}件）`, () => { app.ui.shown += PAGE; app.render(); }, 'btn', { 'data-key': 'cand-more' })));
+  // 「NEW」「自分で追加・ブクマ」で絞ったときはまとめずに全部並べる。それ以外は単発投稿を折りたたむ
+  const flat = app.ui.filter === 'new' || app.ui.filter === 'me';
+  const grouped = flat ? list : list.filter(isGroupedTopic);
+  const singles = flat ? [] : list.filter((t) => !isGroupedTopic(t));
+  sec.append(h('p', { class: 'muted cand-count', attrs: { role: 'status' } },
+    flat ? `${list.length}件` : `まとまった話題 ${grouped.length}件・単発の投稿 ${singles.length}件`,
+    grouped.length > app.ui.shown ? `（上位 ${app.ui.shown}件を表示）` : ''));
+  if (grouped.length) {
+    const grid = h('div', { class: 'cand-grid' });
+    for (const t of grouped.slice(0, app.ui.shown)) grid.append(topicCard(app, wk, t));
+    sec.append(grid);
+    if (grouped.length > app.ui.shown) sec.append(h('div', { class: 'more-row' }, btn(`さらに表示（残り ${grouped.length - app.ui.shown}件）`, () => { app.ui.shown += PAGE; app.render(); }, 'btn', { 'data-key': 'cand-more' })));
+  } else {
+    sec.append(h('p', { class: 'empty' }, 'まとまった話題はありません（下の単発の投稿から選べます）'));
+  }
+  if (singles.length) {
+    const det = h('details', { class: 'singles', open: Boolean(app.ui.singlesOpen) });
+    det.addEventListener('toggle', () => { app.ui.singlesOpen = det.open; });
+    det.append(h('summary', { dataset: { key: 'singles-toggle' } }, `その他の単発投稿（${singles.length}件）`,
+      h('span', { class: 'muted' }, app.ui.query.trim() ? '　話題名で絞り込み中' : '　上の「話題名で探す」で検索できます')));
+    const shown = app.ui.singlesShown || PAGE;
+    const sgrid = h('div', { class: 'cand-grid is-singles' });
+    for (const t of singles.slice(0, shown)) sgrid.append(topicCard(app, wk, t, true));
+    det.append(sgrid);
+    if (singles.length > shown) det.append(h('div', { class: 'more-row' }, btn(`さらに表示（残り ${singles.length - shown}件）`, () => { app.ui.singlesShown = shown + PAGE; app.render(); }, 'btn', { 'data-key': 'singles-more' })));
+    sec.append(det);
+  }
   return sec;
 }
 
@@ -327,15 +349,15 @@ function whereIs(wk, tid) {
   return null;
 }
 
-function topicCard(app, wk, t) {
+function topicCard(app, wk, t, compact = false) {
   const at = whereIs(wk, t.id);
   const carried = isCarriedOut(wk.carriedOut, t.id);
-  const card = h('article', { class: `tcard g-${t.genre}`, dataset: { topic: t.id } });
+  const card = h('article', { class: `tcard g-${t.genre}${compact ? ' is-compact' : ''}`, dataset: { topic: t.id } });
   card.append(h('div', { class: 'tcard-top' }, genreSticker(t.genre, { small: true }), h('span', { class: 'tcard-marks' }, topicMarks(app, t))));
   card.append(h('h3', { class: 'tcard-name' }, t.name));
   card.append(h('p', { class: 'stats' }, statsLine(t)));
   const rep = t.stats.topPostId ? app.postsById.get(t.stats.topPostId) : null;
-  if (rep) card.append(h('p', { class: 'tcard-text' }, rep.text));
+  if (rep && !compact) card.append(h('p', { class: 'tcard-text' }, rep.text));
   else if (t.kind === 'link') card.append(h('p', { class: 'tcard-text' }, '中身は「編集・台本」→「埋め込みで見る」か X で確認'));
   if (t.suggested) {
     const why = t.reasons.map((r) => ({ similar: '本文が似ている', same_user: '同じアカウント', related: '関係者への言及' }[r] || r)).join('・');
@@ -558,7 +580,7 @@ const splitList = (s) => s.split(/[,、，\n]/).map((x) => x.trim()).filter(Bool
 function dictSection(app) {
   const sec = h('section', { class: 'card dict', attrs: { 'aria-labelledby': 'h-dict' } });
   sec.append(h('h2', { id: 'h-dict', class: 'sec-title' }, '話題辞書'),
-    h('p', { class: 'muted' }, '言葉（本文・根拠語）か関係者（店名・源氏名・@アカウント）が一致した投稿を、同じ話題にまとめます。「、」区切りで入力。'));
+    h('p', { class: 'muted' }, '言葉（本文・根拠語）か関係者（店名・源氏名・@アカウント）が一致した投稿を、同じ話題にまとめます。「、」区切りで入力。「夜職のみ」にすると夜職4カテゴリの投稿だけに当てます（「卒業」など一般の話題にも出る言葉向け）。'));
   const list = h('div', { class: 'dict-list' });
   app.saved.dict.forEach((e, i) => {
     const upd = (fn) => app.update((w, s) => { const x = s.dict.find((d) => d.id === e.id); if (x) fn(x); }, { topics: true });
@@ -570,14 +592,17 @@ function dictSection(app) {
     ws.addEventListener('change', () => upd((x) => { x.words = splitList(ws.value).slice(0, 50); }));
     const ps = h('input', { class: 'input input-sm', type: 'text', value: e.people.join('、'), placeholder: '店名・源氏名・@アカウント', dataset: { key: `dict-people-${e.id}` }, attrs: { 'aria-label': '関係者' } });
     ps.addEventListener('change', () => upd((x) => { x.people = splitList(ps.value).slice(0, 50); }));
+    const no = h('input', { type: 'checkbox', checked: Boolean(e.nightOnly), dataset: { key: `dict-night-${e.id}` } });
+    no.addEventListener('change', () => upd((x) => { x.nightOnly = no.checked; }));
     list.append(h('div', { class: 'dict-row', dataset: { dict: e.id } },
       h('span', { class: 'dict-no' }, String(i + 1)), nm, gs, ws, ps,
+      h('label', { class: 'dict-night', title: '夜職4カテゴリの投稿にだけ当てる' }, no, h('span', {}, '夜職のみ')),
       btn('削除', () => app.update((w, s) => { s.dict = s.dict.filter((d) => d.id !== e.id); }, { topics: true }), 'btn btn-small btn-ghost', { 'aria-label': `${e.name} を削除` })));
   });
-  sec.append(h('div', { class: 'dict-head', attrs: { 'aria-hidden': 'true' } }, h('span', {}), h('span', {}, '話題名'), h('span', {}, 'ジャンル'), h('span', {}, '言葉'), h('span', {}, '関係者'), h('span', {})));
+  sec.append(h('div', { class: 'dict-head', attrs: { 'aria-hidden': 'true' } }, h('span', {}), h('span', {}, '話題名'), h('span', {}, 'ジャンル'), h('span', {}, '言葉'), h('span', {}, '関係者'), h('span', {}, '対象'), h('span', {})));
   sec.append(list);
   sec.append(h('div', { class: 'row' },
-    btn('話題を追加', () => app.update((w, s) => { s.dict = [...s.dict, { id: `u-${Date.now().toString(36)}`, name: '新しい話題', genre: 'night', words: [], people: [] }]; }, { topics: true }), 'btn', { 'data-key': 'dict-add' }),
+    btn('話題を追加', () => app.update((w, s) => { s.dict = [...s.dict, { id: `u-${Date.now().toString(36)}`, name: '新しい話題', genre: 'night', words: [], people: [], nightOnly: true }]; }, { topics: true }), 'btn', { 'data-key': 'dict-add' }),
     btn('最初の辞書に戻す', () => app.update((w, s) => { s.dict = DEFAULT_DICT.map((e) => ({ ...e, words: [...e.words], people: [...e.people] })); }, { topics: true }), 'btn btn-ghost', { 'data-key': 'dict-reset' })));
   return sec;
 }

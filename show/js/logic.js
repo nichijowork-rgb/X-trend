@@ -3,7 +3,7 @@
 
 import { formatCompact, formatPace, viewsPerHour, jstParts, parseTimestamp, UNKNOWN } from '../../assets/js/core.js';
 import {
-  SHOW_DEFAULTS, GENRES, GENRE_KEYS, NIGHT_GENRES, CORNERS, DEFAULT_DICT, SCORE_WEIGHTS, SIMILARITY,
+  SHOW_DEFAULTS, GENRES, GENRE_KEYS, NIGHT_GENRES, CORNERS, DEFAULT_DICT, SCORE_WEIGHTS, SIMILARITY, MAIN_SUGGEST_TIERS, GROUPED_MIN_POSTS,
   TERM_PREFIXES, SCHEMA_VERSION, CHECKPOINTS,
 } from './config.js';
 
@@ -178,14 +178,16 @@ function matchInfo(post) {
     tags: ct.topics,
     user: String(post.user || '').toLowerCase(),
     mentions: mentionsOf(post.text),
+    night: isNightPost(post),
   };
 }
 
 /**
- * 辞書の1項目との一致数（言葉は1、関係者は2）。0 なら不一致。
+ * 辞書の1項目との一致数（言葉は1、関係者は2）。0 なら不一致。nightOnly の項目は夜職の投稿（info.night）だけ。
  * people: '@abc' はアカウント名・本文の @abc、それ以外は本文・根拠語・アカウント名に含まれるか。
  */
 export function dictHits(entry, info) {
+  if (entry.nightOnly && info.night === false) return 0; // 夜職の投稿だけに当てる項目
   const prep = entry._n || prepareDictEntry(entry)._n;
   let hits = 0;
   for (const n of prep.words) {
@@ -365,10 +367,36 @@ export function compareIds(a, b) {
   return x < y ? -1 : x > y ? 1 : 0;
 }
 
-function snippet(text, len = 22) {
-  const line = String(text || '').replace(URL_IN_TEXT, '').split(/\n/).map((s) => s.trim()).find(Boolean) || '';
-  const chars = [...line];
-  return chars.length > len ? chars.slice(0, len).join('') + '…' : line || '（本文なし）';
+const EMOJI = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}\uFE0F\u200D\u20E3]/gu;
+const EDGE_JUNK = /^[\s\p{P}\p{S}ー〜～]+|[\s\p{P}\p{S}〜～]+$/gu;
+
+/**
+ * 本文から話題名に使う短い句（最大 len 字）。先頭の【…】タグ・URL・@・絵文字・記号を除き、
+ * 最初の意味のある句（。！？改行などで区切った 4 字以上）を使う。本文が【…】だけならその中身。
+ */
+export function topicPhrase(text, len = 20) {
+  const raw = String(text || '').replace(URL_IN_TEXT, ' ').replace(/[@＠][A-Za-z0-9_]{1,15}/g, ' ').replace(EMOJI, '');
+  const tags = [];
+  let body = raw.replace(/^[\s]*(?:[【\[［〔《≪][^】\]］〕》≫\n]{0,40}[】\]］〕》≫][\s]*)+/u, (m) => {
+    for (const x of m.matchAll(/[【\[［〔《≪]([^】\]］〕》≫\n]{0,40})[】\]］〕》≫]/gu)) tags.push(x[1]);
+    return '';
+  });
+  const clean = (x) => x.replace(/[【】\[\]［］〔〕《》≪≫]/g, ' ').replace(/\s+/g, ' ').replace(EDGE_JUNK, '').trim();
+  const parts = body.split(/[。！？!?\n]|(?:\s{2,})/).map(clean).filter((x) => [...x].length >= 4);
+  let phrase = parts[0] || '';
+  if (!phrase) phrase = tags.map(clean).find((x) => x) || clean(body) || '';
+  // 片方だけ残ったかっこは外す（「『診断』を公開」→ 先頭を削った結果の『 なし 』）
+  for (const [o, c] of [['「', '」'], ['『', '』'], ['（', '）'], ['(', ')'], ['“', '”']]) {
+    if (phrase.split(o).length !== phrase.split(c).length) phrase = phrase.split(o).join('').split(c).join('');
+  }
+  phrase = phrase.replace(EDGE_JUNK, '').trim();
+  const chars = [...phrase];
+  if (!chars.length) return '（本文なし）';
+  return chars.length > len ? chars.slice(0, len).join('') + '…' : phrase;
+}
+
+function snippet(text) {
+  return topicPhrase(text, 20);
 }
 
 const GENERIC_WORDS = new Set(['ホスト', 'キャバ', 'キャバ嬢', 'キャバクラ', '夜職', '歌舞伎町', 'ホストクラブ', '新宿'].map(normalizeForMatch));
@@ -409,12 +437,28 @@ export function topicStats(posts, refTs) {
   };
 }
 
-/** 話題性スコア。表示数がすべて不明なら null（並べ替えでは末尾） */
+/**
+ * 話題性スコア（対数。単発の巨大インプレが勝ちすぎないように）。表示数がすべて不明なら null（並べ替えでは末尾）。
+ * log10(1 + 合計表示 + 最大伸びペース×paceHours) + perDoublePosts×log2(投稿数) + perBookmark×ブックマーク件数
+ */
 export function topicScore(stats, w = SCORE_WEIGHTS, bookmarkCount = 0) {
   if (!stats || stats.totalImp == null) return null;
-  const extra = Math.min(Math.max(0, stats.count - 1), w.maxExtraPosts);
+  const base = Math.log10(1 + stats.totalImp + (stats.maxPace || 0) * w.paceHours);
+  const posts = Math.min(Math.log2(Math.max(1, stats.count)), w.maxPostsLog2);
   const bm = Math.min(Math.max(0, bookmarkCount || 0), w.maxBookmarks);
-  return (stats.totalImp + (stats.maxPace || 0) * w.paceHours) * (1 + w.perExtraPost * extra + w.perBookmark * bm);
+  return base + w.perDoublePosts * posts + w.perBookmark * bm;
+}
+
+/** 画面表示用の点数（スコア×10 を四捨五入）。不明は null */
+export function scorePoints(score) {
+  return score == null ? null : Math.round(score * 10);
+}
+
+/** 「まとまった話題」か（投稿が GROUPED_MIN_POSTS 件以上、または持ち越し・手動・自分で貼った話題） */
+export function isGroupedTopic(t) {
+  if (!t) return false;
+  if (['carried', 'manual', 'link'].includes(t.kind)) return true;
+  return (t.stats ? t.stats.count : t.postIds.length) >= GROUPED_MIN_POSTS || t.personalPaste === true;
 }
 
 /** スコア順（null は末尾）→ 最大表示 → id */
@@ -577,6 +621,7 @@ export function buildTopics(input) {
     t.genre = GENRE_KEYS.includes(og) ? og : (t.fixedGenre || (tp.length ? majorityGenre(tp) : 'night'));
     t.suggested = t.kind === 'cluster' && !accepted.has(t.id);
     t.personal = tp.some((p) => personalIds.has(p.id)) || t.kind === 'link';
+    t.personalPaste = t.personal;
     t.bookmarkCount = tp.filter((p) => bookmarkIds.has(p.id)).length + (t.kind === 'link' && bookmarkIds.has(t.linkId) ? 1 : 0);
     t.bookmark = t.bookmarkCount > 0;
     t.stats = stats;
@@ -611,7 +656,9 @@ function autoTopicName(t, posts, stats, byId) {
       return best;
     }
   }
-  return top ? snippet(top.text) : '話題';
+  if (!top) return '話題';
+  const name = snippet(top.text);
+  return name === '（本文なし）' && top.user ? `@${top.user} の投稿（本文なし）` : name;
 }
 
 /** 一覧から Map（id → 話題） */
@@ -619,10 +666,19 @@ export function indexTopics(topics) {
   return new Map(topics.map((t) => [t.id, t]));
 }
 
-/** メイン候補（全ジャンルからスコア上位。すでに使っている話題は除く） */
-export function suggestMain(topics, usedIds, n = 3) {
+/**
+ * メイン候補。MAIN_SUGGEST_TIERS の順（既定: 夜職で2件以上 → 夜職の単発 → 一般のバズ2件以上 → 一般のバズ単発）、
+ * 同じ段の中はスコア順。すでに使っている話題・スコア不明は除く。
+ */
+export function suggestMain(topics, usedIds, n = 3, tiers = MAIN_SUGGEST_TIERS) {
   const used = new Set(usedIds || []);
-  return sortTopics(topics).filter((t) => !used.has(t.id) && t.score != null).slice(0, n);
+  const pool = sortTopics(topics).filter((t) => !used.has(t.id) && t.score != null);
+  const tierOf = (t) => {
+    const night = NIGHT_GENRES.includes(t.genre);
+    const i = tiers.findIndex((x) => x.night === night && t.stats.count >= x.minPosts);
+    return i < 0 ? tiers.length : i;
+  };
+  return pool.map((t, i) => ({ t, i, tier: tierOf(t) })).sort((a, b) => a.tier - b.tier || a.i - b.i).slice(0, n).map((x) => x.t);
 }
 
 // ================================================================ 文章
@@ -969,6 +1025,8 @@ function sanitizeDictEntry(e, i) {
     genre: GENRE_KEYS.includes(o.genre) ? o.genre : 'night',
     words: strList(o.words, 50, 40),
     people: strList(o.people, 50, 40),
+    // 版 1 の初期辞書には nightOnly が無い → 同じ id の初期値を引き継ぐ
+    nightOnly: typeof o.nightOnly === 'boolean' ? o.nightOnly : Boolean((DEFAULT_DICT.find((d) => d.id === o.id) || {}).nightOnly),
   };
 }
 

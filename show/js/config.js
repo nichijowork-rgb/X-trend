@@ -51,32 +51,49 @@ export const CORNERS = Object.freeze([
 
 /**
  * 話題辞書の初期値。words: 本文・根拠語に含まれる言葉、people: 店名・源氏名・@アカウント。
+ * nightOnly: true なら夜職4カテゴリの投稿にだけ当てる（「卒業」「引退」など一般の話題にも出る言葉のため）。
  * カタカナで始まる（終わる）言葉は、前（後ろ）がカタカナのときは一致とみなさない
  * （例:「コール」は「アルコール」に一致しない）。
  */
 export const DEFAULT_DICT = Object.freeze([
-  { id: 'd-hostcall', name: 'ホストコール', genre: 'host', words: ['ホストコール', 'シャンパンコール', 'コール', 'ラスソン', 'マイク'], people: [] },
-  { id: 'd-tower', name: 'シャンパンタワー', genre: 'host', words: ['シャンパンタワー', 'タワー'], people: [] },
-  { id: 'd-urikake', name: '売掛・ツケ', genre: 'host', words: ['売掛', '売り掛け', 'ツケ'], people: [] },
-  { id: 'd-birthday', name: '生誕祭・周年', genre: 'kyaba', words: ['生誕祭', 'バースデー', '周年'], people: [] },
-  { id: 'd-retire', name: '卒業・引退', genre: 'night', words: ['卒業', '引退', '退店'], people: [] },
-  { id: 'd-toyoko', name: 'トー横', genre: 'kabuki', words: ['トー横', 'ゴジラロード', 'ゴジラ'], people: [] },
-  { id: 'd-papakatsu', name: 'パパ活・頂き', genre: 'night', words: ['パパ活', '頂き女子'], people: [] },
+  { id: 'd-hostcall', name: 'ホストコール', genre: 'host', words: ['ホストコール', 'シャンパンコール', 'コール', 'ラスソン', 'マイク'], people: [], nightOnly: true },
+  { id: 'd-tower', name: 'シャンパンタワー', genre: 'host', words: ['シャンパンタワー', 'タワー'], people: [], nightOnly: true },
+  { id: 'd-urikake', name: '売掛・ツケ', genre: 'host', words: ['売掛', '売り掛け', 'ツケ'], people: [], nightOnly: true },
+  { id: 'd-birthday', name: '生誕祭・周年', genre: 'kyaba', words: ['生誕祭', 'バースデー', '周年'], people: [], nightOnly: true },
+  { id: 'd-retire', name: '卒業・引退', genre: 'night', words: ['卒業', '引退', '退店'], people: [], nightOnly: true },
+  { id: 'd-toyoko', name: 'トー横', genre: 'kabuki', words: ['トー横', 'ゴジラロード', 'ゴジラ'], people: [], nightOnly: true },
+  { id: 'd-papakatsu', name: 'パパ活・頂き', genre: 'night', words: ['パパ活', '頂き女子'], people: [], nightOnly: true },
 ]);
 
 /**
- * 話題性スコアの重み（しきい値ではなく並べ順のための重み）。
- * スコア = 合計表示数 ＋ 最大の伸びペース（1時間あたり）× paceHours、投稿が複数ある話題は少し上乗せ。
+ * 話題性スコアの重み（しきい値ではなく並べ順のための重み）。単発の巨大インプレが勝ちすぎないよう対数で扱う。
+ * スコア = log10(1 + 合計表示 + 最大の伸びペース × paceHours)
+ *        + perDoublePosts × log2(投稿数)            … 投稿が 2 倍になるごとに加点（maxPostsLog2 まで）
+ *        + perBookmark × ブックマーク件数（maxBookmarks 件まで）
+ * 例: 単発 6,000万表示 ≒ 7.8 ／ 20件・合計 3,500万 ≒ 7.5 + 4.3×0.6 ≒ 10.1
  */
 export const SCORE_WEIGHTS = Object.freeze({
   paceHours: 12,
-  perExtraPost: 0.15,
-  maxExtraPosts: 5,
-  /** 自分がブックマークした投稿を含む話題の上乗せ（1件ごと・最大 maxBookmarks 件分） */
-  perBookmark: 0.1,
+  perDoublePosts: 0.6,
+  maxPostsLog2: 5,
+  perBookmark: 0.15,
   maxBookmarks: 3,
 });
-export const SCORE_NOTE = '話題性 = 合計表示数 ＋ いちばん伸びた投稿の1時間あたり表示×12時間分（投稿が多い話題・自分がブックマークした投稿を含む話題は少し上乗せ）。表示数が不明な投稿は計算に入れません。';
+export const SCORE_NOTE = '話題性 = 合計表示数（＋いちばん伸びた投稿の勢い）を桁数で比べ、投稿が多い話題・自分がブックマークした投稿を含む話題を上乗せした点数です。表示数が不明な投稿は計算に入れません。';
+
+/**
+ * メイン3のおすすめの優先順（上から）。同じ段の中は話題性スコア順。
+ * night: 夜職4カテゴリの話題か、minPosts: 投稿数の下限
+ */
+export const MAIN_SUGGEST_TIERS = Object.freeze([
+  Object.freeze({ night: true, minPosts: 2 }),
+  Object.freeze({ night: true, minPosts: 1 }),
+  Object.freeze({ night: false, minPosts: 2 }),
+  Object.freeze({ night: false, minPosts: 1 }),
+]);
+
+/** 候補一覧で「まとまった話題」とみなす投稿数（これ未満は「その他の単発投稿」に折りたたむ） */
+export const GROUPED_MIN_POSTS = 2;
 
 /** 類似まとめの設定 */
 export const SIMILARITY = Object.freeze({
