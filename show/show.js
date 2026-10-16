@@ -1,7 +1,7 @@
 // 配信番組サイト（/show/）のエントリ。データ読み込み・状態・保存・画面切替（#plan / #live / #onair / #review）。
 import { normalizeDataset, parseTimestamp, formatDateTime } from '../assets/js/core.js';
 import { createEmbedder } from '../assets/js/embed.js';
-import { TEXT, VIEW_PREF_KEY } from './js/config.js';
+import { TEXT, VIEW_PREF_KEY, SIDE_PREF_KEY } from './js/config.js';
 import {
   showWeekOf, weekByKey, shiftWeekKey, listWeeks, postsInWeek, buildTopics, indexTopics, buildCues, getWeek,
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
@@ -10,7 +10,7 @@ import {
 import { loadSaved, saveState, openSync } from './js/store.js';
 import { h, clear, isEditable, startEmbeds } from './js/dom.js';
 import { patchView } from './js/patch.js';
-import { renderPlan } from './js/views/plan.js';
+import { renderPlan, planKeydown } from './js/views/plan.js';
 import { renderLive, tickLive, liveKeydown } from './js/views/live.js';
 import { renderOnair, tickOnair } from './js/views/onair.js';
 import { renderReview } from './js/views/review.js';
@@ -36,7 +36,7 @@ const app = {
   newInfo: null,
   weekPostIds: [],
   route: 'plan',
-  ui: { filter: 'all', query: '', shown: 30, openScript: new Set(), bmMode: 'week', view: loadViewPref() },
+  ui: { filter: 'all', query: '', shown: 30, openScript: new Set(), bmMode: 'week', view: loadViewPref(), sideClosed: loadSidePref() },
   bmFlags: new Map(),
   embedder: null,
   ready: false,
@@ -48,6 +48,15 @@ window.__show = app; // E2E・デバッグ用
 function loadViewPref() {
   try { return localStorage.getItem(VIEW_PREF_KEY) === 'card' ? 'card' : 'embed'; } catch { return 'embed'; }
 }
+/** 構成と台本のサイドパネルをたたんでいるか（localStorage に保持） */
+function loadSidePref() {
+  try { return localStorage.getItem(SIDE_PREF_KEY) === 'closed'; } catch { return false; }
+}
+app.setSideClosed = (closed) => {
+  app.ui.sideClosed = Boolean(closed);
+  try { localStorage.setItem(SIDE_PREF_KEY, closed ? 'closed' : 'open'); } catch { /* 保存できなくても切り替える */ }
+  app.render();
+};
 app.setView = (v) => {
   app.ui.view = v === 'card' ? 'card' : 'embed';
   try { localStorage.setItem(VIEW_PREF_KEY, app.ui.view); } catch { /* 保存できなくても表示は切り替える */ }
@@ -405,7 +414,14 @@ async function main() {
     renderRoute();
   });
   window.addEventListener('hashchange', renderRoute);
-  document.addEventListener('keydown', (e) => { if (app.route === 'live') liveKeydown(app, e); });
+  document.addEventListener('keydown', (e) => {
+    if (app.route === 'live') liveKeydown(app, e);
+    else if (app.route === 'plan') planKeydown(app, e);
+  });
+  // 開いたメニュー（番組に入れる ▾ / …）は外側をクリックしたら閉じる
+  document.addEventListener('click', (e) => {
+    for (const d of document.querySelectorAll('details.menu[open]')) if (!d.contains(e.target)) d.open = false;
+  });
   setInterval(() => {
     if (app.route === 'live') tickLive(app);
     else if (app.route === 'onair') tickOnair(app);

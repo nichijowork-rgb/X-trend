@@ -166,9 +166,26 @@ export function prefersReducedMotion() {
  * X 公式埋め込みの入れ物。中身（fallback）は読み込み中の表示を兼ね、埋め込めなかったときはそのまま残る。
  * 実際の読み込みは startEmbeds() が「画面に入ったものだけ」始める（再描画で入れ物を作り直さないよう data-keep-leaf）。
  */
-export function embedHost(id, fallback, cls = '') {
-  const host = h('div', { class: `embed-host ${cls}`.trim(), dataset: { keep: `e:${id}`, embedId: String(id) }, attrs: { 'data-keep-leaf': '' } });
+export function embedHost(id, fallback, cls = '', opts = {}) {
+  const host = h('div', { class: `embed-host ${cls}${opts.clamp ? ' is-clamp' : ''}`.trim(), dataset: { keep: `e:${id}`, embedId: String(id) }, attrs: { 'data-keep-leaf': '' } });
   host.append(h('div', { class: 'embed-skeleton embed-fallback' }, fallback || h('p', { class: 'muted' }, '埋め込みを読み込み中…')));
+  if (opts.clamp) {
+    // 長い投稿は一定の高さで切り、「全体を見る」で展開（入れ物ごと残るので再描画でも状態を保つ）
+    const more = h('button', { type: 'button', class: 'embed-expand', hidden: true, dataset: { key: `expand-${id}` } }, '全体を見る ▾');
+    more.addEventListener('click', () => {
+      const open = host.classList.toggle('is-open');
+      more.textContent = open ? 'たたむ ▴' : '全体を見る ▾';
+    });
+    host.append(more);
+    const check = () => {
+      if (host.classList.contains('is-open')) return;
+      more.hidden = !(host.scrollHeight > host.clientHeight + 8);
+    };
+    let t = null;
+    const later = () => { clearTimeout(t); t = setTimeout(check, 250); };
+    try { new MutationObserver(later).observe(host, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'height'] }); } catch { /* 無視 */ }
+    host.__checkTall = () => { requestAnimationFrame(check); setTimeout(check, 1500); };
+  }
   return host;
 }
 
@@ -178,6 +195,7 @@ export function startEmbeds(root, embedder) {
   for (const host of root.querySelectorAll('.embed-host[data-embed-id]:not([data-embed-started])')) {
     if (!host.isConnected) continue;
     host.dataset.embedStarted = '1';
+    if (host.__checkTall) host.__checkTall();
     embedder.observe(host, host.dataset.embedId, () => {
       host.classList.add('is-failed');
       const sk = host.querySelector('.embed-skeleton');

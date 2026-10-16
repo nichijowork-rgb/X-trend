@@ -119,6 +119,8 @@ export const STORAGE_KEY = 'xtrend-show';
 export const SCHEMA_VERSION = 3;
 /** 候補・ブックマーク・進行の表示（埋め込み／カード）を覚えておく localStorage キー */
 export const VIEW_PREF_KEY = 'xtrend-show-view';
+/** 編成画面の「構成と台本」サイドパネルの開閉を覚えておく localStorage キー */
+export const SIDE_PREF_KEY = 'xtrend-show-side';
 /** localStorage が一杯のとき残す番組週の数（新しい順） */
 export const KEEP_WEEKS_ON_QUOTA = 6;
 export const CHANNEL_NAME = 'xtrend-show';

@@ -1,5 +1,5 @@
 // ① 編成（準備）画面。
-import { formatDateTime, hitRateText } from '../../../assets/js/core.js';
+import { formatDateTime, formatCompact } from '../../../assets/js/core.js';
 import { CHECKPOINTS, GENRES, SCORE_NOTE, DEFAULT_DICT, SHOW_DEFAULTS } from '../config.js';
 import {
   assignTopic, removeTopic, moveInCorner, canBeMain, replaceTopicId, usedTopicIds, suggestMain, cornerDef, totalMinutes,
@@ -30,13 +30,21 @@ export function renderPlan(app) {
   const root = h('div', { class: 'plan wrap', dataset: { keep: `plan:${app.weekKey}` } });
   root.append(headBento(app, wk));
   root.append(mainSlots(app, wk));
-  root.append(h('div', { class: 'plan-cols', dataset: { keep: 'cols' } }, rundownSection(app, wk), candidatesSection(app, wk)));
+  root.append(h('div', { class: `plan-cols${app.ui.sideClosed ? ' is-side-closed' : ''}`, dataset: { keep: 'cols' } }, candidatesSection(app, wk), rundownSection(app, wk)));
   root.append(h('div', { class: 'plan-extra', dataset: { keep: 'extra' } }, app.bookmarks ? bookmarkSection(app, wk) : null, personalSection(app, wk), carriedSection(app, wk), dictSection(app)));
   if (app.ui.dialogTopic) {
     const t = app.topicsById.get(app.ui.dialogTopic);
     if (t) root.append(topicDialog(app, t));
     else app.ui.dialogTopic = null;
+  } else if (app.ui.detailTopic) {
+    const t = app.topicsById.get(app.ui.detailTopic);
+    if (t) root.append(detailDialog(app, wk, t));
+    else app.ui.detailTopic = null;
   }
+  // 開いているべきダイアログを開く（差し替えで残ったものはそのまま）
+  app.afterRender = () => {
+    for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal();
+  };
   return root;
 }
 
@@ -184,13 +192,22 @@ function mainSlots(app, wk) {
 // ================================================================ 構成と台本
 
 function rundownSection(app, wk) {
-  const sec = h('section', { class: 'card rundown', attrs: { 'aria-labelledby': 'h-rundown' } });
+  const closed = Boolean(app.ui.sideClosed);
+  const sec = h('aside', { class: `card rundown side${closed ? ' is-closed' : ''}`, attrs: { 'aria-labelledby': 'h-rundown' } });
   const total = totalMinutes(wk.rundown);
   const diff = total - SHOW_DEFAULTS.totalMinutes;
+  const toggle = btn(closed ? '構成と台本 ◂' : '▸ たたむ', () => app.setSideClosed(!closed), 'btn btn-small btn-ghost side-toggle', {
+    'data-key': 'side-toggle', 'aria-expanded': String(!closed), 'aria-controls': 'rundown-body', title: closed ? '構成と台本を開く' : '構成と台本をたたむ（候補を広く見る）',
+  });
+  if (closed) {
+    const n = wk.rundown.corners.reduce((a, c) => a + c.items.length, 0);
+    sec.append(toggle, h('p', { class: 'side-mini', id: 'h-rundown' }, h('span', {}, '構成'), h('b', {}, `${n}本`), h('span', {}, `${total}分`)));
+    return sec;
+  }
   sec.append(h('div', { class: 'sec-head' },
-    h('h2', { id: 'h-rundown', class: 'sec-title' }, '構成と台本'),
+    h('h2', { id: 'h-rundown', class: 'sec-title' }, '構成と台本'), toggle,
     h('p', { class: `sec-note${diff ? ' is-warn' : ''}` }, `合計 ${total}分${diff ? `（予定の${SHOW_DEFAULTS.totalMinutes}分より${Math.abs(diff)}分${diff > 0 ? '長い' : '短い'}）` : `（予定どおり）`}`)));
-  const list = h('ol', { class: 'corner-list' });
+  const list = h('ol', { class: 'corner-list', id: 'rundown-body' });
   for (const c of wk.rundown.corners) list.append(cornerBlock(app, wk, c));
   sec.append(list);
   return sec;
@@ -320,6 +337,8 @@ function candidatesSection(app, wk) {
   const flat = app.ui.filter === 'new' || app.ui.filter === 'me';
   const grouped = flat ? list : list.filter(isGroupedTopic);
   const singles = flat ? [] : list.filter((t) => !isGroupedTopic(t));
+  // 詳細ビューの「前へ／次へ」はこの並び（表示中の話題）
+  app.ui.detailList = [...grouped.slice(0, app.ui.shown), ...(app.ui.singlesOpen ? singles.slice(0, app.ui.singlesShown || PAGE) : [])].map((t) => t.id);
   sec.append(h('p', { class: 'muted cand-count', attrs: { role: 'status' } },
     flat ? `${list.length}件` : `まとまった話題 ${grouped.length}件・単発の投稿 ${singles.length}件`,
     grouped.length > app.ui.shown ? `（上位 ${app.ui.shown}件を表示）` : ''));
@@ -337,8 +356,8 @@ function candidatesSection(app, wk) {
     det.append(h('summary', { dataset: { key: 'singles-toggle' } }, `その他の単発投稿（${singles.length}件）`,
       h('span', { class: 'muted' }, app.ui.query.trim() ? '　話題名で絞り込み中' : '　上の「話題名で探す」で検索できます')));
     const shown = app.ui.singlesShown || PAGE;
-    const sgrid = h('div', { class: 'cand-grid is-singles' });
-    for (const t of singles.slice(0, shown)) sgrid.append(topicCard(app, wk, t, true));
+    const sgrid = h('ul', { class: 'single-list' });
+    for (const t of singles.slice(0, shown)) sgrid.append(singleRow(app, wk, t));
     det.append(sgrid);
     if (singles.length > shown) det.append(h('div', { class: 'more-row' }, btn(`さらに表示（残り ${singles.length - shown}件）`, () => { app.ui.singlesShown = shown + PAGE; app.render(); }, 'btn', { 'data-key': 'singles-more' })));
     sec.append(det);
@@ -390,31 +409,56 @@ function whereIs(wk, tid) {
   return null;
 }
 
-/** 話題の操作ボタン（カード・埋め込みカード共通） */
-function topicActions(app, wk, t) {
-  const at = whereIs(wk, t.id);
-  const carried = isCarriedOut(wk.carriedOut, t.id);
-  const acts = h('div', { class: 'tcard-actions' });
-  if (at) {
-    acts.append(h('span', { class: 'in-corner' }, `「${cornerDef(at).name}」に入っています`),
-      btn('外す', () => app.update((w) => { w.rundown = removeTopic(w.rundown, t.id); }), 'btn btn-small btn-dark', { 'data-key': `card-rm-${t.id}` }));
-  } else if (carried) {
-    acts.append(h('span', { class: 'in-corner' }, '来週に回しました'),
-      btn('取り消す', () => app.update((w) => { w.carriedOut = togglePlanCarry(w.carriedOut, t, app.weekKey, w.script[t.id]); }), 'btn btn-small btn-dark', { 'data-key': `card-uncarry-${t.id}` }));
-  } else {
-    const mainFull = wk.rundown.corners.find((c) => c.key === 'main').items.length >= cornerDef('main').maxItems;
-    // 一般のバズはメインに入れない（ボタンを出さない）
-    if (canBeMain(t)) acts.append(btn('メインへ', () => app.update((w) => { w.rundown = assignTopic(w.rundown, t.id, 'main') || w.rundown; }), 'btn btn-small btn-dark', { disabled: mainFull, title: mainFull ? 'メインは3本までです' : null, 'data-key': `to-main-${t.id}` }));
-    acts.append(
-      btn('カテゴリ別へ', () => app.update((w) => { w.rundown = assignTopic(w.rundown, t.id, 'category') || w.rundown; }), 'btn btn-small btn-dark', { 'data-key': `to-category-${t.id}` }),
-      btn('雑談へ', () => app.update((w) => { w.rundown = assignTopic(w.rundown, t.id, 'chat') || w.rundown; }), 'btn btn-small btn-dark', { 'data-key': `to-chat-${t.id}` }),
-      btn('来週へ', () => app.update((w) => { w.carriedOut = togglePlanCarry(w.carriedOut, t, app.weekKey, w.script[t.id]); }), 'btn btn-small btn-ghost-dark', { 'data-key': `card-carry-${t.id}` }));
+/** 開閉メニュー（<details>）。中のボタンを押すと閉じる */
+function menu(label, items, cls, key, attrs = {}) {
+  const det = h('details', { class: `menu ${cls}` });
+  det.append(h('summary', { class: 'btn btn-small menu-btn', dataset: { key }, attrs }, label));
+  const list = h('div', { class: 'menu-list', attrs: { role: 'menu' } });
+  for (const it of items.filter(Boolean)) {
+    if (it.note) { list.append(h('p', { class: 'menu-note' }, it.note)); continue; }
+    list.append(h('button', {
+      type: 'button', class: `menu-item${it.danger ? ' is-danger' : ''}`, disabled: Boolean(it.disabled), dataset: { key: it.key },
+      attrs: { role: 'menuitem', title: it.title || null }, on: { click: () => { det.open = false; it.run(); } },
+    }, it.label));
   }
-  acts.append(btn('編集・台本', () => openDialog(app, t.id), 'btn btn-small btn-ghost-dark', { 'data-key': `edit-${t.id}` }), tidyButtons(app, t));
-  return acts;
+  det.append(list);
+  return det;
 }
 
-/** 整理のボタン（片付ける＝この週だけ候補から外す／削除＝ゴミ箱へ・今後の週も出さない）。「済」（配信で読んだ）とは別 */
+/** 主ボタン「番組に入れる ▾」（メイン／カテゴリ別／雑談。一般のバズはメイン不可）。入っていれば「◯◯に入っています（外す）」 */
+function primaryArea(app, wk, t) {
+  const at = whereIs(wk, t.id);
+  if (at) {
+    return h('span', { class: 'in-corner-box' }, h('span', { class: 'in-corner' }, `「${cornerDef(at).name}」に入っています`),
+      btn('外す', () => app.update((w) => { w.rundown = removeTopic(w.rundown, t.id); }), 'btn btn-small btn-ghost', { 'data-key': `card-rm-${t.id}` }));
+  }
+  if (isCarriedOut(wk.carriedOut, t.id)) {
+    return h('span', { class: 'in-corner-box' }, h('span', { class: 'in-corner' }, '来週に回しました'),
+      btn('取り消す', () => app.update((w) => { w.carriedOut = togglePlanCarry(w.carriedOut, t, app.weekKey, w.script[t.id]); }), 'btn btn-small btn-ghost', { 'data-key': `card-uncarry-${t.id}` }));
+  }
+  const mainFull = wk.rundown.corners.find((c) => c.key === 'main').items.length >= cornerDef('main').maxItems;
+  const put = (key) => () => app.update((w) => { w.rundown = assignTopic(w.rundown, t.id, key) || w.rundown; });
+  return menu('番組に入れる ▾', [
+    canBeMain(t)
+      ? { key: `to-main-${t.id}`, label: mainFull ? 'メイン3トピック（3本入っています）' : 'メイン3トピック', disabled: mainFull, run: put('main') }
+      : { note: '一般のバズはメインに入れません' },
+    { key: `to-category-${t.id}`, label: 'カテゴリ別ニュース', run: put('category') },
+    { key: `to-chat-${t.id}`, label: '雑談（一般のバズ）', run: put('chat') },
+  ], 'menu-put', `put-${t.id}`);
+}
+
+/** 「…」メニュー（来週へ・編集・片付ける・削除） */
+function moreMenu(app, wk, t) {
+  const carried = isCarriedOut(wk.carriedOut, t.id);
+  return menu('…', [
+    !whereIs(wk, t.id) && !carried ? { key: `card-carry-${t.id}`, label: '来週に回す', run: () => app.update((w) => { w.carriedOut = togglePlanCarry(w.carriedOut, t, app.weekKey, w.script[t.id]); }) } : null,
+    { key: `edit-${t.id}`, label: '編集・台本（名前・まとめ直し）', run: () => openDialog(app, t.id) },
+    { key: `shelve-${t.id}`, label: '片付ける（この週は使わない）', run: () => app.shelve(t) },
+    { key: `trash-${t.id}`, label: '削除（ゴミ箱へ・今後も出さない）', danger: true, run: () => app.trash(t) },
+  ], 'menu-more', `more-${t.id}`, { 'aria-label': `「${t.name}」のその他の操作`, title: 'その他の操作' });
+}
+
+/** 整理のボタン（構成の行・ブックマーク枠用。片付ける＝この週だけ／削除＝ゴミ箱へ）。「済」（配信で読んだ）とは別 */
 function tidyButtons(app, t, cls = 'btn btn-small btn-ghost-dark') {
   return h('span', { class: 'tidy-btns' },
     btn('片付ける', () => app.shelve(t), cls, { 'data-key': `shelve-${t.id}`, title: 'この週は使わないので候補から片付けます（片付けタブから戻せます）' }),
@@ -435,52 +479,137 @@ function repId(t) {
   return t.stats.topPostId || t.linkId || (t.linkIds && t.linkIds[0]) || null;
 }
 
+/** 帯の数字（1行）「13件／合計2834.6万／伸び6.5万/時」 */
+function statsOneLine(t) {
+  const st = t.stats;
+  if (!st.count) return '数値は不明（データに無い投稿）';
+  const parts = [`${st.count}件`, `合計${formatCompact(st.totalImp)}${st.unknownImp && st.totalImp != null ? '（一部不明）' : ''}`];
+  if (st.maxPace != null) parts.push(`伸び${formatCompact(st.maxPace)}/時`);
+  return parts.join('／');
+}
+
+function openDetail(app, tid) {
+  app.ui.detailTopic = tid;
+  app.ui.dialogTopic = null;
+  app.render();
+}
+
+/** 帯（ジャンル・話題名・数字・シール）。クリックで詳細ビュー */
+function topicBand(app, t) {
+  const band = h('header', { class: `tcard-band g-${t.genre}` },
+    h('div', { class: 'tcard-top' }, genreSticker(t.genre, { small: true }), h('span', { class: 'tcard-marks' }, topicMarks(app, t))),
+    h('h3', { class: 'tcard-name' }, h('button', { type: 'button', class: 'tcard-open', dataset: { key: `open-${t.id}` }, attrs: { title: 'この話題の投稿を全部見る' }, on: { click: () => openDetail(app, t.id) } }, t.name)),
+    h('p', { class: 'tcard-stats' }, statsOneLine(t)));
+  band.addEventListener('click', (e) => { if (!e.target.closest('button, a, summary, details')) openDetail(app, t.id); });
+  return band;
+}
+
+/** カード下部（主ボタン・ほか n 件・…） */
+function cardFoot(app, wk, t) {
+  const others = Math.max(0, t.stats.count - 1);
+  return h('footer', { class: 'tcard-foot' },
+    primaryArea(app, wk, t),
+    others ? btn(`ほか${others}件 ▸`, () => openDetail(app, t.id), 'btn btn-small btn-ghost tcard-more', { 'data-key': `others-${t.id}` }) : null,
+    moreMenu(app, wk, t));
+}
+
 /**
- * 話題カード。mode: 'embed'（既定。上にジャンル色の帯、中身は代表投稿の X 埋め込み。失敗時は自前の表示）
- *               'card'（従来の自前カード）／ compact（単発の折りたたみ一覧用・軽い表示＋「埋め込みで見る」）
+ * 話題カード。既定は代表投稿の X 埋め込み（長い投稿は一定の高さで切って「全体を見る」）。
+ * 「カード表示」設定のときは代表投稿の本文と数字だけの軽い表示。
  */
-function topicCard(app, wk, t, compact = false) {
-  const embedMode = !compact && app.ui.view !== 'card';
+function topicCard(app, wk, t) {
+  const embedMode = app.ui.view !== 'card';
   const id = repId(t);
+  const card = h('article', { class: `tcard is-embed${embedMode ? '' : ' is-datacard'}`, dataset: { topic: t.id, keep: `t:${t.id}:${embedMode ? 'e' : 'c'}` } });
+  card.append(topicBand(app, t));
+  const rep = id ? app.postsById.get(id) : null;
   if (embedMode && id) {
-    const rep = app.postsById.get(id);
-    const st = t.stats;
-    const card = h('article', { class: 'tcard is-embed', dataset: { topic: t.id, keep: `t:${t.id}` } });
-    card.append(h('header', { class: `tcard-band g-${t.genre}` },
-      h('div', { class: 'tcard-top' }, genreSticker(t.genre, { small: true }), h('span', { class: 'tcard-marks' }, topicMarks(app, t))),
-      h('h3', { class: 'tcard-name' }, t.name),
-      h('p', { class: 'stats' }, statsLine(t))));
     const fallback = rep ? postCard(rep, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, noActions: true, bm: bmInfo(app, rep.id) }) : h('p', { class: 'muted' }, `データに無い投稿（ID ${id}）`);
-    card.append(h('div', { class: 'tcard-body', dataset: { keep: 'body' } }, embedHost(id, fallback, 'tcard-embed')));
-    card.append(...[suggestRow(app, t), topicActions(app, wk, t)].filter(Boolean));
-    return card;
+    card.append(h('div', { class: 'tcard-body', dataset: { keep: 'body' } }, embedHost(id, fallback, 'tcard-embed', { clamp: true })));
+  } else {
+    card.append(h('div', { class: 'tcard-body' }, rep
+      ? postCard(rep, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, embedder: app.embedder, bm: bmInfo(app, rep.id) })
+      : h('p', { class: 'muted' }, id ? `データに無い投稿（ID ${id}）。「ほか」や X で確認` : '投稿はありません')));
   }
-  const card = h('article', { class: `tcard g-${t.genre}${compact ? ' is-compact' : ''}`, dataset: { topic: t.id } });
-  card.append(h('div', { class: 'tcard-top' }, genreSticker(t.genre, { small: true }), h('span', { class: 'tcard-marks' }, topicMarks(app, t))));
-  card.append(h('h3', { class: 'tcard-name' }, t.name));
-  card.append(h('p', { class: 'stats' }, statsLine(t)));
-  const rep = t.stats.topPostId ? app.postsById.get(t.stats.topPostId) : null;
-  if (rep && !compact) card.append(h('p', { class: 'tcard-text' }, rep.text));
-  else if (t.kind === 'link') card.append(h('p', { class: 'tcard-text' }, '中身は「埋め込みで見る」か X で確認'));
   const sr = suggestRow(app, t);
   if (sr) card.append(sr);
-  const acts = topicActions(app, wk, t);
-  if (compact && id) {
-    const b = btn('埋め込みで見る', () => {
-      b.disabled = true;
-      const host = h('div', { class: 'embed-host' }, h('div', { class: 'embed-skeleton' }, '埋め込みを読み込み中…'));
-      card.append(host);
-      app.embedder.now(host, String(id), () => {
-        const sk = host.querySelector('.embed-skeleton');
-        if (sk) sk.textContent = '埋め込みを表示できませんでした（削除・非公開・通信の遮断など）';
-        const tg = host.querySelector('.embed-target');
-        if (tg) tg.remove();
-      });
-    }, 'btn btn-small btn-ghost-dark', { 'data-key': `embed-now-${t.id}` });
-    acts.prepend(b);
-  }
-  card.append(acts);
+  card.append(cardFoot(app, wk, t));
   return card;
+}
+
+/** 単発投稿の折りたたみ一覧の行（軽い表示。名前を押すと詳細ビュー） */
+function singleRow(app, wk, t) {
+  const rep = app.postsById.get(repId(t));
+  return h('li', { class: 'srow', dataset: { topic: t.id } },
+    genreSticker(t.genre, { label: false, small: true }),
+    h('div', { class: 'srow-main' },
+      h('button', { type: 'button', class: 'srow-open tcard-name', dataset: { key: `open-${t.id}` }, on: { click: () => openDetail(app, t.id) } }, t.name),
+      h('p', { class: 'srow-sub' }, rep && rep.user ? `@${rep.user}・` : '', statsOneLine(t)), topicMarks(app, t)),
+    h('div', { class: 'srow-acts' }, primaryArea(app, wk, t),
+      btn('埋め込みで見る', () => openDetail(app, t.id), 'btn btn-small btn-ghost', { 'data-key': `embed-now-${t.id}` }),
+      moreMenu(app, wk, t)));
+}
+
+// ================================================================ 1件ずつ見る詳細ビュー
+
+function detailNav(app, delta) {
+  const list = app.ui.detailList || [];
+  const i = list.indexOf(app.ui.detailTopic);
+  if (i < 0 || !list.length) return;
+  app.ui.detailTopic = list[(i + delta + list.length) % list.length];
+  app.render();
+}
+
+/** 詳細ビューでのキー操作（←→ で前後の話題。入力中・メニュー操作中は除く） */
+export function planKeydown(app, e) {
+  if (!app.ui.detailTopic || e.ctrlKey || e.metaKey || e.altKey) return;
+  const tg = e.target;
+  if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT' || tg.isContentEditable)) return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); detailNav(app, 1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); detailNav(app, -1); }
+}
+
+function detailDialog(app, wk, t) {
+  const list = app.ui.detailList || [];
+  const pos = list.indexOf(t.id);
+  const dlg = h('dialog', { class: 'detail-dialog', dataset: { keep: `detail:${t.id}`, topic: t.id }, attrs: { 'data-modal': '', 'aria-labelledby': 'detail-title' } });
+  const close = () => { app.ui.detailTopic = null; app.render(); };
+  dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); }); // 外側（背景）クリックで閉じる
+  dlg.append(h('header', { class: `detail-head g-${t.genre}` },
+    h('div', { class: 'detail-title-row' }, genreSticker(t.genre, { small: true }), h('span', { class: 'tcard-marks' }, topicMarks(app, t))),
+    h('h2', { id: 'detail-title', class: 'detail-title' }, t.name),
+    h('p', { class: 'tcard-stats' }, statsOneLine(t), pos >= 0 ? `　（${pos + 1} / ${list.length}）` : ''),
+    h('div', { class: 'detail-nav' },
+      btn('← 前の話題', () => detailNav(app, -1), 'btn btn-small btn-dark', { 'data-key': 'detail-prev', disabled: list.length < 2 || pos < 0 }),
+      btn('次の話題 →', () => detailNav(app, 1), 'btn btn-small btn-dark', { 'data-key': 'detail-next', disabled: list.length < 2 || pos < 0 }),
+      btn('閉じる（Esc）', close, 'btn btn-small btn-dark', { 'data-key': 'detail-close' }))));
+  dlg.append(h('div', { class: 'detail-actions' },
+    primaryArea(app, wk, t),
+    btn('編集・台本', () => openDialog(app, t.id), 'btn btn-small btn-ghost', { 'data-key': 'detail-edit' }),
+    btn('片付ける', () => { app.ui.detailTopic = null; app.shelve(t); }, 'btn btn-small btn-ghost', { 'data-key': 'detail-shelve' }),
+    btn('削除', () => { app.ui.detailTopic = null; app.trash(t); }, 'btn btn-small btn-ghost btn-danger', { 'data-key': 'detail-trash' }),
+    suggestRow(app, t)));
+  const box = h('div', { class: 'detail-posts', dataset: { keep: 'posts' } });
+  const posts = topicPosts(app, t);
+  const useEmbed = app.ui.view !== 'card';
+  if (!posts.length) {
+    const id = repId(t);
+    if (id) box.append(h('article', { class: 'detail-post', dataset: { keep: `p:${id}` } }, useEmbed ? embedHost(id, linkCard(id, null, null)) : linkCard(id, null, app.embedder)));
+    else box.append(h('p', { class: 'empty' }, '投稿はありません'));
+  }
+  posts.forEach((p, i) => {
+    const own = postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), compact: false, noActions: !useEmbed ? false : true, embedder: useEmbed ? null : app.embedder, bm: bmInfo(app, p.id) });
+    box.append(h('article', { class: 'detail-post', dataset: { keep: `p:${p.id}`, id: p.id } },
+      h('p', { class: 'detail-post-no' }, `${i + 1} / ${posts.length}${p.id === t.stats.topPostId ? '（代表）' : ''}`),
+      useEmbed ? embedHost(p.id, own, 'detail-embed') : own,
+      h('div', { class: 'detail-post-acts' },
+        posts.length > 1 ? btn('この投稿を話題から外す', () => app.update((w) => { w.overrides.moves[p.id] = `p:${p.id}`; }, { topics: true }), 'btn btn-small btn-ghost', { 'data-key': `detail-detach-${p.id}` }) : null,
+        btn('この投稿を削除', () => app.hidePost(p.id, t.name), 'btn btn-small btn-ghost btn-danger', { 'data-key': `detail-hide-${p.id}`, title: 'どの話題にも出さない（ゴミ箱から戻せます）' }),
+        h('a', { href: statusUrl(p.id), target: '_blank', rel: 'noopener noreferrer', class: 'btn btn-small btn-ghost' }, 'Xで開く'))));
+  });
+  dlg.append(box);
+  return dlg;
 }
 
 // ================================================================ 話題の編集（ダイアログ）
@@ -492,7 +621,7 @@ function openDialog(app, tid) {
 
 function topicDialog(app, t) {
   const wk = app.weekState();
-  const dlg = h('dialog', { class: `topic-dialog`, attrs: { 'aria-labelledby': 'dlg-title' } });
+  const dlg = h('dialog', { class: `topic-dialog`, attrs: { 'data-modal': '', 'aria-labelledby': 'dlg-title' } });
   const close = () => { app.ui.dialogTopic = null; if (dlg.open) dlg.close(); app.render(); };
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
   const name = h('input', { class: 'input', type: 'text', value: t.name, maxLength: 80, dataset: { key: 'dlg-name' } });
@@ -568,7 +697,6 @@ function topicDialog(app, t) {
   }
   if (posts.length > 40) body.append(h('p', { class: 'muted' }, `ほか ${posts.length - 40}件`));
   dlg.append(body);
-  app.afterRender = () => { if (!dlg.open && typeof dlg.showModal === 'function') dlg.showModal(); };
   return dlg;
 }
 
