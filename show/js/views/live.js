@@ -1,9 +1,8 @@
 // ② 進行（配信中）画面。キーボード: →/Enter 読んだ、← 戻す、S 飛ばす、L 来週へ。
 import { computeTimer, formatClock, cornerDef, cueStates } from '../logic.js';
-import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard } from '../dom.js';
+import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
-import { cueColor, leadFor, scriptFor, topicPosts, topicMarks, repPostCard, currentTitle, mainTopics, statsLine, refYear, bmInfo } from './common.js';
-import { reviewSummary } from './plan.js';
+import { cueColor, leadFor, scriptFor, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
 
@@ -25,7 +24,7 @@ export function renderLive(app) {
   const cue = cues[live.index] || null;
   const color = cue ? cueColor(app, cue) : 'white';
   const def = cue ? cornerDef(cue.cornerKey) : null;
-  const root = h('div', { class: 'live' });
+  const root = h('div', { class: 'live', dataset: { keep: `live:${app.weekKey}` } });
 
   const startArea = live.startedAt == null
     ? btn('▶ 配信開始（計測スタート）', () => app.liveAction('start'), 'btn btn-start', { 'data-key': 'live-start' })
@@ -44,7 +43,7 @@ export function renderLive(app) {
     h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }),
     h('div', { class: 'live-start' }, startArea)));
 
-  const mainCard = h('section', { class: 'live-main', attrs: { 'aria-label': '今読むニュース' } });
+  const mainCard = h('section', { class: 'live-main', dataset: { keep: 'main' }, attrs: { 'aria-label': '今読むニュース' } });
   mainCard.append(cueContent(app, cue, wk));
   if (app.ui.stampAt && Date.now() - app.ui.stampAt < 1200) {
     const stamp = h('div', { class: `stamp${prefersReducedMotion() ? '' : ' is-anim'}`, attrs: { 'aria-hidden': 'true' } }, '済');
@@ -53,14 +52,14 @@ export function renderLive(app) {
     app.ui.stampAt = null;
   }
 
-  root.append(h('div', { class: 'live-grid' }, mainCard, progressList(app, cues, live)));
+  root.append(h('div', { class: 'live-grid', dataset: { keep: 'grid' } }, mainCard, progressList(app, cues, live)));
   root.append(controls(app, cue, live));
   tickLive(app, root);
   return root;
 }
 
 function cueContent(app, cue, wk) {
-  const box = h('div', { class: 'live-content' });
+  const box = h('div', { class: 'live-content', dataset: { keep: cue ? `c:${cue.id}` : 'end' } });
   if (!cue) {
     box.append(h('h2', { class: 'live-headline' }, 'おつかれさまでした！'),
       h('p', { class: 'live-lead' }, 'すべてのコーナーが終わりました。'),
@@ -78,11 +77,15 @@ function cueContent(app, cue, wk) {
     box.append(h('p', { class: 'live-lead' }, leadFor(app, t)));
     const notesBox = h('div', { class: 'live-notes' },
       h('h3', {}, '話すポイント'), h('p', { class: 'pre' }, sc.points || '（未入力）'),
-      h('h3', {}, '視聴者への質問'), h('p', { class: 'pre' }, sc.question || '（未入力）'));
-    const rep = repPostCard(app, t);
+      h('h3', {}, '視聴者への質問'), h('p', { class: 'pre' }, sc.question || '（未入力）'),
+      notes ? [h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)] : null);
+    // 代表投稿は X 埋め込みが既定（「カード表示」のときと、埋め込めなかったときは自前のカード）
+    const repId = t.stats.topPostId || t.linkId || (t.linkIds && t.linkIds[0]) || null;
+    const own = repPostCard(app, t);
+    const rep = app.ui.view !== 'card' && repId ? h('div', { dataset: { keep: 'rep' } }, embedHost(repId, own, 'live-embed')) : own;
     const related = topicPosts(app, t).filter((p) => p.id !== t.stats.topPostId).slice(0, 3);
-    box.append(h('div', { class: 'live-two' },
-      h('div', {}, h('h3', { class: 'live-h3' }, '代表投稿'), rep || h('p', { class: 'muted' }, '該当なし'),
+    box.append(h('div', { class: 'live-two', dataset: { keep: 'two' } },
+      h('div', { dataset: { keep: 'left' } }, h('h3', { class: 'live-h3' }, '代表投稿'), rep || h('p', { class: 'muted' }, '該当なし'),
         related.length ? h('div', {}, h('h3', { class: 'live-h3' }, `関連投稿（${topicPosts(app, t).length - 1}件中 ${related.length}件）`),
           related.map((p) => postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: app.embedder, compact: true, bm: bmInfo(app, p.id) }))) : null),
       notesBox));
@@ -91,20 +94,6 @@ function cueContent(app, cue, wk) {
   if (cue.kind === 'empty') {
     box.append(h('h2', { class: 'live-headline' }, cornerDef(cue.cornerKey).name),
       h('p', { class: 'live-lead' }, 'このコーナーにはまだ話題が入っていません（編成で追加できます）。'));
-  } else if (cue.cornerKey === 'opening') {
-    const mains = mainTopics(app);
-    box.append(h('p', { class: 'live-kicker-dark' }, 'タイトルコール'), h('h2', { class: 'live-headline' }, currentTitle(app)),
-      h('h3', { class: 'live-h3' }, '今週の3大ニュース'),
-      mains.length ? h('ol', { class: 'big-list' }, mains.map((t) => h('li', {}, t.name))) : h('p', { class: 'muted' }, '（メイン未設定）'));
-  } else if (cue.cornerKey === 'ending') {
-    const done = app.cues.filter((c) => c.kind === 'topic' && wk.live.status[c.id] === 'done').map((c) => cueTitle(app, c));
-    box.append(h('h2', { class: 'live-headline' }, 'エンディング'),
-      h('h3', { class: 'live-h3' }, `今日読んだニュース（${done.length}件）`),
-      done.length ? h('ul', { class: 'big-list' }, done.map((n) => h('li', {}, n))) : h('p', { class: 'muted' }, '該当なし'),
-      h('h3', { class: 'live-h3' }, `来週へ持ち越し（${wk.carriedOut.length}件）`),
-      wk.carriedOut.length ? h('ul', { class: 'big-list' }, wk.carriedOut.map((c) => h('li', {}, c.name))) : h('p', { class: 'muted' }, 'なし'));
-  } else if (cue.kind === 'review') {
-    box.append(h('h2', { class: 'live-headline' }, '今週の答え合わせ'), reviewSummary(app));
   } else {
     box.append(h('h2', { class: 'live-headline' }, cornerDef(cue.cornerKey).name), h('p', { class: 'live-lead' }, cornerDef(cue.cornerKey).sub));
   }

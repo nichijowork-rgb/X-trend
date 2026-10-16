@@ -1,13 +1,15 @@
 // 配信番組サイト（/show/）のエントリ。データ読み込み・状態・保存・画面切替（#plan / #live / #onair / #review）。
-import { normalizeDataset, normalizeReports, parseTimestamp, formatDateTime } from '../assets/js/core.js';
+import { normalizeDataset, parseTimestamp, formatDateTime } from '../assets/js/core.js';
 import { createEmbedder } from '../assets/js/embed.js';
-import { TEXT } from './js/config.js';
+import { TEXT, VIEW_PREF_KEY } from './js/config.js';
 import {
   showWeekOf, weekByKey, shiftWeekKey, listWeeks, postsInWeek, buildTopics, indexTopics, buildCues, getWeek,
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
+  partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
 } from './js/logic.js';
 import { loadSaved, saveState, openSync } from './js/store.js';
-import { h, clear, isEditable } from './js/dom.js';
+import { h, clear, isEditable, startEmbeds } from './js/dom.js';
+import { patchView } from './js/patch.js';
 import { renderPlan } from './js/views/plan.js';
 import { renderLive, tickLive, liveKeydown } from './js/views/live.js';
 import { renderOnair, tickOnair } from './js/views/onair.js';
@@ -19,7 +21,6 @@ const $ = (id) => document.getElementById(id);
 const app = {
   ds: null,
   postsById: new Map(),
-  reports: null,
   bookmarks: null, // null = 機能非表示
   isSample: false,
   saved: null,
@@ -27,18 +28,31 @@ const app = {
   week: null,
   weeks: [],
   topics: [],
+  visibleTopics: [],
+  shelvedTopics: [],
+  trashedTopics: [],
   topicsById: new Map(),
   cues: [],
   newInfo: null,
   weekPostIds: [],
   route: 'plan',
-  ui: { filter: 'all', query: '', shown: 30, openScript: new Set(), bmMode: 'week' },
+  ui: { filter: 'all', query: '', shown: 30, openScript: new Set(), bmMode: 'week', view: loadViewPref() },
   bmFlags: new Map(),
   embedder: null,
   ready: false,
   clusterCache: {},
 };
 window.__show = app; // E2E・デバッグ用
+
+/** 候補・ブックマーク・進行の表示（'embed' 既定 / 'card'）。localStorage が使えなくても動く */
+function loadViewPref() {
+  try { return localStorage.getItem(VIEW_PREF_KEY) === 'card' ? 'card' : 'embed'; } catch { return 'embed'; }
+}
+app.setView = (v) => {
+  app.ui.view = v === 'card' ? 'card' : 'embed';
+  try { localStorage.setItem(VIEW_PREF_KEY, app.ui.view); } catch { /* 保存できなくても表示は切り替える */ }
+  app.render();
+};
 
 // ================================================================ データ
 
@@ -50,9 +64,7 @@ async function fetchJson(url) {
 
 async function loadData() {
   const tryLoad = async (base) => {
-    const [posts, reports, bookmarks] = await Promise.allSettled([
-      fetchJson(`${base}posts.json`), fetchJson(`${base}reports.json`), fetchJson(`${base}bookmarks.json`),
-    ]);
+    const [posts, bookmarks] = await Promise.allSettled([fetchJson(`${base}posts.json`), fetchJson(`${base}bookmarks.json`)]);
     if (posts.status !== 'fulfilled') throw posts.reason;
     const ds = normalizeDataset(posts.value); // 形式不正は例外
     // ブックマークで取り込まれた投稿の印（normalizeDataset は未知のフィールドを落とすので別に持つ）
@@ -63,7 +75,6 @@ async function loadData() {
     return {
       ds,
       bmFlags,
-      reports: reports.status === 'fulfilled' ? normalizeReports(reports.value) : null,
       bookmarks: bookmarks.status === 'fulfilled' ? normalizeBookmarks(bookmarks.value) : null,
     };
   };
@@ -112,8 +123,14 @@ function recompute() {
   app.topics = buildTopics({
     posts: weekPosts, extraPosts, missingIds: missingIds.sort(compareIds), personalIds, bookmarkIds, carried,
     postsById: app.postsById, dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache,
+    hiddenPostIds: new Set(app.saved.hiddenPosts.map((x) => x.id)),
   });
   app.topicsById = indexTopics(app.topics);
+  // 候補に出す話題（片付け・削除を除く）
+  const part = partitionTopics(app.topics, wk, app.saved.trash);
+  app.visibleTopics = part.visible;
+  app.shelvedTopics = part.shelved;
+  app.trashedTopics = part.trashed;
   app.cues = buildCues(wk.rundown, app.topicsById);
   app.weekPostIds = [...weekPosts.map((p) => p.id), ...extraPosts.map((p) => p.id)];
   app.newInfo = newSince(wk, app.weekPostIds, app.topics);
@@ -184,6 +201,76 @@ app.liveAction = (type, extra = {}) => {
   });
 };
 
+// ================================================================ 整理（片付け・削除）と元に戻す
+
+let toastTimer = null;
+/** 画面下のお知らせ（「元に戻す」つき）。onUndo が無ければ文だけ */
+function toast(text, onUndo = null) {
+  let el = $('toast');
+  if (!el) {
+    el = h('div', { id: 'toast', class: 'toast', attrs: { role: 'status', 'aria-live': 'polite' } });
+    document.body.append(el);
+  }
+  clear(el);
+  el.append(h('span', { class: 'toast-text' }, text));
+  if (onUndo) {
+    el.append(h('button', { type: 'button', class: 'btn btn-small toast-undo', dataset: { key: 'toast-undo' }, on: { click: () => { hide(); onUndo(); } } }, '元に戻す'));
+  }
+  el.hidden = false;
+  const hide = () => { el.hidden = true; clearTimeout(toastTimer); };
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hide, 8000);
+}
+app.toast = toast;
+
+/** 操作の前の状態を覚えておき、直後のトーストから「元に戻す」 */
+function withUndo(message, mutate) {
+  const before = serializeSaved(app.saved);
+  app.update(mutate, { topics: true });
+  toast(message, () => {
+    const r = parseSaved(before);
+    if (r.ok) { app.replaceSaved(r.state); toast('元に戻しました'); }
+  });
+}
+
+app.shelve = (topic) => withUndo(`「${topic.name}」を片付けました（この週の候補から外しました）`, (w) => {
+  Object.assign(w, shelveTopic(w, topic, Date.now()));
+});
+app.unshelve = (topicId) => {
+  let placed = false;
+  app.update((w) => { const r = unshelveTopic(w, topicId); Object.assign(w, r.week); placed = r.placed; }, { topics: true });
+  toast(placed ? '候補に戻し、元の枠にも戻しました' : '候補に戻しました');
+};
+app.trash = (topic) => withUndo(`「${topic.name}」を削除しました（ゴミ箱へ。今後の週にも出しません）`, (w, s) => {
+  const r = trashTopic(s, w, topic, app.weekKey, Date.now());
+  s.trash = r.saved.trash;
+  Object.assign(w, r.week);
+});
+app.restoreTrash = (ids) => {
+  let placed = 0;
+  app.update((w, s) => {
+    for (const id of ids) {
+      const r = restoreTrash(s, w, id, app.weekKey);
+      s.trash = r.saved.trash;
+      Object.assign(w, r.week);
+      if (r.placed) placed++;
+    }
+  }, { topics: true });
+  toast(placed ? `ゴミ箱から戻しました（${placed}件は元の枠にも戻しました）` : 'ゴミ箱から戻しました');
+};
+app.hidePost = (postId, topicName) => withUndo('投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）', (w, s) => {
+  s.hiddenPosts = hidePost(s, postId, app.weekKey, Date.now(), topicName).hiddenPosts;
+});
+app.unhidePost = (postId) => {
+  app.update((w, s) => { s.hiddenPosts = unhidePost(s, postId).hiddenPosts; }, { topics: true });
+  toast('投稿を戻しました');
+};
+app.restoreAllTrash = () => {
+  const ids = app.saved.trash.map((x) => x.id);
+  app.restoreTrash(ids);
+  app.update((w, s) => { s.hiddenPosts = []; }, { topics: true });
+};
+
 function setSaveStatus(text, kind = 'ok') {
   const el = $('save-status');
   if (!el) return;
@@ -237,10 +324,15 @@ function renderRoute() {
   // 再描画してもフォーカスを失わないよう、data-key でたどる
   const active = document.activeElement;
   lastFocusKey = active && root.contains(active) && active.dataset ? active.dataset.key || null : null;
-  clear(root);
   const view = { plan: renderPlan, live: renderLive, onair: renderOnair, review: renderReview }[app.route];
+  // 同じ画面・同じ週の再描画は差し替え（patch.js）で、表示済みの X 埋め込みを作り直さない
+  const old = root.firstElementChild;
+  const sameScreen = old && old.dataset.keep && old.dataset.keep === `${app.route}:${app.weekKey}`;
+  if (!sameScreen && app.embedder) app.embedder.reset();
   app.afterRender = null;
-  root.append(view(app));
+  const fresh = view(app);
+  if (!(sameScreen && patchView(old, fresh))) { clear(root); root.append(fresh); }
+  startEmbeds(root, app.embedder);
   if (app.afterRender) app.afterRender();
   if (lastFocusKey) {
     const el = root.querySelector(`[data-key="${CSS.escape(lastFocusKey)}"]`);
@@ -272,7 +364,6 @@ async function main() {
   try {
     const d = await loadData();
     app.ds = d.ds;
-    app.reports = d.reports;
     app.bookmarks = d.bookmarks;
     app.bmFlags = d.bmFlags;
     app.isSample = d.isSample;
@@ -327,12 +418,5 @@ async function main() {
   app.ready = true;
   renderRoute();
 }
-
-// 見出しフォント（Google Fonts）が読めたら印を付ける。読めなければシステムの太字のまま
-try {
-  if (document.fonts && document.fonts.load) {
-    document.fonts.load('1em "Dela Gothic One"', '番組').then((list) => { if (list && list.length) document.documentElement.classList.add('has-display-font'); }, () => {});
-  }
-} catch { /* 無視 */ }
 
 main();

@@ -124,6 +124,8 @@ function postActions(id, url, embedder) {
       embedder.now(host, String(id), () => {
         const sk = host.querySelector('.embed-skeleton');
         if (sk) sk.textContent = '埋め込みを表示できませんでした（削除・非公開・通信の遮断など）';
+        const t = host.querySelector('.embed-target');
+        if (t) t.remove();
       });
     }, 'btn btn-small btn-ghost');
     row.append(b);
@@ -158,4 +160,30 @@ export function downloadText(filename, text, type = 'application/json') {
 
 export function prefersReducedMotion() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; }
+}
+
+/**
+ * X 公式埋め込みの入れ物。中身（fallback）は読み込み中の表示を兼ね、埋め込めなかったときはそのまま残る。
+ * 実際の読み込みは startEmbeds() が「画面に入ったものだけ」始める（再描画で入れ物を作り直さないよう data-keep-leaf）。
+ */
+export function embedHost(id, fallback, cls = '') {
+  const host = h('div', { class: `embed-host ${cls}`.trim(), dataset: { keep: `e:${id}`, embedId: String(id) }, attrs: { 'data-keep-leaf': '' } });
+  host.append(h('div', { class: 'embed-skeleton embed-fallback' }, fallback || h('p', { class: 'muted' }, '埋め込みを読み込み中…')));
+  return host;
+}
+
+/** root 内の未開始の埋め込みを embedder に登録する（画面に近づいたものだけ数件ずつ生成される） */
+export function startEmbeds(root, embedder) {
+  if (!embedder) return;
+  for (const host of root.querySelectorAll('.embed-host[data-embed-id]:not([data-embed-started])')) {
+    if (!host.isConnected) continue;
+    host.dataset.embedStarted = '1';
+    embedder.observe(host, host.dataset.embedId, () => {
+      host.classList.add('is-failed');
+      const sk = host.querySelector('.embed-skeleton');
+      if (sk && !sk.querySelector('.embed-failed-note')) sk.prepend(h('p', { class: 'embed-failed-note' }, '埋め込みを表示できなかったため、データの内容を表示しています'));
+      const t = host.querySelector('.embed-target');
+      if (t) t.remove();
+    });
+  }
 }

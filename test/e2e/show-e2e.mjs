@@ -63,9 +63,14 @@ async function check(name, fn) {
 function assert(cond, msg) { if (!cond) throw new Error(msg || 'assertion failed'); }
 
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP4/5/hPwAHAgL/jg2v2QAAAABJRU5ErkJggg==', 'base64');
+// 偽 widgets.js: ID 末尾が奇数なら埋め込み失敗（undefined）→ 自前の表示に戻ることを確かめる
 const FAKE_WIDGETS = `
 window.twttr = { ready: function (cb) { cb(window.twttr); }, widgets: { createTweet: function (id, el) {
-  return new Promise(function (resolve) { setTimeout(function () { var d = document.createElement('div'); d.className = 'fake-tweet'; d.textContent = 'FAKE EMBED ' + id; el.appendChild(d); resolve(d); }, 50); });
+  window.__embedCalls = (window.__embedCalls || []).concat([id]);
+  return new Promise(function (resolve) { setTimeout(function () {
+    if (/[13579]$/.test(id)) { resolve(undefined); return; }
+    var d = document.createElement('div'); d.className = 'fake-tweet'; d.style.height = '180px'; d.textContent = 'FAKE EMBED ' + id; el.appendChild(d); resolve(d);
+  }, 50); });
 } } };`;
 
 /**
@@ -152,14 +157,15 @@ async function main() {
       assert(await page.$('.tcard[data-topic="t:サンプル王子さんの引退"]'), 'topic: の話題');
       assert(await page.$('.tcard .badge-suggest'), '同じ話題かも？');
       assert(await page.isVisible('.bookmarks-sec'), 'bookmark section');
-      const weekN = await page.$$eval('.bm-list li', (l) => l.length);
+      const weekN = await page.$$eval('.bm-grid .bm-card, .bm-list li', (l) => l.length);
       assert(weekN === 4, `今週のブックマーク ${weekN}`);
       await page.click('[data-key="bm-all"]');
-      const allN = await page.$$eval('.bm-list li', (l) => l.length);
+      const allN = await page.$$eval('.bm-grid .bm-card, .bm-list li', (l) => l.length);
       assert(allN === sampleBm.bookmarks.length, `すべて ${allN}`);
       assert((await page.textContent('.bookmarks-sec')).includes('ブクマで取り込み'), 'below_threshold の印');
       assert(await page.$('.tcard .badge-bm'), '★ブックマークの印');
-      const ext = external.filter((u) => !/fonts\.(googleapis|gstatic)\.com/.test(u));
+      const ext = external.filter((u) => !u.startsWith('https://platform.twitter.com/widgets.js'));
+      assert(!external.some((u) => /fonts\.(googleapis|gstatic)\.com/.test(u)), '外部フォントは読まない');
       assert(ext.length === 0, `外部通信: ${ext.join(', ')}`);
       await ctx.close();
       return `今週 ${weekN}件・すべて ${allN}件`;
@@ -272,6 +278,7 @@ async function main() {
     });
 
     let onair;
+    let afterMain = '';
     await check('進行: 開始・読んだ（→）・飛ばす（S）・来週へ（L）・戻す（←）＋映す用が追従', async () => {
       const oaPage = await ctx.newPage();
       await oaPage.setViewportSize({ width: 1920, height: 1080 });
@@ -287,8 +294,6 @@ async function main() {
       await page.goto(`${show}#live`);
       await ready(page);
       await page.click('[data-key="live-start"]');
-      await waitOnair(oaPage, 'opening');
-      await page.keyboard.press('ArrowRight'); // オープニング済
       assert((await curCue(page)) === `main:${mainIds[0]}`, await curCue(page));
       await waitOnair(oaPage, `main:${mainIds[0]}`);
       await oaPage.waitForTimeout(300);
@@ -299,6 +304,9 @@ async function main() {
       assert(!oaText.includes('ヒミツの話すポイント') && !oaText.includes('みんなはどう？'), 'メモは映さない');
       const liveText = await page.textContent('.live-main');
       assert(liveText.includes('ヒミツの話すポイント'), '進行にはメモを出す');
+      // 代表投稿は埋め込み（モック）が既定。映す用も埋め込みを試す（失敗時は自前の表示）
+      await page.waitForSelector('.live-main .live-embed.is-loaded, .live-main .live-embed.is-failed', { timeout: 8000 });
+      await oaPage.waitForSelector('.oa-embed.is-loaded, .oa-embed.is-failed', { timeout: 8000 });
       await page.screenshot({ path: path.join(SHOTS, 'live-1280.png') });
       await page.keyboard.press('s'); // メイン1 飛ばす
       await page.keyboard.press('l'); // メイン2 来週へ
@@ -316,8 +324,9 @@ async function main() {
       assert(await page.$('.stamp'), '済スタンプ');
       st = await live(page);
       assert(st.status[`main:${mainIds[2]}`] === 'done', 'done by button');
-      assert((await curCue(page)) === 'break', await curCue(page));
-      await waitOnair(oaPage, 'break');
+      afterMain = await curCue(page);
+      assert(afterMain.startsWith('category:'), afterMain);
+      await waitOnair(oaPage, afterMain);
       // 入力欄の中ではキー操作しない
       const idx = (await live(page)).index;
       await page.goto(`${show}#plan`);
@@ -336,14 +345,14 @@ async function main() {
       await ready(page);
       const after = await live(page);
       assert(after.index === before.index && JSON.stringify(after.status) === JSON.stringify(before.status) && after.startedAt === before.startedAt, 'live');
-      assert((await curCue(page)) === 'break', await curCue(page));
+      assert((await curCue(page)) === afterMain, await curCue(page));
       const sc = await page.evaluate((id) => window.__show.weekState().script[id], mainIds[0]);
       assert(sc && sc.points === 'ヒミツの話すポイント', JSON.stringify(sc));
       const carried = await page.evaluate(() => window.__show.weekState().carriedOut.map((c) => c.topicId));
       assert(carried.includes(mainIds[1]), 'carried kept');
       await onair.reload();
       await ready(onair);
-      assert((await oaCue(onair)) === 'break', 'onair restored');
+      assert((await oaCue(onair)) === afterMain, 'onair restored');
     });
 
     await check('来週に回した話題が翌週の候補に出る', async () => {
@@ -366,10 +375,10 @@ async function main() {
       await page.goto(`${show}#review`);
       await ready(page);
       const n = async (k) => page.$$eval(`.review-col[data-list="${k}"] li`, (l) => l.length);
-      assert((await n('done')) === 2 && (await n('skipped')) === 1 && (await n('carried')) === 1, `${await n('done')}/${await n('skipped')}/${await n('carried')}`);
+      assert((await n('done')) === 1 && (await n('skipped')) === 1 && (await n('carried')) === 1, `${await n('done')}/${await n('skipped')}/${await n('carried')}`);
       const pub = await page.inputValue('[data-key="export-public"]');
       const full = await page.inputValue('[data-key="export-full"]');
-      assert(pub.startsWith('【週刊ヨルニュース】') && pub.includes('00:00 オープニング') && !pub.includes('ヒミツの話すポイント'), pub.slice(0, 120));
+      assert(pub.startsWith('【週刊ヨルニュース】') && pub.includes('00:00 メイン3トピック\n45:00 カテゴリ別ニュース') && !/オープニング|中休み|エンディング/.test(pub) && !pub.includes('ヒミツの話すポイント'), pub.slice(0, 120));
       assert(full.includes('ヒミツの話すポイント'), 'full has points');
       await page.screenshot({ path: path.join(SHOTS, 'review-1280.png'), fullPage: true });
     });
@@ -381,7 +390,7 @@ async function main() {
       const file = path.join(tmp, 'export.json');
       await dl.saveAs(file);
       const exported = JSON.parse(readFileSync(file, 'utf8'));
-      assert(exported.app === 'xtrend-show' && exported.v === 1, 'export format');
+      assert(exported.app === 'xtrend-show' && exported.v === 3, 'export format');
       // 変更: メインを全部外す
       for (const id of mainIds) { const b = await page.$(`[data-key="main-rm-${id}"]`); if (b) await b.click(); }
       assert((await page.$$('.slot.g-main')).length < 3, 'removed');
@@ -415,25 +424,110 @@ async function main() {
       await page.setViewportSize({ width: 1280, height: 800 });
     });
 
-    await check('映す用: 1920×1080 にぴったり（エンディング・答え合わせ）', async () => {
+    await check('映す用: 1920×1080 にぴったり（雑談・終わり）', async () => {
       await page.goto(`${show}#live`);
       await ready(page);
       const cues = await page.evaluate(() => window.__show.cues.map((c) => c.id));
-      await page.click(`[data-key="prog-review"]`);
-      await waitOnair(onair, 'review');
+      assert(!cues.some((c) => /^(opening|break|review|ending)$/.test(c)), `旧コーナー ${cues}`);
+      const last = cues[cues.length - 1];
+      await page.click(`[data-key="prog-${last}"]`);
+      await waitOnair(onair, last);
       await onair.waitForTimeout(2800);
-      await onair.screenshot({ path: path.join(SHOTS, 'onair-1920-review.png') });
+      await onair.screenshot({ path: path.join(SHOTS, 'onair-1920-chat.png') });
       const box = await onair.$eval('#oa-stage', (e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; });
       assert(Math.round(box[0]) === 1920 && Math.round(box[1]) === 1080, `${box}`);
-      await page.click(`[data-key="prog-ending"]`);
-      await waitOnair(onair, 'ending');
-      await onair.waitForTimeout(2800);
-      await onair.screenshot({ path: path.join(SHOTS, 'onair-1920-ending.png') });
+      await page.click('[data-key="ctl-done"]');
+      await waitOnair(onair, 'end');
+      await onair.screenshot({ path: path.join(SHOTS, 'onair-1920-end.png') });
       await onair.setViewportSize({ width: 960, height: 540 });
       await onair.waitForTimeout(300);
       const half = await onair.$eval('#oa-stage', (e) => Math.round(e.getBoundingClientRect().width));
       assert(half === 960, `scaled ${half}`);
       return `cues ${cues.length}`;
+    });
+
+    await check('整理: 片付け・削除 → トーストで元に戻す・タブから戻す・構成から外して元の枠へ・リロード後も保持', async () => {
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      const free = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
+      const a = free.find((id) => !mainIds.includes(id));
+      // 片付け → トーストの「元に戻す」
+      await page.click(`[data-key="shelve-${a}"]`);
+      await page.waitForSelector('#toast:not([hidden]) [data-key="toast-undo"]');
+      assert(!(await page.$(`.candidates > .cand-grid .tcard[data-topic="${a}"]`)), 'shelved hidden');
+      assert((await page.textContent('[data-key="tab-shelf"]')).includes('（1）'), 'shelf count');
+      await page.click('[data-key="toast-undo"]');
+      await page.waitForSelector(`.candidates > .cand-grid .tcard[data-topic="${a}"]`);
+      // 片付け → 片付けタブから戻す
+      await page.click(`[data-key="shelve-${a}"]`);
+      await page.click('[data-key="tab-shelf"]');
+      await page.click(`[data-key="unshelve-${a}"]`);
+      await page.click('[data-key="tab-list"]');
+      await page.waitForSelector(`.candidates > .cand-grid .tcard[data-topic="${a}"]`);
+      // 構成（メイン）に入っている話題を削除 → 枠から外れる → ゴミ箱から戻すと元の枠（2番目）へ
+      const m = await page.$$eval('.slot.g-main', (l) => l.map((e) => e.dataset.topic));
+      await page.click(`[data-key="main-edit-${m[1]}"]`);
+      await page.waitForSelector('dialog.topic-dialog[open]');
+      await page.click('[data-key="dlg-trash"]');
+      await page.waitForFunction((id) => ![...document.querySelectorAll('.slot.g-main')].some((e) => e.dataset.topic === id), m[1]);
+      assert(!(await page.$('dialog[open]')), 'dialog closed');
+      // 削除はリロード後も保持
+      await page.reload();
+      await ready(page);
+      assert((await page.textContent('[data-key="tab-trash"]')).includes('（1）'), 'trash kept after reload');
+      await page.click('[data-key="tab-trash"]');
+      await page.screenshot({ path: path.join(SHOTS, 'plan-trash-1280.png') });
+      await page.click(`[data-key="untrash-${m[1]}"]`);
+      await page.waitForFunction((ids) => JSON.stringify([...document.querySelectorAll('.slot.g-main')].map((e) => e.dataset.topic)) === JSON.stringify(ids), m);
+      // 投稿単位の削除（ダイアログ）→ ゴミ箱の「すべて戻す」
+      await page.click('[data-key="tab-list"]');
+      await page.click(`[data-key="main-edit-${m[0]}"]`);
+      await page.waitForSelector('dialog.topic-dialog[open]');
+      const pid = await page.$eval('dialog[open] .post', (e) => e.dataset.id);
+      await page.click(`[data-key="dlg-hide-${pid}"]`);
+      await page.waitForFunction((id) => window.__show.saved.hiddenPosts.some((x) => x.id === id), pid);
+      assert(!(await page.evaluate((id) => window.__show.topics.some((t) => t.postIds.includes(id)), pid)), 'hidden post removed from topics');
+      await page.click('[data-key="dlg-close"]');
+      await page.click('[data-key="tab-trash"]');
+      await page.click('[data-key="trash-restore-all"]');
+      await page.waitForFunction(() => window.__show.saved.hiddenPosts.length === 0 && window.__show.saved.trash.length === 0);
+      await page.click('[data-key="tab-list"]');
+      // 「済」（配信で読んだ）と「片付け」は別の言葉
+      const txt = await page.textContent('.candidates');
+      assert(!txt.includes('アーカイブ'), 'no ambiguous アーカイブ');
+    });
+
+    await check('話題カードは X 埋め込み（モック）・失敗時は自前の表示・カード表示に切替（保持）', async () => {
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      await page.waitForSelector('.tcard.is-embed .embed-host.is-loaded .fake-tweet', { timeout: 8000 });
+      const first = await page.evaluate(() => window.__embedCalls.length);
+      const cards = await page.$$eval('.embed-host[data-embed-id]', (l) => l.length);
+      assert(first < cards, `画面から遠いものはまだ読まない（${first}/${cards}）`);
+      // 画面に近いものだけ生成されるので、下までスクロールして失敗（自前の表示に戻る）も確かめる
+      for (let y = 0; y < 6000 && !(await page.$('.tcard.is-embed .embed-host.is-failed .embed-fallback .post')); y += 600) {
+        await page.mouse.wheel(0, 600);
+        await page.waitForTimeout(250);
+      }
+      await page.waitForSelector('.tcard.is-embed .embed-host.is-failed .embed-fallback .post', { state: 'attached', timeout: 8000 });
+
+      const loaded = await page.$$eval('.tcard.is-embed .embed-host.is-loaded', (l) => l.length);
+      const total = await page.$$eval('.tcard.is-embed', (l) => l.length);
+      // 再描画（ボタン操作）しても読み込み済みの埋め込みは作り直さない
+      const before = await page.evaluate(() => window.__embedCalls.length);
+      await page.click('[data-filter="host"]');
+      await page.click('[data-filter="all"]');
+      await page.waitForTimeout(300);
+      const after = await page.evaluate(() => window.__embedCalls.length);
+      await page.screenshot({ path: path.join(SHOTS, 'plan-embed-1280.png') });
+      await page.click('[data-key="view-toggle"]');
+      assert(!(await page.$('.tcard.is-embed')), 'card mode');
+      await page.reload();
+      await ready(page);
+      assert(!(await page.$('.tcard.is-embed')), 'card mode kept');
+      await page.click('[data-key="view-toggle"]');
+      assert(await page.$('.tcard.is-embed'), 'embed mode back');
+      return `埋め込み ${loaded}/${total}・再描画での追加生成 ${after - before}`;
     });
     await ctx.close();
 
@@ -474,12 +568,11 @@ async function main() {
       await p.goto(`${show}#live`);
       await ready(p);
       await p.click('[data-key="live-start"]');
-      await p.keyboard.press('ArrowRight');
       await oa.waitForSelector('.oa-headline');
       assert((await oa.textContent('.oa-post-text')).includes('<script>'), 'onair text');
       assert((await p.textContent('.live-main')).includes('<img src=x'), 'live text');
       assert(!(await p.$('.live-main img[src="x"]')) && !(await oa.$('img[src="x"]')), 'no injected img');
-      const xss = await p.evaluate(() => window.__xss) ?? await oa.evaluate(() => window.__xss);
+      const xss = (await p.evaluate(() => window.__xss)) ?? (await oa.evaluate(() => window.__xss));
       assert(xss === undefined, `xss ${xss}`);
       const hrefs = await p.$$eval('a[href]', (l) => l.map((a) => a.getAttribute('href')));
       assert(!hrefs.some((h) => /^javascript:/i.test(h)), 'javascript: link');

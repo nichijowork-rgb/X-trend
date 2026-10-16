@@ -32,21 +32,15 @@ export const GENRE_KEYS = Object.freeze(GENRES.map((g) => g.key));
 export const NIGHT_GENRES = Object.freeze(['host', 'kyaba', 'kabuki', 'night']);
 
 /**
- * 番組構成（既定）。kind:
- *  talk   … 話題を入れないコーナー（オープニング・中休み・エンディング）
- *  main   … メイン（最大 maxItems 本）
- *  news   … 話題を入れるコーナー
- *  review … 今週の答え合わせ（reports.json weekly）
- * color はコーナー自体の色（news で話題が入っているときは話題のジャンル色）。
+ * 番組構成（既定・2026-10-16 改定）。メイン3トピック／カテゴリ別ニュース／雑談の 3 コーナー（合計 90 分。時間は編集可）。
+ * オープニング・中休み・答え合わせ・エンディングは廃止（タイトルコールは編成画面のタイトル欄で足りる）。
+ * kind: main … メイン（最大 maxItems 本・夜職の話題だけ）／ news … 話題を入れるコーナー
+ * color はコーナー自体の色（話題が入っているときは話題のジャンル色）。
  */
 export const CORNERS = Object.freeze([
-  Object.freeze({ key: 'opening', name: 'オープニング', sub: 'タイトルコール・3大ニュース予告', min: 5, color: 'white', kind: 'talk' }),
-  Object.freeze({ key: 'main', name: 'メイン3トピック', sub: '各約11分', min: 35, color: 'main', kind: 'main', maxItems: 3 }),
-  Object.freeze({ key: 'break', name: '中休み', sub: 'コメント・告知', min: 5, color: 'white', kind: 'talk' }),
-  Object.freeze({ key: 'category', name: 'カテゴリ別ニュース', sub: 'ホスト／キャバクラ／歌舞伎町／夜職その他', min: 25, color: 'night', kind: 'news' }),
-  Object.freeze({ key: 'chat', name: '雑談', sub: '一般のバズ', min: 10, color: 'general', kind: 'news' }),
-  Object.freeze({ key: 'review', name: '今週の答え合わせ', sub: '伸びる予想は当たった？', min: 5, color: 'review', kind: 'review' }),
-  Object.freeze({ key: 'ending', name: 'エンディング', sub: 'まとめ・来週へ持ち越し', min: 5, color: 'white', kind: 'talk' }),
+  Object.freeze({ key: 'main', name: 'メイン3トピック', sub: '各約15分', min: 45, color: 'main', kind: 'main', maxItems: 3 }),
+  Object.freeze({ key: 'category', name: 'カテゴリ別ニュース', sub: 'ホスト／キャバクラ／歌舞伎町／夜職その他', min: 30, color: 'night', kind: 'news' }),
+  Object.freeze({ key: 'chat', name: '雑談（一般のバズ）', sub: '一般のバズ', min: 15, color: 'general', kind: 'news' }),
 ]);
 
 /**
@@ -82,15 +76,15 @@ export const SCORE_WEIGHTS = Object.freeze({
 export const SCORE_NOTE = '話題性 = 合計表示数（＋いちばん伸びた投稿の勢い）を桁数で比べ、投稿が多い話題・自分がブックマークした投稿を含む話題を上乗せした点数です。表示数が不明な投稿は計算に入れません。';
 
 /**
- * メイン3のおすすめの優先順（上から）。同じ段の中は話題性スコア順。
+ * メイン3のおすすめの優先順（上から）。同じ段の中は話題性スコア順。一般のバズは入れない（MAIN_NIGHT_ONLY）。
  * night: 夜職4カテゴリの話題か、minPosts: 投稿数の下限
  */
 export const MAIN_SUGGEST_TIERS = Object.freeze([
   Object.freeze({ night: true, minPosts: 2 }),
   Object.freeze({ night: true, minPosts: 1 }),
-  Object.freeze({ night: false, minPosts: 2 }),
-  Object.freeze({ night: false, minPosts: 1 }),
 ]);
+/** メイン3に一般のバズは入れない（おすすめにも出さず、カードに「メインへ」を出さない） */
+export const MAIN_NIGHT_ONLY = true;
 
 /** 候補一覧で「まとまった話題」とみなす投稿数（これ未満は「その他の単発投稿」に折りたたむ） */
 export const GROUPED_MIN_POSTS = 2;
@@ -118,7 +112,13 @@ export const TERM_PREFIXES = Object.freeze({
 
 /** 保存データ */
 export const STORAGE_KEY = 'xtrend-show';
-export const SCHEMA_VERSION = 1;
+/**
+ * 2: 番組構成を 3 コーナーに改定（旧コーナーは読み込み時に取り除く）
+ * 3: 話題の整理（週ごとの片付け shelved、ゴミ箱 trash、削除した投稿 hiddenPosts）を追加（無ければ空）
+ */
+export const SCHEMA_VERSION = 3;
+/** 候補・ブックマーク・進行の表示（埋め込み／カード）を覚えておく localStorage キー */
+export const VIEW_PREF_KEY = 'xtrend-show-view';
 /** localStorage が一杯のとき残す番組週の数（新しい順） */
 export const KEEP_WEEKS_ON_QUOTA = 6;
 export const CHANNEL_NAME = 'xtrend-show';

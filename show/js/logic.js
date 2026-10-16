@@ -3,7 +3,7 @@
 
 import { formatCompact, formatPace, viewsPerHour, jstParts, parseTimestamp, UNKNOWN } from '../../assets/js/core.js';
 import {
-  SHOW_DEFAULTS, GENRES, GENRE_KEYS, NIGHT_GENRES, CORNERS, DEFAULT_DICT, SCORE_WEIGHTS, SIMILARITY, MAIN_SUGGEST_TIERS, GROUPED_MIN_POSTS,
+  SHOW_DEFAULTS, GENRES, GENRE_KEYS, NIGHT_GENRES, CORNERS, DEFAULT_DICT, SCORE_WEIGHTS, SIMILARITY, MAIN_SUGGEST_TIERS, GROUPED_MIN_POSTS, MAIN_NIGHT_ONLY,
   TERM_PREFIXES, SCHEMA_VERSION, CHECKPOINTS,
 } from './config.js';
 
@@ -491,6 +491,7 @@ function emptyOverrides() {
  *   postsById   … 全投稿の Map（持ち越し話題の投稿を引く）
  *   dict, overrides, refTs
  *   cache       … 任意。{} を渡すと類似まとめの結果を使い回す
+ *   hiddenPostIds … 削除（非表示）にした投稿 id（どの話題にも入れない）
  * }
  * 返り値: 話題の配列（スコア順）
  */
@@ -501,7 +502,9 @@ export function buildTopics(input) {
   } = input;
   const ov = { ...emptyOverrides(), ...(input.overrides || {}) };
   const byId = new Map();
-  for (const p of [...posts, ...extraPosts]) if (p && p.id && !byId.has(p.id)) byId.set(p.id, p);
+  // 削除（非表示）にした投稿は最初から入れない
+  const hiddenPosts = input.hiddenPostIds instanceof Set ? input.hiddenPostIds : new Set(input.hiddenPostIds || []);
+  for (const p of [...posts, ...extraPosts]) if (p && p.id && !byId.has(p.id) && !hiddenPosts.has(p.id)) byId.set(p.id, p);
   const topics = new Map();
   const where = new Map(); // postId → topicId
   const add = (tid, base, postId) => {
@@ -519,7 +522,7 @@ export function buildTopics(input) {
     add(tid, { kind: 'carried', autoName: c.name || '持ち越しの話題', fixedGenre: c.genre || null, carriedFrom: c.fromWeek || null, linkId: (c.linkIds || [])[0] || null });
     for (const pid of c.postIds || []) {
       const p = byId.get(pid) || postsById.get(pid);
-      if (p && !where.has(pid)) { byId.set(pid, p); add(tid, {}, pid); }
+      if (p && !where.has(pid) && !hiddenPosts.has(pid)) { byId.set(pid, p); add(tid, {}, pid); }
     }
   }
 
@@ -667,7 +670,7 @@ export function indexTopics(topics) {
 }
 
 /**
- * メイン候補。MAIN_SUGGEST_TIERS の順（既定: 夜職で2件以上 → 夜職の単発 → 一般のバズ2件以上 → 一般のバズ単発）、
+ * メイン候補。MAIN_SUGGEST_TIERS の順（既定: 夜職で2件以上 → 夜職の単発。一般のバズは出さない）、
  * 同じ段の中はスコア順。すでに使っている話題・スコア不明は除く。
  */
 export function suggestMain(topics, usedIds, n = 3, tiers = MAIN_SUGGEST_TIERS) {
@@ -678,7 +681,9 @@ export function suggestMain(topics, usedIds, n = 3, tiers = MAIN_SUGGEST_TIERS) 
     const i = tiers.findIndex((x) => x.night === night && t.stats.count >= x.minPosts);
     return i < 0 ? tiers.length : i;
   };
-  return pool.map((t, i) => ({ t, i, tier: tierOf(t) })).sort((a, b) => a.tier - b.tier || a.i - b.i).slice(0, n).map((x) => x.t);
+  return pool.map((t, i) => ({ t, i, tier: tierOf(t) }))
+    .filter((x) => x.tier < tiers.length) // どの段にも入らない話題（一般のバズ）はおすすめしない
+    .sort((a, b) => a.tier - b.tier || a.i - b.i).slice(0, n).map((x) => x.t);
 }
 
 // ================================================================ 文章
@@ -711,13 +716,18 @@ export function cornerDef(key) {
   return CORNERS.find((c) => c.key === key) || null;
 }
 
+/** メインに入れてよい話題か（一般のバズは入れない） */
+export function canBeMain(topic) {
+  return Boolean(topic) && (!MAIN_NIGHT_ONLY || NIGHT_GENRES.includes(topic.genre));
+}
+
 /** 話題をコーナーへ入れる（他のコーナーからは外す）。メインは最大本数まで */
 export function assignTopic(rundown, topicId, cornerKey, index = null) {
   const r = cloneRundown(rundown);
   for (const c of r.corners) c.items = c.items.filter((x) => x !== topicId);
   const c = r.corners.find((x) => x.key === cornerKey);
   const def = cornerDef(cornerKey);
-  if (!c || !def || def.kind === 'talk' || def.kind === 'review') return r;
+  if (!c || !def || (def.kind !== 'main' && def.kind !== 'news')) return r;
   if (def.maxItems && c.items.length >= def.maxItems) return null; // 満杯
   if (index == null || index < 0 || index > c.items.length) c.items.push(topicId);
   else c.items.splice(index, 0, topicId);
@@ -988,18 +998,23 @@ export function defaultWeek() {
     title: null, // null = 自動タイトル
     rundown: defaultRundown(),
     script: {}, // topicId → { lead: string|null, points, question }
-    notes: {}, // talk コーナーのメモ（cornerKey → 文字列）
+    notes: {}, // コーナーごとのメモ（cornerKey → 文字列）
     overrides: emptyOverrides(),
     personal: [], // [{ id, url, addedAt }]
     checkpoints: [],
     live: defaultLive(),
     carriedOut: [], // 来週に回した話題のスナップショット
     usedPostIds: [], // 進行で「読んだ」話題の投稿 id（次の週以降のブックマーク枠で「使用済み」）
+    shelved: [], // 片付けた話題（この週は候補に出さない）。[{ topicId, name, genre, postIds, at, corner }]
   };
 }
 
 export function defaultSaved() {
-  return { v: SCHEMA_VERSION, showName: SHOW_DEFAULTS.showName, dict: DEFAULT_DICT.map((e) => ({ ...e, words: [...e.words], people: [...e.people] })), weeks: {}, activeWeek: null, savedAt: null };
+  return {
+    v: SCHEMA_VERSION, showName: SHOW_DEFAULTS.showName, dict: DEFAULT_DICT.map((e) => ({ ...e, words: [...e.words], people: [...e.people] })), weeks: {}, activeWeek: null, savedAt: null,
+    trash: [], // 削除した話題（ゴミ箱。今後の週にも出さない）。[{ id, topicId, name, genre, postIds, week, at, corner }]
+    hiddenPosts: [], // 削除（非表示）にした投稿。[{ id, week, at, topicName }]
+  };
 }
 
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : null);
@@ -1030,7 +1045,7 @@ function sanitizeDictEntry(e, i) {
   };
 }
 
-function sanitizeRundown(v) {
+function sanitizeRundown(v, ver = SCHEMA_VERSION) {
   const base = defaultRundown();
   const o = obj(v);
   if (!o || !Array.isArray(o.corners)) return base;
@@ -1038,7 +1053,8 @@ function sanitizeRundown(v) {
   for (const c of base.corners) {
     const src = o.corners.find((x) => obj(x) && x.key === c.key);
     if (!src) continue;
-    if (isNum(src.min) && src.min >= 0 && src.min <= 240) c.min = Math.round(src.min);
+    // 版 1（7 コーナー時代）の分数は使わない（構成が変わったため新しい既定 45/30/15 分にする）
+    if (ver >= 2 && isNum(src.min) && src.min >= 0 && src.min <= 240) c.min = Math.round(src.min);
     const def = cornerDef(c.key);
     if (def.kind === 'main' || def.kind === 'news') {
       c.items = strList(src.items, 50).filter((x) => (used.has(x) ? false : used.add(x)));
@@ -1048,14 +1064,15 @@ function sanitizeRundown(v) {
   return base;
 }
 
-function sanitizeLive(v) {
+function sanitizeLive(v, ver = SCHEMA_VERSION) {
   const o = obj(v);
   const d = defaultLive();
   if (!o) return d;
   d.startedAt = isNum(o.startedAt) ? o.startedAt : null;
-  d.index = isNum(o.index) && o.index >= 0 ? Math.floor(o.index) : 0;
+  // 版 1 は並びが違うので位置は最初に戻す（済などの状態は今あるコーナーの分だけ残す）
+  d.index = ver >= 2 && isNum(o.index) && o.index >= 0 ? Math.floor(o.index) : 0;
   const st = obj(o.status) || {};
-  for (const [k, x] of Object.entries(st)) if (LIVE_STATUS.includes(x) && k !== '__proto__') d.status[k] = x;
+  for (const [k, x] of Object.entries(st)) if (LIVE_STATUS.includes(x) && k !== '__proto__' && cornerDef(k.split(':')[0])) d.status[k] = x;
   d.history = strList(o.history, 500).filter((id) => d.status[id]);
   const en = obj(o.enteredAt) || {};
   for (const [k, x] of Object.entries(en)) if (isNum(x) && cornerDef(k)) d.enteredAt[k] = x;
@@ -1086,14 +1103,14 @@ function sanitizeScript(v) {
   return out;
 }
 
-function sanitizeWeek(v) {
+function sanitizeWeek(v, ver = SCHEMA_VERSION) {
   const o = obj(v);
   const w = defaultWeek();
   if (!o) return w;
   w.title = typeof o.title === 'string' ? o.title.slice(0, 200) : null;
-  w.rundown = sanitizeRundown(o.rundown);
+  w.rundown = sanitizeRundown(o.rundown, ver);
   w.script = sanitizeScript(o.script);
-  w.notes = strMap(o.notes, 4000);
+  w.notes = Object.fromEntries(Object.entries(strMap(o.notes, 4000)).filter(([k]) => cornerDef(k)));
   w.overrides = sanitizeOverrides(o.overrides);
   const seenP = new Set();
   w.personal = (Array.isArray(o.personal) ? o.personal : [])
@@ -1109,9 +1126,11 @@ function sanitizeWeek(v) {
       return out;
     })
     .filter(Boolean).slice(-20);
-  w.live = sanitizeLive(o.live);
+  w.live = sanitizeLive(o.live, ver);
   w.carriedOut = sanitizeCarried(o.carriedOut);
   w.usedPostIds = (Array.isArray(o.usedPostIds) ? o.usedPostIds : []).filter((id) => typeof id === 'string' && ID_RE.test(id)).slice(0, 5000);
+  const seenS = new Set();
+  w.shelved = (Array.isArray(o.shelved) ? o.shelved : []).map(sanitizeShelf).filter((x) => x && (seenS.has(x.topicId) ? false : seenS.add(x.topicId))).slice(0, 2000);
   return w;
 }
 
@@ -1156,9 +1175,19 @@ export function parseSaved(input) {
     s.dict = o.dict.map(sanitizeDictEntry).filter((e) => e && (seen.has(e.id) ? false : seen.add(e.id))).slice(0, 200);
   }
   const weeks = obj(o.weeks) || {};
-  for (const [k, w] of Object.entries(weeks)) if (weekByKey(k)) s.weeks[k] = sanitizeWeek(w);
+  for (const [k, w] of Object.entries(weeks)) if (weekByKey(k)) s.weeks[k] = sanitizeWeek(w, v);
   s.activeWeek = typeof o.activeWeek === 'string' && weekByKey(o.activeWeek) ? o.activeWeek : null;
   s.savedAt = isNum(o.savedAt) ? o.savedAt : null;
+  const seenT = new Set();
+  s.trash = (Array.isArray(o.trash) ? o.trash : []).map((x) => {
+    const e = sanitizeShelf(x);
+    if (!e) return null;
+    return { ...e, id: typeof x.id === 'string' && x.id ? x.id.slice(0, 60) : `tr-${e.topicId}`, week: typeof x.week === 'string' && weekByKey(x.week) ? x.week : null };
+  }).filter((x) => x && (seenT.has(x.id) ? false : seenT.add(x.id))).slice(0, 3000);
+  const seenH = new Set();
+  s.hiddenPosts = (Array.isArray(o.hiddenPosts) ? o.hiddenPosts : [])
+    .map((x) => (obj(x) && ID_RE.test(String(x.id)) ? { id: String(x.id), week: typeof x.week === 'string' && weekByKey(x.week) ? x.week : null, at: isNum(x.at) ? x.at : null, topicName: str(x.topicName, 120) || '' } : null))
+    .filter((x) => x && (seenH.has(x.id) ? false : seenH.add(x.id))).slice(0, 5000);
   return { state: s, ok: true, reason: v > SCHEMA_VERSION ? '新しい版の保存データです（読める部分だけ読み込みました）' : undefined };
 }
 
@@ -1226,6 +1255,114 @@ export function togglePlanCarry(list, topic, weekKey, script) {
 
 export function isCarriedOut(list, topicId) {
   return (list || []).some((c) => sameCarry(c, topicId));
+}
+
+// ================================================================ 整理（片付け・削除）と元に戻す
+// 用語: 配信で読んだもの＝「済」（進行）。編成の整理で候補から外す＝「片付け」（その週だけ）／「削除」（ゴミ箱。今後の週も出さない）。
+
+function sanitizeShelf(x) {
+  const o = obj(x);
+  if (!o || typeof o.topicId !== 'string' || !o.topicId) return null;
+  const c = obj(o.corner);
+  return {
+    topicId: o.topicId.slice(0, 200),
+    name: str(o.name, 120) || '話題',
+    genre: GENRE_KEYS.includes(o.genre) ? o.genre : 'night',
+    postIds: (Array.isArray(o.postIds) ? o.postIds : []).filter((id) => typeof id === 'string' && ID_RE.test(id)).slice(0, 500),
+    at: isNum(o.at) ? o.at : null,
+    corner: c && cornerDef(c.key) && isNum(c.index) ? { key: c.key, index: Math.max(0, Math.floor(c.index)) } : null,
+  };
+}
+
+function cornerPos(rundown, topicId) {
+  for (const c of rundown.corners) {
+    const i = c.items.indexOf(topicId);
+    if (i >= 0) return { key: c.key, index: i };
+  }
+  return null;
+}
+
+function snapshot(topic, rundown, nowMs) {
+  return {
+    topicId: topic.id, name: topic.name, genre: topic.genre, postIds: [...topic.postIds],
+    at: isNum(nowMs) ? nowMs : null, corner: cornerPos(rundown, topic.id),
+  };
+}
+
+/** 元の枠に戻す（その枠に空きがあれば元の位置へ。無ければ戻さない＝候補に戻るだけ）。返り値: { rundown, placed } */
+export function restoreToCorner(rundown, topicId, corner) {
+  if (!corner || usedTopicIds(rundown).includes(topicId)) return { rundown, placed: false };
+  const r = assignTopic(rundown, topicId, corner.key, corner.index);
+  return r ? { rundown: r, placed: true } : { rundown, placed: false };
+}
+
+/** 片付け（この週だけ候補から外す）。構成に入っていれば外し、元の枠を覚えておく */
+export function shelveTopic(week, topic, nowMs) {
+  if (!topic || week.shelved.some((x) => x.topicId === topic.id)) return week;
+  return { ...week, shelved: [...week.shelved, snapshot(topic, week.rundown, nowMs)], rundown: removeTopic(week.rundown, topic.id) };
+}
+
+/** 片付けを戻す。返り値: { week, placed } */
+export function unshelveTopic(week, topicId) {
+  const e = week.shelved.find((x) => x.topicId === topicId);
+  if (!e) return { week, placed: false };
+  const r = restoreToCorner(week.rundown, topicId, e.corner);
+  return { week: { ...week, shelved: week.shelved.filter((x) => x !== e), rundown: r.rundown }, placed: r.placed };
+}
+
+/** 削除（ゴミ箱へ。今後の週にも同じ話題を出さない）。返り値: { saved, week } */
+export function trashTopic(saved, week, topic, weekKey, nowMs) {
+  if (!topic) return { saved, week };
+  const id = `tr-${topic.id}-${isNum(nowMs) ? nowMs.toString(36) : 'x'}`;
+  const entry = { ...snapshot(topic, week.rundown, nowMs), id, week: weekKey };
+  return {
+    saved: { ...saved, trash: [...saved.trash.filter((x) => x.topicId !== topic.id), entry] },
+    week: { ...week, rundown: removeTopic(week.rundown, topic.id), shelved: week.shelved.filter((x) => x.topicId !== topic.id) },
+  };
+}
+
+/** ゴミ箱から戻す（削除した週なら元の枠にも戻す）。返り値: { saved, week, placed } */
+export function restoreTrash(saved, week, trashId, weekKey) {
+  const e = saved.trash.find((x) => x.id === trashId);
+  if (!e) return { saved, week, placed: false };
+  const r = e.week === weekKey ? restoreToCorner(week.rundown, e.topicId, e.corner) : { rundown: week.rundown, placed: false };
+  return { saved: { ...saved, trash: saved.trash.filter((x) => x !== e) }, week: { ...week, rundown: r.rundown }, placed: r.placed };
+}
+
+/**
+ * 削除済みの話題か。同じ話題 id（辞書の話題・データ側の話題名は週をまたいで同じ id）か、
+ * 話題の投稿がすべて削除した話題の投稿に含まれていれば削除済みとみなす（翌週以降も自動で出さない）。
+ */
+export function isTrashed(topic, trash) {
+  if (!topic || !trash || !trash.length) return false;
+  const ids = new Set(trash.map((x) => x.topicId));
+  if (ids.has(topic.id) || (topic.kind === 'carried' && ids.has(topic.id.replace(/^k:/, '')))) return true;
+  if (!topic.postIds.length || topic.kind === 'dict' || topic.kind === 'tag' || topic.kind === 'manual') return false;
+  const posts = new Set(trash.flatMap((x) => x.postIds));
+  return topic.postIds.every((id) => posts.has(id));
+}
+
+/** 候補に出す話題（片付け・削除を除く）と、片付け・削除の一覧 */
+export function partitionTopics(topics, week, trash) {
+  const shelf = new Set((week.shelved || []).map((x) => x.topicId));
+  const visible = [];
+  const shelved = [];
+  const trashed = [];
+  for (const t of topics) {
+    if (isTrashed(t, trash)) trashed.push(t);
+    else if (shelf.has(t.id)) shelved.push(t);
+    else visible.push(t);
+  }
+  return { visible, shelved, trashed };
+}
+
+/** 投稿を削除（非表示）にする／戻す */
+export function hidePost(saved, postId, weekKey, nowMs, topicName = '') {
+  if (!ID_RE.test(String(postId)) || saved.hiddenPosts.some((x) => x.id === postId)) return saved;
+  return { ...saved, hiddenPosts: [...saved.hiddenPosts, { id: String(postId), week: weekKey, at: isNum(nowMs) ? nowMs : null, topicName }] };
+}
+export function unhidePost(saved, postId) {
+  return { ...saved, hiddenPosts: saved.hiddenPosts.filter((x) => x.id !== postId) };
 }
 
 // ================================================================ 振り返り・書き出し

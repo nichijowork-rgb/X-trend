@@ -11,7 +11,8 @@ import {
   defaultRundown, assignTopic, removeTopic, moveInCorner, replaceTopicId, buildCues, defaultLive, liveReduce, carriedTopicIds,
   cueStates, computeTimer, formatClock, recordCheckpoint, newSince, defaultWeek, defaultSaved, parseSaved, serializeSaved,
   pruneWeeks, syncCarriedOut, togglePlanCarry, isCarriedOut, reviewLists, scriptText, indexTopics, compareIds, pickWeeklyReport,
-  bookmarkList, usedPostIdsOf, pastUsedIds, topicPhrase, isGroupedTopic, scorePoints,
+  bookmarkList, usedPostIdsOf, pastUsedIds, topicPhrase, isGroupedTopic, scorePoints, canBeMain,
+  shelveTopic, unshelveTopic, trashTopic, restoreTrash, isTrashed, partitionTopics, hidePost, unhidePost, restoreToCorner,
 } from '../show/js/logic.js';
 
 const ts = (iso) => Math.floor(Date.parse(iso) / 1000);
@@ -268,7 +269,7 @@ test('構成: コーナーへ入れる（メインは3本まで）・外す・�
   assert.deepEqual(r.corners.map((c) => c.key), CORNERS.map((c) => c.key));
   for (const id of ['a', 'b', 'c']) r = assignTopic(r, id, 'main');
   assert.equal(assignTopic(r, 'd', 'main'), null, 'メインは満杯');
-  assert.equal(assignTopic(r, 'd', 'opening').corners[0].items.length, 0, 'トークのコーナーには入らない');
+  assert.equal(assignTopic(r, 'd', 'opening').corners[0].items.length, 3, '無いコーナーには入らない');
   r = assignTopic(r, 'a', 'category');
   assert.deepEqual(r.corners.find((c) => c.key === 'main').items, ['b', 'c'], '他のコーナーから移動');
   r = moveInCorner(r, 'main', 'c', -1);
@@ -290,10 +291,10 @@ function liveSetup() {
 
 test('進行の並び: 話題ごと・空のコーナーは「未設定」・消えた話題は飛ばす', () => {
   const { r, cues } = liveSetup();
-  assert.deepEqual(cues.map((c) => c.id), ['opening', 'main:A', 'main:B', 'break', 'category:C', 'chat', 'review', 'ending']);
+  assert.deepEqual(cues.map((c) => c.id), ['main:A', 'main:B', 'category:C', 'chat']);
   assert.equal(cues.find((c) => c.id === 'chat').kind, 'empty');
-  assert.equal(cues[1].n, 1);
-  assert.equal(cues[1].of, 2);
+  assert.equal(cues[0].n, 1);
+  assert.equal(cues[0].of, 2);
   const cues2 = buildCues(r, new Map([['A', { id: 'A' }]]));
   assert.ok(!cues2.some((c) => c.id === 'main:B'));
 });
@@ -303,34 +304,34 @@ test('進行の状態遷移: 読んだ・戻す・飛ばす・来週へ・移動
   let s = defaultLive();
   s = liveReduce(s, { type: 'start', now: 1000 }, cues);
   assert.equal(s.startedAt, 1000);
-  assert.equal(s.enteredAt.opening, 1000);
+  assert.equal(s.enteredAt.main, 1000);
   s = liveReduce(s, { type: 'done', now: 2000 }, cues);
-  assert.equal(s.status.opening, 'done');
+  assert.equal(s.status['main:A'], 'done');
   assert.equal(s.index, 1);
-  assert.equal(s.enteredAt.main, 2000);
   s = liveReduce(s, { type: 'carry', now: 3000 }, cues);
-  assert.equal(s.status['main:A'], 'carried');
-  assert.deepEqual([...carriedTopicIds(s, cues)], ['A']);
+  assert.equal(s.status['main:B'], 'carried');
+  assert.deepEqual([...carriedTopicIds(s, cues)], ['B']);
+  assert.equal(s.enteredAt.category, 3000);
   s = liveReduce(s, { type: 'skip', now: 4000 }, cues);
-  assert.equal(s.status['main:B'], 'skipped');
-  assert.equal(cues[s.index].id, 'break');
-  // 話題でないキューは「来週へ」できない
+  assert.equal(s.status['category:C'], 'skipped');
+  assert.equal(cues[s.index].id, 'chat');
+  // 話題でないキュー（未設定のコーナー）は「来週へ」できない
   const same = liveReduce(s, { type: 'carry', now: 5000 }, cues);
   assert.deepEqual(same.status, s.status);
   assert.equal(same.index, s.index);
   // 戻す: 直前の操作を順に取り消す
   s = liveReduce(s, { type: 'back' }, cues);
-  assert.equal(cues[s.index].id, 'main:B');
-  assert.equal(s.status['main:B'], undefined);
+  assert.equal(cues[s.index].id, 'category:C');
+  assert.equal(s.status['category:C'], undefined);
   s = liveReduce(s, { type: 'back' }, cues);
-  assert.equal(cues[s.index].id, 'main:A');
+  assert.equal(cues[s.index].id, 'main:B');
   assert.equal(carriedTopicIds(s, cues).size, 0, '戻すと来週へも取り消し');
   assert.deepEqual(cueStates(s, cues).slice(0, 3), ['done', 'current', 'todo']);
   // 移動と、済を飛ばして次の未処理へ
   s = liveReduce(s, { type: 'goto', index: 0, now: 6000 }, cues);
   assert.equal(s.index, 0);
   s = liveReduce(s, { type: 'done', now: 7000 }, cues);
-  assert.equal(cues[s.index].id, 'main:A', '済のキューは飛ばす');
+  assert.equal(cues[s.index].id, 'main:B', '済のキューは飛ばす');
   // 最後まで
   for (let i = 0; i < 20; i++) s = liveReduce(s, { type: 'done', now: 8000 }, cues);
   assert.equal(s.index, cues.length);
@@ -344,24 +345,26 @@ test('進行の状態遷移: 読んだ・戻す・飛ばす・来週へ・移動
   assert.equal(liveReduce({ index: 999, status: null }, { type: 'back' }, cues).index, cues.length - 1);
 });
 
-test('タイマー: 経過・コーナー残り・押し/巻き', () => {
+test('タイマー: 経過・コーナー残り・押し/巻き（既定 45/30/15 分）', () => {
   const { r, cues } = liveSetup();
+  assert.deepEqual(r.corners.map((c) => [c.key, c.min]), [['main', 45], ['category', 30], ['chat', 15]]);
   assert.equal(computeTimer(defaultLive(), r, cues, 0).state, 'idle');
   const t0 = 1_000_000;
   let s = liveReduce(defaultLive(), { type: 'start', now: t0 }, cues);
   let t = computeTimer(s, r, cues, t0 + 60_000);
   assert.equal(t.elapsedSec, 60);
-  assert.equal(t.cornerRemainSec, 4 * 60);
+  assert.equal(t.cornerRemainSec, 44 * 60);
   assert.equal(t.state, 'ok');
-  // オープニング（5分）を 8 分続けた → 押し 3 分
-  t = computeTimer(s, r, cues, t0 + 8 * 60_000);
+  // メイン（45分）を 48 分続けた → 押し 3 分
+  t = computeTimer(s, r, cues, t0 + 48 * 60_000);
   assert.equal(t.driftSec, 180);
   assert.equal(t.state, 'over');
   assert.equal(t.cornerRemainSec, -180);
-  // 1 分でメインへ → 巻き 4 分
-  s = liveReduce(s, { type: 'done', now: t0 + 60_000 }, cues);
-  t = computeTimer(s, r, cues, t0 + 61_000);
-  assert.equal(t.driftSec, -240);
+  // 40 分でカテゴリ別へ → 巻き 5 分
+  s = liveReduce(s, { type: 'done', now: t0 + 20 * 60_000 }, cues);
+  s = liveReduce(s, { type: 'done', now: t0 + 40 * 60_000 }, cues);
+  t = computeTimer(s, r, cues, t0 + 40 * 60_000 + 1000);
+  assert.equal(t.driftSec, -300);
   assert.equal(t.state, 'under');
   assert.equal(t.totalSec, 90 * 60);
   assert.equal(formatClock(65), '1:05');
@@ -445,7 +448,7 @@ test('保存データ: 往復・版数・壊れた値・未知のフィールド
         overrides: { renames: { a: 'A', b: 1 }, genres: { a: 'host', b: 'bad' }, moves: { notanid: 'x', 123: 'p:123' }, merges: { a: 'a', b: 'c' }, manual: [{ id: 'x' }, { id: 'm:1', name: 'M' }] },
         personal: [{ id: 'abc' }, { id: '2110000000000000001', url: 'javascript:alert(1)' }, { id: '2110000000000000001' }],
         checkpoints: [{ kind: 'bad' }, { kind: 'preview', dataAt: 'x', postIds: ['1', 2, 'a'] }],
-        live: { startedAt: 'x', index: -5, status: { a: 'done', b: 'weird' }, history: ['a', 'b'], enteredAt: { main: 5, zzz: 1 } },
+        live: { startedAt: 'x', index: -5, status: { 'main:a': 'done', 'main:b': 'weird', 'opening': 'done' }, history: ['main:a', 'main:b', 'opening'], enteredAt: { main: 5, zzz: 1 } },
         carriedOut: [{ topicId: 'd:a', name: 'A', genre: 'x', postIds: ['1', 'x'], fromWeek: '2026-10-10', via: 'plan' }, { topicId: 'd:a' }, {}],
       },
     },
@@ -461,7 +464,7 @@ test('保存データ: 往復・版数・壊れた値・未知のフィールド
   const wk = st.weeks['2026-10-17'];
   assert.equal(wk.title, null);
   const main = wk.rundown.corners.find((c) => c.key === 'main');
-  assert.equal(main.min, 35, '範囲外の分数は既定のまま');
+  assert.equal(main.min, 45, '範囲外の分数は既定のまま');
   assert.deepEqual(main.items, ['a', 'b', 'c'], 'メインは3本まで・重複除去');
   assert.deepEqual(wk.rundown.corners.find((c) => c.key === 'chat').items, ['e'], 'コーナーをまたぐ重複も除去');
   assert.equal(wk.rundown.corners.length, CORNERS.length);
@@ -476,7 +479,7 @@ test('保存データ: 往復・版数・壊れた値・未知のフィールド
   assert.equal(wk.personal.length, 1);
   assert.equal(wk.personal[0].url, 'https://x.com/i/web/status/2110000000000000001', '危険な URL は捨てる');
   assert.deepEqual(wk.checkpoints, [{ kind: 'preview', dataAt: 'x', recordedAt: null, count: null, postIds: ['1'] }]);
-  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { a: 'done' }, history: ['a'], enteredAt: { main: 5 } });
+  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 } });
   assert.equal(wk.carriedOut.length, 1);
   assert.deepEqual(wk.carriedOut[0].postIds, ['1']);
   assert.equal(wk.carriedOut[0].genre, 'night');
@@ -505,20 +508,22 @@ test('振り返り一覧とテキスト書き出し（概要欄用はメモを�
   r = assignTopic(r, 't:王子の引退', 'main');
   const cues = buildCues(r, byId);
   let live = liveReduce(defaultLive(), { type: 'done' }, cues);
-  live = liveReduce(live, { type: 'skip' }, cues);
   live = liveReduce(live, { type: 'carry' }, cues);
+  live = liveReduce(live, { type: 'skip' }, cues);
   const lists = reviewLists(live, cues);
-  assert.deepEqual(lists.done.map((c) => c.id), ['opening']);
-  assert.deepEqual(lists.skipped.map((c) => c.id), ['main:d:d-hostcall']);
+  assert.deepEqual(lists.done.map((c) => c.id), ['main:d:d-hostcall']);
   assert.deepEqual(lists.carried.map((c) => c.id), ['main:t:王子の引退']);
+  assert.deepEqual(lists.skipped.map((c) => c.id), ['category']);
+  assert.deepEqual(lists.todo.map((c) => c.id), ['chat']);
   const args = {
     title: '【T】ホストコール／王子の引退', week: weekByKey('2026-10-17'), rundown: r, topicsById: byId,
-    script: { 'd:d-hostcall': { lead: null, points: '秘密のメモ', question: '質問？' } }, notes: { opening: '内輪メモ' },
+    script: { 'd:d-hostcall': { lead: null, points: '秘密のメモ', question: '質問？' } }, notes: { main: '内輪メモ' },
     postsById: new Map(d.posts.map((p) => [p.id, p])), refTs: d.refTs,
   };
   const pub = scriptText({ ...args, mode: 'public' });
   assert.match(pub, /^【T】ホストコール／王子の引退\n配信：10\/17\(土\) 1:00〜（約90分）/);
-  assert.match(pub, /00:00 オープニング\n05:00 メイン3トピック\n40:00 中休み/);
+  assert.match(pub, /00:00 メイン3トピック\n45:00 カテゴリ別ニュース\n1:15:00 雑談（一般のバズ）\n/);
+  assert.ok(!/オープニング|中休み|答え合わせ|エンディング/.test(pub), '旧コーナーは出ない');
   assert.match(pub, /1\. ホストコール\n {3}今週「ホストコール」が話題に。/);
   assert.match(pub, /https:\/\/x\.com\/i\/web\/status\/\d+/);
   assert.ok(!pub.includes('秘密のメモ') && !pub.includes('内輪メモ'));
@@ -624,11 +629,40 @@ test('話題性スコアは対数: 単発の巨大インプレより、まとま
   assert.equal(scorePoints(null), null);
 });
 
-test('メインのおすすめ: 夜職で2件以上 → 夜職の単発 → 一般のバズ', () => {
+test('メインのおすすめ: 夜職で2件以上 → 夜職の単発（一般のバズは出さない）', () => {
   const t = (id, genre, count, score) => ({ id, genre, score, stats: { count, maxImp: 0 }, postIds: [] });
   const topics = [t('g1', 'general', 1, 99), t('g2', 'general', 3, 98), t('n1', 'host', 1, 50), t('n2', 'kyaba', 2, 10), t('n3', 'night', 5, 20), t('x', 'host', 4, null)];
   assert.deepEqual(suggestMain(topics, [], 3).map((x) => x.id), ['n3', 'n2', 'n1']);
-  assert.deepEqual(suggestMain(topics, ['n3', 'n2'], 3).map((x) => x.id), ['n1', 'g2', 'g1']);
+  assert.deepEqual(suggestMain(topics, ['n3', 'n2'], 3).map((x) => x.id), ['n1'], '一般のバズはおすすめしない');
+  assert.equal(canBeMain({ genre: 'general' }), false);
+  assert.equal(canBeMain({ genre: 'kabuki' }), true);
+  assert.equal(canBeMain(null), false);
+});
+
+test('保存データの移行（版 1 → 2）: 旧コーナーを取り除き、時間は新しい既定、進行は最初から', () => {
+  const v1 = {
+    v: 1,
+    weeks: {
+      '2026-10-17': {
+        rundown: { corners: [
+          { key: 'opening', min: 5, items: [] }, { key: 'main', min: 35, items: ['a', 'g'] }, { key: 'break', min: 5 },
+          { key: 'category', min: 25, items: ['b'] }, { key: 'chat', min: 10, items: ['c'] }, { key: 'review', min: 5 }, { key: 'ending', min: 5 },
+        ] },
+        notes: { opening: 'オープニングのメモ', main: 'メインのメモ' },
+        live: { startedAt: 5, index: 4, status: { opening: 'done', 'main:a': 'done', break: 'skipped' }, history: ['opening', 'main:a', 'break'], enteredAt: { opening: 5, main: 6 } },
+      },
+    },
+  };
+  const st = parseSaved(JSON.stringify(v1)).state;
+  const w = st.weeks['2026-10-17'];
+  assert.deepEqual(w.rundown.corners.map((c) => [c.key, c.min, c.items]), [['main', 45, ['a', 'g']], ['category', 30, ['b']], ['chat', 15, ['c']]],
+    'メインに入っていた一般のバズ（g）は自動では消さない');
+  assert.deepEqual(w.notes, { main: 'メインのメモ' });
+  assert.deepEqual(w.live.status, { 'main:a': 'done' });
+  assert.deepEqual(w.live.history, ['main:a']);
+  assert.equal(w.live.index, 0);
+  assert.deepEqual(w.live.enteredAt, { main: 6 });
+  assert.equal(JSON.parse(serializeSaved(st)).v, SCHEMA_VERSION);
 });
 
 test('まとまった話題（2件以上・持ち越し・手動・自分で貼った）と単発', () => {
@@ -666,4 +700,76 @@ test('辞書の「夜職のみ」: 一般のバズの「卒業」「引退」は
   const old = parseSaved({ v: 1, dict: [{ id: 'd-retire', name: '卒業・引退', genre: 'night', words: ['卒業'] }, { id: 'u-1', name: '自作', words: ['x'] }] }).state;
   assert.equal(old.dict[0].nightOnly, true);
   assert.equal(old.dict[1].nightOnly, false);
+});
+
+// ---------------------------------------------------------------- 整理（片付け・削除）と元に戻す
+
+test('片付け: 構成から外して覚え、戻すと元の枠へ（空きが無ければ候補に戻るだけ）', () => {
+  const tA = { id: 'A', name: 'A', genre: 'host', postIds: ['1'] };
+  let w = defaultWeek();
+  for (const id of ['A', 'B', 'C']) w.rundown = assignTopic(w.rundown, id, 'main');
+  w = shelveTopic(w, tA, 100);
+  assert.deepEqual(w.rundown.corners[0].items, ['B', 'C']);
+  assert.deepEqual(w.shelved[0].corner, { key: 'main', index: 0 });
+  assert.equal(shelveTopic(w, tA, 200).shelved.length, 1, '二重には片付けない');
+  const back = unshelveTopic(w, 'A');
+  assert.ok(back.placed);
+  assert.deepEqual(back.week.rundown.corners[0].items, ['A', 'B', 'C'], '元の位置へ');
+  assert.equal(back.week.shelved.length, 0);
+  // 枠が埋まっていたら候補に戻るだけ
+  let w2 = { ...w, rundown: assignTopic(w.rundown, 'D', 'main') };
+  const full = unshelveTopic(w2, 'A');
+  assert.equal(full.placed, false);
+  assert.deepEqual(full.week.rundown.corners[0].items, ['B', 'C', 'D']);
+  assert.equal(restoreToCorner(w.rundown, 'Z', null).placed, false);
+  // 候補の振り分け
+  const part = partitionTopics([tA, { id: 'B', postIds: ['2'] }], w, []);
+  assert.deepEqual(part.shelved.map((t) => t.id), ['A']);
+  assert.deepEqual(part.visible.map((t) => t.id), ['B']);
+});
+
+test('削除: ゴミ箱へ・翌週以降も同じ話題（辞書名・同じ投稿だけ）を出さない・戻すと元の枠へ', () => {
+  let saved = defaultSaved();
+  let w = defaultWeek();
+  w.rundown = assignTopic(w.rundown, 'd:d-hostcall', 'category');
+  const dictTopic = { id: 'd:d-hostcall', kind: 'dict', name: 'ホストコール', genre: 'host', postIds: ['1', '2'] };
+  let r = trashTopic(saved, w, dictTopic, '2026-10-17', 1000);
+  saved = r.saved; w = r.week;
+  assert.equal(saved.trash.length, 1);
+  assert.equal(w.rundown.corners[1].items.length, 0, '構成からも外す');
+  // 翌週: 同じ辞書の話題（投稿は別）も出さない
+  assert.ok(isTrashed({ id: 'd:d-hostcall', kind: 'dict', postIds: ['9'] }, saved.trash));
+  // 投稿だけの話題: 同じ投稿の組なら出さない・新しい投稿が混じれば出す
+  r = trashTopic(saved, w, { id: 'c:5', kind: 'cluster', name: 'X', genre: 'night', postIds: ['5', '6'] }, '2026-10-17', 2000);
+  saved = r.saved;
+  assert.ok(isTrashed({ id: 'p:5', kind: 'single', postIds: ['5'] }, saved.trash));
+  assert.ok(isTrashed({ id: 'c:5', kind: 'cluster', postIds: ['5', '7'] }, saved.trash), '同じ id なら出さない');
+  assert.ok(!isTrashed({ id: 'c:7', kind: 'cluster', postIds: ['5', '7'] }, saved.trash), '新しい投稿が混じれば出す');
+  assert.ok(!isTrashed({ id: 'd:other', kind: 'dict', postIds: ['5'] }, saved.trash), '辞書の話題は id だけで判定');
+  // 戻す（削除した週なら元の枠へ・別の週なら候補に戻るだけ）
+  const id = saved.trash.find((x) => x.topicId === 'd:d-hostcall').id;
+  const other = restoreTrash(saved, defaultWeek(), id, '2026-10-24');
+  assert.equal(other.placed, false);
+  const back = restoreTrash(saved, w, id, '2026-10-17');
+  assert.ok(back.placed);
+  assert.deepEqual(back.week.rundown.corners[1].items, ['d:d-hostcall']);
+  assert.equal(back.saved.trash.length, 1);
+  // 保存の往復（版 3）
+  const st = parseSaved(serializeSaved({ ...saved, weeks: { '2026-10-17': shelveTopic(w, { id: 'A', name: 'A', genre: 'host', postIds: ['1'] }, 5) } })).state;
+  assert.equal(st.trash.length, 2);
+  assert.equal(st.weeks['2026-10-17'].shelved[0].topicId, 'A');
+  assert.equal(parseSaved({ v: 2 }).state.trash.length, 0, '版 2 には無い → 空');
+});
+
+test('投稿の削除（非表示）: どの話題にも入れない・戻せる', () => {
+  const d = weekData();
+  const call = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs }).find((t) => t.id === 'd:d-hostcall');
+  let saved = hidePost(defaultSaved(), call.postIds[0], '2026-10-17', 1, 'ホストコール');
+  assert.equal(hidePost(saved, call.postIds[0], '2026-10-17', 2).hiddenPosts.length, 1);
+  const t2 = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs, hiddenPostIds: new Set(saved.hiddenPosts.map((x) => x.id)) });
+  assert.ok(!t2.some((t) => t.postIds.includes(call.postIds[0])));
+  assert.equal(t2.find((t) => t.id === 'd:d-hostcall').postIds.length, 1);
+  saved = unhidePost(saved, call.postIds[0]);
+  assert.equal(saved.hiddenPosts.length, 0);
+  assert.equal(parseSaved(serializeSaved(hidePost(defaultSaved(), '123', null, 1))).state.hiddenPosts[0].id, '123');
 });

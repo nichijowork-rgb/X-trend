@@ -1,11 +1,11 @@
 // ③ 映す用（配信画面用・1920×1080）。自分用メモ（話すポイント・質問・メモ）は出さない。
 // 進行画面の操作に追従する（show.js の同期で app.saved が更新されると描き直される）。
-import { formatCompact, hitRateText, UNKNOWN } from '../../../assets/js/core.js';
-import { cornerDef, pickWeeklyReport } from '../logic.js';
-import { h, genreSticker, metricRow, prefersReducedMotion } from '../dom.js';
+import { formatCompact, UNKNOWN } from '../../../assets/js/core.js';
+import { cornerDef } from '../logic.js';
+import { h, genreSticker, metricRow, prefersReducedMotion, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
 import { sizedImageUrl } from '../../../assets/js/media.js';
-import { cueColor, currentTitle, mainTopics, refYear } from './common.js';
+import { cueColor, currentTitle, refYear } from './common.js';
 import { cueTitle } from './live.js';
 import { formatDateTime } from '../../../assets/js/core.js';
 
@@ -18,8 +18,8 @@ export function renderOnair(app) {
   const cue = app.cues[live.index] || null;
   const waiting = live.startedAt == null && !Object.keys(live.status).length && live.index === 0;
   const color = waiting ? 'main' : cue ? cueColor(app, cue) : 'white';
-  const vp = h('div', { class: 'oa-viewport' });
-  const stage = h('div', { class: `oa-stage oa-${color}`, id: 'oa-stage', dataset: { cue: cue ? cue.id : 'end', waiting: String(waiting) } });
+  const vp = h('div', { class: 'oa-viewport', dataset: { keep: `onair:${app.weekKey}` } });
+  const stage = h('div', { class: `oa-stage oa-${color}`, id: 'oa-stage', dataset: { cue: cue ? cue.id : 'end', waiting: String(waiting), keep: 'stage' } });
   const def = cue ? cornerDef(cue.cornerKey) : null;
 
   stage.append(h('header', { class: 'oa-top' },
@@ -28,7 +28,7 @@ export function renderOnair(app) {
     h('span', { class: 'oa-date' }, `${app.weekKey.slice(5).replace('-', '/')}(土) 配信`),
     app.isSample ? h('span', { class: 'oa-pill oa-sample' }, 'サンプル') : null));
 
-  const body = h('div', { class: 'oa-body' });
+  const body = h('div', { class: 'oa-body', dataset: { keep: 'body' } });
   if (waiting) body.append(titleScreen(app, 'まもなく配信開始'));
   else if (!cue) body.append(titleScreen(app, 'ご視聴ありがとうございました'));
   else body.append(cueBody(app, cue, wk, color));
@@ -80,30 +80,11 @@ function cueBody(app, cue, wk, color) {
         num('合計表示', formatCompact(st.totalImp)),
         num('最大', formatCompact(st.maxImp))));
     const p = st.topPostId ? app.postsById.get(st.topPostId) : null;
-    const right = p ? postPanel(app, p) : h('div', { class: 'oa-post is-empty' }, h('p', {}, 'くわしくは X で'));
-    return h('div', { class: 'oa-split' }, left, right);
-  }
-  if (cue.cornerKey === 'opening') {
-    const mains = mainTopics(app);
-    return h('div', { class: 'oa-list-wrap' },
-      h('h1', { class: 'oa-title-main is-small' }, currentTitle(app)),
-      h('p', { class: 'oa-list-head' }, '今週の3大ニュース'),
-      h('ol', { class: 'oa-list' }, mains.map((t, i) => h('li', { class: 'g-main' }, h('span', { class: 'oa-no' }, String(i + 1)), t.name))));
-  }
-  if (cue.kind === 'review') {
-    const wr = app.reports ? pickWeeklyReport(app.reports.weekly, app.week) : null;
-    const rows = wr ? [...wr.byCondition, ...wr.byPace].slice(0, 5) : [];
-    return h('div', { class: 'oa-list-wrap' },
-      h('h1', { class: 'oa-title-main is-small' }, '今週の答え合わせ'),
-      rows.length
-        ? h('ul', { class: 'oa-hits' }, rows.map((r) => h('li', {}, h('span', {}, r.label ?? UNKNOWN), h('b', {}, hitRateText(r.total, r.crossed)))))
-        : h('p', { class: 'oa-list-head' }, '今週のまとめは準備中です'));
-  }
-  if (cue.cornerKey === 'ending') {
-    return h('div', { class: 'oa-list-wrap' },
-      h('h1', { class: 'oa-title-main is-small' }, 'ご視聴ありがとうございました'),
-      wk.carriedOut.length ? h('p', { class: 'oa-list-head' }, '来週もこの話題を追いかけます') : null,
-      wk.carriedOut.length ? h('ul', { class: 'oa-list' }, wk.carriedOut.slice(0, 4).map((c) => h('li', { class: `g-${c.genre}` }, c.name))) : null);
+    const own = p ? postPanel(app, p) : h('div', { class: 'oa-post is-empty' }, h('p', {}, 'くわしくは X で'));
+    // 代表投稿は X 埋め込み（失敗・読み込み中・カード表示設定のときは自前の表示）
+    const id = st.topPostId || t.linkId || null;
+    const right = app.ui.view !== 'card' && id ? h('div', { class: 'oa-post-wrap', dataset: { keep: 'post' } }, embedHost(id, own, 'oa-embed')) : own;
+    return h('div', { class: 'oa-split', dataset: { keep: `s:${cue.id}` } }, left, right);
   }
   return h('div', { class: 'oa-title' }, h('span', { class: 'oa-big-icon' }, genreIcon(color)), h('h1', { class: 'oa-title-main' }, cue.kind === 'empty' ? def.name : cueTitle(app, cue)), h('p', { class: 'oa-title-sub' }, def.sub));
 }

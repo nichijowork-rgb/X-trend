@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <!-- 通信先は自サイトのみ。例外は「埋め込みで見る」を押したときの platform.twitter.com、X の画像・動画（pbs/video.twimg.com）、
-       見出しフォント（fonts.googleapis.com / fonts.gstatic.com。読めなければシステムの太字で表示）。
+  <!-- 通信先は自サイトのみ。例外は X 埋め込み（platform.twitter.com ほか。話題の候補・進行・映す用で画面に入ったものだけ）と、
+       X の画像・動画（pbs/video.twimg.com）。フォントは端末の標準ゴシック（外部フォントは読まない）。
        widgets.js が iframe に style 属性を付けるため style-src に 'unsafe-inline' を許可（本文は常に textContent で挿入） -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark">
@@ -14,9 +14,6 @@
   <title>番組｜週刊ヨルニュース</title>
   <meta name="description" content="週1回のニュース形式トーク配信の台本・進行サイト">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23e02a1b'/%3E%3Cpath d='M16 5l3 7 7 .6-5.4 4.6 1.7 7.3L16 20.6l-6.3 3.9 1.7-7.3L6 12.6l7-.6z' fill='%23fff'/%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&amp;display=swap">
   <link rel="stylesheet" href="show.css">
   <script type="module" src="show.js"></script>
 </head>
