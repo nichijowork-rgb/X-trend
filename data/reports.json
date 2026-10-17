@@ -1,6 +1,156 @@
 {
- "generated_at": "2026-10-17T00:03:52+09:00",
+ "generated_at": "2026-10-18T00:03:30+09:00",
  "daily": [
+  {
+   "date": "2026-10-17",
+   "rising": [
+    {
+     "id": "2111404696846111154",
+     "views": 456708,
+     "hours_since_post": 4.04,
+     "views_per_hour": 113015,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2111346909319487925",
+     "views": 464204,
+     "hours_since_post": 7.87,
+     "views_per_hour": 58996,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2111295384261967983",
+     "views": 463489,
+     "hours_since_post": 11.28,
+     "views_per_hour": 41087,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2111431425606209620",
+     "views": 290736,
+     "hours_since_post": 2.27,
+     "views_per_hour": 128031,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "星乃リアさん失踪騒動の続報（3週間出勤なし）"
+    },
+    {
+     "id": "2111433739960230066",
+     "views": 208262,
+     "hours_since_post": 2.12,
+     "views_per_hour": 98340,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "星乃リアさんがCLUB RIOに3週間出勤していなかったという続報"
+    },
+    {
+     "id": "2111431833561031162",
+     "views": 220122,
+     "hours_since_post": 2.24,
+     "views_per_hour": 98098,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントによる星乃リアさん失踪のまとめ"
+    },
+    {
+     "id": "2111424535539110020",
+     "views": 140694,
+     "hours_since_post": 2.73,
+     "views_per_hour": 51589,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "星乃リアさん失踪の速報"
+    },
+    {
+     "id": "2111423365273817403",
+     "views": 133858,
+     "hours_since_post": 2.8,
+     "views_per_hour": 47726,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ノア社長と星羽さんの関係についての投稿"
+    },
+    {
+     "id": "2111384812800053576",
+     "views": 184433,
+     "hours_since_post": 5.36,
+     "views_per_hour": 34422,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウントによる山本裕典さんの暴露（追いかける話題にも掲載）"
+    },
+    {
+     "id": "2111391903916913131",
+     "views": 157016,
+     "hours_since_post": 4.89,
+     "views_per_hour": 32121,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "星乃リアさんの算命学鑑定を紹介する投稿"
+    }
+   ],
+   "review": [
+    {
+     "id": "2111013540459114939",
+     "before_views": 446221,
+     "after_views": 1276329,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2111007924525097319",
+     "before_views": 419208,
+     "after_views": 758945,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2111071756614295697",
+     "before_views": 133946,
+     "after_views": 1315882,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111063894974492695",
+     "before_views": 163085,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111041261897699770",
+     "before_views": 258181,
+     "after_views": 590264,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111033518004535746",
+     "before_views": 223997,
+     "after_views": 1159659,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-16",
    "rising": [
@@ -700,5 +850,65 @@
    "hit_rate": []
   }
  ],
- "weekly": []
+ "weekly": [
+  {
+   "period": {
+    "from": "2026-10-10",
+    "to": "2026-10-17"
+   },
+   "generated_at": "2026-10-17T12:10:00+09:00",
+   "hit_rate_by_condition": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 5,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 12,
+     "crossed": 11
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 9,
+     "crossed": 8
+    }
+   ],
+   "hit_rate_by_pace": [
+    {
+     "pace_label": "1時間あたり5万表示以上",
+     "total": 22,
+     "crossed": 18
+    },
+    {
+     "pace_label": "1時間あたり5万表示未満",
+     "total": 4,
+     "crossed": 4
+    }
+   ],
+   "threshold_proposal": "2時間15万は5件中3件と一番当たりにくいので、20万に上げるか「伸びそう」の扱いにする案があります。\n「6時間以内で15万＋1時間あたり3万」（伸びそう枠）は6件すべて50万を超えたので、「伸びている投稿」の条件に格上げしてもよさそうです。\n1時間5万で分けても差が出ていません。どれも件数が少ないので、並び順の目安のまま来週も様子を見るのがよさそうです。",
+   "watch_candidates": [
+    {
+     "user": "yorunohuku",
+     "reason": "キャバ嬢の私服やバースデー、ホストコールの話題で今週50万超えが3件（最大685.4万表示）"
+    },
+    {
+     "user": "sumomodane",
+     "reason": "妹尾ユウカさんの女性向け風俗の件で50万超えが3件（最大605.3万表示）"
+    },
+    {
+     "user": "8u07wx",
+     "reason": "ジャングル銀座のきこさんの暴露で50万超えが2件（655.2万・201.5万表示）"
+    },
+    {
+     "user": "mayumayu_0_0",
+     "reason": "ホス狂いを名乗るアカウントで、ゆいぴすさんや明日花キララさんの話題で50万超えが2件"
+    },
+    {
+     "user": "rinne_channel",
+     "reason": "キャバクラ界隈のまとめ投稿で30万超えが4件、うち50万超えが2件（最大119.1万表示）"
+    }
+   ]
+  }
+ ]
 }
