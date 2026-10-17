@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-18T00:03:30+09:00",
+ "generated_at": "2026-10-18T00:29:06+09:00",
  "min_impressions": 300000,
- "total_posts": 2156,
- "total_accounts": 1382,
+ "total_posts": 2157,
+ "total_accounts": 1383,
  "below_threshold_posts": 35,
  "report_missing_ids": [],
  "unknown_user_posts": 0,
@@ -134,13 +134,13 @@
  "by_category": {
   "ホスト": {
    "posts": 147,
-   "impressions": 391508697,
-   "likes": 1068935
+   "impressions": 391544366,
+   "likes": 1069120
   },
   "キャバクラ": {
    "posts": 302,
-   "impressions": 832963274,
-   "likes": 2088683
+   "impressions": 833149879,
+   "likes": 2089179
   },
   "歌舞伎町": {
    "posts": 50,
@@ -149,8 +149,8 @@
   },
   "夜職その他": {
    "posts": 152,
-   "impressions": 367533431,
-   "likes": 1210627
+   "impressions": 367547926,
+   "likes": 1210674
   },
   "監視アカウント": {
    "posts": 272,
@@ -158,9 +158,9 @@
    "likes": 2180293
   },
   "その他": {
-   "posts": 1593,
-   "impressions": 4545346196,
-   "likes": 44936845
+   "posts": 1594,
+   "impressions": 4545601992,
+   "likes": 44937439
   }
  },
  "by_account": [
@@ -294,8 +294,8 @@
    "user": "rinne_channel",
    "is_watched": false,
    "posts": 9,
-   "impressions": 4863406,
-   "likes": 5173
+   "impressions": 5013628,
+   "likes": 5199
   },
   {
    "user": "orihara_bakuro",
@@ -550,18 +550,18 @@
    "likes": 125039
   },
   {
+   "user": "hostcall_world",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 2911440,
+   "likes": 3144
+  },
+  {
    "user": "nino_honmono",
    "is_watched": false,
    "posts": 4,
    "impressions": 2882859,
    "likes": 242429
-  },
-  {
-   "user": "hostcall_world",
-   "is_watched": false,
-   "posts": 4,
-   "impressions": 2875771,
-   "likes": 2959
   },
   {
    "user": "EBiDAN_official",
@@ -805,8 +805,8 @@
    "user": "hostcallch",
    "is_watched": false,
    "posts": 3,
-   "impressions": 1247882,
-   "likes": 2813
+   "impressions": 1260042,
+   "likes": 2902
   },
   {
    "user": "recta_erabi",
@@ -9349,6 +9349,13 @@
    "likes": 5508
   },
   {
+   "user": "akiS2_aaa",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 340117,
+   "likes": 906
+  },
+  {
    "user": "jeongyeon_chama",
    "is_watched": false,
    "posts": 1,
@@ -9727,18 +9734,18 @@
    "likes": 736
   },
   {
+   "user": "Alice_mochica",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 293485,
+   "likes": 1024
+  },
+  {
    "user": "1e6awk",
    "is_watched": false,
    "posts": 1,
    "impressions": 287722,
    "likes": 1169
-  },
-  {
-   "user": "Alice_mochica",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 278990,
-   "likes": 977
   },
   {
    "user": "tojo_kaoru_",
@@ -9790,13 +9797,6 @@
    "likes": 330
   },
   {
-   "user": "akiS2_aaa",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 153512,
-   "likes": 410
-  },
-  {
    "user": "ExtraTimeGoals",
    "is_watched": false,
    "posts": 1,
@@ -9830,6 +9830,13 @@
    "posts": 1,
    "impressions": 104381,
    "likes": 1354
+  },
+  {
+   "user": "B42171105",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 93414,
+   "likes": 479
   },
   {
    "user": "acqua_aki",
@@ -11145,8 +11152,8 @@
   {
    "date": "2026-10-15",
    "posts": 188,
-   "impressions": 623789638,
-   "likes": 3377288,
+   "impressions": 623851962,
+   "likes": 3377609,
    "categories": {
     "ホスト": 14,
     "キャバクラ": 22,
@@ -11158,16 +11165,16 @@
   },
   {
    "date": "2026-10-16",
-   "posts": 511,
-   "impressions": 933658250,
-   "likes": 14700802,
+   "posts": 512,
+   "impressions": 934088491,
+   "likes": 14701803,
    "categories": {
     "ホスト": 15,
     "キャバクラ": 21,
     "歌舞伎町": 4,
     "夜職その他": 21,
     "監視アカウント": 27,
-    "その他": 458
+    "その他": 459
    }
   },
   {
