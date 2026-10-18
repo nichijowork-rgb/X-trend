@@ -1,6 +1,138 @@
 {
- "generated_at": "2026-10-18T00:03:30+09:00",
+ "generated_at": "2026-10-19T00:10:19+09:00",
  "daily": [
+  {
+   "date": "2026-10-18",
+   "rising": [
+    {
+     "id": "2111712916294799763",
+     "views": 471954,
+     "hours_since_post": 7.47,
+     "views_per_hour": 63156,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2111805032236830883",
+     "views": 143428,
+     "hours_since_post": 1.37,
+     "views_per_hour": 104522,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿。星乃リアさんが美容院に行っていたという続報"
+    },
+    {
+     "id": "2111801942993440984",
+     "views": 151812,
+     "hours_since_post": 1.58,
+     "views_per_hour": 96287,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿。ラヴ上等2出演のキャバ嬢るなさんのニルス卒業に出演メンバーが集合"
+    },
+    {
+     "id": "2111781936737763777",
+     "views": 152239,
+     "hours_since_post": 2.9,
+     "views_per_hour": 52466,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿。キャバ嬢ひめかさんがかけるんさんに贈ったアルバムの話題"
+    }
+   ],
+   "review": [
+    {
+     "id": "2111404696846111154",
+     "before_views": 456708,
+     "after_views": 1572024,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2111346909319487925",
+     "before_views": 464204,
+     "after_views": 1679700,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2111295384261967983",
+     "before_views": 463489,
+     "after_views": 626887,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2111431425606209620",
+     "before_views": 290736,
+     "after_views": 468495,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111433739960230066",
+     "before_views": 208262,
+     "after_views": 405969,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111431833561031162",
+     "before_views": 220122,
+     "after_views": 2539953,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111424535539110020",
+     "before_views": 140694,
+     "after_views": 330884,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111423365273817403",
+     "before_views": 133858,
+     "after_views": 142015,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111384812800053576",
+     "before_views": 184433,
+     "after_views": 297868,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111391903916913131",
+     "before_views": 157016,
+     "after_views": 262919,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 5,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-10-17",
    "rising": [
