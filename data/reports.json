@@ -1,6 +1,94 @@
 {
- "generated_at": "2026-10-19T00:10:19+09:00",
+ "generated_at": "2026-10-20T00:16:42+09:00",
  "daily": [
+  {
+   "date": "2026-10-19",
+   "rising": [],
+   "rising_watch": [
+    {
+     "id": "2112134891907526779",
+     "views": 228226,
+     "hours_since_post": 3.51,
+     "views_per_hour": 64975,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "星乃リアさんの動画は事実、SNSを辞めない理由への疑問（キャバクラ次点にも掲載）"
+    },
+    {
+     "id": "2112131617766732175",
+     "views": 232974,
+     "hours_since_post": 3.73,
+     "views_per_hour": 62469,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウントの投稿。ちなにーさんのホスト飲み会（ホスト次点にも掲載）"
+    },
+    {
+     "id": "2112162577505787927",
+     "views": 103914,
+     "hours_since_post": 1.68,
+     "views_per_hour": 61895,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "星乃リアさんの擁護勢を批判する投稿"
+    },
+    {
+     "id": "2112146322665144432",
+     "views": 155924,
+     "hours_since_post": 2.76,
+     "views_per_hour": 56585,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "星乃リア失踪事件の全流れまとめ"
+    },
+    {
+     "id": "2112153102405324859",
+     "views": 125322,
+     "hours_since_post": 2.31,
+     "views_per_hour": 54337,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿。星乃リアさんを家庭環境の悪い家の長女と分析"
+    }
+   ],
+   "review": [
+    {
+     "id": "2111712916294799763",
+     "before_views": 471954,
+     "after_views": 733934,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2111805032236830883",
+     "before_views": 143428,
+     "after_views": 1740759,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111801942993440984",
+     "before_views": 151812,
+     "after_views": 559984,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2111781936737763777",
+     "before_views": 152239,
+     "after_views": 465452,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-18",
    "rising": [
