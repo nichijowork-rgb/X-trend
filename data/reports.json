@@ -1,6 +1,93 @@
 {
- "generated_at": "2026-10-20T00:16:42+09:00",
+ "generated_at": "2026-10-21T00:07:47+09:00",
  "daily": [
+  {
+   "date": "2026-10-20",
+   "rising": [
+    {
+     "id": "2112506788440645663",
+     "views": 477555,
+     "hours_since_post": 2.93,
+     "views_per_hour": 162911,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2112498487590072424",
+     "views": 231794,
+     "hours_since_post": 3.48,
+     "views_per_hour": 66586,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "橋本姫奈さんの活動終了報告のまとめ。本人の報告が350万表示超えで関連投稿も伸びている（キャバクラ次点にも掲載）"
+    },
+    {
+     "id": "2112470382188130634",
+     "views": 268106,
+     "hours_since_post": 5.34,
+     "views_per_hour": 50184,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "「抱ける夜職一覧」。夜職その他の次点にも掲載"
+    },
+    {
+     "id": "2112469456329085252",
+     "views": 180759,
+     "hours_since_post": 5.4,
+     "views_per_hour": 33450,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "ホストが「BREAKING DOWNには出れません」などと自虐。この投稿を引用した投稿への返信で「エルコレ大丈夫か？」という声も（ホスト次点にも掲載）"
+    }
+   ],
+   "review": [
+    {
+     "id": "2112134891907526779",
+     "before_views": 228226,
+     "after_views": 1665020,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2112131617766732175",
+     "before_views": 232974,
+     "after_views": 516060,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2112162577505787927",
+     "before_views": 103914,
+     "after_views": 1580312,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2112146322665144432",
+     "before_views": 155924,
+     "after_views": 249981,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2112153102405324859",
+     "before_views": 125322,
+     "after_views": 1434739,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-19",
    "rising": [],
