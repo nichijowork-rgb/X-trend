@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-10-21T00:09:36+09:00",
+ "generated_at": "2026-10-21T00:24:24+09:00",
  "min_impressions": 300000,
- "total_posts": 2414,
+ "total_posts": 2415,
  "total_accounts": 1502,
  "below_threshold_posts": 34,
  "report_missing_ids": [],
@@ -138,9 +138,9 @@
    "likes": 1150740
   },
   "キャバクラ": {
-   "posts": 384,
-   "impressions": 1049705671,
-   "likes": 2561566
+   "posts": 385,
+   "impressions": 1050102695,
+   "likes": 2562804
   },
   "歌舞伎町": {
    "posts": 51,
@@ -159,8 +159,8 @@
   },
   "その他": {
    "posts": 1745,
-   "impressions": 4978779179,
-   "likes": 46566746
+   "impressions": 4981087905,
+   "likes": 46569514
   }
  },
  "by_account": [
@@ -438,11 +438,18 @@
    "likes": 71166
   },
   {
+   "user": "yorudeki",
+   "is_watched": false,
+   "posts": 6,
+   "impressions": 10365111,
+   "likes": 11185
+  },
+  {
    "user": "lastcall_krnk",
    "is_watched": false,
    "posts": 6,
-   "impressions": 8475383,
-   "likes": 8077
+   "impressions": 8518449,
+   "likes": 8708
   },
   {
    "user": "milk_info",
@@ -478,13 +485,6 @@
    "posts": 5,
    "impressions": 15817256,
    "likes": 36813
-  },
-  {
-   "user": "yorudeki",
-   "is_watched": false,
-   "posts": 5,
-   "impressions": 9968087,
-   "likes": 9947
   },
   {
    "user": "attk_gossip",
@@ -532,8 +532,8 @@
    "user": "AshleyJ62727",
    "is_watched": false,
    "posts": 4,
-   "impressions": 12277315,
-   "likes": 29134
+   "impressions": 12304034,
+   "likes": 29197
   },
   {
    "user": "UN_NERV",
@@ -767,6 +767,13 @@
    "likes": 101759
   },
   {
+   "user": "omegudayon",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 4630039,
+   "likes": 23020
+  },
+  {
    "user": "ihararyotaro",
    "is_watched": false,
    "posts": 3,
@@ -835,13 +842,6 @@
    "posts": 3,
    "impressions": 3144978,
    "likes": 168773
-  },
-  {
-   "user": "omegudayon",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 3095584,
-   "likes": 22143
   },
   {
    "user": "togootto",
@@ -3889,6 +3889,13 @@
    "likes": 19248
   },
   {
+   "user": "ichinose_labo",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2891478,
+   "likes": 11326
+  },
+  {
    "user": "CollinRugg",
    "is_watched": false,
    "posts": 1,
@@ -4699,13 +4706,6 @@
    "posts": 1,
    "impressions": 2200758,
    "likes": 24444
-  },
-  {
-   "user": "ichinose_labo",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 2186992,
-   "likes": 10129
   },
   {
    "user": "nikkei_local",
@@ -12181,8 +12181,8 @@
   {
    "date": "2026-10-18",
    "posts": 78,
-   "impressions": 189865225,
-   "likes": 697092,
+   "impressions": 190639496,
+   "likes": 698983,
    "categories": {
     "ホスト": 8,
     "キャバクラ": 23,
@@ -12195,8 +12195,8 @@
   {
    "date": "2026-10-19",
    "posts": 73,
-   "impressions": 194136693,
-   "likes": 526521,
+   "impressions": 195671148,
+   "likes": 527398,
    "categories": {
     "ホスト": 3,
     "キャバクラ": 31,
@@ -12208,12 +12208,12 @@
   },
   {
    "date": "2026-10-20",
-   "posts": 36,
-   "impressions": 68280999,
-   "likes": 251941,
+   "posts": 37,
+   "impressions": 68678023,
+   "likes": 253179,
    "categories": {
     "ホスト": 3,
-    "キャバクラ": 16,
+    "キャバクラ": 17,
     "歌舞伎町": 0,
     "夜職その他": 3,
     "監視アカウント": 11,
