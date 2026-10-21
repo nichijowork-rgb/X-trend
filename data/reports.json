@@ -1,6 +1,62 @@
 {
- "generated_at": "2026-10-21T00:07:47+09:00",
+ "generated_at": "2026-10-22T00:03:37+09:00",
  "daily": [
+  {
+   "date": "2026-10-21",
+   "rising": [],
+   "rising_watch": [
+    {
+     "id": "2112871946358845657",
+     "views": 102124,
+     "hours_since_post": 2.74,
+     "views_per_hour": 37219,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "前日に続く橋本姫奈さんの話題。@Sanzou3506は前夜の関連投稿が244.8万表示まで伸びている（キャバクラ次点にも掲載）"
+    }
+   ],
+   "review": [
+    {
+     "id": "2112506788440645663",
+     "before_views": 477555,
+     "after_views": 2066501,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2112498487590072424",
+     "before_views": 231794,
+     "after_views": 2419771,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2112470382188130634",
+     "before_views": 268106,
+     "after_views": 443482,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2112469456329085252",
+     "before_views": 180759,
+     "after_views": 317025,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 3,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-20",
    "rising": [
