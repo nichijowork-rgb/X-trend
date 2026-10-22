@@ -1,6 +1,60 @@
 {
- "generated_at": "2026-10-22T00:03:37+09:00",
+ "generated_at": "2026-10-23T00:01:45+09:00",
  "daily": [
+  {
+   "date": "2026-10-22",
+   "rising": [],
+   "rising_watch": [
+    {
+     "id": "2113232026350326181",
+     "views": 233581,
+     "hours_since_post": 2.81,
+     "views_per_hour": 83116,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウント本人の投稿。前夜34.3万表示だった「ラストコール」のタレコミの続報"
+    },
+    {
+     "id": "2113210255501074713",
+     "views": 181389,
+     "hours_since_post": 4.25,
+     "views_per_hour": 42660,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウント本人の投稿。前夜のまとめ時点で192.4万表示だった「ひめかさんと林社長」の話題の続き"
+    },
+    {
+     "id": "2113199629420667111",
+     "views": 180700,
+     "hours_since_post": 4.96,
+     "views_per_hour": 36462,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "歌舞伎町のビル屋上の火災を通りがかりに撮った投稿"
+    },
+    {
+     "id": "2113199921298018693",
+     "views": 177770,
+     "hours_since_post": 4.94,
+     "views_per_hour": 36012,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "同じ火災の速報"
+    }
+   ],
+   "review": [
+    {
+     "id": "2112871946358845657",
+     "before_views": 102124,
+     "after_views": 631782,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-21",
    "rising": [],
