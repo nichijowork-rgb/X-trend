@@ -1,6 +1,53 @@
 {
- "generated_at": "2026-10-23T00:01:45+09:00",
+ "generated_at": "2026-10-24T00:04:35+09:00",
  "daily": [
+  {
+   "date": "2026-10-23",
+   "rising": [],
+   "rising_watch": [],
+   "review": [
+    {
+     "id": "2113232026350326181",
+     "before_views": 233581,
+     "after_views": 550390,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2113210255501074713",
+     "before_views": 181389,
+     "after_views": 1371526,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2113199629420667111",
+     "before_views": 180700,
+     "after_views": 239867,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2113199921298018693",
+     "before_views": 177770,
+     "after_views": 232378,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 3,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-22",
    "rising": [],
