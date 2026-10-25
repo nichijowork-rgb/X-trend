@@ -1,6 +1,59 @@
 {
- "generated_at": "2026-10-25T00:03:25+09:00",
+ "generated_at": "2026-10-26T00:06:54+09:00",
  "daily": [
+  {
+   "date": "2026-10-25",
+   "rising": [
+    {
+     "id": "2114306496951615694",
+     "views": 347983,
+     "hours_since_post": 3.69,
+     "views_per_hour": 94247,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2114329486800163081",
+     "views": 238945,
+     "hours_since_post": 2.17,
+     "views_per_hour": 110127,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ジャングルの売れっ子キャバ嬢3人の整形ビフォーアフターで、投稿から2時間ほどで1,000いいねを超えているため"
+    },
+    {
+     "id": "2114281785374970219",
+     "views": 278810,
+     "hours_since_post": 5.33,
+     "views_per_hour": 52320,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "前夜に4bに入れた同じ投稿者の「LAST CALL歴代クイーン格付け」がその後78.9万表示まで伸びたため"
+    }
+   ],
+   "review": [
+    {
+     "id": "2113947386896904502",
+     "before_views": 202455,
+     "after_views": 789467,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2113924781905183197",
+     "before_views": 153116,
+     "after_views": 981484,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-24",
    "rising": [],
