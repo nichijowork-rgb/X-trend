@@ -1,6 +1,90 @@
 {
- "generated_at": "2026-10-26T00:06:54+09:00",
+ "generated_at": "2026-10-27T00:14:21+09:00",
  "daily": [
+  {
+   "date": "2026-10-26",
+   "rising": [
+    {
+     "id": "2114666275553394774",
+     "views": 495525,
+     "hours_since_post": 3.98,
+     "views_per_hour": 124417,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2114658304182083709",
+     "views": 413271,
+     "hours_since_post": 4.51,
+     "views_per_hour": 91617,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2114643754162528528",
+     "views": 425712,
+     "hours_since_post": 5.47,
+     "views_per_hour": 77764,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2114686225215049861",
+     "views": 132442,
+     "hours_since_post": 2.66,
+     "views_per_hour": 49759,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "キャバクラ系の話題をよく伸ばす@bakusokuhochanの投稿で、投稿から2時間半ほどで13万表示を超えているため"
+    },
+    {
+     "id": "2114643210886635855",
+     "views": 180345,
+     "hours_since_post": 5.51,
+     "views_per_hour": 32729,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "同じゆいぴすさんのプライベートジェットの投稿が今夜41万表示を超えて伸びていて、こちらも1,300いいねを超えているため"
+    }
+   ],
+   "review": [
+    {
+     "id": "2114306496951615694",
+     "before_views": 347983,
+     "after_views": 731650,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2114329486800163081",
+     "before_views": 238945,
+     "after_views": 1201678,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2114281785374970219",
+     "before_views": 278810,
+     "after_views": 943060,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-25",
    "rising": [
