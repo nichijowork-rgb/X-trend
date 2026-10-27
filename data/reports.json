@@ -1,6 +1,105 @@
 {
- "generated_at": "2026-10-27T00:14:21+09:00",
+ "generated_at": "2026-10-28T00:10:13+09:00",
  "daily": [
+  {
+   "date": "2026-10-27",
+   "rising": [
+    {
+     "id": "2115060597280907314",
+     "views": 426361,
+     "hours_since_post": 1.91,
+     "views_per_hour": 222933,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2115061886614221102",
+     "views": 179888,
+     "hours_since_post": 1.83,
+     "views_per_hour": 98463,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2115052455943942374",
+     "views": 271122,
+     "hours_since_post": 2.45,
+     "views_per_hour": 110586,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ヒカルさんの交際歴を「2026 加藤神楽→8ヶ月（リーチ）」とまとめた投稿で、同じ内容の@omochimochigの投稿が今夜300万表示を超えているため"
+    },
+    {
+     "id": "2115049745551126582",
+     "views": 288753,
+     "hours_since_post": 2.63,
+     "views_per_hour": 109745,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見出しのきゃにょんさんの離婚報道の投稿で、2,000いいねを超えているため"
+    },
+    {
+     "id": "2115048459594256388",
+     "views": 243986,
+     "hours_since_post": 2.72,
+     "views_per_hour": 89829,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見出しのきゃにょんさんの離婚報道を引用した投稿のため"
+    }
+   ],
+   "review": [
+    {
+     "id": "2114666275553394774",
+     "before_views": 495525,
+     "after_views": 987260,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2114658304182083709",
+     "before_views": 413271,
+     "after_views": 1295523,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2114643754162528528",
+     "before_views": 425712,
+     "after_views": 685366,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2114686225215049861",
+     "before_views": 132442,
+     "after_views": 292291,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2114643210886635855",
+     "before_views": 180345,
+     "after_views": 695061,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-26",
    "rising": [
