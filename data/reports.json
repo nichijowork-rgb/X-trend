@@ -1,6 +1,84 @@
 {
- "generated_at": "2026-10-28T00:10:13+09:00",
+ "generated_at": "2026-10-29T00:05:27+09:00",
  "daily": [
+  {
+   "date": "2026-10-28",
+   "rising": [
+    {
+     "id": "2115405555443597753",
+     "views": 470543,
+     "hours_since_post": 2.96,
+     "views_per_hour": 159236,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2115324175347077295",
+     "views": 441559,
+     "hours_since_post": 8.34,
+     "views_per_hour": 52914,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2115421515533758723",
+     "views": 142764,
+     "hours_since_post": 1.9,
+     "views_per_hour": 75215,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "夜職やAV女優の子どもへの世間の偏見について書いた投稿で、投稿から2時間足らずで14万表示を超えているため"
+    }
+   ],
+   "review": [
+    {
+     "id": "2115060597280907314",
+     "before_views": 426361,
+     "after_views": 1773678,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2115061886614221102",
+     "before_views": 179888,
+     "after_views": 679182,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2115052455943942374",
+     "before_views": 271122,
+     "after_views": 1312175,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2115049745551126582",
+     "before_views": 288753,
+     "after_views": 1325783,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2115048459594256388",
+     "before_views": 243986,
+     "after_views": 450385,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-27",
    "rising": [
