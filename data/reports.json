@@ -1,6 +1,66 @@
 {
- "generated_at": "2026-10-29T00:05:27+09:00",
+ "generated_at": "2026-10-30T00:07:19+09:00",
  "daily": [
+  {
+   "date": "2026-10-29",
+   "rising": [
+    {
+     "id": "2115631755952886180",
+     "views": 483460,
+     "hours_since_post": 11.92,
+     "views_per_hour": 40552,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2115645344151404747",
+     "views": 427877,
+     "hours_since_post": 11.02,
+     "views_per_hour": 38820,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [],
+   "review": [
+    {
+     "id": "2115405555443597753",
+     "before_views": 470543,
+     "after_views": 3333154,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2115324175347077295",
+     "before_views": 441559,
+     "after_views": 532064,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2115421515533758723",
+     "before_views": 142764,
+     "after_views": 3685807,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-28",
    "rising": [
