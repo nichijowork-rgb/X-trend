@@ -1,6 +1,94 @@
 {
- "generated_at": "2026-10-30T00:07:19+09:00",
+ "generated_at": "2026-10-31T00:12:22+09:00",
  "daily": [
+  {
+   "date": "2026-10-30",
+   "rising": [
+    {
+     "id": "2116140730519556553",
+     "views": 469581,
+     "hours_since_post": 2.2,
+     "views_per_hour": 208300,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2116072247341260825",
+     "views": 484154,
+     "hours_since_post": 6.8,
+     "views_per_hour": 71300,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2116075535046696994",
+     "views": 462891,
+     "hours_since_post": 6.6,
+     "views_per_hour": 70400,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2116054437005570197",
+     "views": 443677,
+     "hours_since_post": 8.0,
+     "views_per_hour": 55700,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2116054881723351271",
+     "views": 423039,
+     "hours_since_post": 7.9,
+     "views_per_hour": 53300,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2116130265630462039",
+     "views": 264920,
+     "hours_since_post": 3.0,
+     "views_per_hour": 89900,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿で、きゃにょんさんの話題がまだ続いているため"
+    },
+    {
+     "id": "2116127250525589885",
+     "views": 272917,
+     "hours_since_post": 3.1,
+     "views_per_hour": 86700,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "細川バレンタインさんとのやりとりの直後で注目が集まっているため"
+    },
+    {
+     "id": "2116138368669241609",
+     "views": 152941,
+     "hours_since_post": 2.4,
+     "views_per_hour": 63400,
+     "condition_label": "投稿から3時間以内で10万表示以上"
+    }
+   ],
+   "review": [
+    {
+     "id": "2115631755952886180",
+     "before_views": 483460,
+     "after_views": 572949,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2115645344151404747",
+     "before_views": 427877,
+     "after_views": 513281,
+     "crossed_500k": true,
+     "source": "rising"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-10-29",
    "rising": [
