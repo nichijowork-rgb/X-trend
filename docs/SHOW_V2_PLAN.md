@@ -57,3 +57,10 @@
 
 ### 段階2を見据えて
 - 進行状態の変化（現在の話題・コーナー・投稿カードの表示/非表示）を1か所でイベントとして発行する作りにしておく（段階2で OBS WebSocket に流す）。
+
+## 段階2・4 の調査結果（2026-10-31、一部は検索要約ベースで未確認）
+- **OBS 連動の方式**: 進行画面（Chrome、https）だけが `ws://127.0.0.1:4455`（obs-websocket v5）に接続し、`CallVendorRequest`（vendorName `obs-browser`、requestType `emit_event`、requestData `{ event_name, event_data }`）で全ブラウザソースへ window の CustomEvent として配信する。オーバーレイ側は `window.addEventListener(event_name, e => e.detail)` で受けるだけ（オーバーレイ側に WebSocket 接続は不要）。
+- 認証: Hello の challenge/salt → `secret = b64(SHA256(password+salt))`、`auth = b64(SHA256(secret+challenge))` → Identify。`crypto.subtle` で実装可。
+- **Chrome の「ローカルネットワークアクセス」許可**: https の公開サイトから loopback への接続は許可プロンプトで制御（WebSocket も対象になったとの情報あり）。サイト設定の「デバイス上のアプリ」を許可に。初回に1回許可しておく運用。実機確認が必要。
+- 補助: `BroadcastCustomEvent`（受信側も WebSocket 接続が必要。OBS ブラウザソース内からの接続可否は未確認）。`window.obsstudio` API はシーン切替などのイベント受信に使える。
+- **CastCraft / Doneru**: 外部からスパチャ・どねのイベントを受け取る公開 API・Webhook は見つからない。Doneru のアラートURLは配信者の秘密URLなので公開サイトに置かない。→ 段階4は「手動ボタン／キーで自前エフェクト発火」を基本とし、既存アラートとは位置・時間をずらして共存させる。自動化は YouTube Data API（superChatEvents 等）を使う別の仕組みが必要で、静的サイト単体では難しい。
