@@ -1897,3 +1897,12 @@ test('台本の保留: 投稿 id で保留フォルダへ（手で置いた話�
   const held = heldPostsOf({ posts, topics, prepared: [], forced, protectedTopicIds: new Set(['p:22222']), exceptions: new Set(['33333']) });
   assert.deepEqual([...held.entries()], [['11111', '台本：x']]);
 });
+
+test('台本ファイル: BOM・コードブロック・前後の文章つきでも読める', async () => {
+  const { parseScriptFile } = await import('../show/js/scriptimport.js');
+  const body = JSON.stringify({ app: 'xtrend-script', v: 1, week: '2026-10-31', corners: { main: [{ name: 'テスト', genre: 'ホスト', post_ids: ['1'] }] } });
+  for (const t of ['﻿' + body, '```json\n' + body + '\n```', 'これが台本です\n' + body + '\nよろしく']) {
+    const r = parseScriptFile(t);
+    assert.equal(r.ok, true, t.slice(0, 20));
+  }
+});

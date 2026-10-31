@@ -45,7 +45,13 @@ function ids(v) {
 export function parseScriptFile(input) {
   let raw = input;
   if (typeof input === 'string') {
-    try { raw = JSON.parse(input); } catch { return { ok: false, errors: ['JSON として読めませんでした（台本ファイル xtrend-script を選んでください）'], warnings: [] }; }
+    // 先頭の BOM・前後の空白、チャットからコピーしたときの ```json … ``` や前後の説明文に耐える
+    let t = input.replace(/^\uFEFF/, '').trim();
+    const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(t);
+    if (fence) t = fence[1].trim();
+    const a = t.indexOf('{'), b = t.lastIndexOf('}');
+    if (a > 0 || (b >= 0 && b < t.length - 1)) t = a >= 0 && b > a ? t.slice(a, b + 1) : t;
+    try { raw = JSON.parse(t); } catch { return { ok: false, errors: ['JSON として読めませんでした（台本ファイル xtrend-script を選ぶか、中身をそのまま貼り付けてください）'], warnings: [] }; }
   }
   const errors = [];
   const warnings = [];

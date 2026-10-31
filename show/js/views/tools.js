@@ -229,7 +229,7 @@ function scriptSection(app) {
     // 確認の一覧を見えるところへ
     requestAnimationFrame(() => { const el = document.querySelector('[data-key="script-confirm"]'); if (el) el.scrollIntoView({ block: 'nearest' }); });
   };
-  const file = h('input', { type: 'file', accept: 'application/json,.json', class: 'sr-only', id: 'script-file', dataset: { key: 'script-file' } });
+  const file = h('input', { type: 'file', accept: '.json,.txt,application/json,text/plain', class: 'sr-only', id: 'script-file', dataset: { key: 'script-file' } });
   file.addEventListener('change', async () => {
     const f = file.files && file.files[0];
     if (!f) return;
