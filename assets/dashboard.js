@@ -49,9 +49,11 @@ async function loadFrom(dir) {
   // reports.json は任意。無い・壊れている場合はレポート欄を出さないだけ
   const reports = r.status === 'fulfilled' ? normalizeReports(r.value) : null;
   const dataset = normalizeDataset(p.value); // 形式不正は例外
+  // ブックマーク由来の基準未満の投稿（below_threshold: true）は一覧に出さない（番組サイト用）。伸びている投稿の参照用に別に持つ
+  const belowIds = new Set((Array.isArray(p.value.posts) ? p.value.posts : []).filter((x) => x && x.below_threshold === true).map((x) => String(x.id)));
   const summary = s.status === 'fulfilled' && isValidSummary(s.value) ? s.value : null;
   const summaryNote = s.status === 'rejected' ? s.reason.message : (summary ? '' : `${dir}/summary.json: 形式が不正です`);
-  return { dataset, summary, summaryNote, dir, reports };
+  return { dataset, summary, summaryNote, dir, reports, belowIds };
 }
 
 async function load() {
@@ -1197,6 +1199,7 @@ async function main() {
     app.summaryNote = loaded.summaryNote;
     app.refYear = loaded.dataset.refTs != null ? jstParts(loaded.dataset.refTs).y : null;
     for (const p of app.ds.posts) if (!app.postsById.has(p.id)) app.postsById.set(p.id, p);
+    if (loaded.belowIds && loaded.belowIds.size) app.ds.posts = app.ds.posts.filter((p) => !loaded.belowIds.has(p.id));
     app.allAgg = mergeSummary(aggregate(app.ds.posts, app.ds.categories), app.summary, app.postsById);
 
     if (loaded.isSample) {
