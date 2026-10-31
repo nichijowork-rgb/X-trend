@@ -1,6 +1,141 @@
 {
- "generated_at": "2026-10-31T00:12:22+09:00",
+ "generated_at": "2026-11-01T00:06:39+09:00",
  "daily": [
+  {
+   "date": "2026-10-31",
+   "rising": [
+    {
+     "id": "2116494780398236020",
+     "views": 411146,
+     "hours_since_post": 2.9,
+     "views_per_hour": 143500,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2116471272439988448",
+     "views": 395111,
+     "hours_since_post": 4.4,
+     "views_per_hour": 89300,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2116388400584700323",
+     "views": 408815,
+     "hours_since_post": 9.9,
+     "views_per_hour": 41200,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2116473898925711409",
+     "views": 293593,
+     "hours_since_post": 4.2,
+     "views_per_hour": 69100,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上"
+    },
+    {
+     "id": "2116477888866431216",
+     "views": 196167,
+     "hours_since_post": 4.0,
+     "views_per_hour": 49200,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上"
+    },
+    {
+     "id": "2116456560058834969",
+     "views": 263060,
+     "hours_since_post": 5.4,
+     "views_per_hour": 48700,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "同じ話題の最初の投稿が190万表示を超えているため"
+    }
+   ],
+   "review": [
+    {
+     "id": "2116140730519556553",
+     "before_views": 469581,
+     "after_views": 1955370,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116072247341260825",
+     "before_views": 484154,
+     "after_views": 843055,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116075535046696994",
+     "before_views": 462891,
+     "after_views": 686597,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116054437005570197",
+     "before_views": 443677,
+     "after_views": 559595,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116054881723351271",
+     "before_views": 423039,
+     "after_views": 534390,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116130265630462039",
+     "before_views": 264920,
+     "after_views": 326856,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116127250525589885",
+     "before_views": 272917,
+     "after_views": 1609073,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116138368669241609",
+     "before_views": 152941,
+     "after_views": 655222,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 4,
+     "crossed": 4
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-30",
    "rising": [
@@ -1801,6 +1936,65 @@
   }
  ],
  "weekly": [
+  {
+   "period": {
+    "from": "2026-10-24",
+    "to": "2026-10-31"
+   },
+   "generated_at": "2026-10-31T12:17:00+09:00",
+   "hit_rate_by_condition": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 6,
+     "crossed": 6
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 7,
+     "crossed": 7
+    }
+   ],
+   "hit_rate_by_pace": [
+    {
+     "pace_label": "1時間あたり5万表示以上",
+     "total": 13,
+     "crossed": 13
+    },
+    {
+     "pace_label": "1時間あたり5万表示未満",
+     "total": 2,
+     "crossed": 2
+    }
+   ],
+   "threshold_proposal": "「伸びている投稿」は2週続けて全件が50万を超えました（先週5件、今週15件）。基準は厳しめの可能性がありますが、緩めた場合のデータはまだないので、今のまま続けるのがよさそうです。\n「12時間以内で40万」は7件すべて超えたものの2件は51万台でぎりぎりだったので、この枠を下げる案はおすすめしません。\n「6時間以内で15万＋1時間あたり3万」（伸びそう枠）は今週5件中5件、2週合わせて15件中9件（60%）なので、格上げはもう1週様子を見るのがよさそうです。",
+   "watch_candidates": [
+    {
+     "user": "mietokyo",
+     "reason": "大物キャバ嬢の太客や誕生日営業の話などで、夜職の話題の50万超えが9件（最大506.8万表示）"
+    },
+    {
+     "user": "rinne_channel",
+     "reason": "きゃにょんさん夫婦の騒動やジャングル銀座のきほさんのまとめで、夜職の話題の50万超えが7件（最大480.2万表示）"
+    },
+    {
+     "user": "yorunohuku",
+     "reason": "きゃにょんさんの騒動とひめかさんのバースデーの投稿で、50万超えが7件（最大489.6万表示）"
+    },
+    {
+     "user": "kyo_kokuhatsu",
+     "reason": "きゃにょんさんの離婚騒動とひめかさんのバースデー結果の投稿で、50万超えが4件（最大812.6万表示）"
+    },
+    {
+     "user": "Sanzou3506",
+     "reason": "HOST CALLとLAST CALLの歴代格付け表で、夜職の話題の50万超えが2件（135.8万・107.6万表示）。先週も候補"
+    }
+   ]
+  },
   {
    "period": {
     "from": "2026-10-17",
