@@ -162,3 +162,17 @@ export const BOT = Object.freeze({
   maxTopics: 500,
   maxPostsPerTopic: 300,
 });
+
+/**
+ * 優先ジャンル（オーナー指定: ホスト最優先）。メイン候補のおすすめ・まとまり一覧・受信箱の並びで、
+ * 優先ジャンルの投稿を含む話題は話題性スコア×boost で並べる（表示する点数は変えない）。
+ * ツールの「優先ジャンル」で変えられる（保存・書き出しに含む。'none' で加点なし）。
+ */
+export const GENRE_PRIORITY = Object.freeze({
+  order: Object.freeze(['host', 'kyaba', 'kabuki', 'night']),
+  default: 'host',
+  boost: 1.5,
+});
+
+/** 保留する言葉の初期値（YouTuber 関連など。本文・アカウント・話題名に一致したら「保留」フォルダへ） */
+export const DEFAULT_HOLD_TERMS = Object.freeze(['ヒカル', '加藤神楽', '今森茉耶', 'YouTuber', 'ユーチューバー', 'ぎし', 'みゆみゆ', '堀大輔', '高須', 'あおちゃんぺ']);

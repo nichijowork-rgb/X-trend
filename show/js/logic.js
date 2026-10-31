@@ -4,7 +4,7 @@
 import { formatCompact, formatPace, viewsPerHour, jstParts, parseTimestamp, UNKNOWN } from '../../assets/js/core.js';
 import {
   SHOW_DEFAULTS, GENRES, GENRE_KEYS, NIGHT_GENRES, CORNERS, DEFAULT_DICT, SCORE_WEIGHTS, SIMILARITY, MAIN_SUGGEST_TIERS, GROUPED_MIN_POSTS, MAIN_NIGHT_ONLY,
-  TERM_PREFIXES, SCHEMA_VERSION, CHECKPOINTS,
+  TERM_PREFIXES, SCHEMA_VERSION, CHECKPOINTS, GENRE_PRIORITY, DEFAULT_HOLD_TERMS,
 } from './config.js';
 
 const JST = 9 * 3600;
@@ -515,11 +515,19 @@ export function isGroupedTopic(t) {
   return (t.stats ? t.stats.count : t.postIds.length) >= GROUPED_MIN_POSTS || t.personalPaste === true;
 }
 
-/** スコア順（null は末尾）→ 最大表示 → id */
+/** 並べるときのスコア（優先ジャンルの加点込み。rank が無ければ score） */
+const rankOf = (t) => (t.rank !== undefined ? t.rank : t.score);
+
+/** 優先ジャンルの値を確かめる（'none' か ジャンルキー。それ以外は既定） */
+export function normalizePriorityGenre(g) {
+  return g === 'none' || GENRE_KEYS.includes(g) ? g : GENRE_PRIORITY.default;
+}
+
+/** スコア順（優先ジャンルの加点込み。null は末尾）→ 最大表示 → id */
 export function sortTopics(topics) {
   return [...topics].sort((a, b) => {
-    const sa = a.score;
-    const sb = b.score;
+    const sa = rankOf(a);
+    const sb = rankOf(b);
     if (sa == null && sb != null) return 1;
     if (sb == null && sa != null) return -1;
     if (sa != null && sb != null && sb !== sa) return sb - sa;
@@ -547,6 +555,7 @@ function emptyOverrides() {
  *   cache       … 任意。{} を渡すと類似まとめの結果を使い回す
  *   hiddenPostIds … 削除（非表示）にした投稿 id（どの話題にも入れない）
  *   botTopics   … 段階3: ボットのまとめ（bot.js の normalizeBotTopics の topics）。番組週の投稿だけ使う
+ *   priorityGenre … 優先ジャンル（既定 'host'。'none' で加点なし）。その投稿を含む話題はスコア×GENRE_PRIORITY.boost で並べる
  *   pinnedIds   … 段階3: ユーザーが手を入れた話題 id（番組構成・メイン候補・名前・ジャンル・片付け・削除など）。
  *                 データ側の話題名・辞書・1件の話題がこれに当たれば、ボットのまとめより先にその話題へ入れる
  * }
@@ -630,12 +639,14 @@ export function buildTopics(input) {
   // 4. 類似まとめ（提案）・1件ずつ
   const splitSet = new Set(ov.split);
   // 類似まとめは重いので、同じ投稿の組み合わせなら input.cache（{ key, value }）を使い回す
+  // （保留の言葉があると 1 回の再計算で 2 通り作るので、直近 4 通りまで覚える）
   const cacheKey = rest.map((p) => p.id).join(',');
   let clusters;
-  if (input.cache && input.cache.key === cacheKey) clusters = input.cache.value;
+  const cmap = input.cache ? (input.cache.map || (input.cache.map = new Map())) : null;
+  if (cmap && cmap.has(cacheKey)) clusters = cmap.get(cacheKey);
   else {
     clusters = similarClusters(rest);
-    if (input.cache) { input.cache.key = cacheKey; input.cache.value = clusters; }
+    if (cmap) { cmap.set(cacheKey, clusters); if (cmap.size > 4) cmap.delete(cmap.keys().next().value); }
   }
   for (const g of clusters) {
     const anchor = [...g.ids].sort(compareIds)[0];
@@ -701,6 +712,8 @@ export function buildTopics(input) {
 
   // 9. 仕上げ（統計・名前・ジャンル・スコア）
   const accepted = new Set(ov.accepted);
+  const pg = input.priorityGenre === undefined ? GENRE_PRIORITY.default : input.priorityGenre;
+  const prio = GENRE_KEYS.includes(pg) ? pg : null;
   const out = [];
   for (const t of topics.values()) {
     if (!t.postIds.length && !['link', 'manual', 'carried'].includes(t.kind)) continue;
@@ -723,6 +736,9 @@ export function buildTopics(input) {
     t.bookmark = t.bookmarkCount > 0;
     t.stats = stats;
     t.score = topicScore(stats, SCORE_WEIGHTS, t.bookmarkCount);
+    // 優先ジャンル（既定ホスト）の投稿を含む話題は並び順で加点（表示の点数は score のまま）
+    t.prio = Boolean(prio) && (t.genre === prio || tp.some((p) => postGenre(p) === prio));
+    t.rank = t.score == null ? null : t.score * (t.prio ? GENRE_PRIORITY.boost : 1);
     delete t.fixedGenre;
     out.push(t);
   }
@@ -1187,6 +1203,9 @@ export function defaultSaved() {
     hiddenPosts: [], // 削除（非表示）にした投稿。[{ id, week, at, topicName }]
     // 投稿のジャンルの上書き（投稿 id ごと・全週に効く。段階3でボットへ返す）。{ [postId]: { genre, at, from } }
     genreOverrides: {},
+    priorityGenre: GENRE_PRIORITY.default, // 優先ジャンル（'none' で加点なし）
+    holdTerms: [...DEFAULT_HOLD_TERMS], // 保留する言葉（一致した投稿・話題は「保留」フォルダへ）
+    holdExceptions: [], // 保留から戻した投稿 id・話題 id（言葉に一致しても保留しない）
   };
 }
 
@@ -1368,6 +1387,9 @@ export function parseSaved(input) {
   s.hiddenPosts = (Array.isArray(o.hiddenPosts) ? o.hiddenPosts : [])
     .map((x) => (obj(x) && ID_RE.test(String(x.id)) ? { id: String(x.id), week: typeof x.week === 'string' && weekByKey(x.week) ? x.week : null, at: isNum(x.at) ? x.at : null, topicName: str(x.topicName, 120) || '' } : null))
     .filter((x) => x && (seenH.has(x.id) ? false : seenH.add(x.id))).slice(0, 5000);
+  s.priorityGenre = normalizePriorityGenre(o.priorityGenre);
+  if (Array.isArray(o.holdTerms)) s.holdTerms = strList(o.holdTerms, 200, 40);
+  s.holdExceptions = strList(o.holdExceptions, 5000, 200);
   for (const [id, x] of Object.entries(obj(o.genreOverrides) || {})) {
     const e = obj(x);
     if (!ID_RE.test(id) || !e || !GENRE_KEYS.includes(e.genre)) continue;

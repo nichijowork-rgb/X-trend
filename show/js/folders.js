@@ -154,6 +154,13 @@ export function folderRows(ctx, key) {
   if (key === 'bookmarks') return out((ctx.bookmarkRows || ctx.bookmarkPosts || []).map((p) => postRow(p.id)));
   if (key === 'new') return out([...(ctx.newPostIds || [])].filter((id) => ctx.postsById.has(id)).map(postRow));
   if (key === 'shelf') return out((ctx.shelvedTopics || []).map(topicRow));
+  if (key === 'hold') {
+    // 保留（言葉に一致）: 話題名が一致した話題と、本文・アカウントが一致した投稿
+    return out([
+      ...(ctx.heldTopics || []).map((t) => ({ key: `ht:${t.id}`, type: 'heldTopic', id: t.id })),
+      ...[...(ctx.heldPosts || new Map()).keys()].map((id) => ({ key: `hp:${id}`, type: 'heldPost', id })),
+    ]);
+  }
   if (key === 'trash') {
     const rows = [
       ...[...(ctx.saved.trash || [])].reverse().map((e) => ({ key: `tr:${e.id}`, type: 'trash', id: e.id })),
@@ -207,6 +214,7 @@ export function buildTree(ctx, open = new Set()) {
   if (ctx.bookmarkPosts) add({ key: 'bookmarks', label: '★ブックマーク', count: ctx.bookmarkPosts.length, drop: false });
   add({ key: 'new', label: 'NEW', count: (ctx.newPostIds || new Set()).size, drop: false });
   add({ key: 'shelf', label: '片付け', count: (ctx.shelvedTopics || []).length });
+  add({ key: 'hold', label: '保留', sub: '保留する言葉に一致', count: (ctx.heldTopics || []).length + (ctx.heldPosts ? ctx.heldPosts.size : 0), drop: false });
   add({ key: 'trash', label: 'ゴミ箱', count: (ctx.saved.trash || []).length + (ctx.saved.hiddenPosts || []).length });
   return nodes;
 }

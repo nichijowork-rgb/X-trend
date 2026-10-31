@@ -5,7 +5,8 @@
 // { generated_at, week,
 //   genre_overrides: [{ id, genre（カテゴリ名）, was: [元のカテゴリ] }],
 //   topic_edits: [{ topic_id, source: 'bot'|'site', name, genre, post_ids, deleted, edits: ['rename'|'genre'|'posts'|'merge'|'new'|'shelve'|'delete'], merged_from? }],
-//   removed_posts: [{ id, reason: 'trash'|'hidden', topic_id? }] }
+//   removed_posts: [{ id, reason: 'trash'|'hidden', topic_id? }],
+//   hold_terms: ['ヒカル', …], hold_exceptions: ['<投稿id か 話題id>', …] }
 //  - topic_id はボットの話題ならボットの id（サイトの 'g:' を外したもの）、サイトの話題はサイトの id（d:辞書 / t:話題名 / c:類似 / m:手動 …）
 //  - 書き込み先は BOT.feedbackPath（feedback/）に固定。data/ には書かない
 
@@ -74,6 +75,9 @@ export function buildFeedback(input) {
     genre_overrides,
     topic_edits: edits,
     removed_posts: [...removed.values()].sort((a, b) => compareIds(a.id, b.id)),
+    // 保留する言葉（YouTuber 関連など。ボットが分類・まとめから外す参考）と、ユーザーが保留から戻した投稿・話題
+    hold_terms: [...(saved.holdTerms || [])],
+    hold_exceptions: [...new Set(saved.holdExceptions || [])].map((x) => (feedbackTopicId(x).source === 'bot' ? feedbackTopicId(x).topic_id : x)).sort(),
   };
 }
 

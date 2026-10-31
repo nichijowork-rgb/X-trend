@@ -6,11 +6,12 @@ import {
   showWeekOf, weekByKey, shiftWeekKey, listWeeks, postsInWeek, buildTopics, indexTopics, buildCues, getWeek,
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
   partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
-  applyGenreOverrides, majorityGenre, pastUsedIds, usedTopicIds,
+  applyGenreOverrides, majorityGenre, pastUsedIds, usedTopicIds, normalizePriorityGenre,
 } from './js/logic.js';
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { prepareHoldTerms, heldPostsOf, heldTopicsOf, removeHoldTerm } from './js/hold.js';
 import { makeEffect, createCooldown, EFFECT_TTL_MS, effectDef } from './js/effects.js';
 import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBACK_SENT_KEY } from './js/feedback.js';
 import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload } from './js/payload.js';
@@ -161,21 +162,34 @@ function recompute() {
   }
   const prevKey = shiftWeekKey(app.weekKey, -1);
   const carried = prevKey ? getWeek(app.saved, prevKey).carriedOut : [];
-  app.topics = buildTopics({
+  const hidden = new Set(app.saved.hiddenPosts.map((x) => x.id));
+  const build = (hiddenPostIds) => buildTopics({
     posts: weekPosts, extraPosts, missingIds: missingIds.sort(compareIds), personalIds, bookmarkIds, carried,
     postsById: app.postsById, dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache,
-    hiddenPostIds: new Set(app.saved.hiddenPosts.map((x) => x.id)),
-    botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk),
+    hiddenPostIds, botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk), priorityGenre: app.saved.priorityGenre,
   });
+  app.topics = build(hidden);
+  // 保留する言葉: 一致した投稿は話題から外し（手で置いた話題の投稿・移動・自分で追加したものは除く）、話題名が一致した話題は保留へ
+  const prepared = prepareHoldTerms(app.saved.holdTerms);
+  const exceptions = new Set(app.saved.holdExceptions);
+  const placed = new Set([...usedTopicIds(wk.rundown), ...(wk.mainCand || [])]);
+  app.heldPosts = heldPostsOf({
+    posts: [...weekPosts, ...extraPosts], topics: app.topics, prepared, exceptions, protectedTopicIds: placed,
+    protectedPostIds: new Set([...Object.keys(wk.overrides.moves), ...personalIds]),
+  });
+  for (const id of hidden) app.heldPosts.delete(id);
+  if (app.heldPosts.size) app.topics = build(new Set([...hidden, ...app.heldPosts.keys()]));
   app.topicsById = indexTopics(app.topics);
-  // 候補に出す話題（片付け・削除を除く）
+  // 候補に出す話題（片付け・削除・保留を除く）
   const part = partitionTopics(app.topics, wk, app.saved.trash);
-  app.visibleTopics = part.visible;
+  app.heldTopicTerms = heldTopicsOf(part.visible, prepared, exceptions, placed);
+  app.heldTopics = part.visible.filter((t) => app.heldTopicTerms.has(t.id));
+  app.visibleTopics = part.visible.filter((t) => !app.heldTopicTerms.has(t.id));
   app.shelvedTopics = part.shelved;
   app.trashedTopics = part.trashed;
   app.cues = buildCues(wk.rundown, app.topicsById);
   app.weekPostIds = [...weekPosts.map((p) => p.id), ...extraPosts.map((p) => p.id)];
-  app.weekPosts = [...weekPosts, ...extraPosts];
+  app.weekPosts = [...weekPosts, ...extraPosts].filter((p) => !app.heldPosts.has(p.id));
   app.newInfo = newSince(wk, app.weekPostIds, app.topics);
   app.postTopic = postTopicMap(app.topics);
   app.recommended = recommendGeneral(app.visibleTopics, undefined, app.pickIds);
@@ -538,6 +552,23 @@ app.restoreTrash = (ids) => {
 app.hidePost = (postId, topicName) => app.edit('投稿の削除', (w, s) => {
   s.hiddenPosts = hidePost(s, postId, app.weekKey, Date.now(), topicName).hiddenPosts;
 }, { toastText: '投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）' });
+// ---------------------------------------------------------------- 保留する言葉・優先ジャンル（保存・書き出しに含む）
+
+/** 保留から戻す（その投稿・話題だけ。言葉に一致しても保留しない例外に入れる） */
+app.unhold = (ids) => {
+  const list = [...new Set(ids.map(String))];
+  app.edit('保留から戻す', (w, s) => { s.holdExceptions = [...new Set([...s.holdExceptions, ...list])].slice(-5000); }, { toastText: `保留から ${list.length}件戻しました` });
+};
+app.removeHoldTerm = (term) => {
+  app.edit(`保留の言葉「${term}」を外す`, (w, s) => { s.holdTerms = removeHoldTerm(s.holdTerms, term); }, { toastText: `「${term}」を保留する言葉から外しました` });
+};
+app.setHoldTerms = (terms) => {
+  app.edit('保留する言葉の変更', (w, s) => { s.holdTerms = terms; });
+};
+app.setPriorityGenre = (g) => {
+  app.edit('優先ジャンルの変更', (w, s) => { s.priorityGenre = normalizePriorityGenre(g); });
+};
+
 app.unhidePost = (postId) => {
   app.edit('投稿を戻す', (w, s) => { s.hiddenPosts = unhidePost(s, postId).hiddenPosts; });
   toast('投稿を戻しました');

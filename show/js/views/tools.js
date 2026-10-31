@@ -3,7 +3,8 @@ import { GENRES, DEFAULT_DICT, SHOW_DEFAULTS } from '../config.js';
 import { extractStatusIds, parseSaved, serializeSaved, statusUrl, genreOverrideList } from '../logic.js';
 import { h, btn, field, downloadText, genreSticker } from '../dom.js';
 import { feedbackCounts } from '../feedback.js';
-import { BOT } from '../config.js';
+import { BOT, GENRE_PRIORITY, DEFAULT_HOLD_TERMS } from '../config.js';
+import { parseHoldTerms } from '../hold.js';
 
 const splitList = (s) => s.split(/[,、，\n]/).map((x) => x.trim()).filter(Boolean);
 
@@ -23,6 +24,8 @@ export function toolsDialog(app) {
     field('番組名', nameInput),
     h('div', { class: 'row' }, btn(isCard ? '埋め込み表示に切替' : 'カード表示に切替', () => app.setView(isCard ? 'embed' : 'card'), 'btn btn-small', { 'data-key': 'view-toggle', 'aria-pressed': String(isCard) }),
       h('span', { class: 'muted' }, isCard ? '今はカード表示（X の埋め込みを使わない軽い表示）' : '今は X の埋め込み表示（プレビュー・進行・映す用）'))));
+
+  body.append(prioritySection(app));
 
   // 書き出し・読み込み
   const file = h('input', { type: 'file', accept: 'application/json,.json', class: 'sr-only', id: 'import-file', dataset: { key: 'import-file' } });
@@ -178,5 +181,26 @@ function botSection(app) {
         h('li', {}, '「Generate token」→ 表示された github_pat_… をコピーして、上の欄に貼り付け →「GitHub に保存」。'))));
   sec.append(gh);
   if (msg) sec.append(msg);
+  return sec;
+}
+
+// ---------------------------------------------------------------- 優先ジャンル・保留する言葉
+
+function prioritySection(app) {
+  const s = app.saved;
+  const sec = h('section', { class: 'tools-sec', dataset: { key: 'prio-sec' } }, h('h3', {}, '優先ジャンルと保留する言葉'));
+  const label = (k) => (GENRES.find((g) => g.key === k) || {}).label || k;
+  const sel = h('select', { class: 'input input-sm', dataset: { key: 'priority-genre' }, attrs: { 'aria-label': '優先ジャンル' } },
+    [...GENRE_PRIORITY.order.map((k) => h('option', { value: k, selected: s.priorityGenre === k }, label(k))), h('option', { value: 'none', selected: s.priorityGenre === 'none' }, '優先しない')]);
+  sel.addEventListener('change', () => app.setPriorityGenre(sel.value));
+  sec.append(field('優先ジャンル', sel, `（その投稿を含む話題を、メイン候補のおすすめ・まとまり・受信箱で上に並べます。話題性スコア×${GENRE_PRIORITY.boost}）`));
+  const ta = h('textarea', { class: 'input', rows: 3, value: s.holdTerms.join('、'), dataset: { key: 'hold-terms' }, placeholder: '例：ヒカル、YouTuber' });
+  const held = (app.heldTopics || []).length + (app.heldPosts ? app.heldPosts.size : 0);
+  sec.append(field('保留する言葉（「、」か改行で区切る）', ta, `（本文・アカウント・話題名に一致したものは「保留」フォルダへ。今週 ${held}件）`),
+    h('p', { class: 'muted' }, '番組構成に手で入れた話題・手で作ったまとまり・自分で追加した投稿は保留しません。保留フォルダから 1 件ずつ戻すこともできます。'),
+    h('div', { class: 'row' },
+      btn('保留する言葉を保存', () => app.setHoldTerms(parseHoldTerms(ta.value)), 'btn btn-small', { 'data-key': 'hold-save' }),
+      btn('最初の言葉に戻す', () => app.setHoldTerms([...DEFAULT_HOLD_TERMS]), 'btn btn-small btn-ghost', { 'data-key': 'hold-reset' }),
+      s.holdExceptions.length ? btn(`戻した例外 ${s.holdExceptions.length}件をやめる`, () => app.edit('保留の例外をやめる', (w, x) => { x.holdExceptions = []; }), 'btn btn-small btn-ghost', { 'data-key': 'hold-clear-exceptions' }) : null));
   return sec;
 }

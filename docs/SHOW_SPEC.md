@@ -157,7 +157,9 @@
   "genre_overrides": [ { "id": "2109…", "genre": "その他", "was": ["キャバクラ"] } ],             // 投稿のジャンル上書き（全週）。was は元のカテゴリ
   "topic_edits": [ { "topic_id": "host-call-2026w44", "source": "bot", "name": "ホストコール規制", "genre": "ホスト",
                      "post_ids": ["…"], "deleted": false, "edits": ["rename", "posts"], "merged_from": ["…"] } ],
-  "removed_posts": [ { "id": "2109…", "reason": "trash", "topic_id": "…" }, { "id": "…", "reason": "hidden" } ] }
+  "removed_posts": [ { "id": "2109…", "reason": "trash", "topic_id": "…" }, { "id": "…", "reason": "hidden" } ],
+  "hold_terms": ["ヒカル", "YouTuber"],            // 保留する言葉（ボットが分類・まとめから外す参考）
+  "hold_exceptions": ["2109…", "host-call-2026w44"] }   // 保留から戻した投稿・話題（ボットの話題は g: を外した id）
 ```
   - `topic_edits`: その週の話題のうち手を入れたもの（`edits`: rename 名前／genre 話題のジャンル／posts 投稿の出し入れ／merge 結合／new 新しいまとまり／shelve 片付け）と、ゴミ箱の話題（`deleted: true`・`edits: ["delete"]`・`week`）。`topic_id` はボットの話題ならボットの id（`g:` を外す）、サイトの話題はサイトの id（`d:辞書` `t:話題名` `c:類似` `m:手動` `p:1件`）、`source` で区別。
   - `removed_posts`: ゴミ箱の話題の投稿（trash）と、1 件ずつ削除した投稿（hidden）。
@@ -177,6 +179,15 @@
 - `?motion=off`・OS の「動きを減らす」: 粒を減らして位置を固定し、フェードだけ（Web Animations）。
 - **効果音**: `?sound=on` のときだけ WebAudio で合成（ファイル・外部素材なし。拍手＝ノイズの連打、紙吹雪＝きらきらの和音、神回＝ファンファーレ、えぇっ＝上下する音、炎上＝ゴーッ、感謝＝ベル）。既定では AudioContext も作らない。OBS のブラウザソースで「OBS で音声を制御」をオンにすると音声ミキサーで音量を調整できる。
 - 自動発火（スパチャ・どね連動）は CastCraft / Doneru に公開の受け取り口が無いので対象外。将来 YouTube Data API などから出すときは `kind` を増やすか `params.source` を足す（受け手は知らない kind を無視する）。
+
+### ⑧ 優先ジャンル（ホスト）と保留する言葉（2026-10-31 追加・オーナー確定）
+- **優先ジャンル**（`config.js` の `GENRE_PRIORITY`: 既定 ホスト、選べる順は ホスト・キャバクラ・歌舞伎町・夜職その他、`boost` 1.5）: 優先ジャンルの投稿を含む話題（ジャンルが優先ジャンルか、中にその投稿がある）は、**並び順だけ**話題性スコア×1.5 で比べる（`topic.rank`。表示する点数 `score` は変えない）。メイン候補のおすすめ・まとまり一覧（木・行）・受信箱の並びに効く。［ツール…］→「優先ジャンル」で変えられる（「優先しない」も可）。保存データ・書き出しの `priorityGenre`。
+- **保留する言葉**（初期値 `DEFAULT_HOLD_TERMS`: ヒカル、加藤神楽、今森茉耶、YouTuber、ユーチューバー、ぎし、みゆみゆ、堀大輔、高須、あおちゃんぺ）: 本文・@アカウント・話題名に一致（NFKC・大文字小文字を無視、カタカナの言葉はカタカナの途中では一致しない）した投稿・話題は、編成画面の左の木の **「保留」フォルダ**（片付けとは別。件数つき）に入り、候補・おすすめ・受信箱・まとまり・検索・仕分けモード・メイン候補のおすすめに出さない。
+  - 投稿が一致 → その投稿を話題から外して保留（話題の件数・数値からも外れる）。話題名が一致 → その話題ごと保留。
+  - **手作業が優先**: 番組構成（メイン1〜3・メイン候補・カテゴリ別・雑談）に入れた話題の投稿、手で作ったまとまり、持ち越しの話題、手で移動した投稿、自分で追加した投稿は保留しない。
+  - 保留フォルダの行（`hp:<投稿id>` / `ht:<話題id>`）: プレビューか右クリックで［この投稿（話題）を戻す］（例外 `holdExceptions` に入る。言葉に一致しても以後保留しない）・［言葉「◯◯」を外す］。一括操作バーの「戻す」でもよい。元に戻す（Ctrl+Z）可。
+  - ［ツール…］→「保留する言葉」（「、」か改行区切り。1 語 40 字・200 語まで）・［最初の言葉に戻す］・［戻した例外をやめる］。保存データ・書き出しの `holdTerms` / `holdExceptions`。ボットへの修正（feedback）にも `hold_terms`・`hold_exceptions` として入る。
+  - 実装: `show/js/hold.js`（純粋関数）。`recompute` で 1 回話題を作り、保留する投稿を決めてから、その投稿を除いてもう 1 回作る（類似まとめの結果は直近 4 通りを使い回す）。
 
 ## デザイン
 - 参考: POPでカラフルなベントー配置（黒背景、彩度の高い単色の角丸カード、丸いシール風バッジ、スタンプ）。POP さは色・角丸・シールで出す。ダッシュボードはネオン調のまま、番組サイトだけPOP。
@@ -215,6 +226,7 @@
 | `show/js/overlayinfo.js` | **段階2**: パーツ一覧（推奨サイズ）と参考配置 |
 | `show/js/views/obsui.js` | **段階2**: OBS 接続ダイアログ・セットアップガイド（`#obs-setup`） |
 | `show/js/bot.js` | **段階3**: ボットの話題まとめ（data/show/topics.json）の読み込み・検証（DOM 非依存。単体テスト対象） |
+| `show/js/hold.js` | **追加**: 保留する言葉の照合・保留する投稿/話題の決定（手作業・例外を除く）・言葉の入力と削除（DOM 非依存。単体テスト対象） |
 | `show/js/effects.js` | **段階4**: 演出の種類・effect の作成（一意な id）・感謝バナーの入力の制限・発火の門番（発火済み id・古い at・連打・同時 3 つ）（DOM 非依存。単体テスト対象） |
 | `show/js/feedback.js` | **段階3**: 修正の書き戻し（feedback/show-feedback.json の生成・GitHub Contents API での保存）（DOM 非依存。単体テスト対象） |
 | `show/overlay.html` / `overlay.css` / `overlay.js` | **段階2・4**: OBS のブラウザソース用オーバーレイ（`?part=topicbar|card|title|fx|all`、背景透明。fx は演出と WebAudio の効果音） |
@@ -253,6 +265,9 @@
   "app": "xtrend-show", "v": 4, "savedAt": 1790000000000,   // 版 2: 3 コーナー化／版 3: 整理（片付け・ゴミ箱）／版 4: フォルダ型（メイン枠・メイン候補・ジャンル上書き）
   "genreOverrides": { "<投稿id>": { "genre": "general", "from": "kyaba", "at": 0 } },   // 投稿のジャンル上書き（全週に効く・段階3でボットへ返す）
   "showName": "週刊ヨルニュース",
+  "priorityGenre": "host",                   // 優先ジャンル（host/kyaba/kabuki/night/general か none）
+  "holdTerms": ["ヒカル", "YouTuber"],        // 保留する言葉
+  "holdExceptions": ["2109…", "t:…"],        // 保留から戻した投稿 id・話題 id
   "activeWeek": "2026-10-17",              // 映す用はこの週に追従
   "trash": [{ "id": "tr-…", "topicId": "d:d-hostcall", "name": "…", "genre": "host", "postIds": ["…"], "week": "2026-10-17", "at": 0, "corner": { "key": "main", "index": 1 } }],   // 削除（ゴミ箱。全週に効く）
   "hiddenPosts": [{ "id": "…", "week": "2026-10-17", "at": 0, "topicName": "…" }],   // 削除（非表示）にした投稿

@@ -27,7 +27,7 @@ const narrow = () => typeof matchMedia === 'function' && matchMedia('(max-width:
 const FOLDER_NAMES = {
   cand: 'メイン候補', 'corner:category': 'カテゴリ別ニュース', 'corner:chat': '雑談（一般のバズ）',
   'group:night': 'まとまり：夜職', 'group:general': 'まとまり：一般のバズ', inbox: '受信箱（未整理）',
-  bookmarks: '★ブックマーク', new: 'NEW（前回のチェック以降）', shelf: '片付け', trash: 'ゴミ箱', search: '検索結果',
+  bookmarks: '★ブックマーク', new: 'NEW（前回のチェック以降）', shelf: '片付け', hold: '保留（保留する言葉に一致）', trash: 'ゴミ箱', search: '検索結果',
 };
 
 function ui(app) {
@@ -46,6 +46,7 @@ function folderCtx(app) {
     newPostIds: app.newInfo ? app.newInfo.posts : new Set(), bookmarkPosts: app.bookmarkPosts, pickIds: app.pickIds,
     bookmarkRows: app.ui.bmAll ? app.bookmarkPostsAll : app.bookmarkPosts,
     generalAll: Boolean(app.ui.generalAll), query: app.ui.query, postTopic: app.postTopic, recommended: app.recommended,
+    heldTopics: app.heldTopics || [], heldPosts: app.heldPosts || new Map(),
   };
 }
 
@@ -304,6 +305,8 @@ function rowGenre(app, row) {
   if (row.type === 'post') return postGenre(app.postsById.get(row.id));
   if (row.type === 'topic') { const t = app.topicsById.get(row.id); return t ? t.genre : 'night'; }
   if (row.type === 'trash') { const e = app.saved.trash.find((x) => x.id === row.id); return e ? e.genre : 'night'; }
+  if (row.type === 'heldPost') return postGenre(app.postsById.get(row.id));
+  if (row.type === 'heldTopic') { const t = app.topicsById.get(row.id); return t ? t.genre : 'night'; }
   return 'review';
 }
 
@@ -311,6 +314,8 @@ function rowLabel(app, row) {
   if (row.type === 'post') { const p = app.postsById.get(row.id); return p ? (p.text || '（本文なし）').replace(/\s+/g, ' ') : `データに無い投稿（ID ${row.id}）`; }
   if (row.type === 'topic') { const t = app.topicsById.get(row.id); return t ? t.name : '話題'; }
   if (row.type === 'trash') { const e = app.saved.trash.find((x) => x.id === row.id); return e ? `話題：${e.name}` : '話題'; }
+  if (row.type === 'heldTopic') { const t = app.topicsById.get(row.id); return t ? `まとまり：${t.name}` : '話題'; }
+  if (row.type === 'heldPost') { const p = app.postsById.get(row.id); return p ? (p.text || '（本文なし）').replace(/\s+/g, ' ') : `ID ${row.id}`; }
   const p = app.postsById.get(row.id);
   return `投稿：${p ? p.text.replace(/\s+/g, ' ') : `ID ${row.id}`}`;
 }
@@ -366,6 +371,11 @@ function rowEl(app, row, index) {
       const nw = app.newInfo && app.newInfo.topics.get(t.id);
       if (nw != null) meta.push(h('span', { class: 'rm-new' }, 'NEW'));
     }
+  } else if (row.type === 'heldPost' || row.type === 'heldTopic') {
+    const term = holdTermOfRow(app, row);
+    const p = row.type === 'heldPost' ? app.postsById.get(row.id) : null;
+    if (p) meta.push(h('span', { class: 'rm-user' }, `@${p.user}`), h('span', { class: 'rm-imp' }, formatCompact(p.metrics.impression_count)));
+    meta.push(h('span', { class: 'rm-hold', attrs: { title: '保留する言葉に一致（ツールで変えられます）' } }, `保留：${term || '言葉'}`));
   } else {
     meta.push(h('span', { class: 'muted' }, row.type === 'trash' ? 'ゴミ箱の話題' : 'ゴミ箱の投稿'));
   }
@@ -520,7 +530,7 @@ function bulkBar(app, sel) {
     h('summary', { class: 'btn btn-small menu-btn', dataset: { key: 'bulk-genre' } }, 'ジャンル変更 ▴'),
     h('div', { class: 'menu-list' }, GENRES.map((g) => h('button', { type: 'button', class: 'menu-item', dataset: { key: `bulk-genre-${g.key}` }, on: { click: () => setGenre(app, sel, g.key) } }, g.label))));
   const movable = sel.filter((r) => r.type === 'post' || r.type === 'topic');
-  const restorable = sel.filter((r) => r.type === 'trash' || r.type === 'hidden');
+  const restorable = sel.filter((r) => r.type === 'trash' || r.type === 'hidden' || r.type === 'heldPost' || r.type === 'heldTopic');
   return h('div', { class: 'bulk-bar', attrs: { role: 'toolbar', 'aria-label': '選んだものの一括操作' } },
     h('b', { class: 'bulk-count', dataset: { key: 'bulk-count' } }, `${sel.length}件選択中`),
     movable.length ? [
@@ -534,9 +544,18 @@ function bulkBar(app, sel) {
     btn('選択解除', () => { u.sel = { sel: new Set(), anchor: null }; app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'bulk-clear' }));
 }
 
+/** 保留になった言葉（行） */
+function holdTermOfRow(app, row) {
+  if (row.type === 'heldPost') return app.heldPosts ? app.heldPosts.get(row.id) || '' : '';
+  if (row.type === 'heldTopic') return app.heldTopicTerms ? app.heldTopicTerms.get(row.id) || '' : '';
+  return '';
+}
+
 function restoreRows(app, rows) {
   const tr = rows.filter((r) => r.type === 'trash').map((r) => r.id);
   const hid = rows.filter((r) => r.type === 'hidden').map((r) => r.id);
+  const held = rows.filter((r) => r.type === 'heldPost' || r.type === 'heldTopic').map((r) => r.id);
+  if (held.length) app.unhold(held);
   if (tr.length) app.restoreTrash(tr);
   for (const id of hid) app.unhidePost(id);
   app.ui.sel = { sel: new Set(), anchor: null };
@@ -553,6 +572,13 @@ function openMenu(app, rows, x, y, opts = {}) {
 function menuItems(app, rows, opts) {
   const u = app.ui;
   const one = rows.length === 1 ? rows[0] : null;
+  if (rows.every((r) => r.type === 'heldPost' || r.type === 'heldTopic')) {
+    const terms = [...new Set(rows.map((r) => holdTermOfRow(app, r)).filter(Boolean))];
+    return [
+      { label: `保留から戻す（${rows.length}件。この${rows.length === 1 && rows[0].type === 'heldTopic' ? '話題' : '投稿'}だけ）`, key: 'ctx-unhold', run: () => restoreRows(app, rows) },
+      ...terms.map((t) => ({ label: `言葉「${t}」を保留リストから外す`, key: 'ctx-unhold-term', run: () => app.removeHoldTerm(t) })),
+    ];
+  }
   if (rows.every((r) => r.type === 'trash' || r.type === 'hidden')) {
     return [{ label: `戻す（${rows.length}件）`, key: 'ctx-restore', run: () => restoreRows(app, rows) }];
   }
@@ -679,8 +705,27 @@ function previewPane(app, wk) {
   }
   if (row.type === 'post') pane.append(postPreview(app, wk, row));
   else if (row.type === 'topic') pane.append(topicPreview(app, wk, row));
+  else if (row.type === 'heldPost' || row.type === 'heldTopic') pane.append(heldPreview(app, row));
   else pane.append(h('div', { class: 'pv-body' }, h('p', {}, rowLabel(app, row)), btn('戻す', () => restoreRows(app, [row]), 'btn btn-small', { 'data-key': 'pv-restore' })));
   return pane;
+}
+
+/** 保留の行のプレビュー（理由と、戻す・言葉を外す） */
+function heldPreview(app, row) {
+  const term = holdTermOfRow(app, row);
+  const box = h('div', { class: 'pv-body', dataset: { keep: `pv:${row.key}` } });
+  box.append(h('p', { class: 'hold-note', dataset: { key: 'pv-hold-note' } }, h('b', {}, '保留中'), `：保留する言葉「${term}」に一致したので、候補・おすすめ・受信箱に出していません。`));
+  box.append(h('div', { class: 'row' },
+    btn(row.type === 'heldTopic' ? 'この話題を戻す' : 'この投稿を戻す', () => restoreRows(app, [row]), 'btn btn-small', { 'data-key': 'pv-unhold' }),
+    term ? btn(`言葉「${term}」を外す`, () => app.removeHoldTerm(term), 'btn btn-small btn-ghost', { 'data-key': 'pv-unhold-term' }) : null));
+  if (row.type === 'heldPost') {
+    const p = app.postsById.get(row.id);
+    if (p) box.append(h('div', { class: 'pv-post' }, postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), noActions: true, bm: bmInfo(app, p.id) })));
+  } else {
+    const t = app.topicsById.get(row.id);
+    if (t) box.append(h('p', { class: 'pv-title' }, t.name), h('p', { class: 'stats' }, statsLine(t)));
+  }
+  return box;
 }
 
 function genreSelect(app, rows, cur, key) {

@@ -1017,3 +1017,7 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 @media (prefers-reduced-motion: reduce) { .fxp-btn.is-fired { animation: none; outline: 2px solid var(--yellow); } }
 .setup-box.part-fx-thanks { background: rgba(255, 214, 10, .8); color: var(--ink); border-color: var(--ink); }
 .setup-box.part-fx-stamp { background: rgba(123, 47, 242, .45); border-style: dashed; z-index: 2; }
+
+/* 保留（保留する言葉に一致） */
+.rm-hold { color: var(--warn); }
+.hold-note { padding: 8px 12px; border-radius: 10px; background: #2b2610; border: 1px solid var(--warn); font-size: 14px; margin-bottom: 8px; }

@@ -1621,3 +1621,87 @@ test('演出の配置: 感謝バナーはトピック帯のすぐ上で、投稿
     assert.ok(!overlap(g((x) => x.fx === 'stamp'), o), `スタンプと ${o.label}`);
   }
 });
+
+// ================================================================ 追加: 優先ジャンル（ホスト）・保留する言葉
+import { prepareHoldTerms, matchHoldTerm, postHoldTerm, heldPostsOf, heldTopicsOf, removeHoldTerm, parseHoldTerms } from '../show/js/hold.js';
+import { GENRE_PRIORITY, DEFAULT_HOLD_TERMS } from '../show/js/config.js';
+import { normalizePriorityGenre } from '../show/js/logic.js';
+
+test('優先ジャンル: 既定はホスト。ホストの投稿を含む話題を並びで加点（表示の点数は変えない）・選べる・保存と読み込み', () => {
+  const host = [post({ text: 'ホストの話A', categories: ['ホスト'] }), post({ text: 'ホストの話B', categories: ['ホスト'] })];
+  for (const p of host) p.metrics.impression_count = 3000;
+  const kyaba = [post({ text: 'キャバの話A', categories: ['キャバクラ'], metrics: { impression_count: 9000 } }), post({ text: 'キャバの話B', categories: ['キャバクラ'], metrics: { impression_count: 9000 } })];
+  const d = ds([...host, ...kyaba]);
+  const ov = { manual: [{ id: 'm:h', name: 'ホスト', genre: 'host' }, { id: 'm:k', name: 'キャバ', genre: 'kyaba' }], moves: { [host[0].id]: 'm:h', [host[1].id]: 'm:h', [kyaba[0].id]: 'm:k', [kyaba[1].id]: 'm:k' } };
+  const run = (pg) => buildTopics({ posts: d.posts, dict: [], refTs: d.refTs, overrides: ov, priorityGenre: pg }).filter((t) => t.kind === 'manual');
+  const none = run('none');
+  assert.equal(none[0].id, 'm:k', '加点なしならスコアの高いキャバが先');
+  const def = run(undefined);
+  assert.equal(GENRE_PRIORITY.default, 'host');
+  assert.equal(def[0].id, 'm:h', '既定（ホスト）なら先頭寄せ');
+  assert.ok(def[0].prio && !def[1].prio);
+  assert.equal(def[0].score, none.find((t) => t.id === 'm:h').score, '表示の点数（score）は同じ');
+  assert.ok(Math.abs(def[0].rank - def[0].score * GENRE_PRIORITY.boost) < 1e-9);
+  assert.equal(run('kyaba')[0].id, 'm:k');
+  assert.deepEqual(suggestMain(def, [], 2).map((t) => t.id).slice(0, 1), ['m:h'], 'メイン候補のおすすめも');
+  assert.equal(normalizePriorityGenre('bad'), 'host');
+  assert.equal(normalizePriorityGenre('none'), 'none');
+  const s = defaultSaved();
+  assert.equal(s.priorityGenre, 'host');
+  assert.deepEqual(s.holdTerms, [...DEFAULT_HOLD_TERMS]);
+  s.priorityGenre = 'kabuki';
+  s.holdTerms = ['ヒカル', 'テスト'];
+  s.holdExceptions = ['2110000000000000001', 'g:x'];
+  const back = parseSaved(serializeSaved(s)).state;
+  assert.deepEqual([back.priorityGenre, back.holdTerms, back.holdExceptions], ['kabuki', ['ヒカル', 'テスト'], ['2110000000000000001', 'g:x']]);
+  const old = parseSaved(JSON.stringify({ app: 'xtrend-show', v: 4, weeks: {} })).state;
+  assert.deepEqual([old.priorityGenre, old.holdTerms, old.holdExceptions], ['host', [...DEFAULT_HOLD_TERMS], []], '古い保存データは既定');
+  assert.equal(parseSaved(JSON.stringify({ priorityGenre: '<x>', holdTerms: [1, ' a ', 'a'] })).state.holdTerms.length, 1);
+});
+
+test('保留する言葉: 一致（本文・アカウント・話題名、NFKC・カタカナの区切り）・入力・外す', () => {
+  const pr = prepareHoldTerms(['ヒカル', ' youtuber ', 'YouTuber', '', 3, 'ぎし']);
+  assert.deepEqual(pr.map((x) => x.term), ['ヒカル', 'youtuber', 'ぎし'], '空・重複（大文字小文字）を除く');
+  assert.equal(matchHoldTerm(['ヒカルさんの新しい動画'], pr), 'ヒカル');
+  assert.equal(matchHoldTerm(['ﾋｶﾙの動画'], pr), 'ヒカル', '半角カナも');
+  assert.equal(matchHoldTerm(['ピカヒカルン'], pr), null, 'カタカナの途中は一致しない');
+  assert.equal(matchHoldTerm(['人気ＹｏｕＴｕｂｅｒ'], pr), 'youtuber');
+  assert.equal(postHoldTerm({ text: '普通の投稿', user: 'youtuber_x' }, pr), 'youtuber', '@アカウントも');
+  assert.equal(postHoldTerm(null, pr), null);
+  assert.equal(matchHoldTerm(['x'], []), null);
+  assert.deepEqual(parseHoldTerms('ヒカル、YouTuber\n\n高須,ヒカル'), ['ヒカル', 'YouTuber', '高須']);
+  assert.deepEqual(removeHoldTerm(['ヒカル', 'YouTuber'], 'youtuber'), ['ヒカル']);
+});
+
+test('保留: 手で置いた話題・手で作ったまとまり・持ち越し・移動・自分で追加・戻した例外は保留しない', () => {
+  const pr = prepareHoldTerms(['ヒカル']);
+  const P = (id, text) => ({ id, text, user: 'u' });
+  const posts = [P('1', 'ヒカルの動画'), P('2', 'ヒカルの対談'), P('3', 'ヒカル（まとまり）'), P('4', 'ヒカル（持ち越し）'), P('5', 'ヒカル（移動）'), P('6', 'ヒカル（戻した）'), P('7', '関係ない')];
+  const topics = [
+    { id: 'p:1', kind: 'single', postIds: ['1'], name: 'a' },
+    { id: 'p:2', kind: 'single', postIds: ['2'], name: 'b' },
+    { id: 'm:x', kind: 'manual', postIds: ['3'], name: 'c' },
+    { id: 'k:y', kind: 'carried', postIds: ['4'], name: 'd' },
+    { id: 'p:5', kind: 'single', postIds: ['5'], name: 'e' },
+    { id: 'p:6', kind: 'single', postIds: ['6'], name: 'f' },
+    { id: 'p:7', kind: 'single', postIds: ['7'], name: 'g' },
+  ];
+  const held = heldPostsOf({ posts, topics, prepared: pr, exceptions: new Set(['6']), protectedTopicIds: new Set(['p:2']), protectedPostIds: new Set(['5']) });
+  assert.deepEqual([...held.keys()], ['1']);
+  assert.equal(held.get('1'), 'ヒカル');
+  assert.equal(heldPostsOf({ posts, topics, prepared: [] }).size, 0, '言葉が無ければ何もしない');
+  const ht = heldTopicsOf([{ id: 't:ヒカル騒動', kind: 'tag', name: 'ヒカル騒動' }, { id: 't:ヒカル2', kind: 'tag', name: 'ヒカルの件' }, { id: 'm:z', kind: 'manual', name: 'ヒカル' }, { id: 't:x', kind: 'tag', name: '別の話' }],
+    pr, new Set(['t:ヒカル2']), new Set());
+  assert.deepEqual([...ht.keys()], ['t:ヒカル騒動']);
+  assert.deepEqual([...heldTopicsOf([{ id: 'd:a', kind: 'dict', name: 'ヒカル' }], pr, new Set(), new Set(['d:a'])).keys()], [], '番組構成に入れた話題は保留しない');
+});
+
+test('ボットへの修正（feedback）に保留する言葉と戻した例外が入る', () => {
+  const saved = defaultSaved();
+  saved.holdTerms = ['ヒカル'];
+  saved.holdExceptions = ['2110000000000000005', 'g:bot-1', 'd:d-hostcall'];
+  const fb = buildFeedback({ saved, weekKey: '2026-10-17', topics: [], nowMs: 0 });
+  assert.deepEqual(fb.hold_terms, ['ヒカル']);
+  assert.deepEqual(fb.hold_exceptions, ['2110000000000000005', 'bot-1', 'd:d-hostcall']);
+  assert.deepEqual(buildFeedback({ saved: defaultSaved(), weekKey: 'w', topics: [], nowMs: 0 }).hold_terms, [...DEFAULT_HOLD_TERMS]);
+});

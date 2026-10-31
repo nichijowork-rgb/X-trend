@@ -1117,6 +1117,109 @@ async function main() {
       }
     });
 
+    // ---- 4e. 優先ジャンル（ホスト）・保留する言葉（YouTuber 関連など）
+    await check('保留する言葉: 一致した投稿・話題は「保留」フォルダへ（受信箱・まとまり・検索・仕分けに出さない）→ 戻す・言葉を外す・言葉を足す・手で置いたものは優先・保存と書き出し', async () => {
+      const wkTs = (h) => Math.floor(Date.parse(`2026-10-14T${h}:00:00+09:00`) / 1000);
+      const mk = (id, text, cats, extra = {}) => ({ id, url: '', user: `sample_hold_${id.slice(-2)}`, created_jst: null, ts: wkTs('12'), metrics: { impression_count: 50000, like_count: 1, retweet_count: 0 }, text, categories: cats, matched_terms: [], is_watched: false, ...extra });
+      const A = mk('2110000000000099901', 'ヒカルさんの新しい動画の話（テスト）', ['ホスト']);
+      const B = mk('2110000000000099902', '人気YouTuberのコラボ配信（テスト）', ['その他']);
+      const C1 = mk('2110000000000099903', 'あの騒動の続報（テスト）', ['その他'], { matched_terms: ['topic:ユーチューバー騒動'] });
+      const C2 = mk('2110000000000099904', 'あの騒動のまとめ（テスト）', ['その他'], { matched_terms: ['topic:ユーチューバー騒動'] });
+      const E = mk('2110000000000099905', '高須さんとホストの対談（テスト）', ['ホスト']);
+      const posts = { ...sample, posts: [...sample.posts, A, B, C1, C2, E] };
+      const c = await newCtx();
+      const { page } = await open(c, show, { data: { posts, bookmarks: sampleBm, topics: null } });
+      const count = () => page.$eval('[data-key="folder-hold"] .tree-count', (e) => Number(e.textContent));
+      assert(await count() === 4, `保留 ${await count()}（A・B・E の投稿＋C の話題）`);
+      const visibleIds = () => page.evaluate(() => ({ posts: window.__show.weekPosts.map((p) => p.id), topics: window.__show.visibleTopics.map((t) => t.id), inbox: null }));
+      const v = await visibleIds();
+      assert(![A.id, B.id, E.id].some((id) => v.posts.includes(id)) && !v.topics.includes('t:ユーチューバー騒動'), '候補・検索に出ない');
+      await folder(page, 'inbox');
+      assert(!(await rowKeys(page)).some((k) => [A.id, B.id].some((id) => k.includes(id))), '受信箱に出ない');
+      await search(page, 'ヒカル');
+      assert((await rowKeys(page)).length === 0, '検索にも出ない');
+      await search(page, '');
+      await folder(page, 'hold');
+      const keys = await rowKeys(page);
+      assert(keys.includes(`hp:${A.id}`) && keys.includes(`hp:${B.id}`) && keys.includes('ht:t:ユーチューバー騒動'), JSON.stringify(keys));
+      assert((await page.textContent(`${rowSel(`hp:${A.id}`)} .row-meta`)).includes('保留：ヒカル'), 'meta');
+      // その投稿だけ戻す（プレビュー）
+      await page.click(`${rowSel(`hp:${A.id}`)} .row-main`);
+      await page.waitForSelector('[data-key="pv-hold-note"]');
+      await page.screenshot({ path: path.join(SHOTS, 'hold-960.png') });
+      await page.click('[data-key="pv-unhold"]');
+      await page.waitForFunction((id) => window.__show.weekPosts.some((p) => p.id === id), A.id);
+      assert((await page.evaluate(() => window.__show.saved.holdExceptions)).includes(A.id), 'exceptions');
+      // 言葉を外す（右クリック）
+      await page.evaluate(() => { window.__show.ui.pane = 'list'; window.__show.render(); });
+      await folder(page, 'hold');
+      await ctx(page, `${rowSel(`hp:${B.id}`)} .row-main`, 'ctx-unhold-term');
+      await page.waitForFunction(() => !window.__show.saved.holdTerms.includes('YouTuber'));
+      assert(await page.evaluate((id) => window.__show.weekPosts.some((p) => p.id === id), B.id), 'B back');
+      // 手で番組構成に入れたものは保留より優先: 言葉を空にして E をメイン1へ → 言葉を戻しても E は残る
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      await page.fill('[data-key="hold-terms"]', '');
+      await page.click('[data-key="hold-save"]');
+      await page.waitForFunction(() => window.__show.saved.holdTerms.length === 0);
+      await page.click('[data-key="tools-close"]');
+      const eTopic = await page.evaluate((id) => window.__show.postTopic.get(id), E.id);
+      await page.evaluate((tid) => window.__show.edit('メイン1', (w) => { w.rundown.corners[0].items[0] = tid; }), eTopic);
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      await page.click('[data-key="hold-reset"]');
+      await page.waitForFunction(() => window.__show.saved.holdTerms.includes('高須'));
+      assert(await page.evaluate((id) => window.__show.weekPosts.some((p) => p.id === id), E.id), '手で置いた E は保留しない');
+      // 言葉を足す（ゴジラロード）→ サンプルの投稿が保留へ
+      const before = await count();
+      await page.fill('[data-key="hold-terms"]', `${await page.inputValue('[data-key="hold-terms"]')}、ゴジラロード`);
+      await page.click('[data-key="hold-save"]');
+      await page.waitForFunction((n) => Number(document.querySelector('[data-key="folder-hold"] .tree-count').textContent) === n + 1, before);
+      // 保存・書き出し・ボットへの修正に入る
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="export"]')]);
+      const f = path.join(tmp, 'hold-export.json');
+      await dl.saveAs(f);
+      const ex = JSON.parse(readFileSync(f, 'utf8'));
+      assert(ex.holdTerms.includes('ゴジラロード') && ex.holdExceptions.includes(A.id) && ex.priorityGenre === 'host', 'export');
+      const [dl2] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="fb-download"]')]);
+      const f2 = path.join(tmp, 'hold-fb.json');
+      await dl2.saveAs(f2);
+      const fb = JSON.parse(readFileSync(f2, 'utf8'));
+      assert(fb.hold_terms.includes('ゴジラロード') && fb.hold_exceptions.includes(A.id), 'feedback');
+      await page.screenshot({ path: path.join(SHOTS, 'hold-tools-960.png') });
+      await page.reload();
+      await ready(page);
+      assert(await page.evaluate((id) => window.__show.weekPosts.some((p) => p.id === id) && window.__show.saved.holdTerms.includes('ゴジラロード'), A.id), 'reload');
+      await c.close();
+    });
+
+    await check('優先ジャンル: 既定はホストのまとまりが上・ツールで変えられる（保存）', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      const firstNight = () => page.evaluate(() => {
+        const t = window.__show.visibleTopics.filter((x) => ['host', 'kyaba', 'kabuki', 'night'].includes(x.genre) && x.postIds.length >= 2);
+        return t.slice(0, 3).map((x) => x.genre);
+      });
+      const def = await firstNight();
+      assert(def[0] === 'host', JSON.stringify(def));
+      await folder(page, 'group:night');
+      const k0 = (await rowKeys(page))[0];
+      assert(await page.evaluate((id) => window.__show.topicsById.get(id).prio, k0.slice(2)), '一覧の先頭はホスト');
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      await page.selectOption('[data-key="priority-genre"]', 'kyaba');
+      await page.waitForFunction(() => window.__show.saved.priorityGenre === 'kyaba');
+      const ky = await firstNight();
+      assert(ky[0] === 'kyaba', JSON.stringify(ky));
+      await page.selectOption('[data-key="priority-genre"]', 'none');
+      await page.waitForFunction(() => window.__show.saved.priorityGenre === 'none');
+      await page.reload();
+      await ready(page);
+      assert(await page.evaluate(() => window.__show.saved.priorityGenre) === 'none', 'saved');
+      await c.close();
+      return `既定 ${def.join('/')} → キャバ優先 ${ky.join('/')}`;
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';
