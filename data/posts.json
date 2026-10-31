@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-01T00:06:39+09:00",
+ "generated_at": "2026-11-01T00:30:10+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -501,7 +501,8 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2116475006909813229",
@@ -1026,6 +1027,66 @@
      "height": 2019
     }
    ]
+  },
+  {
+   "id": "2116449473945907346",
+   "url": "https://x.com/hcselection/status/2116449473945907346",
+   "user": "hcselection",
+   "created_utc": "2026-10-31T08:37:30Z",
+   "created_jst": "2026-10-31T17:37:30+09:00",
+   "ts": 1793435850,
+   "metrics": {
+    "impression_count": 355020,
+    "like_count": 253,
+    "retweet_count": null,
+    "reply_count": 7,
+    "quote_count": 6,
+    "bookmark_count": 53
+   },
+   "text": "【騒然】HOST CALLの次回予告で、あおいとアレスが一触即発の事態に\n\nあおい「なんやコラァお前！」\n↓\nアレスに激しく詰め寄る\n↓\nあおい「クレームきとんねん！」\n↓\nわちさん「まあまあまあ、あわてんなって…」\n↓\n一方、アレスは\n「やり返されても全然何も思わんす」 https://t.co/rWtnHYGRMr https://t.co/bB1Z4pzc12",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "quote:キャバ嬢",
+    "quote:キャバ"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2116449450222817280/img/xGeU07ts90lWZzO2.jpg",
+     "variants": [
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2116449450222817280/vid/avc1/540x540/XHItx7cyOOPH4_H6.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2116449450222817280/pl/LcXs92nCvS7wI4-3.m3u8?v=0a0"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2116449450222817280/vid/avc1/1080x1080/XdFUobTG0hAXsrAJ.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2116449450222817280/vid/avc1/320x320/tykA2S0U59r5HLIZ.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2116449450222817280/vid/avc1/720x720/5xBjvRtTmJb9NGQh.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116444815307248091",
@@ -2192,6 +2253,55 @@
    ]
   },
   {
+   "id": "2116383907969151359",
+   "url": "https://x.com/umiuminemui/status/2116383907969151359",
+   "user": "umiuminemui",
+   "created_utc": "2026-10-31T04:16:58Z",
+   "created_jst": "2026-10-31T13:16:58+09:00",
+   "ts": 1793420218,
+   "metrics": {
+    "impression_count": 3667835,
+    "like_count": 16128,
+    "retweet_count": null,
+    "reply_count": 94,
+    "quote_count": 161,
+    "bookmark_count": 1354
+   },
+   "text": "ルナちゃんラストの日に駆けつけてルナちゃん膝の上に乗っけながらキラ伝するルネ。\nこれがほんとの水揚げ上等…？ https://t.co/zJ0pvpf11O",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HV7npp4asAAvTUY.jpg",
+     "width": 795,
+     "height": 1436
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HV7npp7bIAAnz3p.jpg",
+     "width": 805,
+     "height": 1429
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HV7npp9bcAAjKZI.jpg",
+     "width": 789,
+     "height": 593
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HV7npqJbsAAK-jG.jpg",
+     "width": 786,
+     "height": 1060
+    }
+   ],
+   "in_bookmarks": true
+  },
+  {
    "id": "2116380529646064120",
    "url": "https://x.com/KxeSHkstW453827/status/2116380529646064120",
    "user": "KxeSHkstW453827",
@@ -2569,7 +2679,8 @@
      "width": 1283,
      "height": 1715
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116365233086472420",
@@ -2628,6 +2739,29 @@
      "height": 680
     }
    ]
+  },
+  {
+   "id": "2116363941693817126",
+   "url": "https://x.com/bakubijokintama/status/2116363941693817126",
+   "user": "bakubijokintama",
+   "created_utc": "2026-10-31T02:57:38Z",
+   "created_jst": "2026-10-31T11:57:38+09:00",
+   "ts": 1793415458,
+   "metrics": {
+    "impression_count": 2596807,
+    "like_count": 3827,
+    "retweet_count": null,
+    "reply_count": 55,
+    "quote_count": 32,
+    "bookmark_count": 651
+   },
+   "text": "六本木界隈では有名だし、朝起きたらホテルでお金置いてあったらしいww不同意性行為すぎるww男もパニックだよ https://t.co/E3od2LwngA",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2116363817571786868",
@@ -2987,7 +3121,8 @@
    "matched_terms": [
     "すすきの"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2116338971697676487",
@@ -3418,7 +3553,8 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2116323012672880789",
@@ -4178,7 +4314,8 @@
      "width": 720,
      "height": 1280
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116249806561820915",
@@ -4625,6 +4762,43 @@
    ]
   },
   {
+   "id": "2116178762115190978",
+   "url": "https://x.com/fuakawa_/status/2116178762115190978",
+   "user": "fuakawa_",
+   "created_utc": "2026-10-30T14:41:48Z",
+   "created_jst": "2026-10-30T23:41:48+09:00",
+   "ts": 1793371308,
+   "metrics": {
+    "impression_count": 401556,
+    "like_count": 1885,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 63,
+    "bookmark_count": 164
+   },
+   "text": "天使優生との最後の会話コレなのやばいwww\nおばあちゃんは詐欺罪で逮捕、そのおばあちゃんとお母さんとグルで姫実家に入れまくり家族ぐるみの結婚詐欺師が家紋の刺青入れるとか言って吹いた\n何背負う気だよwww https://t.co/Md2l6UyYaV",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HV4tXe5bQAAzyUB.jpg",
+     "width": 945,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HV4tXfHa0AA2zeV.jpg",
+     "width": 945,
+     "height": 2048
+    }
+   ],
+   "in_bookmarks": true
+  },
+  {
    "id": "2116168347310239921",
    "url": "https://x.com/mietokyo/status/2116168347310239921",
    "user": "mietokyo",
@@ -4660,7 +4834,8 @@
      "width": 1206,
      "height": 976
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116168243853615418",
@@ -4998,7 +5173,8 @@
    "report_refs": [
     "review",
     "rising"
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116138368669241609",
@@ -5788,7 +5964,8 @@
      "width": 1448,
      "height": 1086
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116105276575396040",
@@ -7552,7 +7729,8 @@
      "width": 1180,
      "height": 654
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2116044157856923752",
@@ -9185,7 +9363,8 @@
      "width": 1809,
      "height": 4096
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2115981261034713521",
@@ -10517,7 +10696,8 @@
      "width": 1206,
      "height": 1271
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2115912923432227128",
@@ -11629,6 +11809,40 @@
    "is_watched": false
   },
   {
+   "id": "2115814891881955369",
+   "url": "https://x.com/cocoa_naruse/status/2115814891881955369",
+   "user": "cocoa_naruse",
+   "created_utc": "2026-10-29T14:35:54Z",
+   "created_jst": "2026-10-29T23:35:54+09:00",
+   "ts": 1793284554,
+   "metrics": {
+    "impression_count": 892078,
+    "like_count": 4245,
+    "retweet_count": null,
+    "reply_count": 77,
+    "quote_count": 50,
+    "bookmark_count": 202
+   },
+   "text": "今日放送のホストコール、終始めっちゃもやもやしたな。\n\n闇金ってそんなコンプラ緩いの？\n俺が無知なだけ？\n\nこの収録から時間経ってるから解決してることを切に願う。\n\n周りの大人が頭働かせてくれてるかな。\n\n違法金利を返済するためにお金使うお客様が現れませんように。 https://t.co/sG7DOqiib8",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HVzibgoawAADdoT.jpg",
+     "width": 2048,
+     "height": 1150
+    }
+   ],
+   "in_bookmarks": true
+  },
+  {
    "id": "2115814776765022363",
    "url": "https://x.com/mizoguchi_yuji/status/2115814776765022363",
    "user": "mizoguchi_yuji",
@@ -11707,7 +11921,8 @@
      "width": 1170,
      "height": 1492
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2115802033290990077",
@@ -31662,6 +31877,29 @@
    "is_watched": false
   },
   {
+   "id": "2114401535987966265",
+   "url": "https://x.com/hiragi_yuta/status/2114401535987966265",
+   "user": "hiragi_yuta",
+   "created_utc": "2026-10-25T16:59:44Z",
+   "created_jst": "2026-10-26T01:59:44+09:00",
+   "ts": 1792947584,
+   "metrics": {
+    "impression_count": 747540,
+    "like_count": 403,
+    "retweet_count": null,
+    "reply_count": 33,
+    "quote_count": 55,
+    "bookmark_count": 43
+   },
+   "text": "1番売れそうな志願者で名前を上がってもらったのに1番売れてなくてほんと申し訳ない\n\nお世話になったのに人の顔に泥塗ることしかできてない\n\n今ちょっとガチで消えたいし死にたい",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "in_bookmarks": true
+  },
+  {
    "id": "2114398069173453249",
    "url": "https://x.com/tw0mlj/status/2114398069173453249",
    "user": "tw0mlj",
@@ -41218,8 +41456,8 @@
    "created_jst": "2026-10-23T04:16:09+09:00",
    "ts": 1792696569,
    "metrics": {
-    "impression_count": 277680,
-    "like_count": 1555,
+    "impression_count": 277724,
+    "like_count": 1554,
     "retweet_count": null,
     "reply_count": 4,
     "quote_count": 31,
@@ -50824,6 +51062,29 @@
      "height": 593
     }
    ]
+  },
+  {
+   "id": "2112410213227917562",
+   "url": "https://x.com/NewsPicks/status/2112410213227917562",
+   "user": "NewsPicks",
+   "created_utc": "2026-10-20T05:06:56Z",
+   "created_jst": "2026-10-20T14:06:56+09:00",
+   "ts": 1792472816,
+   "metrics": {
+    "impression_count": 1226403,
+    "like_count": 503,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 6,
+    "bookmark_count": 475
+   },
+   "text": "NOT A HOTELは謎めいた会社だ。人里離れた静かな場所に、映画なら何か起こりそうなほどタダモノではない豪奢な建築物を建てている。最近公表された決算で粗利益率が65％に達することが判明。詳細が知られていない彼らのビジネスを探ると、驚愕の世界が現れた。",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2112394771511824699",
