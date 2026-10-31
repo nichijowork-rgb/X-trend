@@ -964,6 +964,159 @@ async function main() {
       return REF_IMAGE ? '合成スクショあり' : '合成スクショなし（OBS_REF_IMAGE 未指定）';
     });
 
+    // ---- 4d. 演出（段階4）。偽の OBS（認証なし）で emit_event を受け、fx パーツへ配る
+    await check('演出: パレット（開閉の保存）・ボタンと Shift+1〜6 で emit_event に effect・fx パーツで出て消える・再送や同じ id で二重に出ない・連打・感謝バナー（Enter・XSS）・音は既定で鳴らさない', async () => {
+      const obs = { payloads: [], targets: [] };
+      const c = await newCtx();
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      watchConsole(page, errors);
+      await page.routeWebSocket(/^ws:\/\/127\.0\.0\.1:4455/, (ws) => {
+        ws.send(JSON.stringify({ op: 0, d: { obsWebSocketVersion: '5.5.2', rpcVersion: 1 } }));
+        ws.onMessage((raw) => {
+          const m = JSON.parse(String(raw));
+          if (m.op === 1) ws.send(JSON.stringify({ op: 2, d: { negotiatedRpcVersion: 1 } }));
+          if (m.op === 6) {
+            ws.send(JSON.stringify({ op: 7, d: { requestType: m.d.requestType, requestId: m.d.requestId, requestStatus: { result: true, code: 100 } } }));
+            const ev = m.d.requestData.requestData;
+            obs.payloads.push(ev.event_data);
+            for (const t of obs.targets) t.evaluate(([name, d]) => window.dispatchEvent(new CustomEvent(name, { detail: d })), [ev.event_name, ev.event_data]).catch(() => {});
+          }
+        });
+      });
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.click('#obs-pill');
+      await page.click('[data-key="obs-connect"]');
+      await page.waitForFunction(() => document.getElementById('obs-pill').dataset.state === 'connected', null, { timeout: 5000 });
+      await page.click('[data-key="obs-close"]');
+      // パーツ（別のブラウザ）。AudioContext を作ったら数える
+      const oc = await newCtx();
+      await oc.addInitScript(() => {
+        window.__ac = 0;
+        const A = window.AudioContext;
+        if (A) window.AudioContext = class extends A { constructor(...a) { super(...a); window.__ac++; } };
+      });
+      const openFx = async (q) => {
+        const p = await oc.newPage();
+        await p.setViewportSize({ width: 1920, height: 1080 });
+        await setupRoutes(p, { data: SAMPLE_404 });
+        watchConsole(p, errors);
+        await p.goto(`${show}overlay.html?${q}`);
+        await p.waitForFunction(() => window.__overlay);
+        return p;
+      };
+      const fx = await openFx('part=fx');
+      obs.targets.push(fx);
+      const effects = () => obs.payloads.map((x) => x.effect).filter(Boolean);
+      // パレット: 閉じている → 開く（保存）
+      assert(!(await page.$('[data-key="fx-confetti"]')), '既定は閉じている');
+      await page.click('[data-key="fx-toggle"]');
+      await page.waitForSelector('[data-key="fx-confetti"]');
+      assert(await page.evaluate(() => localStorage.getItem('xtrend-show-fx-open')) === '1', '開閉の保存');
+      await page.screenshot({ path: path.join(SHOTS, 'fx-palette-960.png') });
+      // ボタン → emit_event の effect → fx パーツで出て、一定時間で消える
+      await page.click('[data-key="fx-confetti"]');
+      await fx.waitForSelector('.fx-item[data-kind="confetti"]', { timeout: 5000 });
+      const conf = await fx.$$eval('.fx-conf', (x) => x.length);
+      assert(conf >= 50, `紙吹雪 ${conf}`);
+      const ce = effects().find((e) => e.kind === 'confetti');
+      assert(ce && typeof ce.id === 'string' && Number.isFinite(ce.at) && ce.params && Object.keys(ce.params).length === 0, JSON.stringify(ce));
+      await fx.waitForSelector('.fx-item[data-kind="confetti"]', { state: 'detached', timeout: 6000 });
+      // キー（Shift+3 = 神回！）
+      await page.keyboard.press('Shift+Digit3');
+      await fx.waitForSelector('.fx-item[data-kind="kami"] .fx-stamp', { timeout: 5000 });
+      assert((await fx.textContent('.fx-item[data-kind="kami"] .fx-stamp')) === '神回！', 'kami');
+      // 連打（同じ演出の 1 秒以内）は 1 回だけ
+      await page.click('[data-key="fx-clap"]');
+      await page.click('[data-key="fx-clap"]');
+      await page.keyboard.press('Shift+Digit1');
+      await fx.waitForSelector('.fx-item[data-kind="clap"]', { timeout: 5000 });
+      await page.waitForTimeout(300);
+      const clapIds = new Set(effects().filter((e) => e.kind === 'clap').map((e) => e.id));
+      assert(clapIds.size === 1, `連打 ${clapIds.size}`);
+      // 再送（5 秒おき）と、同じ effect の別送り手・新しい時刻でも二重に出ない
+      const firedBefore = await fx.evaluate(() => window.__overlay.fired.length);
+      await page.waitForTimeout(5600);
+      const last = obs.payloads.at(-1);
+      await fx.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: { ...d, sid: 'other', seq: 1, at: Date.now() } })), { ...last, effect: effects().at(-1) });
+      await page.waitForTimeout(200);
+      const firedAfter = await fx.evaluate(() => window.__overlay.fired);
+      assert(firedAfter.length === firedBefore && new Set(firedAfter).size === firedAfter.length, `二重 ${firedBefore} → ${firedAfter.length}`);
+      assert(obs.payloads.length > new Set(obs.payloads.map((x) => x.seq)).size, '再送あり');
+      // 感謝バナー: 名前・金額 → Enter（入力中は Shift+数字は効かない）
+      const evil = '<b>太字</b>&amp;';
+      await page.fill('[data-key="fx-name"]', evil);
+      await page.fill('[data-key="fx-amount"]', '<i>500</i>');
+      const n0 = effects().length;
+      await page.focus('[data-key="fx-name"]');
+      await page.keyboard.press('Shift+Digit2');
+      await page.waitForTimeout(300);
+      assert(effects().length === n0, '入力欄では演出キーは効かない（文字が入るだけ）');
+      await page.fill('[data-key="fx-name"]', evil);
+      await page.keyboard.press('Enter');
+      await fx.waitForSelector('.fx-item[data-kind="thanks"] .fx-thanks-main', { timeout: 5000 });
+      assert((await fx.textContent('.fx-thanks-main')) === `${evil}さん ありがとう！`, await fx.textContent('.fx-thanks-main'));
+      assert((await fx.textContent('.fx-thanks-amount')) === '<i>500</i>', 'amount');
+      assert(!(await fx.$('.fx-banner b, .fx-banner i')), 'タグは文字のまま');
+      assert((await live(page)).index === 0, 'Enter で「読んだ」にならない');
+      // 直接届いた長い・危ない名前も制限・文字のまま
+      const bad = { ...last, sid: 'evil', seq: 1, at: Date.now() + 2000, effect: { id: 'evil-1', kind: 'thanks', at: Date.now(), params: { name: '<img src=x onerror="window.__xss=1">'.repeat(3), amount: 'x'.repeat(100) } } };
+      await page.waitForTimeout(1100);
+      const fx2 = await openFx('part=fx&motion=off');
+      await fx2.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: JSON.stringify(d) })), bad);
+      await fx2.waitForSelector('.fx-item[data-kind="thanks"]');
+      const t2 = await fx2.evaluate(() => ({ main: document.querySelector('.fx-thanks-main').textContent, amount: document.querySelector('.fx-thanks-amount').textContent, img: !!document.querySelector('.fx img'), xss: window.__xss, calm: document.querySelector('.fx-item').classList.contains('is-calm') }));
+      assert(!t2.img && t2.xss === undefined && [...t2.main].length <= 20 + 'さん ありがとう！'.length && t2.amount.length === 12 && t2.calm, JSON.stringify(t2));
+      // 音: 既定は AudioContext を作らない／?sound=on なら作る
+      assert(await fx.evaluate(() => window.__ac) === 0 && await fx.evaluate(() => window.__overlay.audio) === false, '既定で音なし');
+      const fx3 = await openFx('part=fx&sound=on');
+      await fx3.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: d })), { ...last, sid: 'snd', seq: 1, at: Date.now(), effect: { id: 'snd-1', kind: 'kami', at: Date.now(), params: {} } });
+      await fx3.waitForSelector('.fx-item[data-kind="kami"]');
+      assert(await fx3.evaluate(() => window.__ac) === 1, 'sound=on');
+      // 同時に 3 つまで（受け手）
+      const fx4 = await openFx('part=fx');
+      const now = Date.now();
+      for (const [i, k] of ['clap', 'confetti', 'kami', 'eh', 'fire'].entries()) {
+        await fx4.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: d })), { ...last, sid: 'max', seq: i + 1, at: now + i, effect: { id: `max-${i}`, kind: k, at: now, params: {} } });
+      }
+      assert(await fx4.$$eval('.fx-item', (x) => x.length) === 3, '同時 3 つ');
+      await oc.close();
+      await c.close();
+      return `effect 付きの送信 ${effects().length}件（再送を含む）・出した演出 ${new Set(effects().map((e) => e.id)).size} 回`;
+    });
+
+    await check('演出: 進行画面 375 幅で横スクロールなし・セットアップガイドに演出の説明・合成スクショ（紙吹雪・神回・感謝バナー）', async () => {
+      const c = await newCtx({ viewport: { width: 375, height: 812 } });
+      const { page } = await open(c, `${show}#live`);
+      await page.click('[data-key="fx-toggle"]');
+      await page.waitForSelector('[data-key="fx-thanks"]');
+      const s2 = await sw(page);
+      assert(s2 <= 375, `scrollWidth ${s2}`);
+      await page.screenshot({ path: path.join(SHOTS, 'fx-palette-375.png') });
+      await page.goto(`${show}#obs-setup`);
+      await ready(page);
+      assert((await page.textContent('.setup-fx')).includes('OBS で音声を制御') && (await page.textContent('.setup-fx')).includes('Stream Deck'), 'guide');
+      assert(await page.$('[data-key="url-fx"]'), 'fx の URL');
+      await c.close();
+      if (REF_IMAGE && existsSync(REF_IMAGE)) {
+        const ext = path.extname(REF_IMAGE).slice(1).replace('jpg', 'jpeg');
+        const uri = `data:image/${ext};base64,${readFileSync(REF_IMAGE).toString('base64')}`;
+        const c2 = await newCtx({ viewport: { width: 1920, height: 1080 } });
+        for (const [k, wait] of [['confetti', 900], ['kami', 700], ['thanks', 900]]) {
+          const q = await c2.newPage();
+          await setupRoutes(q, { data: SAMPLE_404 });
+          await q.goto(`${show}overlay.html?part=all&demo=1&fx=${k}&name=${encodeURIComponent('みお')}&amount=${encodeURIComponent('¥10,000')}`);
+          await q.waitForSelector(`.fx-item[data-kind="${k}"]`);
+          await q.evaluate((u) => { document.body.style.setProperty('background', `url("${u}") 0 0 / 100% 100% no-repeat`, 'important'); document.body.style.height = '1080px'; document.querySelector('.tt').hidden = true; }, uri);
+          await q.waitForTimeout(wait);
+          await q.screenshot({ path: path.join(SHOTS, `fx-composite-${k}-1920.png`) });
+          await q.close();
+        }
+        await c2.close();
+      }
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';

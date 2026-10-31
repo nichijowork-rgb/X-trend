@@ -998,3 +998,22 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .gh-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 0 10px; }
 .gh-box .obs-help ol { margin: 6px 0 0 18px; display: grid; gap: 4px; }
 .fb-link { margin-left: 8px; color: inherit; text-decoration: underline; }
+
+/* ================================================================ 段階4: 演出パレット（進行画面。折りたたみ式・画面半分でも 1〜2 行） */
+.fx-palette { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 8px; min-width: 0; }
+.fxp-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 32px; }
+.fxp-toggle { min-height: 30px; padding: 2px 12px; }
+.fxp-hint { font-size: 12px; color: var(--muted); }
+.fxp-status { margin-left: auto; font-size: 12px; color: var(--text-2); }
+.fxp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 0 4px; }
+.fxp-btn { min-height: 36px; padding: 2px 10px; background: var(--surface-2); color: var(--text); border-color: var(--line); gap: 4px; }
+.fxp-btn kbd { font-size: 10px; margin-left: 4px; padding: 0 4px; border-radius: 4px; border: 1px solid var(--muted); color: var(--muted); font-family: inherit; }
+.fxp-icon { margin-right: 4px; }
+.fxp-btn.is-fired { animation: fxp-fired .6s ease-out; }
+@keyframes fxp-fired { from { background: var(--yellow); color: var(--ink); } to { background: var(--surface-2); } }
+.fxp-thanks { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
+.fxp-name { width: 9em; }
+.fxp-amount { width: 7em; }
+@media (prefers-reduced-motion: reduce) { .fxp-btn.is-fired { animation: none; outline: 2px solid var(--yellow); } }
+.setup-box.part-fx-thanks { background: rgba(255, 214, 10, .8); color: var(--ink); border-color: var(--ink); }
+.setup-box.part-fx-stamp { background: rgba(123, 47, 242, .45); border-style: dashed; z-index: 2; }

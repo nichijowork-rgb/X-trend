@@ -4,6 +4,7 @@ import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, embed
 import { genreIcon } from '../icons.js';
 import { cueColor, leadFor, leadIsBot, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
 import { obsDialog } from './obsui.js';
+import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
 
@@ -46,6 +47,8 @@ export function renderLive(app) {
     h('h2', { class: 'live-headline lh-title', dataset: { key: 'live-title' } }, topic ? topic.name : (cue ? (cue.kind === 'empty' ? `${def.name}（話題が未設定）` : def.name) : 'おつかれさまでした')),
     h('div', { class: 'lh-row' }, h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }), h('div', { class: 'live-start' }, cardToggle, startArea))));
 
+  root.append(fxPalette(app));
+
   const mainCard = h('section', { class: 'live-main', dataset: { keep: 'main' }, attrs: { 'aria-label': '今読むニュース' } });
   mainCard.append(cueContent(app, cue, wk));
   if (app.ui.stampAt && Date.now() - app.ui.stampAt < 1200) {
@@ -63,6 +66,49 @@ export function renderLive(app) {
   }
   tickLive(app, root);
   return root;
+}
+
+/** 演出を出す（ボタン・Shift+1〜6）。押したボタンを一瞬光らせ、状態を読み上げ用に出す */
+function fire(app, kind) {
+  const params = kind === 'thanks' ? { name: app.ui.fxName || '', amount: app.ui.fxAmount || '' } : {};
+  const e = app.fireEffect(kind, params);
+  const st = document.querySelector('[data-key="fx-status"]');
+  if (st) st.textContent = e ? `「${effectDef(kind).label}」を出しました` : '連打は 1 秒あけてください';
+  const b = document.querySelector(`[data-key="fx-${kind}"]`);
+  if (b && e) { b.classList.remove('is-fired'); void b.offsetWidth; b.classList.add('is-fired'); }
+  return e;
+}
+
+/** 「演出」パレット（折りたたみ式の小さなボタン列。開閉は localStorage に保存） */
+function fxPalette(app) {
+  const open = Boolean(app.fxOpen);
+  const bar = h('section', { class: `fx-palette${open ? ' is-open' : ''}`, attrs: { 'aria-label': '演出' }, dataset: { keep: 'fx-palette' } });
+  const head = h('div', { class: 'fxp-head' },
+    btn(open ? '演出 ▾' : '演出 ▸', () => app.setFxOpen(!open), 'btn btn-small btn-ghost-dark fxp-toggle', { 'data-key': 'fx-toggle', 'aria-expanded': String(open), title: '拍手・紙吹雪などの演出（OBS の「演出」パーツに出ます。キーは Shift+1〜6）' }),
+    open ? h('span', { class: 'fxp-hint' }, 'Shift+1〜6 でも出せます') : null,
+    h('span', { class: 'fxp-status', attrs: { role: 'status', 'aria-live': 'polite' }, dataset: { key: 'fx-status' } }));
+  bar.append(head);
+  if (!open) return bar;
+  const row = h('div', { class: 'fxp-row' });
+  for (const d of EFFECTS) {
+    if (d.kind === 'thanks') continue;
+    row.append(btn(h('span', {}, h('span', { class: 'fxp-icon', attrs: { 'aria-hidden': 'true' } }, d.icon), d.label, h('kbd', {}, `⇧${d.digit}`)), () => fire(app, d.kind), 'btn btn-small fxp-btn', { 'data-key': `fx-${d.kind}`, title: `${d.label}（Shift+${d.digit}）` }));
+  }
+  // 感謝バナー: 名前・金額（任意）→ Enter か ボタン
+  const name = h('input', { class: 'input input-sm fxp-name', type: 'text', value: app.ui.fxName || '', maxLength: THANKS_LIMITS.name, placeholder: '名前', dataset: { key: 'fx-name' }, attrs: { 'aria-label': '感謝バナーの名前', autocomplete: 'off' } });
+  const amount = h('input', { class: 'input input-sm fxp-amount', type: 'text', value: app.ui.fxAmount || '', maxLength: THANKS_LIMITS.amount, placeholder: '金額（任意）', dataset: { key: 'fx-amount' }, attrs: { 'aria-label': '感謝バナーの金額', autocomplete: 'off' } });
+  name.addEventListener('input', () => { app.ui.fxName = name.value; });
+  amount.addEventListener('input', () => { app.ui.fxAmount = amount.value; });
+  for (const x of [name, amount]) x.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); fire(app, 'thanks'); } });
+  const thanks = effectDef('thanks');
+  row.append(h('span', { class: 'fxp-thanks' }, name, amount,
+    btn(h('span', {}, h('span', { class: 'fxp-icon', attrs: { 'aria-hidden': 'true' } }, thanks.icon), '感謝', h('kbd', {}, `⇧${thanks.digit}`)), () => fire(app, 'thanks'), 'btn btn-small fxp-btn', { 'data-key': 'fx-thanks', title: '「◯◯さん ありがとう！」のバナー（Enter・Shift+6）' })));
+  row.append(btn('プレビュー', () => {
+    const url = new URL('overlay.html?part=all', location.href).toString();
+    window.open(url, 'xtrend-fx-preview', 'popup,width=640,height=360');
+  }, 'btn btn-small btn-ghost-dark', { 'data-key': 'fx-preview', title: 'このブラウザの小窓でオーバーレイ（全部入り）を確認します' }));
+  bar.append(row);
+  return bar;
 }
 
 /** 上の細い進行バー（コーナーごとの区切り。済・現在・残り） */
@@ -169,6 +215,13 @@ function doAction(app, type) {
 export function liveKeydown(app, e) {
   if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || isEditable(e.target)) return;
   if (document.querySelector('dialog[open]')) return;
+  // 演出: Shift+1〜6（入力欄にいるときは使わない。Stream Deck などからはこのキーを送る）
+  const m = e.shiftKey ? /^(?:Digit|Numpad)([1-6])$/.exec(e.code || '') : null;
+  if (m) {
+    const d = EFFECTS.find((x) => x.digit === Number(m[1]));
+    if (d) { e.preventDefault(); fire(app, d.kind); }
+    return;
+  }
   const onButton = e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A');
   let type = null;
   if (e.key === 'ArrowRight') type = 'done';

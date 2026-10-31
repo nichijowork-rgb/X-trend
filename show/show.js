@@ -11,6 +11,7 @@ import {
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { makeEffect, createCooldown, EFFECT_TTL_MS, effectDef } from './js/effects.js';
 import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBACK_SENT_KEY } from './js/feedback.js';
 import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload } from './js/payload.js';
 import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
@@ -290,7 +291,7 @@ app.publishLive = publishLive;
 // 変化したときに seq を進めて送り、RESEND_MS ごとに同じものを再送（後から開いたパーツが追いつく）。
 
 // コーナータイトルの時刻は進行の記録（live.enteredAt＝そのコーナーに初めて入った時刻）を使うので、開き直しても出し直さない
-const overlay = { sid: Math.random().toString(36).slice(2, 10), seq: 0, last: null, bc: null };
+const overlay = { sid: Math.random().toString(36).slice(2, 10), seq: 0, last: null, bc: null, effect: null };
 try { if ('BroadcastChannel' in window) overlay.bc = new BroadcastChannel(OVERLAY_CHANNEL); } catch { overlay.bc = null; }
 
 function isSender() {
@@ -302,6 +303,8 @@ function currentPayload() {
   return buildPayload({
     live: wk.live, cues: app.cues, topicsById: app.topicsById, postsById: app.postsById, showName: app.saved.showName,
     title: typeof wk.title === 'string' && wk.title.trim() ? wk.title : '',
+    // 段階4: 直近の演出（EFFECT_TTL_MS の間だけ載せる。受け手は id で二重に出さない）
+    effect: overlay.effect && Date.now() - overlay.effect.at < EFFECT_TTL_MS ? overlay.effect : null,
   });
 }
 
@@ -327,6 +330,28 @@ function resendOverlay() {
   if (!overlay.last) { sendOverlay(true); return; }
   transmit(overlay.last);
 }
+
+// ---------------------------------------------------------------- 演出（段階4）
+
+const fxCooldown = createCooldown();
+/** 演出を出す（パレットのボタン・Shift+1〜6）。同じ演出の 1 秒以内の連打は無視。出したら effect を返す */
+app.fireEffect = (kind, params = {}) => {
+  if (!effectDef(kind) || !fxCooldown(kind)) return null;
+  const e = makeEffect(kind, params);
+  if (!e) return null;
+  overlay.effect = e;
+  app.lastEffect = e;
+  sendOverlay();
+  // 載せておく時間が過ぎたら外す（次の変化か再送で effect: null になる）
+  setTimeout(() => { if (overlay.effect === e) { overlay.effect = null; sendOverlay(); } }, EFFECT_TTL_MS + 50);
+  return e;
+};
+app.fxOpen = (() => { try { return localStorage.getItem('xtrend-show-fx-open') === '1'; } catch { return false; } })();
+app.setFxOpen = (open) => {
+  app.fxOpen = Boolean(open);
+  try { localStorage.setItem('xtrend-show-fx-open', open ? '1' : '0'); } catch { /* 保存できなくても切り替える */ }
+  app.render();
+};
 
 // ---------------------------------------------------------------- OBS 接続（設定は localStorage）
 

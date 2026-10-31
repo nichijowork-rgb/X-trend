@@ -1296,14 +1296,14 @@ test('オーバーレイ: 再送の判定（samePayload）と受け手の seq・
 });
 
 test('オーバーレイのパーツと参考配置', () => {
-  assert.deepEqual(OVERLAY_PARTS.map((p) => [p.key, p.w, p.h]), [['topicbar', 1300, 150], ['card', 640, 760], ['title', 1920, 1080]]);
+  assert.deepEqual(OVERLAY_PARTS.map((p) => [p.key, p.w, p.h]), [['topicbar', 1300, 150], ['card', 640, 760], ['title', 1920, 1080], ['fx', 1920, 1080]]);
   const ours = LAYOUT_GUIDE.filter((g) => g.ours);
   const others = LAYOUT_GUIDE.filter((g) => !g.ours && !/吹き出し/.test(g.label));
   const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   for (const o of ours) {
     assert.ok(o.x >= 0 && o.y >= 0 && o.x + o.w <= 1920 && o.y + o.h <= 1080, `${o.label} 画面内`);
     const part = OVERLAY_PARTS.find((p) => p.key === o.key);
-    assert.ok(Math.abs(o.w / o.h - part.w / part.h) < 0.05, `${o.label} 縦横比`);
+    if (part) assert.ok(Math.abs(o.w / o.h - part.w / part.h) < 0.05, `${o.label} 縦横比`);
     for (const x of others) assert.ok(!overlap(o, x), `${o.label} と ${x.label} が重なる`);
   }
 });
@@ -1536,4 +1536,88 @@ test('GitHub に保存: エラーは日本語（401・403・404・通信不可�
   assert.deepEqual(parseGhPrefs(null), { repo: BOT.defaultRepo, branch: BOT.defaultBranch, token: '' });
   assert.deepEqual(parseGhPrefs('{"repo":"a/b","branch":"main","token":" t "}'), { repo: 'a/b', branch: 'main', token: 't' });
   assert.equal(parseGhPrefs('{"repo":"bad"}').repo, BOT.defaultRepo);
+});
+
+// ================================================================ 段階4: 演出（effects.js）
+import {
+  EFFECTS, EFFECT_KINDS, makeEffect, effectId, validEffect, createEffectGate, createCooldown, sanitizeThanks, thanksText, clipText,
+  EFFECT_COOLDOWN_MS, EFFECT_MAX_AGE_MS, THANKS_LIMITS,
+} from '../show/js/effects.js';
+
+test('演出: 6 種・Shift+1〜6・id は一意・知らない種類は作らない', () => {
+  assert.deepEqual(EFFECT_KINDS, ['clap', 'confetti', 'kami', 'eh', 'fire', 'thanks']);
+  assert.deepEqual(EFFECTS.map((e) => e.digit), [1, 2, 3, 4, 5, 6]);
+  const ids = new Set();
+  for (let i = 0; i < 2000; i++) ids.add(effectId('clap', 1000));
+  assert.equal(ids.size, 2000, '同じ時刻・同じ種類でも重ならない');
+  const e = makeEffect('confetti', { name: 'x' }, 5000);
+  assert.deepEqual([e.kind, e.at, e.params], ['confetti', 5000, {}], 'thanks 以外は params を持たない');
+  assert.ok(validEffect(e));
+  assert.equal(makeEffect('unknown'), null);
+  assert.equal(makeEffect('clap', {}, NaN), null);
+  for (const bad of [null, {}, { id: '', kind: 'clap', at: 1 }, { id: 'a', kind: 'boom', at: 1 }, { id: 'a', kind: 'clap', at: 'x' }, { id: 'x'.repeat(200), kind: 'clap', at: 1 }]) assert.ok(!validEffect(bad), JSON.stringify(bad));
+});
+
+test('演出: 感謝バナーの入力は文字数を制限し、制御文字・方向制御を除く（表示は textContent）', () => {
+  const p = sanitizeThanks({ name: '  <img src=x onerror=alert(1)>さくら‮\u0000  ', amount: '¥1,000,000,000,000,000' });
+  assert.equal([...p.name].length <= THANKS_LIMITS.name, true);
+  assert.ok(p.name.startsWith('<img src=x'), 'タグは文字のまま（表示側で textContent）');
+  assert.ok(!/[‮\u0000]/.test(p.name));
+  assert.equal(p.amount, '¥1,000,000,0');
+  assert.equal([...clipText('👏'.repeat(30), THANKS_LIMITS.name)].length, 20, '絵文字も 1 文字');
+  assert.deepEqual(sanitizeThanks(null), { name: '', amount: '' });
+  assert.deepEqual(sanitizeThanks({ name: 3, amount: {} }), { name: '', amount: '' });
+  assert.deepEqual(thanksText({ name: 'みお', amount: '500円' }), { main: 'みおさん ありがとう！', amount: '500円' });
+  assert.deepEqual(thanksText({}), { main: 'ありがとう！', amount: '' });
+  const e = makeEffect('thanks', { name: 'a'.repeat(50), amount: 'b'.repeat(50), extra: 1 }, 1);
+  assert.deepEqual(e.params, { name: 'a'.repeat(20), amount: 'b'.repeat(12) });
+});
+
+test('演出の門番: 発火済み id・古い at は出さない（再送で二重に出ない）・同じ演出 1 秒・同時 3 つまで', () => {
+  const g = createEffectGate();
+  const e1 = makeEffect('clap', {}, 10000);
+  assert.equal(g.accept(e1, 10050), true);
+  assert.equal(g.accept(e1, 10100), false, '同じ id（再送）は出さない');
+  assert.equal(g.accept({ ...e1 }, 10200), false);
+  assert.equal(g.accept(makeEffect('clap', {}, 10500), 10500), false, `同じ演出は ${EFFECT_COOLDOWN_MS}ms 以内なら出さない`);
+  assert.equal(g.accept(makeEffect('clap', {}, 11100), 11100), true);
+  assert.equal(g.accept(makeEffect('kami', {}, 11100), 11150), true);
+  assert.equal(g.activeCount(11200), 3);
+  assert.equal(g.accept(makeEffect('fire', {}, 11200), 11200), false, '同時に 3 つまで');
+  assert.equal(g.accept(makeEffect('fire', {}, 20000), 20000), true, '終わったら出せる');
+  const g2 = createEffectGate();
+  assert.equal(g2.accept(makeEffect('confetti', {}, 1000), 1000 + EFFECT_MAX_AGE_MS + 1), false, '古い（後から開いたパーツ・遅れて届いた）');
+  assert.equal(g2.accept(makeEffect('confetti', {}, 99999), 1000), false, '未来すぎる時刻');
+  assert.equal(g2.accept({ id: 'x', kind: 'nope', at: 1 }, 1), false);
+  const cd = createCooldown();
+  assert.equal(cd('clap', 0), true);
+  assert.equal(cd('clap', 999), false);
+  assert.equal(cd('kami', 999), true);
+  assert.equal(cd('clap', 1000), true);
+});
+
+test('演出はペイロードの effect 欄に載る（ほかの表示と同じ再送の仕組み）', () => {
+  const { topicsById, cues, postsById } = payloadFixture();
+  const live = defaultLive();
+  const e = makeEffect('kami', {}, 1);
+  const a = buildPayload({ live, cues, topicsById, postsById, effect: e });
+  const b = buildPayload({ live, cues, topicsById, postsById });
+  assert.deepEqual(a.effect, e);
+  assert.equal(b.effect, null);
+  assert.ok(!samePayload(a, b), '演出を出したら新しい seq で送る');
+  assert.ok(samePayload(a, buildPayload({ live, cues, topicsById, postsById, effect: e })), '同じ演出の再送は同じ中身');
+});
+
+test('演出の配置: 感謝バナーはトピック帯のすぐ上で、投稿カード・トピック帯・ほかのツールと重ならない', () => {
+  const g = (f) => LAYOUT_GUIDE.find(f);
+  const banner = g((x) => x.fx === 'thanks');
+  const tb = g((x) => x.key === 'topicbar');
+  const card = g((x) => x.key === 'card');
+  const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  assert.ok(banner.y + banner.h <= tb.y && tb.y - (banner.y + banner.h) < 30, 'トピック帯のすぐ上');
+  assert.ok(!overlap(banner, card) && !overlap(banner, tb));
+  for (const o of LAYOUT_GUIDE.filter((x) => !x.ours && !/吹き出し/.test(x.label))) {
+    assert.ok(!overlap(banner, o), `感謝バナーと ${o.label}`);
+    assert.ok(!overlap(g((x) => x.fx === 'stamp'), o), `スタンプと ${o.label}`);
+  }
 });

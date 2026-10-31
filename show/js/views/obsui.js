@@ -92,12 +92,18 @@ export function renderObsSetup(app) {
         h('a', { class: 'btn btn-small btn-ghost', href: urlOf(`part=${p.key}&demo=1`), target: '_blank', rel: 'noopener' }, '見本を開く'))));
   }
   root.append(h('h3', { class: 'sub-title' }, 'パーツ（ブラウザソースに 1 つずつ）'), table);
-  root.append(h('p', { class: 'muted' }, 'オプション（URL の後ろに付ける）: ', h('code', {}, '&scale=1.2'), '（拡大）・', h('code', {}, '&motion=off'), '（動きを止める）・', h('code', {}, '&demo=1'), '（見本を表示。配置の確認用）。全部入りの確認用: ', h('code', {}, 'part=all')));
+  root.append(h('p', { class: 'muted' }, 'オプション（URL の後ろに付ける）: ', h('code', {}, '&scale=1.2'), '（拡大）・', h('code', {}, '&motion=off'), '（動きを止める。演出はフェードだけ）・', h('code', {}, '&demo=1'), '（見本を表示。配置の確認用。演出は ', h('code', {}, '&demo=1&fx=confetti'), ' など）・', h('code', {}, '&sound=on'), '（演出の効果音を鳴らす。演出パーツだけ）。全部入りの確認用: ', h('code', {}, 'part=all')));
+  root.append(h('h3', { class: 'sub-title' }, '演出（拍手・紙吹雪・神回！・えぇっ！？・炎上・感謝バナー）'));
+  root.append(h('ul', { class: 'setup-steps setup-fx' },
+    h('li', {}, '「演出」パーツ（', h('code', {}, 'part=fx'), '・1920×1080）をいちばん上に貼ります。出し方は［進行］の「演出 ▸」を開いてボタンを押すか、キーボードの Shift+1〜6（1 拍手・2 紙吹雪・3 神回！・4 えぇっ！？・5 炎上・6 感謝バナー）。名前・金額の欄で Enter でも感謝バナーが出ます。'),
+    h('li', {}, '効果音は既定で鳴りません。鳴らすときは URL に ', h('code', {}, '&sound=on'), ' を付け、OBS のブラウザソースのプロパティで「OBS で音声を制御」をオンにすると、音声ミキサーで音量を調整できます（音声ファイルは使わず、その場で合成します）。'),
+    h('li', {}, 'Stream Deck などのボタンから出すときは「ホットキー」で Shift+1〜6 を送ります。キーは進行画面のブラウザのウィンドウが前面（フォーカスがある状態）のときだけ届きます。名前・金額の入力欄にカーソルがあるときはキーは効きません。'),
+    h('li', {}, '同じ演出は 1 秒以内の連打を無視、同時に出るのは 3 つまで。Doneru のアラートと重ならないよう、感謝バナーはトピック帯のすぐ上に細く出ます。スタンプは中央〜右寄り、紙吹雪は全面。')));
   // 参考配置図（1920×1080 を縮小）
   const fig = h('figure', { class: 'setup-fig' });
   const canvas = h('div', { class: 'setup-canvas', attrs: { role: 'img', 'aria-label': '参考配置図' } });
   for (const g of LAYOUT_GUIDE) {
-    const b = h('div', { class: `setup-box ${g.ours ? 'is-ours' : 'is-other'}${g.key ? ` part-${g.key}` : ''}` }, h('span', {}, g.label));
+    const b = h('div', { class: `setup-box ${g.ours ? 'is-ours' : 'is-other'}${g.key ? ` part-${g.key}` : ''}${g.fx ? ` part-fx-${g.fx}` : ''}` }, h('span', {}, g.label));
     Object.assign(b.style, { left: `${(g.x / 1920) * 100}%`, top: `${(g.y / 1080) * 100}%`, width: `${(g.w / 1920) * 100}%`, height: `${(g.h / 1080) * 100}%` });
     canvas.append(b);
   }

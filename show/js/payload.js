@@ -12,7 +12,7 @@
 //   next:   { name, corner } | null,                            … 次の話題（無ければ次のコーナー名）
 //   card:   { visible, post: { id, user, text, created, metrics: { impression_count, like_count, retweet_count }, thumb } | null },
 //   title:  { id, text, sub, color, at, duration } | null,      … コーナーが変わった時刻 at から duration ms だけ大きく出す
-//   effect: null                                               … 段階4（拍手・紙吹雪など）のための空き
+//   effect: { id, kind, at, params } | null                    … 段階4: 1 回限りの演出（effects.js）。受け手は id で二重に出さない
 // }
 
 import { cornerDef } from './logic.js';
@@ -102,7 +102,7 @@ export function buildPayload(input) {
     next,
     card: { visible: live.cardVisible !== false && Boolean(post || postId), post: post ? postInfo(post) : (postId ? { id: postId, user: '', text: '', created: null, metrics: {}, thumb: null } : null) },
     title: cue && cornerChangedAt != null ? { id: `${cue.cornerKey}@${cornerChangedAt}`, text: def.name, sub: def.sub, color: cue.cornerKey === 'main' ? 'main' : def.color, at: cornerChangedAt, duration: TITLE_DURATION_MS } : null,
-    effect: null,
+    effect: input.effect || null,
   };
 }
 

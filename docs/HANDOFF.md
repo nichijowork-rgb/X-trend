@@ -49,7 +49,7 @@
 | `test/e2e/dashboard-e2e.mjs` | E2E（Playwright。リポジトリに依存は入れない） |
 | `CNAME` | 独自ドメイン `www.x-yoru-buzz.com`。**消さない** |
 | `data/` | 収集botの管轄。読むだけ |
-| `show/` | **配信番組サイト**（台本・進行・映す用・OBS オーバーレイ `show/overlay.html`・Grok ボット連携。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
+| `show/` | **配信番組サイト**（台本・進行・映す用・OBS オーバーレイ `show/overlay.html`（演出つき）・Grok ボット連携。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
 | `feedback/` | 番組サイトがボットへ返す修正（`show-feedback.json`。サイトの「GitHub に保存」で作られる。ボットは読むだけ） |
 
 ## 4. データ（収集botとの取り決め）
@@ -142,5 +142,6 @@ PW_DIR=/tmp/qa/node_modules node test/e2e/dashboard-e2e.mjs
   | `feedback/show-feedback.json` | サイトだけ | ボット | ユーザーの修正（ジャンル上書き・まとまりの編集・削除）。毎回「今の全修正」 |
 
   優先順位は「持ち越し＞ユーザーが手を入れた話題＞ボット＞topic:/辞書＞類似」。書き戻しは［ツール…］からファイル保存か GitHub Contents API（fine-grained トークンを localStorage `xtrend-show-github` に平文保存・Contents の Read and write だけ・`feedback/` 固定で data/ には書かない。CSP に `https://api.github.com`）。
+- **v2 段階4（2026-10-31）演出**: `show/overlay.html?part=fx`（1920×1080 透明。`part=all` にも入る）。［進行］の「演出 ▸」パレット（開閉は保存）か Shift+1〜6 で 拍手／紙吹雪／神回！／えぇっ！？／炎上／感謝バナー（名前・金額）。ペイロードの `effect: { id, kind, at, params }` で送り、受け手は id で二重発火を防ぎ、古い at は無視。同じ演出は 1 秒あける・同時 3 つまで・`?motion=off` はフェードだけ。効果音は `?sound=on` のときだけ WebAudio で合成（既定は AudioContext も作らない）。純粋ロジックは `show/js/effects.js`、詳細は SHOW_SPEC.md「⑦」。
 - データは `data/posts.json`・`bookmarks.json` を読むだけ（`show_pick: true` が付いた投稿は雑談おすすめの最優先、`show_pick_reason` を表示）・`show/topics.json`（任意）。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
 - 仕様・ファイル構成・保存データの形・使い方は [SHOW_SPEC.md](SHOW_SPEC.md) の「実装メモ」。テストは `npm test`（`test/show.test.js` を含む）と `PW_DIR=… node test/e2e/show-e2e.mjs`（`OBS_REF_IMAGE=参考の配信画面の画像` で合成スクショ、`ONLY=名前の一部` で一部だけ実行）。サンプルは `sample/show/`（`node tools/make-show-sample.mjs`）。
