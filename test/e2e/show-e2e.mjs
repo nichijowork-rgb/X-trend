@@ -1417,6 +1417,89 @@ async function main() {
       await c.close();
     });
 
+    // ---- 4h. 進行の関連投稿（全件）と「これを映す」
+    await check('進行: 関連投稿は最初に 5 件→「残り n件を表示」で全部・並び順・「映す」で emit の card.post が変わる・J/K・話題が変わると代表投稿へ', async () => {
+      const obs = { payloads: [] };
+      const c = await newCtx();
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      watchConsole(page, errors);
+      await page.routeWebSocket(/^ws:\/\/127\.0\.0\.1:4455/, (ws) => {
+        ws.send(JSON.stringify({ op: 0, d: { obsWebSocketVersion: '5.5.2', rpcVersion: 1 } }));
+        ws.onMessage((raw) => {
+          const m = JSON.parse(String(raw));
+          if (m.op === 1) ws.send(JSON.stringify({ op: 2, d: { negotiatedRpcVersion: 1 } }));
+          if (m.op === 6) { ws.send(JSON.stringify({ op: 7, d: { requestType: m.d.requestType, requestId: m.d.requestId, requestStatus: { result: true, code: 100 } } })); obs.payloads.push(m.d.requestData.requestData.event_data); }
+        });
+      });
+      await page.goto(show);
+      await ready(page);
+      await page.evaluate(() => window.__show.edit('メイン', (w) => { w.rundown.corners[0].items = ['d:d-hostcall', 'd:d-tower']; }));
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.click('#obs-pill');
+      await page.click('[data-key="obs-connect"]');
+      await page.waitForFunction(() => document.getElementById('obs-pill').dataset.state === 'connected', null, { timeout: 5000 });
+      await page.click('[data-key="obs-close"]');
+      await page.click('[data-key="live-start"]');
+      const info = await page.evaluate(() => { const t = window.__show.topicsById.get('d:d-hostcall'); return { n: t.postIds.length, rep: t.stats.topPostId, ids: t.postIds }; });
+      const relCount = () => page.$$eval('.live-related .live-post', (x) => x.length);
+      assert(await relCount() === Math.min(5, info.n - 1), `最初は 5 件（${await relCount()}）`);
+      assert((await page.textContent('[data-key="rel-more"]')).includes(`残り ${info.n - 1 - 5}件を表示`), 'more');
+      await page.click('[data-key="rel-more"]');
+      await page.waitForFunction((n) => document.querySelectorAll('.live-related .live-post').length === n, info.n - 1);
+      // 新しい順
+      const firstImp = await page.getAttribute('.live-related .live-post', 'data-post');
+      await page.click('[data-key="rel-order-new"]');
+      const firstNew = await page.getAttribute('.live-related .live-post', 'data-post');
+      const expNew = await page.evaluate((rep) => { const a = window.__show; return a.topicsById.get('d:d-hostcall').postIds.filter((x) => x !== rep).sort((x, y) => a.postsById.get(y).ts - a.postsById.get(x).ts)[0]; }, info.rep);
+      assert(firstNew === expNew && firstImp === info.ids.filter((x) => x !== info.rep)[0], `${firstImp} ${firstNew} ${expNew}`);
+      await page.click('[data-key="rel-order-imp"]');
+      assert(await page.isVisible(`[data-key="shown-${info.rep}"]`), '最初は代表投稿が映し中');
+      // 映す
+      const target = info.ids.filter((x) => x !== info.rep)[2];
+      await page.click(`[data-key="show-${target}"]`);
+      await page.waitForFunction((id) => document.querySelector(`.live-post.is-shown[data-post="${id}"]`), target);
+      await page.waitForFunction((id) => (window.__show.lastPayload || {}).card && window.__show.lastPayload.card.post.id === id, target);
+      const lastObs = () => obs.payloads.filter((x) => x.card && x.card.post).at(-1).card.post.id;
+      await page.waitForTimeout(200);
+      assert(lastObs() === target, `OBS ${lastObs()} / ${target}`);
+      await page.screenshot({ path: path.join(SHOTS, 'live-related-960.png') });
+      // J / K / ↓
+      await page.keyboard.press('j');
+      const after = info.ids.filter((x) => x !== info.rep)[3];
+      await page.waitForFunction((id) => window.__show.weekState().live.shown && window.__show.weekState().live.shown.postId === id, after);
+      await page.keyboard.press('k');
+      await page.keyboard.press('ArrowUp');
+      const two = info.ids.filter((x) => x !== info.rep)[1];
+      await page.waitForFunction((id) => window.__show.weekState().live.shown.postId === id, two);
+      await page.keyboard.press('ArrowDown');
+      await page.waitForFunction((id) => window.__show.weekState().live.shown.postId === id, target);
+      // 隠し中でも映す投稿だけ切り替わる
+      await page.click('[data-key="live-card"]');
+      await page.keyboard.press('j');
+      await page.waitForFunction((id) => { const p = window.__show.lastPayload; return p.card.visible === false && p.card.post.id === id; }, after);
+      await page.click('[data-key="live-card"]');
+      // リロードしても映す投稿は残る
+      await page.reload();
+      await ready(page);
+      assert(await page.isVisible(`[data-key="shown-${after}"]`), 'reload');
+      // 次の話題 → 代表投稿へ
+      await page.keyboard.press('ArrowRight');
+      const rep2 = await page.evaluate(() => window.__show.topicsById.get('d:d-tower').stats.topPostId);
+      await page.waitForFunction((id) => window.__show.lastPayload && window.__show.lastPayload.card.post && window.__show.lastPayload.card.post.id === id, rep2);
+      assert(await page.evaluate(() => window.__show.weekState().live.shown) === null, 'reset');
+      // 375
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.keyboard.press('ArrowLeft');
+      await page.waitForSelector('.live-related');
+      const w = await sw(page);
+      assert(w <= 375, `scrollWidth ${w}`);
+      await page.screenshot({ path: path.join(SHOTS, 'live-related-375.png'), fullPage: true });
+      await c.close();
+      return `ホストコール ${info.n}件（関連 ${info.n - 1}件）`;
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';

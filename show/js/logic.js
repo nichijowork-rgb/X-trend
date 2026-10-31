@@ -1098,7 +1098,8 @@ export function buildCues(rundown, topicsById) {
 
 export function defaultLive() {
   // cardVisible: 映す用に投稿カードを出しているか（段階2で OBS のパーツ表示と連動する）
-  return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {}, cardVisible: true };
+  // shown: 「これを映す」で選んだ投稿（{ cueId, postId }。話題が変わると null＝代表投稿に戻る）
+  return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {}, cardVisible: true, shown: null };
 }
 
 const LIVE_STATUS = ['done', 'skipped', 'carried'];
@@ -1118,7 +1119,48 @@ function nextOpen(cues, status, from) {
  *  goto   … 指定位置へ移動（action.index）
  *  reset  … すべて最初から
  */
+/** 話題の代表投稿 id（無ければリンクだけの投稿） */
+export function repPostId(topic) {
+  return topic ? (topic.stats && topic.stats.topPostId) || topic.linkId || (topic.linkIds && topic.linkIds[0]) || null : null;
+}
+
+/**
+ * 「これを映す」の並び: 代表投稿 → 残り（order: 'imp' インプレ順＝話題の並び／'new' 新しい順）。データに無い投稿も後ろに。
+ */
+export function showablePostIds(topic, postsById = new Map(), order = 'imp') {
+  if (!topic) return [];
+  const rep = repPostId(topic);
+  let rest = (topic.postIds || []).filter((id) => id !== rep);
+  if (order === 'new') rest = [...rest].sort((a, b) => ((postsById.get(b) || {}).ts ?? -Infinity) - ((postsById.get(a) || {}).ts ?? -Infinity) || compareIds(b, a));
+  const miss = (topic.missingIds || []).filter((id) => id !== rep && !rest.includes(id));
+  return [...(rep ? [rep] : []), ...rest, ...miss];
+}
+
+/** 今映している投稿（選んでいて今のキュー・話題に含まれていればそれ、無ければ代表投稿） */
+export function liveShownPost(live, cue, topic) {
+  const rep = repPostId(topic);
+  if (!cue || !topic || !live || !live.shown || live.shown.cueId !== cue.id) return rep;
+  const id = live.shown.postId;
+  return (topic.postIds || []).includes(id) || (topic.missingIds || []).includes(id) || id === rep ? id : rep;
+}
+
+/** J/K（↓/↑）で次・前の投稿（端で止まる）。list に無ければ先頭 */
+export function stepShownPost(list, current, delta) {
+  if (!list.length) return null;
+  const i = list.indexOf(current);
+  if (i < 0) return list[0];
+  return list[Math.max(0, Math.min(list.length - 1, i + delta))];
+}
+
 export function liveReduce(live, action, cues) {
+  const next = liveReduceRaw(live, action, cues);
+  // 話題（キュー）が変わったら「これを映す」は代表投稿に戻す
+  const cue = cues[next.index];
+  if (next.shown && (!cue || next.shown.cueId !== cue.id)) return { ...next, shown: null };
+  return next;
+}
+
+function liveReduceRaw(live, action, cues) {
   const s = { ...defaultLive(), ...live, status: { ...(live && live.status) }, history: [...((live && live.history) || [])], enteredAt: { ...(live && live.enteredAt) } };
   const now = isNum(action.now) ? action.now : null;
   const enter = (st) => {
@@ -1164,6 +1206,13 @@ export function liveReduce(live, action, cues) {
       const i = action.index | 0;
       if (i >= 0 && i < cues.length) s.index = i;
       return enter(s);
+    }
+    case 'show': {
+      // 「これを映す」: 今のキューの投稿を選ぶ（投稿カード：表示中/隠し中とは別）
+      const cue = cues[s.index];
+      if (!cue || cue.kind !== 'topic' || !ID_RE.test(String(action.postId || ''))) return s;
+      s.shown = { cueId: cue.id, postId: String(action.postId) };
+      return s;
     }
     case 'toggleCard':
       s.cardVisible = typeof action.visible === 'boolean' ? action.visible : !s.cardVisible;
@@ -1393,6 +1442,8 @@ function sanitizeLive(v, ver = SCHEMA_VERSION) {
   const en = obj(o.enteredAt) || {};
   for (const [k, x] of Object.entries(en)) if (isNum(x) && cornerDef(k)) d.enteredAt[k] = x;
   d.cardVisible = o.cardVisible !== false;
+  const sh = obj(o.shown);
+  d.shown = sh && typeof sh.cueId === 'string' && ID_RE.test(String(sh.postId)) ? { cueId: sh.cueId.slice(0, 200), postId: String(sh.postId) } : null;
   return d;
 }
 

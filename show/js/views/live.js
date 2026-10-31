@@ -1,8 +1,8 @@
-// ② 進行（配信中）画面。キーボード: →/Enter 読んだ、← 戻す、S 飛ばす、L 来週へ。
-import { computeTimer, formatClock, cornerDef, cueStates } from '../logic.js';
-import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, embedHost } from '../dom.js';
+// ② 進行（配信中）画面。キーボード: →/Enter 読んだ、← 戻す、S 飛ばす、L 来週へ、J/↓・K/↑ 映す投稿を次・前へ、Shift+1〜6 演出。
+import { computeTimer, formatClock, cornerDef, cueStates, showablePostIds, liveShownPost, stepShownPost, repPostId, statusUrl } from '../logic.js';
+import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, linkCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
-import { cueColor, leadFor, leadIsBot, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
+import { cueColor, leadFor, leadIsBot, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
 import { obsDialog } from './obsui.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
@@ -149,11 +149,13 @@ function cueContent(app, cue, wk) {
     const repId = t.stats.topPostId || t.linkId || (t.linkIds && t.linkIds[0]) || null;
     const own = repPostCard(app, t);
     const rep = app.ui.view !== 'card' && repId ? h('div', { dataset: { keep: 'rep' } }, embedHost(repId, own, 'live-embed')) : own;
-    const related = topicPosts(app, t).filter((p) => p.id !== t.stats.topPostId).slice(0, 3);
+    // 「これを映す」: 今映している投稿（選んでいなければ代表投稿）
+    const shownId = liveShownPost(wk.live, cue, t);
+    const repWrap = h('div', { class: `live-post${repId && repId === shownId ? ' is-shown' : ''}`, dataset: { keep: 'rep-wrap', post: repId || '' } },
+      h('div', { class: 'lp-bar' }, h('h3', { class: 'live-h3' }, '代表投稿'), repId ? showButton(app, repId, shownId) : null),
+      rep || h('p', { class: 'muted' }, '該当なし'));
     box.append(h('div', { class: notesBox ? 'live-two' : 'live-two is-single', dataset: { keep: 'two' } },
-      h('div', { dataset: { keep: 'left' } }, h('h3', { class: 'live-h3' }, '代表投稿'), rep || h('p', { class: 'muted' }, '該当なし'),
-        related.length ? h('div', {}, h('h3', { class: 'live-h3' }, `関連投稿（${topicPosts(app, t).length - 1}件中 ${related.length}件）`),
-          related.map((p) => postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: app.embedder, compact: true, bm: bmInfo(app, p.id) }))) : null),
+      h('div', { dataset: { keep: 'left' } }, repWrap, relatedList(app, t, repId, shownId)),
       notesBox));
     return box;
   }
@@ -164,6 +166,60 @@ function cueContent(app, cue, wk) {
   }
   if (notes) box.append(h('div', { class: 'live-notes' }, h('h3', {}, 'メモ'), h('p', { class: 'pre' }, notes)));
   return box;
+}
+
+const RELATED_FIRST = 5;
+
+/** 「映す」ボタン（今映している投稿なら「映し中」） */
+function showButton(app, id, shownId) {
+  if (id === shownId) return h('span', { class: 'badge badge-shown', dataset: { key: `shown-${id}` } }, '映し中');
+  return btn('映す', () => app.liveAction('show', { postId: id }), 'btn btn-small btn-show', { 'data-key': `show-${id}`, title: 'この投稿を OBS の投稿カードに出す（J/↓・K/↑ でも切り替え）' });
+}
+
+/** 関連投稿: 最初に 5 件、「残り n件を表示」で全部（話題ごとに開いた状態を覚える）。インプレ順／新しい順 */
+function relatedList(app, t, repId, shownId) {
+  const u = app.ui;
+  if (!u.relOpen) u.relOpen = new Set();
+  const order = u.relOrder === 'new' ? 'new' : 'imp';
+  const ids = showablePostIds(t, app.postsById, order).filter((id) => id !== repId);
+  if (!ids.length) return null;
+  const open = u.relOpen.has(t.id);
+  const shown = open ? ids : ids.slice(0, RELATED_FIRST);
+  const wrap = h('div', { class: 'live-related', dataset: { keep: 'related' } });
+  wrap.append(h('div', { class: 'lp-bar' },
+    h('h3', { class: 'live-h3' }, `関連投稿（${ids.length}件${open || ids.length <= RELATED_FIRST ? '' : `中 ${shown.length}件`}）`),
+    h('span', { class: 'rel-order', attrs: { role: 'group', 'aria-label': '並び順' } },
+      btn('インプレ順', () => { u.relOrder = 'imp'; app.render(); }, `btn btn-small btn-ghost-dark${order === 'imp' ? ' is-on' : ''}`, { 'data-key': 'rel-order-imp', 'aria-pressed': String(order === 'imp') }),
+      btn('新しい順', () => { u.relOrder = 'new'; app.render(); }, `btn btn-small btn-ghost-dark${order === 'new' ? ' is-on' : ''}`, { 'data-key': 'rel-order-new', 'aria-pressed': String(order === 'new') }))));
+  for (const id of shown) {
+    const p = app.postsById.get(id);
+    const card = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: app.embedder, compact: true, bm: bmInfo(app, p.id) }) : linkCard(id, statusUrl(id), null);
+    wrap.append(h('div', { class: `live-post is-compact${id === shownId ? ' is-shown' : ''}`, dataset: { keep: `rp:${id}`, post: id } },
+      h('div', { class: 'lp-bar' }, showButton(app, id, shownId)), card));
+  }
+  if (ids.length > RELATED_FIRST) {
+    wrap.append(open
+      ? btn('たたむ', () => { u.relOpen.delete(t.id); app.render(); }, 'btn btn-small btn-ghost-dark rel-more', { 'data-key': 'rel-less' })
+      : btn(`残り ${ids.length - RELATED_FIRST}件を表示`, () => { u.relOpen.add(t.id); app.render(); }, 'btn btn-small rel-more', { 'data-key': 'rel-more' }));
+  }
+  return wrap;
+}
+
+/** J/↓・K/↑: 映す投稿を次・前へ（今の並び順。たたんでいる投稿も含む）。動かしたら true */
+function stepShow(app, delta) {
+  const wk = app.weekState();
+  const cue = app.cues[wk.live.index];
+  const t = cue && cue.kind === 'topic' ? app.topicsById.get(cue.topicId) : null;
+  if (!t) return false;
+  const order = app.ui.relOrder === 'new' ? 'new' : 'imp';
+  const list = showablePostIds(t, app.postsById, order);
+  const next = stepShownPost(list, liveShownPost(wk.live, cue, t), delta);
+  if (!next) return false;
+  // 次が 6 件目以降なら関連投稿を開いておく
+  if (list.indexOf(next) > RELATED_FIRST) { if (!app.ui.relOpen) app.ui.relOpen = new Set(); app.ui.relOpen.add(t.id); }
+  app.liveAction('show', { postId: next });
+  requestAnimationFrame(() => { const el = document.querySelector(`.live-post[data-post="${CSS.escape(next)}"]`); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); });
+  return true;
 }
 
 function progressList(app, cues, live) {
@@ -224,6 +280,9 @@ export function liveKeydown(app, e) {
   }
   const onButton = e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A');
   let type = null;
+  // 映す投稿: J/↓ 次、K/↑ 前
+  if (!e.shiftKey && (e.key === 'j' || e.key === 'J' || e.key === 'ArrowDown')) { if (stepShow(app, 1)) e.preventDefault(); return; }
+  if (!e.shiftKey && (e.key === 'k' || e.key === 'K' || e.key === 'ArrowUp')) { if (stepShow(app, -1)) e.preventDefault(); return; }
   if (e.key === 'ArrowRight') type = 'done';
   else if (e.key === 'Enter' && !onButton) type = 'done';
   else if (e.key === 'ArrowLeft') type = 'back';

@@ -170,9 +170,8 @@ function recompute() {
   const hidden = new Set(app.saved.hiddenPosts.map((x) => x.id));
   // 期間外: 番組構成（メイン枠・メイン候補・コーナー）に入っている話題の投稿は、期間を変えても外さずに残す（「期間外」の印）
   const placedList = [...usedTopicIds(wk.rundown), ...(wk.mainCand || [])];
-  const lo = Math.min(app.week.start, app.range.start) - 31 * 86400;
-  const hi = Math.max(app.week.end, app.range.end);
-  const candidates = placedList.length ? allPosts.filter((p) => p.ts >= lo && p.ts < hi && !inWeek.has(p.id)) : [];
+  // topic:・辞書の話題は「番組週の投稿」だけ照合する（期間の外の古い投稿まで勝手に足さない）
+  const candidates = placedList.length && !app.range.isWeek ? postsInWeek(allPosts, app.week).filter((p) => !inWeek.has(p.id)) : [];
   const outsideIds = new Set();
   const addOutside = (ids) => {
     for (const id of ids) {

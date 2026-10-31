@@ -3,7 +3,7 @@
 // 受け取り方: onShowEvent(fn) か、window の 'xtrend-show' イベント（detail に同じもの）。
 // DOM 非依存の部分（liveSnapshot / diffSnapshot）は node:test から使える。
 
-import { cornerDef } from './logic.js';
+import { cornerDef, liveShownPost } from './logic.js';
 
 const listeners = new Set();
 let last = null;
@@ -22,7 +22,7 @@ export function liveSnapshot({ weekKey, live, cues, topicsById }) {
     cueId: cue ? cue.id : null,
     corner: cue ? { key: cue.cornerKey, name: cornerDef(cue.cornerKey).name } : null,
     topic: topic ? { id: topic.id, name: topic.name, genre: topic.genre, n: cue.n, of: cue.of } : null,
-    postId: topic ? (topic.stats.topPostId || topic.linkId || null) : null,
+    postId: topic ? liveShownPost(live, cue, topic) : null, // 「これを映す」で選んだ投稿（無ければ代表投稿）
     cardVisible: live.cardVisible !== false,
   };
 }

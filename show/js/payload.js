@@ -15,7 +15,7 @@
 //   effect: { id, kind, at, params } | null                    … 段階4: 1 回限りの演出（effects.js）。受け手は id で二重に出さない
 // }
 
-import { cornerDef } from './logic.js';
+import { cornerDef, liveShownPost } from './logic.js';
 
 export const PAYLOAD_VERSION = 1;
 export const OBS_EVENT_NAME = 'xtrend-show';
@@ -86,7 +86,7 @@ export function buildPayload(input) {
     if (c.kind === 'topic') { const t = topicsById.get(c.topicId); if (t) { next = { name: t.name, corner: cornerDef(c.cornerKey).name }; break; } }
     else { next = { name: cornerDef(c.cornerKey).name, corner: cornerDef(c.cornerKey).name }; break; }
   }
-  const postId = topic ? (topic.stats.topPostId || topic.linkId || null) : null;
+  const postId = topic ? liveShownPost(live, cue, topic) : null; // 「これを映す」で選んだ投稿（無ければ代表投稿）
   const post = postId && postsById ? postsById.get(postId) || null : null;
   return {
     v: PAYLOAD_VERSION,

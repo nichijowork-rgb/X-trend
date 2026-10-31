@@ -481,7 +481,7 @@ test('保存データ: 往復・版数・壊れた値・未知のフィールド
   assert.equal(wk.personal.length, 1);
   assert.equal(wk.personal[0].url, 'https://x.com/i/web/status/2110000000000000001', '危険な URL は捨てる');
   assert.deepEqual(wk.checkpoints, [{ kind: 'preview', dataAt: 'x', recordedAt: null, count: null, postIds: ['1'] }]);
-  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 }, cardVisible: true });
+  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 }, cardVisible: true, shown: null });
   assert.equal(wk.carriedOut.length, 1);
   assert.deepEqual(wk.carriedOut[0].postIds, ['1']);
   assert.equal(wk.carriedOut[0].genre, 'night');
@@ -1914,4 +1914,65 @@ test('OBS: 別のパソコンのアドレスでも接続先を作れ、理由に
   assert.equal(isLoopbackHost('192.168.1.20'), false);
   assert.match(obsCloseReason(1006, { host: '192.168.1.20' }), /別のパソコン.*ファイアウォール/);
   assert.match(obsCloseReason(1006, { host: '127.0.0.1' }), /デバイス上のアプリ/);
+});
+
+// ================================================================ 追加: 進行の関連投稿（全件）と「これを映す」
+import { showablePostIds, liveShownPost, stepShownPost, repPostId } from '../show/js/logic.js';
+
+test('これを映す: 並び（代表→インプレ順／新しい順）・選択・J/K の前後・話題が変わると代表投稿に戻る・ペイロードに反映', () => {
+  const p1 = post({ ts: ts('2026-10-12T00:00:00+09:00'), metrics: { impression_count: 9000 } });
+  const p2 = post({ ts: ts('2026-10-14T00:00:00+09:00'), metrics: { impression_count: 5000 } });
+  const p3 = post({ ts: ts('2026-10-13T00:00:00+09:00'), metrics: { impression_count: 3000 } });
+  const postsById = new Map([p1, p2, p3].map((p) => [p.id, p]));
+  const A = { id: 'A', name: 'A', genre: 'host', postIds: [p1.id, p2.id, p3.id], missingIds: ['1999999999999999993'], stats: { topPostId: p1.id, count: 3 } };
+  const B = { id: 'B', name: 'B', genre: 'host', postIds: [p3.id], stats: { topPostId: p3.id, count: 1 } };
+  const topicsById = new Map([['A', A], ['B', B]]);
+  assert.equal(repPostId(A), p1.id);
+  assert.deepEqual(showablePostIds(A, postsById), [p1.id, p2.id, p3.id, '1999999999999999993'], 'インプレ順（話題の並び）・データに無い投稿は後ろ');
+  assert.deepEqual(showablePostIds(A, postsById, 'new'), [p1.id, p2.id, p3.id, '1999999999999999993'].slice(0, 1).concat([p2.id, p3.id, '1999999999999999993']), '新しい順（代表は先頭のまま）');
+  assert.deepEqual(stepShownPost([1, 2, 3].map(String), '2', 1), '3');
+  assert.deepEqual(stepShownPost(['1', '2', '3'], '3', 1), '3', '端で止まる');
+  assert.deepEqual(stepShownPost(['1', '2', '3'], '1', -1), '1');
+  assert.deepEqual(stepShownPost(['1', '2'], 'x', 1), '1');
+  assert.equal(stepShownPost([], 'x', 1), null);
+  let r = defaultRundown();
+  r = assignTopic(assignTopic(r, 'A', 'main'), 'B', 'main');
+  const cues = buildCues(r, topicsById);
+  let live = liveReduce(defaultLive(), { type: 'start', now: 1 }, cues);
+  assert.equal(liveShownPost(live, cues[0], A), p1.id, '既定は代表投稿');
+  live = liveReduce(live, { type: 'show', postId: p2.id }, cues);
+  assert.deepEqual(live.shown, { cueId: cues[0].id, postId: p2.id });
+  assert.equal(liveShownPost(live, cues[0], A), p2.id);
+  assert.equal(liveReduce(live, { type: 'show', postId: 'bad' }, cues).shown.postId, p2.id, '不正な id は無視');
+  // 投稿カードの表示/非表示とは別
+  const hid = liveReduce(live, { type: 'toggleCard' }, cues);
+  assert.equal(hid.cardVisible, false);
+  assert.equal(hid.shown.postId, p2.id);
+  // ペイロード: card.post が映す投稿になる
+  const pay = buildPayload({ live, cues, topicsById, postsById });
+  assert.equal(pay.card.post.id, p2.id);
+  assert.equal(buildPayload({ live: hid, cues, topicsById, postsById }).card.visible, false);
+  // 話題が変わると代表投稿へ（戻っても代表投稿）
+  live = liveReduce(live, { type: 'done', now: 2 }, cues);
+  assert.equal(live.shown, null);
+  assert.equal(buildPayload({ live, cues, topicsById, postsById }).card.post.id, p3.id);
+  live = liveReduce(live, { type: 'back' }, cues);
+  assert.equal(liveShownPost(live, cues[0], A), p1.id);
+  // 選んだ投稿が話題から外れたら代表投稿
+  assert.equal(liveShownPost({ ...live, shown: { cueId: cues[0].id, postId: '2110000000000099999' } }, cues[0], A), p1.id);
+  // 保存して読み戻せる
+  const s = defaultSaved();
+  s.weeks['2026-10-17'] = { ...defaultWeek(), live: { ...defaultLive(), shown: { cueId: 'main:A', postId: p2.id } } };
+  assert.deepEqual(parseSaved(serializeSaved(s)).state.weeks['2026-10-17'].live.shown, { cueId: 'main:A', postId: p2.id });
+  // 進行イベントも「card」の変化として出す
+  resetLiveEvents();
+  const got = [];
+  const off = onShowEvent((e) => got.push(e));
+  let l2 = liveReduce(defaultLive(), { type: 'start', now: 1 }, cues);
+  publishLiveState({ weekKey: 'w', live: l2, cues, topicsById });
+  l2 = liveReduce(l2, { type: 'show', postId: p3.id }, cues);
+  publishLiveState({ weekKey: 'w', live: l2, cues, topicsById });
+  off();
+  assert.deepEqual(got.at(-1).changed, ['card']);
+  assert.equal(got.at(-1).state.postId, p3.id);
 });
