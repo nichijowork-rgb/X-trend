@@ -2,6 +2,8 @@
 import { GENRES, DEFAULT_DICT, SHOW_DEFAULTS } from '../config.js';
 import { extractStatusIds, parseSaved, serializeSaved, statusUrl, genreOverrideList } from '../logic.js';
 import { h, btn, field, downloadText, genreSticker } from '../dom.js';
+import { feedbackCounts } from '../feedback.js';
+import { BOT } from '../config.js';
 
 const splitList = (s) => s.split(/[,、，\n]/).map((x) => x.trim()).filter(Boolean);
 
@@ -78,6 +80,8 @@ export function toolsDialog(app) {
   }
   body.append(per);
 
+  body.append(botSection(app));
+
   // 持ち越し
   const fromPrev = app.visibleTopics.filter((t) => t.kind === 'carried');
   body.append(h('section', { class: 'tools-sec' }, h('h3', {}, '持ち越し'),
@@ -115,4 +119,64 @@ export function toolsDialog(app) {
 
   dlg.append(body);
   return dlg;
+}
+
+// ---------------------------------------------------------------- 段階3: ボット（Grok）連携
+
+function fmtTime(ms) {
+  const d = new Date(ms + 9 * 3600 * 1000);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}/${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+}
+
+/** 「ボットに修正を送る」: 今の全修正を feedback/show-feedback.json の形で（ファイル保存 or GitHub に直接） */
+function botSection(app) {
+  const u = app.ui;
+  const fb = app.buildFeedback();
+  const n = feedbackCounts(fb);
+  const sent = app.feedbackSent();
+  const sec = h('section', { class: 'tools-sec bot-sec', dataset: { key: 'bot-sec' } }, h('h3', {}, 'ボット（Grok）に修正を送る'));
+  const bi = app.bot;
+  sec.append(h('p', { class: 'muted' }, bi
+    ? `ボットの話題まとめ（data/show/topics.json）: ${bi.topics.length}件を読み込み済み${bi.generatedAt ? `（${bi.generatedAt} 作成）` : ''}。「Grok」の印が付いた話題です。`
+    : 'ボットの話題まとめ（data/show/topics.json）はまだ届いていません（届けば自動で使います）。'));
+  sec.append(h('p', {}, '編成で直したこと（ジャンルの変更・まとまりの名前や中身・削除）をボットに渡すと、次の収集から分類・まとめ方に反映されます。毎回「今の修正すべて」を送ります（何度送っても同じ内容）。'));
+  sec.append(h('p', { class: 'fb-counts', dataset: { key: 'fb-counts' } },
+    `ジャンルの変更 ${n.genres}件・話題の修正 ${n.topics}件・削除した話題 ${n.deleted}件・削除した投稿 ${n.posts}件`));
+  sec.append(h('p', { class: 'muted', dataset: { key: 'fb-last' } }, sent ? `最後に送った日時：${fmtTime(sent.at)}（${sent.via === 'github' ? 'GitHub に保存' : 'ファイルで保存'}）` : 'まだ送っていません'));
+  sec.append(h('div', { class: 'row' },
+    btn('ファイルで保存（show-feedback.json）', () => {
+      downloadText('show-feedback.json', `${JSON.stringify(app.buildFeedback(), null, 2)}\n`);
+      app.markFeedbackSent('download');
+    }, 'btn btn-small', { 'data-key': 'fb-download', title: 'トークン不要。保存したファイルをボットの担当者に渡すか、リポジトリの feedback/ に置いてください' })));
+
+  // GitHub に直接保存（任意）
+  const prefs = app.ghPrefs;
+  const repo = h('input', { class: 'input input-sm', type: 'text', value: prefs.repo, dataset: { key: 'gh-repo' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
+  const branch = h('input', { class: 'input input-sm', type: 'text', value: prefs.branch, dataset: { key: 'gh-branch' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
+  // トークンは画面に出さない（保存済みでも入力欄は空。変えるときだけ入れる）
+  const token = h('input', { class: 'input input-sm', type: 'password', value: '', placeholder: prefs.token ? '保存済み（変えるときだけ入力）' : 'github_pat_… を貼り付け', dataset: { key: 'gh-token' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
+  const values = () => ({ repo: repo.value.trim(), branch: branch.value.trim(), token: token.value.trim() || app.ghPrefs.token });
+  const msg = u.fbMsg ? h('p', { class: `import-msg is-${u.fbMsg.kind}`, attrs: { role: 'status' }, dataset: { key: 'fb-msg' } }, u.fbMsg.text,
+    u.fbMsg.url ? h('a', { href: u.fbMsg.url, target: '_blank', rel: 'noopener noreferrer', class: 'fb-link' }, 'コミットを開く') : null) : null;
+  const gh = h('details', { class: 'gh-box', open: Boolean(u.ghOpen) },
+    h('summary', { on: { click: () => { u.ghOpen = !u.ghOpen; } } }, 'GitHub に直接保存（任意・トークンが必要）'),
+    h('p', { class: 'muted' }, `保存先はリポジトリの ${BOT.feedbackPath} だけです（data/ には書きません）。`),
+    h('div', { class: 'gh-grid' }, field('リポジトリ（持ち主/名前）', repo), field('ブランチ', branch)),
+    field('トークン（fine-grained）', token, prefs.token ? '（保存済み）' : ''),
+    h('p', { class: 'obs-warn' }, '⚠ トークンはこのパソコンのこのブラウザにだけ、暗号化せずに保存します（GitHub 以外へは送りません）。共用のパソコンでは使い終わったら「トークンを消す」を押してください。'),
+    h('div', { class: 'row' },
+      btn(u.fbBusy ? '保存中…' : 'GitHub に保存', () => app.sendFeedbackGitHub(values()), 'btn btn-small btn-red', { 'data-key': 'fb-github', disabled: Boolean(u.fbBusy) }),
+      btn('設定だけ保存', () => { app.saveGhPrefs(values()); u.fbMsg = { kind: 'ok', text: '設定を保存しました' }; app.render(); }, 'btn btn-small', { 'data-key': 'gh-save' }),
+      btn('トークンを消す', () => { app.saveGhPrefs({ ...values(), token: '' }); u.fbMsg = { kind: 'ok', text: 'トークンを消しました' }; app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'gh-forget', disabled: !prefs.token })),
+    h('details', { class: 'obs-help' }, h('summary', {}, 'トークンの作り方'),
+      h('ol', {},
+        h('li', {}, 'GitHub にログイン → 右上のアイコン → Settings → Developer settings → Personal access tokens → Fine-grained tokens →「Generate new token」。'),
+        h('li', {}, 'Token name は「番組サイトの書き戻し」など。Expiration（有効期限）は 90 日などを選ぶ（無期限にしない）。'),
+        h('li', {}, `Repository access は「Only select repositories」で ${BOT.defaultRepo} の 1 つだけを選ぶ。`),
+        h('li', {}, 'Permissions → Repository permissions →「Contents」を「Read and write」に。ほかは触らない（Metadata は自動で Read-only）。'),
+        h('li', {}, '「Generate token」→ 表示された github_pat_… をコピーして、上の欄に貼り付け →「GitHub に保存」。'))));
+  sec.append(gh);
+  if (msg) sec.append(msg);
+  return sec;
 }

@@ -148,3 +148,17 @@ export const PLAN_V2 = Object.freeze({
   /** これ以上動かしたらドラッグ開始（px） */
   dragThreshold: 6,
 });
+
+/** 段階3: Grok ボット連携（data/show/topics.json の読み込みと、修正の書き戻し feedback/show-feedback.json） */
+export const BOT = Object.freeze({
+  /** confidence がこれ未満のボットの話題は「要確認」 */
+  lowConfidence: 0.5,
+  /** 書き戻し先（リポジトリ内のパス。data/ には書かない。固定） */
+  feedbackPath: 'feedback/show-feedback.json',
+  /** GitHub に直接保存するときの既定 */
+  defaultRepo: 'nichijowork-rgb/X-trend',
+  defaultBranch: 'claude/x-scraper-nightlife-tool-sb26pq',
+  /** 読み込む上限（壊れた巨大ファイル対策） */
+  maxTopics: 500,
+  maxPostsPerTopic: 300,
+});

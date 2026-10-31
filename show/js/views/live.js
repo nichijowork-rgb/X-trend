@@ -2,7 +2,7 @@
 import { computeTimer, formatClock, cornerDef, cueStates } from '../logic.js';
 import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
-import { cueColor, leadFor, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
+import { cueColor, leadFor, leadIsBot, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
 import { obsDialog } from './obsui.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
@@ -96,7 +96,7 @@ function cueContent(app, cue, wk) {
     const t = app.topicsById.get(cue.topicId);
     if (!t) { box.append(h('p', {}, '話題が見つかりません')); return box; }
     box.append(h('div', { class: 'live-tags' }, genreSticker(t.genre), topicMarks(app, t), h('p', { class: 'stats' }, statsLine(t))));
-    box.append(h('p', { class: 'live-lead' }, leadFor(app, t)));
+    box.append(h('p', { class: 'live-lead' }, leadFor(app, t), leadIsBot(app, t) ? h('span', { class: 'lead-mark', attrs: { title: 'リード文は Grok（ボット）のまとめ。編成のプレビューで書き換えできます' } }, 'Grok のまとめ') : null));
     // 話すポイント・視聴者への質問の欄は表示しない（オーナー指定）。コーナーのメモは書いてあるときだけ
     const notesBox = notes ? h('div', { class: 'live-notes' }, h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)) : null;
     // 代表投稿は X 埋め込みが既定（「カード表示」のときと、埋め込めなかったときは自前のカード）

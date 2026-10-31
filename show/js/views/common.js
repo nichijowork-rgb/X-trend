@@ -50,7 +50,30 @@ export function topicMarks(app, topic) {
   if (topic.bookmark) marks.push(badge(`★ブックマーク ${topic.bookmarkCount}件`, 'badge-bm'));
   if (topic.personal && topic.postIds.some((id) => app.weekState().personal.some((p) => p.id === id)) || (topic.kind === 'link' && app.weekState().personal.some((p) => p.id === topic.linkId))) marks.push(badge('自分で追加', 'badge-me'));
   if (topic.suggested) marks.push(badge('同じ話題かも？', 'badge-suggest'));
+  marks.push(...botMarks(topic));
   return marks;
+}
+
+/** ボット（Grok）がまとめた話題の印。自信が低いものは「要確認」 */
+export function botMarks(topic, small = false) {
+  if (!topic || !topic.bot) return [];
+  const c = topic.bot.confidence;
+  const title = `Grok（ボット）がまとめた話題${c != null ? `（確からしさ ${Math.round(c * 100)}%）` : ''}`;
+  const out = [h('span', { class: `badge badge-bot${small ? ' is-small' : ''}`, attrs: { title } }, 'Grok')];
+  if (topic.bot.low) out.push(h('span', { class: `badge badge-check${small ? ' is-small' : ''}`, attrs: { title: 'まとめ方の確からしさが低いので、中身を確認してください' } }, '要確認'));
+  return out;
+}
+
+/** リード文がボットのまとめ（summary）そのままか（手で書き換えていない） */
+export function leadIsBot(app, topic) {
+  const sc = app.weekState().script[topic.id];
+  return Boolean(topic.bot && topic.bot.summary) && !(sc && typeof sc.lead === 'string' && sc.lead.trim());
+}
+
+/** 雑談おすすめ（show_pick）の理由。おすすめでなければ null、理由が無ければ '' */
+export function pickReason(app, postId) {
+  if (!app.pickIds || !app.pickIds.has(postId)) return null;
+  return (app.pickReasons && app.pickReasons.get(postId)) || '';
 }
 
 /** 代表投稿（カード）。posts.json に無いときはリンクだけのカード */

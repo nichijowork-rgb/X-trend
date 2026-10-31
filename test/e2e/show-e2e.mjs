@@ -80,7 +80,7 @@ window.twttr = { ready: function (cb) { cb(window.twttr); }, widgets: { createTw
 } } };`;
 
 /**
- * data: { posts, reports, bookmarks } … 値が null なら 404、文字列ならそのまま（不正 JSON 用）、
+ * data: { posts, reports, bookmarks, topics（data/show/topics.json） } … 値が null なら 404、文字列ならそのまま（不正 JSON 用）、
  *       undefined（キーなし）なら 404。data 自体が undefined なら実ファイル（リポジトリの data/）
  */
 async function setupRoutes(page, { data } = {}) {
@@ -89,7 +89,7 @@ async function setupRoutes(page, { data } = {}) {
     const url = new URL(route.request().url());
     if (url.hostname === '127.0.0.1') {
       if (data !== undefined && url.pathname.startsWith('/data/')) {
-        const key = { '/data/posts.json': 'posts', '/data/reports.json': 'reports', '/data/bookmarks.json': 'bookmarks' }[url.pathname];
+        const key = { '/data/posts.json': 'posts', '/data/reports.json': 'reports', '/data/bookmarks.json': 'bookmarks', '/data/show/topics.json': 'topics' }[url.pathname];
         const v = key && data ? data[key] : null;
         if (v == null) return route.fulfill({ status: 404, body: 'not found' });
         return route.fulfill({ status: 200, contentType: 'application/json', body: typeof v === 'string' ? v : JSON.stringify(v) });
@@ -962,6 +962,187 @@ async function main() {
       }
       await c.close();
       return REF_IMAGE ? '合成スクショあり' : '合成スクショなし（OBS_REF_IMAGE 未指定）';
+    });
+
+    // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
+    const RAMEN = 'g:sample-ramen-2026w42';
+    const SAKURA = 'g:sample-sakura-2026w42';
+    await check('Grok: ボットの話題が並ぶ（印・要確認・リード文）・show_pick の理由・手作業が優先（名前・メイン・リロード後も）・進行のリード文', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      const botIds = await page.evaluate(() => window.__show.topics.filter((t) => t.kind === 'bot').map((t) => t.id).sort());
+      assert(JSON.stringify(botIds) === JSON.stringify([RAMEN, SAKURA]), JSON.stringify(botIds));
+      const sakura = await page.evaluate((id) => { const t = window.__show.topicsById.get(id); return { n: t.postIds.length, genre: t.genre, low: t.bot.low }; }, SAKURA);
+      assert(sakura.n === 4 && sakura.genre === 'night' && sakura.low, `週の外・無い id は使わない ${JSON.stringify(sakura)}`);
+      await folder(page, 'group:night');
+      await page.waitForSelector(`[data-key="folder-topic:${RAMEN}"] .tree-bot:not(.is-low)`);
+      assert(await page.$(`[data-key="folder-topic:${SAKURA}"] .tree-bot.is-low`), '要確認の印（木）');
+      const meta = await page.textContent(`${rowSel(`t:${SAKURA}`)} .row-meta`);
+      assert(meta.includes('Grok') && meta.includes('要確認'), meta);
+      await page.click(`${rowSel(`t:${SAKURA}`)} .row-main`);
+      await page.waitForSelector('[data-key="pv-bot-check"]');
+      await page.click('.pv-script summary');
+      const lead = await page.inputValue('[data-key="pv-lead"]');
+      assert(lead.startsWith('同じキャストさんの出勤'), lead);
+      assert(await page.isVisible('.lead-mark-line'), 'Grok のまとめの印');
+      await page.screenshot({ path: path.join(SHOTS, 'bot-preview-960.png') });
+      // show_pick（雑談おすすめ）の理由が行とプレビューに出る（960 幅は一覧⇄プレビューの切替なので一覧へ戻す）
+      await page.click('[data-key="preview-back"]');
+      await search(page, '猫が布団');
+      const pk = (await rowKeys(page)).find((k) => k.startsWith('p:'));
+      const pmeta = await page.textContent(`${rowSel(pk)} .row-meta`);
+      assert(pmeta.includes('雑談おすすめ：（サンプル）ペットの話は誰でも話しやすい'), pmeta);
+      await page.click(`${rowSel(pk)} .row-main`);
+      await page.waitForSelector('[data-key="pv-pick"]');
+      assert((await page.evaluate(() => [...window.__show.recommended])).length >= 2, 'recommended');
+      await page.click('[data-key="preview-back"]');
+      await search(page, ''); // 検索の反映（少し遅れて描き直す）を待ってから
+      // 手作業が優先: 名前を変える・メイン1に入れる → リロードしても残る
+      await folder(page, `topic:${RAMEN}`);
+      await page.dblclick(`[data-key="folder-topic:${RAMEN}"]`);
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', '自分で付けた名前');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction((id) => window.__show.topicsById.get(id).name === '自分で付けた名前', RAMEN);
+      await folder(page, 'group:night');
+      await ctx(page, `${rowSel(`t:${RAMEN}`)} .row-main`, 'ctx-slot-0');
+      await page.reload();
+      await ready(page);
+      const after = await page.evaluate((id) => ({ name: window.__show.topicsById.get(id).name, main: window.__show.weekState().rundown.corners[0].items[0] }), RAMEN);
+      assert(after.name === '自分で付けた名前' && after.main === RAMEN, JSON.stringify(after));
+      // 進行: リード文は Grok のまとめ（印つき）
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.click('[data-key="live-start"]');
+      await page.waitForSelector('.live-lead .lead-mark');
+      assert((await page.textContent('.live-lead')).includes('麺屋サンプル'), 'lead');
+      await page.screenshot({ path: path.join(SHOTS, 'bot-live-960.png') });
+      await c.close();
+    });
+
+    await check('Grok: topics.json が無い・壊れていても従来どおり', async () => {
+      for (const topics of [null, '{壊れた', JSON.stringify({ topics: 'x' })]) {
+        const c = await newCtx();
+        const { page } = await open(c, show, { data: { posts: sample, bookmarks: sampleBm, topics } });
+        assert(await page.isHidden('#sample-banner'), 'data');
+        const n = await page.evaluate(() => [window.__show.bot, window.__show.topics.filter((t) => t.kind === 'bot').length]);
+        assert(n[0] === null && n[1] === 0, JSON.stringify(n));
+        assert(await page.$('[data-key="folder-topic:d:d-hostcall"]'), 'dict');
+        await c.close();
+      }
+      // data/ 側の topics.json も読む
+      const c = await newCtx();
+      const ids = sample.posts.filter((p) => p.text.includes('シャンパンタワー')).map((p) => p.id);
+      const { page } = await open(c, show, { data: { posts: sample, bookmarks: sampleBm, topics: { topics: [{ id: 'tower-w42', name: 'タワーの話（Grok）', genre: 'ホスト', post_ids: ids, confidence: 0.9 }] } } });
+      const t = await page.evaluate(() => { const x = window.__show.topicsById.get('g:tower-w42'); return x && [x.name, x.postIds.length]; });
+      assert(t && t[0] === 'タワーの話（Grok）' && t[1] === ids.length, JSON.stringify(t));
+      await c.close();
+    });
+
+    await check('ボットに修正を送る: ファイル保存（今の全修正・何度でも同じ）と最後に送った日時', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      // 修正: ボットの話題の名前・投稿のジャンル・話題の削除
+      await page.evaluate((id) => window.__show.edit('名前', (w) => { w.overrides.renames[id] = '直した名前'; }), RAMEN);
+      await search(page, '猫が布団');
+      const pk = (await rowKeys(page)).find((k) => k.startsWith('p:'));
+      await page.click(`${rowSel(pk)} .row-main`);
+      await page.selectOption('[data-key="pv-genre"]', 'night');
+      await page.waitForFunction(() => Object.keys(window.__show.saved.genreOverrides).length === 1);
+      await page.evaluate(() => { window.__show.ui.pane = 'list'; window.__show.render(); });
+      await search(page, '');
+      await folder(page, 'group:night');
+      await ctx(page, `${rowSel(`t:${SAKURA}`)} .row-main`, 'ctx-trash');
+      await page.waitForFunction((id) => window.__show.saved.trash.some((x) => x.topicId === id), SAKURA);
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      assert((await page.textContent('[data-key="fb-last"]')).includes('まだ送っていません'), 'last');
+      const counts = await page.textContent('[data-key="fb-counts"]');
+      assert(counts.includes('ジャンルの変更 1件') && counts.includes('削除した話題 1件'), counts);
+      const get = async (name) => {
+        const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="fb-download"]')]);
+        assert(dl.suggestedFilename() === 'show-feedback.json', dl.suggestedFilename());
+        const f = path.join(tmp, name);
+        await dl.saveAs(f);
+        return JSON.parse(readFileSync(f, 'utf8'));
+      };
+      const a = await get('fb1.json');
+      const b = await get('fb2.json');
+      const strip = (x) => JSON.stringify({ ...x, generated_at: '' });
+      assert(strip(a) === strip(b), '冪等');
+      assert(a.week === '2026-10-17' && /\+09:00$/.test(a.generated_at), `${a.week} ${a.generated_at}`);
+      assert(a.genre_overrides.length === 1 && a.genre_overrides[0].genre === '夜職その他' && a.genre_overrides[0].was[0] === 'その他', JSON.stringify(a.genre_overrides));
+      const r = a.topic_edits.find((x) => x.topic_id === 'sample-ramen-2026w42');
+      assert(r && r.source === 'bot' && r.name === '直した名前' && r.edits.includes('rename') && r.post_ids.length === 4, JSON.stringify(r));
+      const d = a.topic_edits.find((x) => x.topic_id === 'sample-sakura-2026w42');
+      assert(d && d.deleted === true, JSON.stringify(d));
+      assert(a.removed_posts.length === 4 && a.removed_posts.every((x) => x.reason === 'trash'), JSON.stringify(a.removed_posts));
+      await page.waitForFunction(() => document.querySelector('[data-key="fb-last"]').textContent.includes('ファイルで保存'));
+      await page.screenshot({ path: path.join(SHOTS, 'bot-tools-960.png') });
+      await c.close();
+    });
+
+    await check('GitHub に保存（API はモック）: GET→PUT・409 で取り直して再試行・401 は日本語のエラー・トークンは画面/URL に出ない', async () => {
+      const SECRET = 'github_pat_E2E_SECRET_0123456789';
+      const c = await newCtx();
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      watchConsole(page, errors);
+      const reqs = [];
+      let mode = 'conflict';
+      let n = 0;
+      await page.route('https://api.github.com/**', async (route) => {
+        const r = route.request();
+        reqs.push({ method: r.method(), url: r.url(), auth: r.headers().authorization, body: r.postData() ? JSON.parse(r.postData()) : null });
+        n++;
+        const cors = { 'access-control-allow-origin': '*' };
+        if (r.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { ...cors, 'access-control-allow-headers': '*', 'access-control-allow-methods': 'GET, PUT' } });
+        if (mode === 'unauth') return route.fulfill({ status: 401, headers: cors, contentType: 'application/json', body: '{"message":"Bad credentials"}' });
+        if (r.method() === 'GET') return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ sha: n < 3 ? 'sha-old' : 'sha-new' }) });
+        if (r.method() === 'PUT' && n < 3) return route.fulfill({ status: 409, headers: cors, contentType: 'application/json', body: '{"message":"conflict"}' });
+        return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ commit: { html_url: 'https://github.com/nichijowork-rgb/X-trend/commit/abc' } }) });
+      });
+      await page.goto(show);
+      await ready(page);
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      await page.click('.gh-box > summary');
+      assert((await page.inputValue('[data-key="gh-repo"]')) === 'nichijowork-rgb/X-trend', 'default repo');
+      assert((await page.inputValue('[data-key="gh-branch"]')) === 'claude/x-scraper-nightlife-tool-sb26pq', 'default branch');
+      await page.fill('[data-key="gh-token"]', SECRET);
+      await page.click('[data-key="fb-github"]');
+      await page.waitForFunction(() => (document.querySelector('[data-key="fb-msg"]') || {}).textContent?.includes('GitHub に保存しました'), null, { timeout: 5000 });
+      const api = reqs.filter((x) => x.method !== 'OPTIONS');
+      assert(JSON.stringify(api.map((x) => x.method)) === '["GET","PUT","GET","PUT"]', JSON.stringify(api.map((x) => x.method)));
+      assert(api[0].url === 'https://api.github.com/repos/nichijowork-rgb/X-trend/contents/feedback/show-feedback.json?ref=claude%2Fx-scraper-nightlife-tool-sb26pq', api[0].url);
+      assert(api.every((x) => x.auth === `Bearer ${SECRET}` && !x.url.includes(SECRET) && /\/contents\/feedback\/show-feedback\.json/.test(x.url)), 'auth/url');
+      const put = api[3].body;
+      assert(put.sha === 'sha-new' && put.branch === 'claude/x-scraper-nightlife-tool-sb26pq' && /^feedback: show edits /.test(put.message), JSON.stringify({ ...put, content: '…' }));
+      const fb = JSON.parse(Buffer.from(put.content, 'base64').toString('utf8'));
+      assert(fb.week && Array.isArray(fb.topic_edits) && Array.isArray(fb.genre_overrides), 'content');
+      assert(await page.$('[data-key="fb-msg"] a[href="https://github.com/nichijowork-rgb/X-trend/commit/abc"]'), 'commit link');
+      assert((await page.textContent('[data-key="fb-last"]')).includes('GitHub に保存'), 'last');
+      // トークンは画面・URL・入力欄に出ない（保存済みと表示するだけ）
+      const leak = await page.evaluate((s) => document.documentElement.outerHTML.includes(s) || [...document.querySelectorAll('input, textarea')].some((i) => i.value.includes(s)) || location.href.includes(s), SECRET);
+      assert(!leak, 'token leaked');
+      assert((await page.getAttribute('[data-key="gh-token"]', 'placeholder')).includes('保存済み'), 'placeholder');
+      await page.screenshot({ path: path.join(SHOTS, 'bot-github-960.png') });
+      // 401
+      mode = 'unauth';
+      await page.click('[data-key="fb-github"]');
+      await page.waitForFunction(() => (document.querySelector('[data-key="fb-msg"]') || {}).textContent?.includes('トークンが正しくない'), null, { timeout: 5000 });
+      assert(!(await page.textContent('[data-key="fb-msg"]')).includes(SECRET), 'token in error');
+      // トークンを消す
+      await page.click('[data-key="gh-forget"]');
+      const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-github')));
+      assert(stored.token === '' && stored.repo === 'nichijowork-rgb/X-trend', JSON.stringify(stored));
+      // 375 幅で横スクロールなし
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(200);
+      const w = await page.evaluate(() => document.querySelector('dialog.tools-dialog').scrollWidth <= document.querySelector('dialog.tools-dialog').clientWidth && document.documentElement.scrollWidth <= 375);
+      assert(w, 'no horizontal scroll at 375');
+      await page.screenshot({ path: path.join(SHOTS, 'bot-tools-375.png') });
+      await c.close();
     });
 
     // ---- 5. 実データ（リポジトリの data/。読むだけ）。今週（約 960 件）の 10/31 配信の週で確認

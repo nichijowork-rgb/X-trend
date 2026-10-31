@@ -49,7 +49,8 @@
 | `test/e2e/dashboard-e2e.mjs` | E2E（Playwright。リポジトリに依存は入れない） |
 | `CNAME` | 独自ドメイン `www.x-yoru-buzz.com`。**消さない** |
 | `data/` | 収集botの管轄。読むだけ |
-| `show/` | **配信番組サイト**（台本・進行・映す用・OBS オーバーレイ `show/overlay.html`。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
+| `show/` | **配信番組サイト**（台本・進行・映す用・OBS オーバーレイ `show/overlay.html`・Grok ボット連携。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
+| `feedback/` | 番組サイトがボットへ返す修正（`show-feedback.json`。サイトの「GitHub に保存」で作られる。ボットは読むだけ） |
 
 ## 4. データ（収集botとの取り決め）
 
@@ -132,5 +133,14 @@ PW_DIR=/tmp/qa/node_modules node test/e2e/dashboard-e2e.mjs
 - 週1回（土 1:00、約90分）のニュース形式トーク配信の台本・進行サイト。画面は ①編成 `#plan` ②進行 `#live` ③映す用 `#onair`（1920×1080・OBS 用）④振り返り `#review`。
 - **v2 段階1（2026-10-31）**: 画面半分（960×1040）基準。編成は**フォルダ型**（左の木＝番組構成〈メイン1〜3・メイン候補・カテゴリ別・雑談〉／まとまり／受信箱／★ブクマ／NEW／片付け／ゴミ箱、右＝行リスト＋プレビュー）。pointer events のドラッグ＆ドロップ・複数選択・一括操作・右クリック・「移動先…」・常設検索・新しいまとまり・名前変更・ジャンル上書き（投稿 ID で全週）・元に戻す/やり直す（Ctrl+Z/Y）・一般のバズはおすすめ 30 件・仕分けモード（1/2/3/G/X/→/←）。進行は縦 1 列。進行状態は `show/js/events.js` から 1 か所で発行（段階2で OBS WebSocket へ）。計画は [SHOW_V2_PLAN.md](SHOW_V2_PLAN.md)。純粋ロジックは `show/js/logic.js` と `show/js/folders.js`。
 - **v2 段階2（2026-10-31）OBS オーバーレイ**: `show/overlay.html?part=topicbar|card|title|all`（背景透明・推奨 1300×150／640×760／1920×1080）を OBS のブラウザソースに貼る。［進行］画面がヘッダーの「OBS：…」ピル → ダイアログから obs-websocket v5（127.0.0.1:4455・パスワードは localStorage `xtrend-show-obs` に平文、注意書きあり）へ接続し、進行状態を `CallVendorRequest`（obs-browser の `emit_event`、event_name `xtrend-show`）で全ブラウザソースへ送る（変化時＋5 秒おき再送、受け手は sid/seq で古いものを無視）。同じブラウザ内は `BroadcastChannel('xtrend-show-overlay')`。ペイロードの形は SHOW_SPEC.md「⑤ OBS 連動」（`show/js/payload.js`、`effect` は段階4用の空き）。セットアップガイドは［OBS］タブ（`#obs-setup`）。CSP の connect-src に `ws://127.0.0.1:* ws://localhost:*`。本物の OBS での確認は未（E2E は偽の OBS＝`page.routeWebSocket`）。
-- データは `data/posts.json`・`bookmarks.json` を読むだけ（`show_pick: true` が付いた投稿は雑談おすすめの最優先＝段階3の受け口）。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
+- **v2 段階3（2026-10-31）Grok ボット連携（サイト側）**: ボットとのファイルの取り決めは下表（詳細は SHOW_SPEC.md「⑥」）。ボット側が未対応でも従来どおり動く。
+
+  | ファイル | 書く | 読む | 用途 |
+  |---|---|---|---|
+  | `data/posts.json` の `show_pick` / `show_pick_reason` | ボット | サイト | 雑談おすすめ（一般のバズの最優先・理由を表示） |
+  | `data/show/topics.json` | ボット | サイト | 話題のまとめ（id は週をまたいで同じ。サイトの話題 id は `g:<id>`。summary＝リード文の既定値、confidence<0.5＝要確認） |
+  | `feedback/show-feedback.json` | サイトだけ | ボット | ユーザーの修正（ジャンル上書き・まとまりの編集・削除）。毎回「今の全修正」 |
+
+  優先順位は「持ち越し＞ユーザーが手を入れた話題＞ボット＞topic:/辞書＞類似」。書き戻しは［ツール…］からファイル保存か GitHub Contents API（fine-grained トークンを localStorage `xtrend-show-github` に平文保存・Contents の Read and write だけ・`feedback/` 固定で data/ には書かない。CSP に `https://api.github.com`）。
+- データは `data/posts.json`・`bookmarks.json` を読むだけ（`show_pick: true` が付いた投稿は雑談おすすめの最優先、`show_pick_reason` を表示）・`show/topics.json`（任意）。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
 - 仕様・ファイル構成・保存データの形・使い方は [SHOW_SPEC.md](SHOW_SPEC.md) の「実装メモ」。テストは `npm test`（`test/show.test.js` を含む）と `PW_DIR=… node test/e2e/show-e2e.mjs`（`OBS_REF_IMAGE=参考の配信画面の画像` で合成スクショ、`ONLY=名前の一部` で一部だけ実行）。サンプルは `sample/show/`（`node tools/make-show-sample.mjs`）。

@@ -1134,6 +1134,11 @@ function fakeObs({ auth = null, onIdentify = null } = {}) {
   return { FakeWS, socks };
 }
 const tick = () => new Promise((r) => setTimeout(r, 5));
+/** 条件を満たすまで待つ（認証の計算は非同期で、負荷によって時間が変わるため） */
+async function until(fn, ms = 3000) {
+  const t0 = Date.now();
+  while (!fn()) { if (Date.now() - t0 > ms) throw new Error('timeout'); await tick(); }
+}
 
 test('OBS クライアント: Hello → Identify（認証）→ Identified → CallVendorRequest(emit_event) → 応答', async () => {
   const auth = { salt: 's', challenge: 'c' };
@@ -1143,7 +1148,7 @@ test('OBS クライアント: Hello → Identify（認証）→ Identified → C
   const timers = [];
   const cl = createObsClient({ WebSocketImpl: FakeWS, onStatus: (s) => states.push(s.state), setTimer: (fn, ms) => { timers.push({ fn, ms }); return timers.length; }, clearTimer: () => {} });
   cl.connect({ host: '127.0.0.1', port: 4455, password: 'pw' });
-  await tick(); await tick();
+  await until(() => cl.status().state === 'connected');
   assert.equal(socks[0].url, 'ws://127.0.0.1:4455');
   assert.equal(socks[0].sent[0].op, 1);
   assert.equal(socks[0].sent[0].d.rpcVersion, 1);
@@ -1168,7 +1173,7 @@ test('OBS クライアント: Hello → Identify（認証）→ Identified → C
   assert.match(cl.status().reason, /切れました/);
   assert.equal(timers.at(-1).ms, 2000);
   timers.at(-1).fn();
-  await tick(); await tick();
+  await until(() => socks.length === 2 && cl.status().state === 'connected');
   assert.equal(socks.length, 2);
   assert.equal(cl.status().state, 'connected');
   // 手動で切断 → 未接続。送信は false
@@ -1183,7 +1188,7 @@ test('OBS クライアント: パスワード違い（4009）は日本語の理�
   const timers = [];
   const cl = createObsClient({ WebSocketImpl: FakeWS, setTimer: (fn, ms) => { timers.push(ms); return 1; }, clearTimer: () => {} });
   cl.connect({ password: 'wrong' });
-  await tick(); await tick();
+  await until(() => cl.status().state === 'error');
   assert.equal(cl.status().state, 'error');
   assert.match(cl.status().reason, /パスワードが違います/);
   assert.equal(timers.length, 0);
@@ -1191,7 +1196,7 @@ test('OBS クライアント: パスワード違い（4009）は日本語の理�
   class DeadWS { constructor() { queueMicrotask(() => this.onclose({ code: 1006 })); } send() {} close() {} }
   const cl2 = createObsClient({ WebSocketImpl: DeadWS, setTimer: (fn, ms) => { timers.push(ms); return 1; }, clearTimer: () => {} });
   cl2.connect({});
-  await tick();
+  await until(() => cl2.status().state === 'error');
   assert.match(cl2.status().reason, /OBS が起動していない/);
   assert.equal(timers.at(-1), 2000);
   const cl3 = createObsClient({ WebSocketImpl: DeadWS });
@@ -1301,4 +1306,234 @@ test('オーバーレイのパーツと参考配置', () => {
     assert.ok(Math.abs(o.w / o.h - part.w / part.h) < 0.05, `${o.label} 縦横比`);
     for (const x of others) assert.ok(!overlap(o, x), `${o.label} と ${x.label} が重なる`);
   }
+});
+
+// ================================================================ 段階3: Grok ボット連携（bot.js・buildTopics・feedback.js）
+import { normalizeBotTopics, botGenre } from '../show/js/bot.js';
+import { buildFeedback, sameFeedback, feedbackTopicId, saveFeedbackToGitHub, parseGhPrefs, githubErrorText, b64utf8, feedbackCounts } from '../show/js/feedback.js';
+import { BOT } from '../show/js/config.js';
+import { isTrashed as isTrashedTopic, partitionTopics as partitionT } from '../show/js/logic.js';
+
+test('ボットの topics.json: 壊れた・欠けた項目に耐え、読める分だけ使う', () => {
+  for (const bad of [null, 'x', 3, {}, { topics: 'x' }, []]) assert.equal(normalizeBotTopics(bad), null);
+  const r = normalizeBotTopics({
+    generated_at: '2026-10-31T00:09:00+09:00', week: { from: 'a', to: 'b' },
+    topics: [
+      { id: 'a1', name: ' ホストコール規制 ', genre: 'ホスト', post_ids: ['2110000000000000001', 2110, '2110000000000000001', 'x', '12'], summary: '要約\u0000です', confidence: 0.8 },
+      { id: 'a1', name: '重複 id', genre: 'ホスト', post_ids: ['2110000000000000002'] },
+      { id: 'b2', genre: 'その他', post_ids: ['2110000000000000003'], confidence: 0.3 },
+      { id: 'c3', genre: '謎', post_ids: ['2110000000000000004'], confidence: 7 },
+      { id: 'd4', post_ids: [] },
+      { id: '', post_ids: ['2110000000000000005'] },
+      null, 'str', { id: { x: 1 }, post_ids: ['2110000000000000006'] },
+    ],
+  });
+  assert.equal(r.generatedAt, '2026-10-31T00:09:00+09:00');
+  assert.deepEqual(r.topics.map((t) => t.id), ['a1', 'b2', 'c3']);
+  const [a, b, c] = r.topics;
+  assert.equal(a.name, 'ホストコール規制');
+  assert.equal(a.genre, 'host');
+  assert.deepEqual(a.postIds, ['2110000000000000001'], '数値の短い id・文字・重複は捨てる');
+  assert.equal(a.summary, '要約 です', '制御文字は空白に');
+  assert.equal(a.low, false);
+  assert.equal(b.genre, 'general', '「その他」は一般のバズ');
+  assert.equal(b.name, null);
+  assert.equal(b.low, true, `confidence < ${BOT.lowConfidence} は要確認`);
+  assert.equal(c.genre, null);
+  assert.equal(c.confidence, 1, '0〜1 に収める');
+  assert.equal(botGenre('kyaba'), 'kyaba');
+  assert.equal(botGenre(3), null);
+  assert.deepEqual(normalizeBotTopics({ topics: [] }).topics, []);
+});
+
+function botFixture() {
+  const call1 = post({ text: 'シャンパンコールの新しい掛け声', categories: ['ホスト'] });
+  const call2 = post({ text: 'ラスソンの歌が本気すぎた', categories: ['ホスト'] });
+  const call3 = post({ text: 'コール中に新人が噛んだ', categories: ['ホスト'] });
+  const tag1 = post({ text: '王子さん引退', matched_terms: ['topic:王子の引退'] });
+  const g1 = post({ text: '猫の話', categories: ['その他'] });
+  const g2 = post({ text: '犬の話', categories: ['その他'] });
+  const old = post({ text: '先週の話', ts: ts('2026-10-01T12:00:00+09:00') });
+  const d = ds([call1, call2, call3, tag1, g1, g2]);
+  const bot = normalizeBotTopics({ topics: [
+    { id: 'night-a', name: 'コールの話（Grok）', genre: 'ホスト', post_ids: [call1.id, call2.id, tag1.id, old.id, '1999999999999999999'], summary: '今週はコールが話題に（Grok）', confidence: 0.9 },
+    { id: 'pets', name: 'ペットの話', genre: 'その他', post_ids: [g1.id, g2.id], confidence: 0.2 },
+  ] }).topics;
+  return { d, bot, call1, call2, call3, tag1, g1, g2, old };
+}
+
+test('ボットのまとめの優先順位: topic:/辞書/類似より先、週の外の投稿は使わない、名前・要約・印', () => {
+  const { d, bot, call1, call2, call3, tag1, g1, g2, old } = botFixture();
+  const base = { posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs, postsById: new Map([[old.id, old]]) };
+  const plain = buildTopics(base);
+  assert.equal(plain.find((t) => t.id === 'd:d-hostcall').postIds.length, 3, 'ボットなしは従来どおり');
+  const topics = buildTopics({ ...base, botTopics: bot });
+  const g = topics.find((t) => t.id === 'g:night-a');
+  assert.equal(g.kind, 'bot');
+  assert.deepEqual([...g.postIds].sort(), [call1.id, call2.id, tag1.id].sort(), 'ボットが先（辞書・topic: より）。週の外・存在しない id は入らない');
+  assert.equal(g.name, 'コールの話（Grok）');
+  assert.equal(g.genre, 'host');
+  assert.deepEqual(g.bot, { id: 'night-a', summary: '今週はコールが話題に（Grok）', confidence: 0.9, low: false });
+  assert.equal(leadText(g, new Map(), d.refTs), '今週はコールが話題に（Grok）', 'summary がリード文の既定値');
+  assert.deepEqual(topics.find((t) => t.id === 'd:d-hostcall').postIds, [call3.id], '残りは辞書へ');
+  assert.ok(!topics.some((t) => t.id === 't:王子の引退'));
+  const pets = topics.find((t) => t.id === 'g:pets');
+  assert.equal(pets.genre, 'general');
+  assert.ok(pets.bot.low);
+  assert.ok(isGroupedTopic(pets), 'ボットの話題は「まとまり」');
+  assert.ok(!topics.some((t) => t.postIds.includes(g1.id) && t.id !== 'g:pets') && pets.postIds.includes(g2.id));
+});
+
+test('ボットのまとめより手作業が優先（番組構成に入れた辞書の話題・移動・名前・ジャンル・削除・持ち越し）', () => {
+  const { d, bot, call1, call2, call3, tag1, g1 } = botFixture();
+  const base = { posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs, botTopics: bot };
+  // 1. 番組構成に入れていた辞書の話題は投稿を取られない
+  let topics = buildTopics({ ...base, pinnedIds: new Set(['d:d-hostcall']) });
+  assert.equal(topics.find((t) => t.id === 'd:d-hostcall').postIds.length, 3);
+  assert.deepEqual(topics.find((t) => t.id === 'g:night-a').postIds, [tag1.id]);
+  // 2. 1件の話題として置いていた投稿も
+  topics = buildTopics({ ...base, pinnedIds: new Set([`p:${g1.id}`]) });
+  assert.ok(topics.find((t) => t.id === `p:${g1.id}`));
+  // 3. 移動・名前・話題のジャンル
+  topics = buildTopics({ ...base, overrides: { moves: { [call2.id]: 'd:d-hostcall' }, renames: { 'g:night-a': '自分の名前' }, genres: { 'g:pets': 'night' } } });
+  const g = topics.find((t) => t.id === 'g:night-a');
+  assert.ok(!g.postIds.includes(call2.id) && topics.find((t) => t.id === 'd:d-hostcall').postIds.includes(call2.id));
+  assert.equal(g.name, '自分の名前');
+  assert.ok(g.movedOut);
+  assert.equal(topics.find((t) => t.id === 'g:pets').genre, 'night');
+  // 4. 投稿のジャンル上書きがあればボットのジャンルは使わない
+  const over = applyGenreOverrides(d.posts, { [call1.id]: { genre: 'kyaba' }, [call2.id]: { genre: 'kyaba' }, [tag1.id]: { genre: 'kyaba' } });
+  topics = buildTopics({ ...base, posts: over });
+  assert.equal(topics.find((t) => t.id === 'g:night-a').genre, 'kyaba');
+  // 5. 削除（ゴミ箱）した話題は翌週も同じ id なら出さない
+  topics = buildTopics(base);
+  const trash = [{ id: 'tr-1', topicId: 'g:night-a', postIds: [], week: '2026-10-10' }];
+  assert.ok(isTrashedTopic(topics.find((t) => t.id === 'g:night-a'), trash));
+  assert.ok(partitionT(topics, { shelved: [] }, trash).trashed.some((t) => t.id === 'g:night-a'));
+  // 6. 前週から持ち越した同じ id の話題に、今週のボットの投稿が入る（要約も）
+  topics = buildTopics({ ...base, carried: [{ topicId: 'g:night-a', name: '先週の名前', genre: 'host', postIds: [], fromWeek: 'w' }] });
+  const k = topics.find((t) => t.id === 'k:g:night-a');
+  assert.equal(k.postIds.length, 3);
+  assert.equal(k.bot.summary, '今週はコールが話題に（Grok）');
+  assert.ok(!topics.some((t) => t.id === 'g:night-a'));
+  assert.ok(leadText(k, new Map(), d.refTs).startsWith('先週からの持ち越し。今週はコール'));
+  assert.ok(call3);
+});
+
+test('ボットへの修正（feedback）: 今の全修正・冪等・ボットの id に戻す・data/ ではなく feedback/', () => {
+  const { d, bot, call1, call2, g1, g2 } = botFixture();
+  const saved = defaultSaved();
+  const wkKey = '2026-10-17';
+  saved.weeks[wkKey] = defaultWeek();
+  const w = saved.weeks[wkKey];
+  w.overrides.renames['g:night-a'] = '直した名前';
+  w.overrides.moves[call2.id] = 'd:d-hostcall';
+  w.overrides.manual.push({ id: 'm:1', name: '新しいまとまり', genre: 'kyaba' });
+  w.overrides.moves[g2.id] = 'm:1';
+  w.shelved.push({ topicId: 'g:pets', name: 'ペット', genre: 'general', postIds: [g1.id], at: 1, corner: null });
+  saved.genreOverrides = { [call1.id]: { genre: 'kyaba', from: 'host', at: 1 } };
+  saved.trash = [{ id: 'tr-x', topicId: 'g:old-topic', name: '消した話題', genre: 'host', postIds: ['2110000000000009999'], week: wkKey, at: 1, corner: null }];
+  saved.hiddenPosts = [{ id: '2110000000000008888', week: wkKey, at: 1, topicName: '' }];
+  const posts = applyGenreOverrides(d.posts, saved.genreOverrides);
+  const topics = buildTopics({ posts, dict: DEFAULT_DICT, refTs: d.refTs, botTopics: bot, overrides: w.overrides });
+  const basePostsById = new Map(d.posts.map((p) => [p.id, p]));
+  const a = buildFeedback({ saved, weekKey: wkKey, topics, basePostsById, nowMs: Date.parse('2026-10-31T03:00:00Z') });
+  const b = buildFeedback({ saved, weekKey: wkKey, topics, basePostsById, nowMs: Date.parse('2026-10-31T05:00:00Z') });
+  assert.equal(a.generated_at, '2026-10-31T12:00:00+09:00');
+  assert.ok(sameFeedback(a, b), '何度作っても同じ（generated_at だけ違う）');
+  assert.equal(a.week, wkKey);
+  assert.deepEqual(a.genre_overrides, [{ id: call1.id, genre: 'キャバクラ', was: ['ホスト'] }]);
+  const byId = Object.fromEntries(a.topic_edits.map((x) => [x.topic_id, x]));
+  assert.equal(byId['night-a'].source, 'bot', 'g: を外してボットの id');
+  assert.equal(byId['night-a'].name, '直した名前');
+  assert.deepEqual(byId['night-a'].edits, ['rename', 'posts']);
+  assert.ok(!byId['night-a'].post_ids.includes(call2.id));
+  assert.deepEqual(byId['d:d-hostcall'].edits, ['posts']);
+  assert.equal(byId['d:d-hostcall'].source, 'site');
+  assert.deepEqual(byId['m:1'].edits, ['posts', 'new']);
+  assert.equal(byId['m:1'].genre, 'キャバクラ');
+  assert.deepEqual(byId.pets.edits, ['posts', 'shelve'], 'g2 を新しいまとまりへ移した＋片付け');
+  assert.equal(byId['old-topic'].deleted, true);
+  assert.deepEqual(a.removed_posts, [{ id: '2110000000000008888', reason: 'hidden' }, { id: '2110000000000009999', reason: 'trash', topic_id: 'old-topic' }]);
+  assert.deepEqual(feedbackCounts(a), { genres: 1, topics: 4, deleted: 1, posts: 2 });
+  assert.deepEqual(feedbackTopicId('k:g:x'), { topic_id: 'x', source: 'bot' });
+  assert.match(BOT.feedbackPath, /^feedback\//);
+  // 修正が無ければ空
+  const empty = buildFeedback({ saved: defaultSaved(), weekKey: wkKey, topics: [], nowMs: 0 });
+  assert.deepEqual([empty.genre_overrides, empty.topic_edits, empty.removed_posts], [[], [], []]);
+});
+
+/** 偽の GitHub API。calls に記録 */
+function fakeGitHub(script) {
+  const calls = [];
+  const fetchImpl = async (url, opts) => {
+    calls.push({ url, method: opts.method, headers: opts.headers, body: opts.body ? JSON.parse(opts.body) : null });
+    const r = script(calls.length, url, opts);
+    if (r instanceof Error) throw r;
+    return { ok: r.status >= 200 && r.status < 300, status: r.status, json: async () => r.json || {}, headers: { get: (k) => (r.headers || {})[k.toLowerCase()] ?? null } };
+  };
+  return { calls, fetchImpl };
+}
+const GH = { repo: 'owner/repo', branch: 'claude/x', token: 'github_pat_SECRET123', content: '{"a":"日本語"}\n', nowMs: Date.parse('2026-10-31T03:00:00Z') };
+
+test('GitHub に保存: GET で sha → PUT（feedback/ 固定・メッセージ・base64）', async () => {
+  const { calls, fetchImpl } = fakeGitHub((n) => (n === 1 ? { status: 200, json: { sha: 'abc' } } : { status: 200, json: { commit: { html_url: 'https://github.com/owner/repo/commit/1' } } }));
+  const r = await saveFeedbackToGitHub({ ...GH, fetchImpl });
+  assert.deepEqual(r, { ok: true, created: false, commitUrl: 'https://github.com/owner/repo/commit/1' });
+  assert.equal(calls[0].method, 'GET');
+  assert.equal(calls[0].url, 'https://api.github.com/repos/owner/repo/contents/feedback/show-feedback.json?ref=claude%2Fx');
+  assert.equal(calls[0].headers.Authorization, 'Bearer github_pat_SECRET123');
+  assert.equal(calls[1].method, 'PUT');
+  assert.equal(calls[1].url, 'https://api.github.com/repos/owner/repo/contents/feedback/show-feedback.json');
+  assert.deepEqual(calls[1].body, { message: 'feedback: show edits 2026-10-31T12:00:00+09:00', content: b64utf8(GH.content), branch: 'claude/x', sha: 'abc' });
+  assert.equal(Buffer.from(calls[1].body.content, 'base64').toString('utf8'), GH.content);
+  assert.ok(calls.every((c) => !c.url.includes('SECRET')), 'トークンは URL に入れない');
+});
+
+test('GitHub に保存: 新規（GET 404）・ぶつかったら（409/422）sha を取り直して 1 回だけやり直す', async () => {
+  let g = fakeGitHub((n) => (n === 1 ? { status: 404 } : { status: 201, json: {} }));
+  let r = await saveFeedbackToGitHub({ ...GH, fetchImpl: g.fetchImpl });
+  assert.deepEqual([r.ok, r.created], [true, true]);
+  assert.ok(!('sha' in g.calls[1].body));
+  g = fakeGitHub((n) => [{ status: 200, json: { sha: 'old' } }, { status: 409 }, { status: 200, json: { sha: 'new' } }, { status: 200, json: {} }][n - 1]);
+  r = await saveFeedbackToGitHub({ ...GH, fetchImpl: g.fetchImpl });
+  assert.ok(r.ok);
+  assert.deepEqual(g.calls.map((c) => c.method), ['GET', 'PUT', 'GET', 'PUT']);
+  assert.equal(g.calls[3].body.sha, 'new');
+  g = fakeGitHub((n) => [{ status: 200, json: { sha: 'a' } }, { status: 422 }, { status: 200, json: { sha: 'b' } }, { status: 409 }][n - 1]);
+  r = await saveFeedbackToGitHub({ ...GH, fetchImpl: g.fetchImpl });
+  assert.equal(r.ok, false);
+  assert.equal(g.calls.length, 4, '2 回目でやめる');
+  assert.match(r.message, /ぶつかりました/);
+});
+
+test('GitHub に保存: エラーは日本語（401・403・404・通信不可・入力違い）でトークンを出さない', async () => {
+  const cases = [
+    [{ status: 401 }, /トークンが正しくない/],
+    [{ status: 403 }, /権限が足りません/],
+    [{ status: 403, headers: { 'x-ratelimit-remaining': '0' } }, /回数制限/],
+  ];
+  for (const [res, re] of cases) {
+    const g = fakeGitHub(() => res);
+    const r = await saveFeedbackToGitHub({ ...GH, fetchImpl: g.fetchImpl });
+    assert.equal(r.ok, false);
+    assert.match(r.message, re);
+    assert.ok(!r.message.includes('SECRET'));
+  }
+  let g = fakeGitHub((n) => (n === 1 ? { status: 404 } : { status: 404 }));
+  let r = await saveFeedbackToGitHub({ ...GH, fetchImpl: g.fetchImpl });
+  assert.match(r.message, /リポジトリかブランチが見つからない/);
+  g = fakeGitHub(() => new TypeError('Failed to fetch'));
+  r = await saveFeedbackToGitHub({ ...GH, fetchImpl: g.fetchImpl });
+  assert.match(r.message, /通信できませんでした/);
+  for (const bad of [{ repo: 'x' }, { repo: '../a/b' }, { branch: '../x' }, { branch: '' }, { token: '' }]) {
+    g = fakeGitHub(() => ({ status: 200 }));
+    r = await saveFeedbackToGitHub({ ...GH, ...bad, fetchImpl: g.fetchImpl });
+    assert.equal(r.ok, false, JSON.stringify(bad));
+    assert.equal(g.calls.length, 0, '送らない');
+  }
+  assert.match(githubErrorText(500), /コード 500/);
+  assert.deepEqual(parseGhPrefs(null), { repo: BOT.defaultRepo, branch: BOT.defaultBranch, token: '' });
+  assert.deepEqual(parseGhPrefs('{"repo":"a/b","branch":"main","token":" t "}'), { repo: 'a/b', branch: 'main', token: 't' });
+  assert.equal(parseGhPrefs('{"repo":"bad"}').repo, BOT.defaultRepo);
 });

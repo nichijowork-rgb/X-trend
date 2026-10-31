@@ -16,7 +16,7 @@ import {
   shelveTopic, trashTopic, hidePost, cleanTerms, topicPhrase, majorityGenre, compareIds,
 } from './logic.js';
 
-const KINDS_FOLDER = new Set(['dict', 'tag', 'cluster', 'carried', 'manual']);
+const KINDS_FOLDER = new Set(['dict', 'tag', 'cluster', 'carried', 'manual', 'bot']);
 
 /** 「まとまり」（フォルダとして扱う話題）か。辞書・話題名・類似まとめ・持ち越し・手で作った話題、または 2 件以上 */
 export function isFolderTopic(t) {
@@ -199,7 +199,7 @@ export function buildTree(ctx, open = new Set()) {
     if (!night && !ctx.generalAll) list = list.filter((t) => rec.has(t.id));
     const isOpen = open.has(key);
     add({ key, label: night ? '夜職' : '一般のバズ', count: total, depth: 1, drop: false, hasChildren: list.length > 0, open: isOpen, genre: night ? 'night' : 'general' });
-    if (isOpen) for (const t of list) add({ key: `topic:${t.id}`, label: t.name, count: t.stats.count, depth: 2, genre: t.genre, topicId: t.id });
+    if (isOpen) for (const t of list) add({ key: `topic:${t.id}`, label: t.name, count: t.stats.count, depth: 2, genre: t.genre, topicId: t.id, bot: t.bot ? (t.bot.low ? 'low' : 'ok') : null });
   }
   const placed = placedTopicIds(week);
   const inboxCount = topics.filter((t) => !isFolderTopic(t) && !placed.has(t.id)).length;

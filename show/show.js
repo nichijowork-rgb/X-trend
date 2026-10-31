@@ -6,10 +6,12 @@ import {
   showWeekOf, weekByKey, shiftWeekKey, listWeeks, postsInWeek, buildTopics, indexTopics, buildCues, getWeek,
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
   partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
-  applyGenreOverrides, majorityGenre, pastUsedIds,
+  applyGenreOverrides, majorityGenre, pastUsedIds, usedTopicIds,
 } from './js/logic.js';
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
+import { normalizeBotTopics } from './js/bot.js';
+import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBACK_SENT_KEY } from './js/feedback.js';
 import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload } from './js/payload.js';
 import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
 import { obsStatusLabel, renderObsSetup, refreshObsDialog } from './js/views/obsui.js';
@@ -44,7 +46,9 @@ const app = {
   route: 'plan',
   ui: { filter: 'all', query: '', shown: 30, openScript: new Set(), bmMode: 'week', view: loadViewPref(), sideClosed: loadSidePref() },
   bmFlags: new Map(),
-  pickIds: new Set(), // ボットの雑談おすすめ（show_pick: true）。段階3の受け口
+  pickIds: new Set(), // ボットの雑談おすすめ（show_pick: true）
+  pickReasons: new Map(), // show_pick_reason（投稿 id → 理由）
+  bot: null, // 段階3: data/show/topics.json（normalizeBotTopics の結果。無ければ null）
   basePostsById: new Map(), // 上書き前の投稿
   postTopic: new Map(),
   recommended: new Set(),
@@ -83,28 +87,36 @@ async function fetchJson(url) {
 }
 
 async function loadData() {
-  const tryLoad = async (base) => {
-    const [posts, bookmarks] = await Promise.allSettled([fetchJson(`${base}posts.json`), fetchJson(`${base}bookmarks.json`)]);
+  const tryLoad = async (base, botUrl) => {
+    const [posts, bookmarks, botRaw] = await Promise.allSettled([fetchJson(`${base}posts.json`), fetchJson(`${base}bookmarks.json`), fetchJson(botUrl)]);
     if (posts.status !== 'fulfilled') throw posts.reason;
     const ds = normalizeDataset(posts.value); // 形式不正は例外
     // ブックマークで取り込まれた投稿の印（normalizeDataset は未知のフィールドを落とすので別に持つ）
     const bmFlags = new Map();
     const pickIds = new Set();
+    const pickReasons = new Map();
     for (const p of posts.value.posts) {
       if (p && p.in_bookmarks === true) bmFlags.set(String(p.id), { below: p.below_threshold === true });
-      if (p && p.show_pick === true) pickIds.add(String(p.id)); // 段階3: ボットの雑談おすすめ
+      if (p && p.show_pick === true) { // 段階3: ボットの雑談おすすめ（理由は任意）
+        pickIds.add(String(p.id));
+        if (typeof p.show_pick_reason === 'string' && p.show_pick_reason.trim()) pickReasons.set(String(p.id), p.show_pick_reason.trim().slice(0, 200));
+      }
     }
+    // 段階3: ボットの話題まとめ（任意。無い・壊れているときは使わない）
+    const bot = botRaw.status === 'fulfilled' ? normalizeBotTopics(botRaw.value) : null;
     return {
       ds,
       bmFlags,
       pickIds,
+      pickReasons,
+      bot,
       bookmarks: bookmarks.status === 'fulfilled' ? normalizeBookmarks(bookmarks.value) : null,
     };
   };
   try {
-    return { ...(await tryLoad('../data/')), isSample: false };
+    return { ...(await tryLoad('../data/', '../data/show/topics.json')), isSample: false };
   } catch (err) {
-    const r = await tryLoad('../sample/show/');
+    const r = await tryLoad('../sample/show/', '../sample/show/topics.json');
     return { ...r, isSample: true, sampleReason: err && err.message ? err.message : '' };
   }
 }
@@ -152,6 +164,7 @@ function recompute() {
     posts: weekPosts, extraPosts, missingIds: missingIds.sort(compareIds), personalIds, bookmarkIds, carried,
     postsById: app.postsById, dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache,
     hiddenPostIds: new Set(app.saved.hiddenPosts.map((x) => x.id)),
+    botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk),
   });
   app.topicsById = indexTopics(app.topics);
   // 候補に出す話題（片付け・削除を除く）
@@ -169,6 +182,61 @@ function recompute() {
   app.bookmarkPostsAll = app.bookmarks ? app.bookmarks.map((b) => app.postsById.get(b.id)).filter(Boolean) : null;
   app.usedBefore = pastUsedIds(app.saved, app.weekKey);
 }
+
+/** ユーザーが手を入れた話題 id（ボットのまとめより優先する。番組構成・メイン候補・名前・ジャンル・結合・移動先・片付け・削除） */
+function pinnedTopicIds(wk) {
+  const ov = wk.overrides;
+  return new Set([
+    ...usedTopicIds(wk.rundown), ...(wk.mainCand || []), ...Object.keys(ov.renames), ...Object.keys(ov.genres),
+    ...Object.keys(ov.merges), ...Object.values(ov.merges), ...Object.values(ov.moves), ...ov.accepted,
+    ...(wk.shelved || []).map((x) => x.topicId), ...app.saved.trash.map((x) => x.topicId),
+  ]);
+}
+
+// ---------------------------------------------------------------- 段階3: ボットへの修正の書き戻し
+
+/** 今の全修正（feedback/show-feedback.json の中身） */
+app.buildFeedback = () => buildFeedback({ saved: app.saved, weekKey: app.weekKey, topics: app.topics, basePostsById: app.basePostsById, nowMs: Date.now() });
+
+app.feedbackSent = () => {
+  try {
+    const o = JSON.parse(localStorage.getItem(FEEDBACK_SENT_KEY) || 'null');
+    return o && Number.isFinite(o.at) ? { at: o.at, via: o.via === 'github' ? 'github' : 'download' } : null;
+  } catch { return null; }
+};
+app.markFeedbackSent = (via) => {
+  try { localStorage.setItem(FEEDBACK_SENT_KEY, JSON.stringify({ at: Date.now(), via })); } catch { /* 保存できなくても続ける */ }
+  app.render();
+};
+
+function loadGhPrefs() {
+  try { return parseGhPrefs(localStorage.getItem(GH_PREF_KEY)); } catch { return parseGhPrefs(null); }
+}
+app.ghPrefs = loadGhPrefs();
+app.saveGhPrefs = (v) => {
+  app.ghPrefs = parseGhPrefs({ ...app.ghPrefs, ...v });
+  try { localStorage.setItem(GH_PREF_KEY, JSON.stringify(app.ghPrefs)); } catch { /* このブラウザでは保存できない（今回だけ使う） */ }
+};
+/** GitHub の feedback/show-feedback.json に保存（GET で sha → PUT。ぶつかったら 1 回だけやり直す） */
+app.sendFeedbackGitHub = async (v) => {
+  if (app.ui.fbBusy) return;
+  app.saveGhPrefs(v);
+  const p = app.ghPrefs;
+  app.ui.fbBusy = true;
+  app.ui.fbMsg = { kind: 'ok', text: 'GitHub に保存しています…' };
+  app.render();
+  const content = `${JSON.stringify(app.buildFeedback(), null, 2)}\n`;
+  const r = await saveFeedbackToGitHub({ repo: p.repo, branch: p.branch, token: p.token, content });
+  app.ui.fbBusy = false;
+  if (r.ok) {
+    const url = r.commitUrl && /^https:\/\/github\.com\//.test(r.commitUrl) ? r.commitUrl : null;
+    app.ui.fbMsg = { kind: 'ok', text: `GitHub に保存しました（${p.repo} の ${p.branch}・feedback/show-feedback.json）。`, url };
+    app.markFeedbackSent('github');
+  } else {
+    app.ui.fbMsg = { kind: 'error', text: `保存できませんでした：${r.message}` };
+    app.render();
+  }
+};
 
 /** 元のジャンル（上書き前。データのカテゴリから） */
 app.origGenreOf = (id) => {
@@ -566,6 +634,8 @@ async function main() {
     app.bookmarks = d.bookmarks;
     app.bmFlags = d.bmFlags;
     app.pickIds = d.pickIds || new Set();
+    app.pickReasons = d.pickReasons || new Map();
+    app.bot = d.bot || null;
     app.isSample = d.isSample;
     app.basePostsById = new Map(d.ds.posts.map((p) => [p.id, p]));
     app.postsById = app.basePostsById;

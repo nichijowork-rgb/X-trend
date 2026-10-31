@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 番組サイト（/show/）用のサンプルデータ生成（決定的）: sample/show/ に posts.json・reports.json・bookmarks.json を作る。
+// 番組サイト（/show/）用のサンプルデータ生成（決定的）: sample/show/ に posts.json・reports.json・bookmarks.json・topics.json を作る。
 //
 //   node tools/make-show-sample.mjs              # → sample/show/
 //   node tools/make-show-sample.mjs /tmp/out     # 出力先を指定（data/ には出さないこと）
@@ -11,6 +11,8 @@
 // 検証用に <img onerror> を含む本文、表示数の欠損、写真（pbs.twimg.com の SAMPLE_ok_）も混ぜる。
 // bookmarks.json（日時あり・null・前週・posts.json に無い id）と in_bookmarks / below_threshold 付きの投稿も作る。
 // ユーザー名はすべて sample_ 始まりの架空、本文の末尾に「（サンプル）」を付ける（話題名が読みやすいよう先頭には付けない）。
+// 段階3（Grok ボット連携）: topics.json（ボットの話題まとめ。自信の低いもの・週の外や存在しない投稿 id・壊れた項目を含む）と、
+// 一般のバズの一部に show_pick: true（雑談おすすめ）・show_pick_reason を付ける（乱数の並びは変えない＝既存の投稿は同じ）。
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -210,9 +212,43 @@ const reports = {
   ],
 };
 
+// ---- 段階3: 雑談おすすめ（show_pick）とボットの話題まとめ（topics.json）
+const byText = (prefix) => posts.find((p) => p.text.startsWith(prefix) && p.ts >= WEEK_START);
+const picks = [
+  [byText('猫が布団から出てこない'), '（サンプル）ペットの話は誰でも話しやすい'],
+  [byText('コンビニの新作スイーツが当たり'), null],
+];
+for (const [p, reason] of picks) {
+  p.show_pick = true;
+  if (reason) p.show_pick_reason = reason;
+}
+const idsOf = (pred) => posts.filter((p) => p.ts >= WEEK_START && pred(p)).map((p) => p.id);
+const botTopics = {
+  generated_at: GENERATED_AT,
+  week: { from: '2026-10-10T01:00:00+09:00', to: '2026-10-17T01:00:00+09:00' },
+  topics: [
+    {
+      id: 'sample-ramen-2026w42', name: '麺屋サンプルの深夜行列', genre: '歌舞伎町',
+      post_ids: idsOf((p) => p.text.includes('麺屋サンプル')),
+      summary: '歌舞伎町に新しくできたラーメン店「麺屋サンプル」に、深夜でも行列ができていると話題に。（サンプル：Grok のまとめ）',
+      confidence: 0.86,
+    },
+    {
+      id: 'sample-sakura-2026w42', name: 'さくらさんの近況', genre: '夜職その他',
+      // 週の外の投稿・posts.json に無い id は使われない
+      post_ids: [...idsOf((p) => p.user === 'sample_night_sakura77'), posts.find((p) => p.ts < WEEK_START).id, '1999999999999999998'],
+      summary: '同じキャストさんの出勤・名刺・異動の話をまとめました。（サンプル：自信が低いので要確認）',
+      confidence: 0.42,
+    },
+    { id: '', name: '壊れた項目（id なし）', post_ids: ['2110000000000000001'] },
+    { id: 'sample-broken', name: '壊れた項目（post_ids が文字列）', post_ids: 'x' },
+  ],
+};
+
 mkdirSync(OUT, { recursive: true });
 writeFileSync(path.join(OUT, 'posts.json'), JSON.stringify({ generated_at: GENERATED_AT, categories: ['ホスト', 'キャバクラ', '歌舞伎町', '夜職その他', '監視アカウント', 'その他'], posts }, null, 1) + '\n');
 writeFileSync(path.join(OUT, 'reports.json'), JSON.stringify(reports, null, 1) + '\n');
 writeFileSync(path.join(OUT, 'bookmarks.json'), JSON.stringify(bookmarks, null, 1) + '\n');
+writeFileSync(path.join(OUT, 'topics.json'), JSON.stringify(botTopics, null, 1) + '\n');
 const ids = posts.map((p) => p.id);
 console.log(`wrote ${posts.length} posts (${inWeek.length} in week) → ${OUT} (ids unique: ${new Set(ids).size === ids.length})`);

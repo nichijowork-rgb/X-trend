@@ -511,7 +511,7 @@ export function scorePoints(score) {
 /** 「まとまった話題」か（投稿が GROUPED_MIN_POSTS 件以上、または持ち越し・手動・自分で貼った話題） */
 export function isGroupedTopic(t) {
   if (!t) return false;
-  if (['carried', 'manual', 'link'].includes(t.kind)) return true;
+  if (['carried', 'manual', 'link', 'bot'].includes(t.kind)) return true;
   return (t.stats ? t.stats.count : t.postIds.length) >= GROUPED_MIN_POSTS || t.personalPaste === true;
 }
 
@@ -546,7 +546,12 @@ function emptyOverrides() {
  *   dict, overrides, refTs
  *   cache       … 任意。{} を渡すと類似まとめの結果を使い回す
  *   hiddenPostIds … 削除（非表示）にした投稿 id（どの話題にも入れない）
+ *   botTopics   … 段階3: ボットのまとめ（bot.js の normalizeBotTopics の topics）。番組週の投稿だけ使う
+ *   pinnedIds   … 段階3: ユーザーが手を入れた話題 id（番組構成・メイン候補・名前・ジャンル・片付け・削除など）。
+ *                 データ側の話題名・辞書・1件の話題がこれに当たれば、ボットのまとめより先にその話題へ入れる
  * }
+ * 優先順位: 持ち越し ＞ ユーザーが手を入れた話題（topic:/辞書/1件）＞ ボットのまとめ ＞ topic:/辞書 ＞ 類似まとめ ＞ 1件。
+ * その後に手作業（投稿の移動・結合・名前・ジャンル）を当てる。
  * 返り値: 話題の配列（スコア順）
  */
 export function buildTopics(input) {
@@ -580,15 +585,45 @@ export function buildTopics(input) {
     }
   }
 
-  // 2. データ側の話題名（matched_terms の topic:）→ 3. 話題辞書
+  // 2. データ側の話題名（matched_terms の topic:）→ 3. 話題辞書（どこに入るかを先に決めておく）
   const prepared = dict.map(prepareDictEntry);
-  const rest = [];
+  const natural = new Map(); // postId → { tid, base }
   for (const p of byId.values()) {
     if (where.has(p.id)) continue;
     const info = matchInfo(p);
-    if (info.tags.length) { add('t:' + info.tags[0], { kind: 'tag', autoName: info.tags[0] }, p.id); continue; }
+    if (info.tags.length) { natural.set(p.id, { tid: 't:' + info.tags[0], base: { kind: 'tag', autoName: info.tags[0] } }); continue; }
     const e = bestDictEntry(prepared, info);
-    if (e) { add('d:' + e.id, { kind: 'dict', autoName: e.name, fixedGenre: GENRE_KEYS.includes(e.genre) ? e.genre : null, dictId: e.id }, p.id); continue; }
+    if (e) natural.set(p.id, { tid: 'd:' + e.id, base: { kind: 'dict', autoName: e.name, fixedGenre: GENRE_KEYS.includes(e.genre) ? e.genre : null, dictId: e.id } });
+  }
+  // 2a. ユーザーが手を入れた話題（番組構成に入れた辞書の話題・削除した話題など）はボットより先
+  const pinned = input.pinnedIds instanceof Set ? input.pinnedIds : new Set(input.pinnedIds || []);
+  if (pinned.size) {
+    for (const p of byId.values()) {
+      if (where.has(p.id)) continue;
+      const n = natural.get(p.id);
+      if (n && pinned.has(n.tid)) add(n.tid, n.base, p.id);
+      else if (pinned.has('p:' + p.id)) add('p:' + p.id, { kind: 'single', autoName: null }, p.id);
+    }
+  }
+  // 2b. ボットのまとめ（番組週の投稿だけ。前週から持ち越した同じ id の話題があればそこへ）
+  const inWeekIds = new Set(posts.map((p) => p && p.id));
+  for (const b of input.botTopics || []) {
+    if (!b || !b.id || !Array.isArray(b.postIds)) continue;
+    const gid = 'g:' + b.id;
+    const tid = topics.has('k:' + gid) ? 'k:' + gid : gid;
+    const info = { id: b.id, summary: b.summary || null, confidence: b.confidence ?? null, low: Boolean(b.low) };
+    for (const pid of b.postIds) {
+      if (!inWeekIds.has(pid) || !byId.has(pid) || where.has(pid)) continue;
+      if (tid === gid) add(gid, { kind: 'bot', autoName: b.name || null, fixedGenre: GENRE_KEYS.includes(b.genre) ? b.genre : null, bot: info, botGenre: true }, pid);
+      else { add(tid, {}, pid); topics.get(tid).bot = info; }
+    }
+  }
+  // 3. 残りを topic:/辞書へ
+  const rest = [];
+  for (const p of byId.values()) {
+    if (where.has(p.id)) continue;
+    const n = natural.get(p.id);
+    if (n) { add(n.tid, n.base, p.id); continue; }
     rest.push(p);
   }
 
@@ -627,7 +662,9 @@ export function buildTopics(input) {
     }
     const ft = topics.get(from);
     ft.postIds = ft.postIds.filter((x) => x !== pid);
+    ft.movedOut = true;
     topics.get(target).postIds.push(pid);
+    topics.get(target).movedIn = true;
     where.set(pid, target);
   }
 
@@ -675,7 +712,10 @@ export function buildTopics(input) {
     t.autoName = name;
     t.name = typeof ov.renames[t.id] === 'string' && ov.renames[t.id].trim() ? ov.renames[t.id].trim() : name;
     const og = ov.genres[t.id];
-    t.genre = GENRE_KEYS.includes(og) ? og : (t.fixedGenre || (tp.length ? majorityGenre(tp) : 'night'));
+    // ボットのジャンルは、ユーザーが投稿のジャンルを上書きしていたら使わない（手作業を優先）
+    const fixed = t.botGenre && tp.some((p) => p._genreOverride) ? null : t.fixedGenre;
+    t.genre = GENRE_KEYS.includes(og) ? og : (fixed || (tp.length ? majorityGenre(tp) : 'night'));
+    delete t.botGenre;
     t.suggested = t.kind === 'cluster' && !accepted.has(t.id);
     t.personal = tp.some((p) => personalIds.has(p.id)) || t.kind === 'link';
     t.personalPaste = t.personal;
@@ -748,6 +788,7 @@ export function leadText(topic, postsById, refTs) {
   const st = topic.stats || {};
   if (!st.count) return `今週は「${topic.name}」を紹介します。（数値はデータに無いため不明）`;
   const total = st.totalImp == null ? `合計インプレは${UNKNOWN}` : `合計${formatCompact(st.totalImp)}インプレ${st.unknownImp ? '（一部不明）' : ''}`;
+  if (topic.bot && topic.bot.summary) return `${topic.kind === 'carried' ? '先週からの持ち越し。' : ''}${topic.bot.summary}`;
   let s = `${topic.kind === 'carried' ? '先週からの持ち越し。' : ''}今週「${topic.name}」が話題に。投稿${st.count}件、${total}。`;
   const pp = st.pacePostId && postsById ? postsById.get(st.pacePostId) : null;
   if (pp && st.count > 0) s += `いちばん伸びた投稿は${formatPace(pp, refTs)}。`;

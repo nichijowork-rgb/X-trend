@@ -51,7 +51,9 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "show_pick": true,
+   "show_pick_reason": "（サンプル）ペットの話は誰でも話しやすい"
   },
   {
    "id": "2110001792060829015",
@@ -1475,7 +1477,8 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "show_pick": true
   },
   {
    "id": "2110001791710754042",

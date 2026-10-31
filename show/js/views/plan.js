@@ -14,7 +14,7 @@ import {
   renameTopic, isFolderTopic, placeOf, isNightGenre, topicsOfRows,
 } from '../folders.js';
 import { h, btn, badge, field, postCard, linkCard, genreSticker, embedHost, isEditable } from '../dom.js';
-import { scriptFor, topicMarks, refYear, mainTopics, currentTitle, bmInfo, statsLine } from './common.js';
+import { scriptFor, topicMarks, refYear, mainTopics, currentTitle, bmInfo, statsLine, botMarks, pickReason } from './common.js';
 import { beginPointer, isDragging } from './dnd.js';
 import { contextMenu, moveDialog, nameDialog } from './menu.js';
 import { toolsDialog } from './tools.js';
@@ -219,6 +219,7 @@ function treePane(app, wk) {
     },
     n.genre ? h('span', { class: `tree-dot g-${n.genre}`, attrs: { 'aria-hidden': 'true' } }) : null,
     h('span', { class: 'tree-name' }, n.label, n.sub ? h('span', { class: 'tree-sub' }, n.sub) : null),
+    n.bot ? h('span', { class: `tree-bot${n.bot === 'low' ? ' is-low' : ''}`, attrs: { title: n.bot === 'low' ? 'Grok のまとめ（要確認）' : 'Grok のまとめ' } }, n.bot === 'low' ? 'G?' : 'G') : null,
     n.count != null ? h('span', { class: 'tree-count' }, String(n.count)) : null);
     if (n.topicId) {
       label.addEventListener('dblclick', (e) => { e.preventDefault(); openRename(app, n.topicId); });
@@ -348,6 +349,8 @@ function rowEl(app, row, index) {
     const pl = t ? placeOf(app.weekState(), t.id) : null;
     if (pl) meta.push(h('span', { class: 'rm-place' }, pl.label));
     if (app.newInfo && app.newInfo.posts.has(row.id)) meta.push(h('span', { class: 'rm-new' }, 'NEW'));
+    const pr = pickReason(app, row.id);
+    if (pr != null) meta.push(h('span', { class: 'rm-pick', attrs: { title: pr ? `雑談おすすめ（Grok）：${pr}` : '雑談おすすめ（Grok）' } }, pr ? `雑談おすすめ：${pr}` : '雑談おすすめ'));
   } else if (row.type === 'topic') {
     const t = app.topicsById.get(row.id);
     if (t) {
@@ -357,6 +360,9 @@ function rowEl(app, row, index) {
       if (pl && !key.startsWith('slot:') && key !== pl.key) meta.push(h('span', { class: 'rm-place' }, pl.label));
       if (t.suggested) meta.push(h('span', { class: 'rm-suggest' }, '同じ話題かも？'));
       if (t.kind === 'carried') meta.push(h('span', { class: 'rm-tag' }, '持ち越し'));
+      if (t.bot) meta.push(...botMarks(t, true));
+      const pick = t.postIds.find((id) => app.pickIds.has(id));
+      if (pick) { const pr = pickReason(app, pick); meta.push(h('span', { class: 'rm-pick', attrs: { title: pr || '雑談おすすめ（Grok）' } }, pr ? `雑談おすすめ：${pr}` : '雑談おすすめ')); }
       const nw = app.newInfo && app.newInfo.topics.get(t.id);
       if (nw != null) meta.push(h('span', { class: 'rm-new' }, 'NEW'));
     }
@@ -693,6 +699,8 @@ function postPreview(app, wk, row) {
     h('b', { class: 'pv-title' }, p ? `@${p.user}` : `ID ${row.id}`),
     t && isFolderTopic(t) ? h('button', { type: 'button', class: 'pv-link', dataset: { key: 'pv-open-topic' }, on: { click: () => openFolder(app, t.id) } }, `▸ まとまり「${t.name}」`) : null,
     p && p._genreOverride ? h('span', { class: 'badge badge-me' }, `ジャンル上書き（元：${genreLabel(app.origGenreOf(row.id))}）`) : null));
+  const pr = pickReason(app, row.id);
+  if (pr != null) box.append(pickNote(pr));
   const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: null, noActions: true, bm: bmInfo(app, p.id) }) : linkCard(row.id, statusUrl(row.id), null);
   box.append(h('div', { class: 'pv-post', dataset: { keep: `pp:${row.id}` } }, app.ui.view !== 'card' ? embedHost(row.id, own, 'pv-embed') : own));
   box.append(h('div', { class: 'pv-actions' },
@@ -706,6 +714,11 @@ function postPreview(app, wk, row) {
   return box;
 }
 
+/** 雑談おすすめ（show_pick）の理由 */
+function pickNote(reason) {
+  return h('p', { class: 'pick-note', dataset: { key: 'pv-pick' } }, h('b', {}, '雑談おすすめ（Grok）'), reason ? `：${reason}` : '');
+}
+
 function topicPreview(app, wk, row) {
   const u = app.ui;
   const t = app.topicsById.get(row.id);
@@ -717,6 +730,9 @@ function topicPreview(app, wk, row) {
     h('span', { class: 'tcard-marks' }, topicMarks(app, t)),
     pl ? h('span', { class: 'badge badge-carry' }, pl.label) : null));
   box.append(h('p', { class: 'stats' }, statsLine(t), t.score != null ? h('span', { class: 'stat' }, '話題性 ', h('b', {}, `${scorePoints(t.score)}点`)) : null));
+  if (t.bot && t.bot.low) box.append(h('p', { class: 'bot-check', dataset: { key: 'pv-bot-check' } }, '⚠ Grok のまとめ方の確からしさが低い話題です（', t.bot.confidence != null ? `${Math.round(t.bot.confidence * 100)}%` : '不明', '）。違う投稿が混ざっていないか確認してください。'));
+  const picks = t.postIds.filter((id) => app.pickIds.has(id));
+  if (picks.length) box.append(pickNote(pickReason(app, picks[0]) || ''));
   const acts = h('div', { class: 'row' },
     btn('フォルダを開く', () => openFolder(app, t.id), 'btn btn-small', { 'data-key': 'pv-open' }),
     btn('移動先…', () => { u.move = { rows: [row] }; app.render(); }, 'btn btn-small', { 'data-key': 'pv-move' }),
@@ -732,13 +748,16 @@ function topicPreview(app, wk, row) {
   // 台本
   const sc = scriptFor(app, t.id);
   const auto = leadText(t, app.postsById, app.ds.refTs);
+  const botLead = Boolean(t.bot && t.bot.summary);
   const lead = h('textarea', { class: 'input', rows: 3, value: typeof sc.lead === 'string' && sc.lead.trim() ? sc.lead : auto, dataset: { key: 'pv-lead' } });
   lead.addEventListener('input', () => app.update((w) => { w.script[t.id] = { ...scriptFor(app, t.id), lead: lead.value === auto ? null : lead.value }; }, { render: false, debounce: true }));
   const points = h('textarea', { class: 'input', rows: 2, value: sc.points, dataset: { key: 'pv-points' }, placeholder: '話すポイント（自分用）' });
   points.addEventListener('input', () => app.update((w) => { w.script[t.id] = { ...scriptFor(app, t.id), points: points.value }; }, { render: false, debounce: true }));
   box.append(h('details', { class: 'pv-script', open: Boolean(u.scriptOpen) },
     h('summary', { on: { click: () => { u.scriptOpen = !u.scriptOpen; } } }, '台本（リード文・話すポイント）'),
-    field('リード文', lead, '（数字からの自動下書き。書き換えできます）'), field('話すポイント', points)));
+    field('リード文', lead, botLead ? '（Grok のまとめ。書き換えできます）' : '（数字からの自動下書き。書き換えできます）'),
+    botLead && !(typeof sc.lead === 'string' && sc.lead.trim()) ? h('p', { class: 'lead-mark-line' }, h('span', { class: 'lead-mark' }, 'Grok のまとめ'), 'リード文はボットの下書きです') : null,
+    field('話すポイント', points)));
   // 代表投稿
   const id = t.stats.topPostId || t.linkId || null;
   if (id) {
