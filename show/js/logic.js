@@ -4,7 +4,7 @@
 import { formatCompact, formatPace, viewsPerHour, jstParts, parseTimestamp, UNKNOWN } from '../../assets/js/core.js';
 import {
   SHOW_DEFAULTS, GENRES, GENRE_KEYS, NIGHT_GENRES, CORNERS, DEFAULT_DICT, SCORE_WEIGHTS, SIMILARITY, MAIN_SUGGEST_TIERS, GROUPED_MIN_POSTS, MAIN_NIGHT_ONLY,
-  TERM_PREFIXES, SCHEMA_VERSION, CHECKPOINTS, GENRE_PRIORITY, DEFAULT_HOLD_TERMS,
+  TERM_PREFIXES, SCHEMA_VERSION, CHECKPOINTS, GENRE_PRIORITY, DEFAULT_HOLD_TERMS, RANGE_PRESETS, RECOMMEND_SCALE, PLAN_V2,
 } from './config.js';
 
 const JST = 9 * 3600;
@@ -69,6 +69,96 @@ export function listWeeks(refTs, minTs, limit = 8) {
 export function postsInWeek(posts, week) {
   if (!week) return [];
   return (posts || []).filter((p) => isNum(p.ts) && p.ts >= week.start && p.ts < week.end);
+}
+
+// ================================================================ 対象期間（台本づくりのデータ収集期間）
+
+const RANGE_MODES = RANGE_PRESETS.map((x) => x.mode);
+
+/** 既定の対象期間（番組週） */
+export function defaultRange() {
+  return { mode: 'week', from: null, to: null };
+}
+
+/** 保存値の検証（from/to は UNIX 秒。custom 以外は使わない） */
+export function sanitizeRange(v) {
+  const o = v && typeof v === 'object' ? v : null;
+  if (!o || !RANGE_MODES.includes(o.mode)) return defaultRange();
+  const from = isNum(o.from) ? Math.floor(o.from) : null;
+  const to = isNum(o.to) ? Math.floor(o.to) : null;
+  if (o.mode !== 'custom') return { mode: o.mode, from: null, to: null };
+  if (from == null) return defaultRange();
+  return { mode: 'custom', from, to: to != null && to > from ? to : null };
+}
+
+/**
+ * 対象期間 → { mode, start, end（end は含まない）, days, label, isWeek }。
+ * week は番組週、refTs は「今」（データの基準時刻）。「今まで」は refTs を含む（end = refTs + 1）。
+ */
+export function resolveRange(range, week, refTs) {
+  const r = sanitizeRange(range);
+  const now = isNum(refTs) ? refTs + 1 : (week ? week.end : null);
+  const preset = RANGE_PRESETS.find((x) => x.mode === r.mode);
+  let start = week ? week.start : null;
+  let end = week ? week.end : null;
+  if (r.mode === 'since' && week && now != null) end = Math.max(now, week.start + 1);
+  else if (preset && preset.days && now != null) { start = now - 1 - preset.days * 86400; end = now; }
+  else if (r.mode === 'custom') { start = r.from; end = r.to != null ? r.to : (now != null ? Math.max(now, r.from + 1) : r.from + 86400); }
+  if (!isNum(start) || !isNum(end) || end <= start) return { mode: 'week', start: week ? week.start : null, end: week ? week.end : null, days: 7, label: weekLabel(week), isWeek: true };
+  const toNow = r.mode !== 'week' && !(r.mode === 'custom' && r.to != null);
+  const label = r.mode === 'week' ? weekLabel(week) : `${formatJstShort(start)} 〜 ${toNow ? `今（${formatJstShort(end - 1)}）` : formatJstShort(end)}`;
+  return { mode: r.mode, start, end, days: (end - start) / 86400, label, isWeek: r.mode === 'week' };
+}
+
+/**
+ * 番組構成（メイン枠・メイン候補・コーナー）に入っている話題の投稿のうち、対象期間の外にあるもの（「期間外」で残すため）。
+ * 話題 id から分かる範囲で集める: p:<投稿>・c:<代表投稿>・g:<ボット>（post_ids）・t:<話題名>・d:<辞書>（候補の投稿を照合）・
+ * 手で移した投稿（moves）・結合元（merges）。candidates は期間外の候補の投稿。
+ */
+export function placedPostIds({ placedIds, candidates = [], dict = [], botTopics = [], overrides = {} }) {
+  const ov = { ...emptyOverrides(), ...overrides };
+  const want = new Set(placedIds || []);
+  // 結合元も（結合先が置いてあれば）
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const [src, dst] of Object.entries(ov.merges)) if (want.has(dst) && !want.has(src)) { want.add(src); changed = true; }
+  }
+  const ids = new Set();
+  if (!want.size) return ids;
+  for (const [pid, target] of Object.entries(ov.moves)) if (want.has(target)) ids.add(pid);
+  for (const t of want) if (/^[pc]:\d+$/.test(t)) ids.add(t.slice(2));
+  for (const b of botTopics || []) if (b && (want.has(`g:${b.id}`) || want.has(`k:g:${b.id}`))) for (const x of b.postIds || []) ids.add(x);
+  const needTag = [...want].some((x) => x.startsWith('t:'));
+  const needDict = [...want].some((x) => x.startsWith('d:'));
+  if (needTag || needDict) {
+    const prepared = needDict ? dict.map(prepareDictEntry) : [];
+    for (const p of candidates) {
+      if (!p || ids.has(p.id)) continue;
+      const info = matchInfo(p);
+      if (info.tags.length) { if (want.has(`t:${info.tags[0]}`)) ids.add(p.id); continue; }
+      if (needDict) { const e = bestDictEntry(prepared, info); if (e && want.has(`d:${e.id}`)) ids.add(p.id); }
+    }
+  }
+  return ids;
+}
+
+/** 一般のバズの「おすすめ」件数（期間の日数に比例。7日で generalRecommendN 件） */
+export function recommendCount(days, base = PLAN_V2.generalRecommendN, scale = RECOMMEND_SCALE) {
+  const d = isNum(days) && days > 0 ? days : scale.baseDays;
+  return Math.max(scale.min, Math.min(scale.max, Math.round((base * d) / scale.baseDays)));
+}
+
+/** UNIX 秒 → datetime-local の値（JST。"2026-10-14T12:00"） */
+export function toJstInput(ts) {
+  if (!isNum(ts)) return '';
+  return new Date((ts + JST) * 1000).toISOString().slice(0, 16);
+}
+
+/** datetime-local の値（JST とみなす）→ UNIX 秒。空・不正は null */
+export function fromJstInput(s) {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s)) return null;
+  const t = Date.parse(`${s.slice(0, 16)}:00+09:00`);
+  return Number.isFinite(t) ? Math.floor(t / 1000) : null;
 }
 
 /** 「10/10(土) 1:00」 */
@@ -167,8 +257,15 @@ export function cleanTerms(terms) {
   return { words, topics };
 }
 
-/** 投稿の照合用キャッシュ */
+/** 投稿の照合用（投稿オブジェクトごとに覚える。ジャンル上書きの投稿は別オブジェクトなので別に計算） */
+const matchCache = new WeakMap();
 function matchInfo(post) {
+  let m = matchCache.get(post);
+  if (!m) { m = matchInfoRaw(post); matchCache.set(post, m); }
+  return m;
+}
+
+function matchInfoRaw(post) {
   const ct = cleanTerms(post.matched_terms);
   const text = normalizeForMatch(post.text);
   return {
@@ -428,7 +525,19 @@ const EDGE_JUNK = /^[\s\p{P}\p{S}ー〜～]+|[\s\p{P}\p{S}〜～]+$/gu;
  * 本文から話題名に使う短い句（最大 len 字）。先頭の【…】タグ・URL・@・絵文字・記号を除き、
  * 最初の意味のある句（。！？改行などで区切った 4 字以上）を使う。本文が【…】だけならその中身。
  */
+const phraseCache = new Map();
 export function topicPhrase(text, len = 20) {
+  // 同じ本文は同じ結果（期間を長くすると件数が増えるので覚えておく。上限つき）
+  const key = `${len}|${text}`;
+  const hit = phraseCache.get(key);
+  if (hit !== undefined) return hit;
+  const v = topicPhraseRaw(text, len);
+  if (phraseCache.size > 20000) phraseCache.clear();
+  phraseCache.set(key, v);
+  return v;
+}
+
+function topicPhraseRaw(text, len) {
   const raw = String(text || '').replace(URL_IN_TEXT, ' ').replace(/[@＠][A-Za-z0-9_]{1,15}/g, ' ').replace(EMOJI, '');
   const tags = [];
   let body = raw.replace(/^[\s]*(?:[【\[［〔《≪][^】\]］〕》≫\n]{0,40}[】\]］〕》≫][\s]*)+/u, (m) => {
@@ -555,6 +664,7 @@ function emptyOverrides() {
  *   cache       … 任意。{} を渡すと類似まとめの結果を使い回す
  *   hiddenPostIds … 削除（非表示）にした投稿 id（どの話題にも入れない）
  *   botTopics   … 段階3: ボットのまとめ（bot.js の normalizeBotTopics の topics）。番組週の投稿だけ使う
+ *   outsideIds  … 対象期間の外だが番組構成に入っているので残した投稿 id（話題に outsideCount を付ける。「期間外」の印）
  *   priorityGenre … 優先ジャンル（既定 'host'。'none' で加点なし）。その投稿を含む話題はスコア×GENRE_PRIORITY.boost で並べる
  *   pinnedIds   … 段階3: ユーザーが手を入れた話題 id（番組構成・メイン候補・名前・ジャンル・片付け・削除など）。
  *                 データ側の話題名・辞書・1件の話題がこれに当たれば、ボットのまとめより先にその話題へ入れる
@@ -615,7 +725,9 @@ export function buildTopics(input) {
     }
   }
   // 2b. ボットのまとめ（番組週の投稿だけ。前週から持ち越した同じ id の話題があればそこへ）
+  const outside = input.outsideIds instanceof Set ? input.outsideIds : new Set(input.outsideIds || []);
   const inWeekIds = new Set(posts.map((p) => p && p.id));
+  for (const id of outside) inWeekIds.add(id); // 番組構成に入っていた期間外の投稿はボットの話題にも戻す
   for (const b of input.botTopics || []) {
     if (!b || !b.id || !Array.isArray(b.postIds)) continue;
     const gid = 'g:' + b.id;
@@ -738,6 +850,8 @@ export function buildTopics(input) {
     t.score = topicScore(stats, SCORE_WEIGHTS, t.bookmarkCount);
     // 優先ジャンル（既定ホスト）の投稿を含む話題は並び順で加点（表示の点数は score のまま）
     t.prio = Boolean(prio) && (t.genre === prio || tp.some((p) => postGenre(p) === prio));
+    // 対象期間の外の投稿（番組構成に入っていたので残したもの）の数。0 なら期間内だけ
+    t.outsideCount = outside.size ? tp.filter((p) => outside.has(p.id)).length : 0;
     t.rank = t.score == null ? null : t.score * (t.prio ? GENRE_PRIORITY.boost : 1);
     delete t.fixedGenre;
     out.push(t);
@@ -1193,6 +1307,7 @@ export function defaultWeek() {
     usedPostIds: [], // 進行で「読んだ」話題の投稿 id（次の週以降のブックマーク枠で「使用済み」）
     shelved: [], // 片付けた話題（この週は候補に出さない）。[{ topicId, name, genre, postIds, at, corner }]
     mainCand: [], // メイン候補（メイン1〜3に入れる前の置き場）。話題 id の並び
+    range: defaultRange(), // 台本づくりの対象期間（版 5。既定は番組週）
   };
 }
 
@@ -1305,6 +1420,7 @@ function sanitizeWeek(v, ver = SCHEMA_VERSION) {
   const w = defaultWeek();
   if (!o) return w;
   w.title = typeof o.title === 'string' ? o.title.slice(0, 200) : null;
+  w.range = sanitizeRange(o.range); // 版 4 以前は無い → 番組週
   w.rundown = sanitizeRundown(o.rundown, ver);
   w.script = sanitizeScript(o.script);
   w.notes = Object.fromEntries(Object.entries(strMap(o.notes, 4000)).filter(([k]) => cornerDef(k)));
@@ -1598,9 +1714,10 @@ function chapterTime(sec) {
  * 台本のテキスト書き出し。
  * mode: 'public'（告知・概要欄用：見出し・リード・チャプター・投稿URL）/ 'full'（話すポイント・質問・メモも）
  */
-export function scriptText({ title, week, rundown, topicsById, script, notes, postsById, refTs, mode = 'public' }) {
+export function scriptText({ title, week, rundown, topicsById, script, notes, postsById, refTs, mode = 'public', rangeLabel = null }) {
   const lines = [title, `配信：${week ? formatJstShort(week.end) : UNKNOWN}〜（約${totalMinutes(rundown)}分）`];
-  if (week) lines.push(`対象：${weekLabel(week)} の投稿`);
+  if (rangeLabel) lines.push(`対象：${rangeLabel} の投稿`);
+  else if (week) lines.push(`対象：${weekLabel(week)} の投稿`);
   lines.push('');
   if (mode === 'public') {
     lines.push('▼ チャプター');

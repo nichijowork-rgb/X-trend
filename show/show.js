@@ -1,12 +1,13 @@
 // 配信番組サイト（/show/）のエントリ。データ読み込み・状態・保存・画面切替（#plan / #live / #onair / #review）。
 import { normalizeDataset, parseTimestamp, formatDateTime } from '../assets/js/core.js';
 import { createEmbedder } from '../assets/js/embed.js';
-import { TEXT, VIEW_PREF_KEY, SIDE_PREF_KEY } from './js/config.js';
+import { TEXT, VIEW_PREF_KEY, SIDE_PREF_KEY, RANGE_PRESETS } from './js/config.js';
 import {
   showWeekOf, weekByKey, shiftWeekKey, listWeeks, postsInWeek, buildTopics, indexTopics, buildCues, getWeek,
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
   partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
   applyGenreOverrides, majorityGenre, pastUsedIds, usedTopicIds, normalizePriorityGenre,
+  resolveRange, sanitizeRange, recommendCount, placedPostIds, toJstInput, fromJstInput,
 } from './js/logic.js';
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
@@ -138,7 +139,8 @@ function normalizeBookmarks(raw) {
 /** 番組週のブックマーク（ブックマークした日時が週内。日時が無ければ投稿日時で判定） */
 function weekBookmarks() {
   if (!app.bookmarks || !app.week) return [];
-  return bookmarkList(app.bookmarks, app.week, app.postsById, new Set(), 'week');
+  // 対象期間（既定は番組週）でしぼる
+  return bookmarkList(app.bookmarks, app.range || app.week, app.postsById, new Set(), 'week');
 }
 
 const overrideCache = new Map();
@@ -148,7 +150,9 @@ function recompute() {
   // 投稿のジャンル上書き（投稿 id ごと・全週）を当てた投稿で話題を作る
   const allPosts = applyGenreOverrides(app.ds.posts, app.saved.genreOverrides, overrideCache);
   app.postsById = allPosts === app.ds.posts ? app.basePostsById : new Map(allPosts.map((p) => [p.id, p]));
-  const weekPosts = postsInWeek(allPosts, app.week);
+  // 対象期間（番組週ごとに選ぶ。既定は番組週）
+  app.range = resolveRange(wk.range, app.week, app.ds.refTs);
+  const weekPosts = postsInWeek(allPosts, app.range);
   const inWeek = new Set(weekPosts.map((p) => p.id));
   const bms = weekBookmarks();
   const personalIds = new Set(wk.personal.map((p) => p.id));
@@ -163,19 +167,45 @@ function recompute() {
   const prevKey = shiftWeekKey(app.weekKey, -1);
   const carried = prevKey ? getWeek(app.saved, prevKey).carriedOut : [];
   const hidden = new Set(app.saved.hiddenPosts.map((x) => x.id));
+  // 期間外: 番組構成（メイン枠・メイン候補・コーナー）に入っている話題の投稿は、期間を変えても外さずに残す（「期間外」の印）
+  const placedList = [...usedTopicIds(wk.rundown), ...(wk.mainCand || [])];
+  const lo = Math.min(app.week.start, app.range.start) - 31 * 86400;
+  const hi = Math.max(app.week.end, app.range.end);
+  const candidates = placedList.length ? allPosts.filter((p) => p.ts >= lo && p.ts < hi && !inWeek.has(p.id)) : [];
+  const outsideIds = new Set();
+  const addOutside = (ids) => {
+    for (const id of ids) {
+      if (inWeek.has(id) || outsideIds.has(id) || hidden.has(id)) continue;
+      const p = app.postsById.get(id);
+      if (!p) continue;
+      outsideIds.add(id);
+      if (!extraPosts.includes(p)) extraPosts.push(p);
+    }
+  };
+  if (placedList.length) addOutside(placedPostIds({ placedIds: placedList, candidates, dict: app.saved.dict, botTopics: app.bot ? app.bot.topics : [], overrides: wk.overrides }));
   const build = (hiddenPostIds) => buildTopics({
+    outsideIds,
     posts: weekPosts, extraPosts, missingIds: missingIds.sort(compareIds), personalIds, bookmarkIds, carried,
     postsById: app.postsById, dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache,
     hiddenPostIds, botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk), priorityGenre: app.saved.priorityGenre,
   });
   app.topics = build(hidden);
+  // 類似まとめ（c:）などで話題 id から投稿が分からず構成の話題が消えたときは、期間外の候補も入れて作り直し、その話題の投稿を戻す
+  const missing = placedList.filter((id) => !app.topics.some((t) => t.id === id) && !id.startsWith('x:'));
+  if (missing.length && candidates.length) {
+    const full = buildTopics({ posts: [...weekPosts, ...candidates], dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache, hiddenPostIds: hidden, botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk), priorityGenre: app.saved.priorityGenre, carried, postsById: app.postsById });
+    const before = outsideIds.size;
+    for (const t of full) if (missing.includes(t.id)) addOutside(t.postIds);
+    if (outsideIds.size > before) app.topics = build(hidden);
+  }
+  app.outsideIds = outsideIds;
   // 保留する言葉: 一致した投稿は話題から外し（手で置いた話題の投稿・移動・自分で追加したものは除く）、話題名が一致した話題は保留へ
   const prepared = prepareHoldTerms(app.saved.holdTerms);
   const exceptions = new Set(app.saved.holdExceptions);
   const placed = new Set([...usedTopicIds(wk.rundown), ...(wk.mainCand || [])]);
   app.heldPosts = heldPostsOf({
     posts: [...weekPosts, ...extraPosts], topics: app.topics, prepared, exceptions, protectedTopicIds: placed,
-    protectedPostIds: new Set([...Object.keys(wk.overrides.moves), ...personalIds]),
+    protectedPostIds: new Set([...Object.keys(wk.overrides.moves), ...personalIds, ...outsideIds]),
   });
   for (const id of hidden) app.heldPosts.delete(id);
   if (app.heldPosts.size) app.topics = build(new Set([...hidden, ...app.heldPosts.keys()]));
@@ -192,7 +222,10 @@ function recompute() {
   app.weekPosts = [...weekPosts, ...extraPosts].filter((p) => !app.heldPosts.has(p.id));
   app.newInfo = newSince(wk, app.weekPostIds, app.topics);
   app.postTopic = postTopicMap(app.topics);
-  app.recommended = recommendGeneral(app.visibleTopics, undefined, app.pickIds);
+  // 一般のバズのおすすめ件数は期間の日数に比例（7日で 30 件）
+  app.recommendN = recommendCount(app.range.days);
+  app.recommended = recommendGeneral(app.visibleTopics, app.recommendN, app.pickIds);
+  app.rangePostCount = weekPosts.length;
   app.bookmarkPosts = app.bookmarks ? bms.map((b) => app.postsById.get(b.id)).filter(Boolean) : null;
   app.bookmarkPostsAll = app.bookmarks ? app.bookmarks.map((b) => app.postsById.get(b.id)).filter(Boolean) : null;
   app.usedBefore = pastUsedIds(app.saved, app.weekKey);
@@ -604,6 +637,32 @@ function setWeek(key, save = true) {
   if (save && app.saved) { app.saved.activeWeek = w.key; persist(); }
 }
 
+/** 対象期間の選択（編成・振り返りで表示。番組週ごとに保存） */
+function renderRangePicker() {
+  const box = $('range-box');
+  if (!box) return;
+  box.hidden = !(app.route === 'plan' || app.route === 'review');
+  const sel = $('range-select');
+  const wk = app.weekState();
+  const r = sanitizeRange(wk.range);
+  clear(sel);
+  for (const x of RANGE_PRESETS) sel.append(h('option', { value: x.mode, selected: x.mode === (app.ui.rangeDraft ? 'custom' : r.mode) }, x.label));
+  const custom = Boolean(app.ui.rangeDraft) || r.mode === 'custom';
+  $('range-custom').hidden = !custom;
+  if (custom && document.activeElement !== $('range-from') && document.activeElement !== $('range-to')) {
+    $('range-from').value = toJstInput(r.mode === 'custom' ? r.from : app.range.start);
+    $('range-to').value = r.mode === 'custom' && r.to != null ? toJstInput(r.to) : '';
+  }
+  sel.title = app.range ? `対象：${app.range.label}` : '';
+  $('range-label').textContent = app.range ? `対象：${app.range.label}（投稿 ${app.rangePostCount ?? 0}件）` : '';
+}
+
+app.setRange = (range) => {
+  app.ui.rangeDraft = false;
+  const r = sanitizeRange(range);
+  app.edit('対象期間の変更', (w) => { w.range = r; }, { toastText: '対象期間を変えました（編成はそのまま残っています）' });
+};
+
 function renderWeekPicker() {
   const sel = $('week-select');
   clear(sel);
@@ -632,7 +691,8 @@ function renderRoute() {
     if (a.dataset.route === app.route) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  $('week-range').textContent = weekLabel(app.week);
+  $('week-range').textContent = app.range && !app.range.isWeek ? `（番組週 ${weekLabel(app.week)}）` : weekLabel(app.week);
+  renderRangePicker();
   renderWeekPicker();
   const root = $('view');
   // 再描画してもフォーカスを失わないよう、data-key でたどる
@@ -748,6 +808,21 @@ async function main() {
   }, 1000);
   setInterval(resendOverlay, RESEND_MS);
   $('obs-pill').addEventListener('click', () => { app.ui.obsDlg = true; renderRoute(); });
+  $('range-select').addEventListener('change', (e) => {
+    const mode = e.target.value;
+    if (mode === 'custom') { app.ui.rangeDraft = true; renderRangePicker(); $('range-from').focus(); return; }
+    app.setRange({ mode });
+  });
+  const applyCustom = () => {
+    const from = fromJstInput($('range-from').value);
+    const to = fromJstInput($('range-to').value);
+    if (from == null) { $('range-msg').textContent = '開始の日時を入れてください'; return; }
+    if (to != null && to <= from) { $('range-msg').textContent = '終了は開始より後にしてください'; return; }
+    $('range-msg').textContent = '';
+    app.setRange({ mode: 'custom', from, to });
+  };
+  $('range-apply').addEventListener('click', applyCustom);
+  for (const id of ['range-from', 'range-to']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCustom(); } });
   window.addEventListener('resize', () => { if (app.route === 'onair') tickOnair(app, true); });
 
   $('loading').hidden = true;

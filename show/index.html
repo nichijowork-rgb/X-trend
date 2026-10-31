@@ -48,6 +48,17 @@
         <select id="week-select" class="input input-sm"></select>
         <span id="week-range" class="week-range"></span>
       </div>
+      <div class="range-box" id="range-box">
+        <label for="range-select" class="week-label">対象期間</label>
+        <select id="range-select" class="input input-sm" data-key="range-select"></select>
+        <span id="range-label" class="range-label"></span>
+        <span id="range-custom" class="range-custom" hidden>
+          <label class="range-in"><span>開始</span><input type="datetime-local" id="range-from" class="input input-sm" data-key="range-from"></label>
+          <label class="range-in"><span>終了</span><input type="datetime-local" id="range-to" class="input input-sm" data-key="range-to" title="空なら「今」（データの基準時刻）まで"></label>
+          <button type="button" id="range-apply" class="btn btn-small" data-key="range-apply">この期間にする</button>
+          <span id="range-msg" class="range-msg" role="status"></span>
+        </span>
+      </div>
       <p class="sh-meta"><button type="button" id="obs-pill" class="obs-pill" data-key="obs-pill" data-state="idle" hidden>OBS：未接続</button> <span id="data-time"></span> <span id="save-status" class="save-status" role="status"></span></p>
     </div>
   </header>

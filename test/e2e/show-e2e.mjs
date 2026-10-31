@@ -426,7 +426,7 @@ async function main() {
       const file = path.join(tmp, 'export.json');
       await dl.saveAs(file);
       const ex = JSON.parse(readFileSync(file, 'utf8'));
-      assert(ex.v === 4 && Object.keys(ex.genreOverrides).length >= 1, 'export has genreOverrides');
+      assert(ex.v === 5 && Object.keys(ex.genreOverrides).length >= 1, 'export has genreOverrides');
       await page.click('[data-key="tools-close"]');
       return `上書き ${Object.keys(ex.genreOverrides).length}件`;
     });
@@ -1220,6 +1220,92 @@ async function main() {
       return `既定 ${def.join('/')} → キャバ優先 ${ky.join('/')}`;
     });
 
+    // ---- 4f. 対象期間（台本づくりのデータ収集期間）
+    await check('対象期間: プリセットで件数が変わる・カスタム日時・編成は消えず期間外は印つきで残る・リロードで復元・書き出しと振り返りに記載', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      const st = () => page.evaluate(() => ({ n: window.__show.rangePostCount, mode: window.__show.weekState().range.mode, label: window.__show.range.label, rec: window.__show.recommendN }));
+      const s0 = await st();
+      assert(s0.mode === 'week' && s0.n > 0 && s0.rec === 30, JSON.stringify(s0));
+      assert(await page.isVisible('#range-select'), 'select');
+      assert((await page.textContent('#range-label')).includes(`投稿 ${s0.n}件`), 'label');
+      // 番組構成に入れておく（メイン1・カテゴリ別）
+      await folder(page, 'group:night');
+      const ks = (await rowKeys(page)).filter((k) => k.startsWith('t:'));
+      await ctx(page, `${rowSel(ks[0])} .row-main`, 'ctx-slot-0');
+      await ctx(page, `${rowSel(ks[1])} .row-main`, 'ctx-category');
+      const placed = await wk(page);
+      // 直近3日 → 件数が減る。編成は残り、期間外は印
+      await page.selectOption('#range-select', 'd3');
+      await page.waitForFunction(() => window.__show.weekState().range.mode === 'd3');
+      const s3 = await st();
+      assert(s3.n < s0.n && s3.rec < 30, JSON.stringify(s3));
+      const after = await wk(page);
+      assert(JSON.stringify(after.main) === JSON.stringify(placed.main) && JSON.stringify(after.category) === JSON.stringify(placed.category), '編成はそのまま');
+      const outs = await page.evaluate((ids) => ids.map((id) => { const t = window.__show.topicsById.get(id); return t ? t.outsideCount : -1; }), [placed.main[0], placed.category[0]]);
+      assert(outs.every((x) => x >= 0), `構成の話題が消えない ${outs}`);
+      assert(outs.some((x) => x > 0), '直近3日では一部が期間外');
+      const outKey = outs[0] > 0 ? ['slot:0', placed.main[0]] : ['corner:category', placed.category[0]];
+      await folder(page, outKey[0]);
+      assert((await page.textContent(`${rowSel(`t:${outKey[1]}`)} .row-meta`)).includes('期間外'), '期間外の印');
+      // 直近14日 → 前の週の投稿も入る
+      await page.selectOption('#range-select', 'd14');
+      await page.waitForFunction(() => window.__show.weekState().range.mode === 'd14');
+      const s14 = await st();
+      assert(s14.n > s0.n && s14.rec === 60, JSON.stringify(s14));
+      // カスタム
+      await page.selectOption('#range-select', 'custom');
+      await page.waitForSelector('#range-custom:not([hidden])');
+      await page.fill('#range-from', '2026-10-12T00:00');
+      await page.fill('#range-to', '2026-10-14T00:00');
+      await page.click('[data-key="range-apply"]');
+      await page.waitForFunction(() => window.__show.weekState().range.mode === 'custom');
+      const sc = await st();
+      const exp = sample.posts.filter((p) => p.ts >= Date.parse('2026-10-12T00:00:00+09:00') / 1000 && p.ts < Date.parse('2026-10-14T00:00:00+09:00') / 1000).length;
+      assert(sc.n === exp && sc.label.startsWith('10/12(月) 0:00 〜 10/14(水) 0:00'), `${JSON.stringify(sc)} 期待 ${exp}`);
+      await page.screenshot({ path: path.join(SHOTS, 'range-960.png') });
+      // 終了を空 → 今まで。終了 < 開始はエラー
+      await page.fill('#range-to', '2026-10-11T00:00');
+      await page.click('[data-key="range-apply"]');
+      assert((await page.textContent('#range-msg')).includes('終了は開始より後'), 'validation');
+      // リロードで復元
+      await page.reload();
+      await ready(page);
+      const sr = await st();
+      assert(sr.mode === 'custom' && sr.n === exp, JSON.stringify(sr));
+      assert(await page.inputValue('#range-from') === '2026-10-12T00:00' && await page.inputValue('#range-to') === '2026-10-14T00:00', 'inputs');
+      const keep = await wk(page);
+      assert(JSON.stringify(keep.main) === JSON.stringify(placed.main), 'reload 編成');
+      // 書き出し・振り返り
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="export"]')]);
+      const f = path.join(tmp, 'range-export.json');
+      await dl.saveAs(f);
+      const ex = JSON.parse(readFileSync(f, 'utf8'));
+      assert(ex.v === 5 && ex.weeks['2026-10-17'].range.mode === 'custom', JSON.stringify(ex.weeks['2026-10-17'].range));
+      await page.click('[data-key="tools-close"]');
+      await page.goto(`${show}#review`);
+      await ready(page);
+      assert((await page.textContent('[data-key="review-range"]')).includes('10/12(月) 0:00'), 'review');
+      assert((await page.inputValue('[data-key="export-public"]')).includes('対象：10/12(月) 0:00 〜 10/14(水) 0:00 の投稿'), 'script');
+      // 番組週に戻す
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      await page.selectOption('#range-select', 'week');
+      await page.waitForFunction(() => window.__show.weekState().range.mode === 'week');
+      assert((await st()).n === s0.n, 'back to week');
+      // 375 幅
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.selectOption('#range-select', 'custom');
+      await page.waitForSelector('#range-custom:not([hidden])');
+      const w375 = await sw(page);
+      assert(w375 <= 375, `scrollWidth ${w375}`);
+      await page.screenshot({ path: path.join(SHOTS, 'range-375.png') });
+      await c.close();
+      return `番組週 ${s0.n}件 → 3日 ${s3.n}件 → 14日 ${s14.n}件（おすすめ ${s14.rec}件）→ カスタム ${sc.n}件・構成の期間外 ${outs.join('/')}件`;
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';
@@ -1437,8 +1523,23 @@ async function main() {
         const undoMs = Date.now() - t2;
         const f = (x) => `${x.toFixed(1)}ms`;
         assert(t.render < 120 && t.select < 120, JSON.stringify(t));
+        // 対象期間を直近30日にしたとき
+        await p.evaluate(() => window.__show.setRange({ mode: 'd30' }));
+        await p.waitForFunction(() => window.__show.weekState().range.mode === 'd30');
+        const t30 = await p.evaluate(() => {
+          const a = window.__show;
+          const ms = (fn) => { const t0 = performance.now(); fn(); return performance.now() - t0; };
+          const out = { n: a.rangePostCount };
+          out.render = ms(() => a.render());
+          out.select = ms(() => { a.ui.sel = { sel: new Set([a.ui.rows[0].key]), anchor: 0 }; a.render(); });
+          out.edit = ms(() => a.edit('計測', (w) => { w.mainCand = [...w.mainCand]; }));
+          out.undo = ms(() => a.undo());
+          return out;
+        });
+        assert(t30.render < 120 && t30.select < 120 && t30.edit < 300, JSON.stringify(t30));
+        t.d30 = t30;
         await c7.close();
-        return `今週 ${n}件（すべて表示 ${t.rows}行）: 描画 ${f(t.render)}・全件表示 ${f(t.allRows)}・検索 ${f(t.search)}・選択 ${f(t.select)}・編集 ${f(t.edit)}・元に戻す ${f(t.undo)}（画面操作込み: 右クリック移動 ${moveMs}ms・元に戻すボタン ${undoMs}ms）`;
+        return `直近30日 ${t.d30.n}件: 描画 ${f(t.d30.render)}・選択 ${f(t.d30.select)}・編集 ${f(t.d30.edit)}・元に戻す ${f(t.d30.undo)}／今週 ${n}件（すべて表示 ${t.rows}行）: 描画 ${f(t.render)}・全件表示 ${f(t.allRows)}・検索 ${f(t.search)}・選択 ${f(t.select)}・編集 ${f(t.edit)}・元に戻す ${f(t.undo)}（画面操作込み: 右クリック移動 ${moveMs}ms・元に戻すボタン ${undoMs}ms）`;
       });
       for (const [w, hh, route] of [[960, 1040, 'plan'], [1280, 1400, 'plan'], [1920, 1080, 'plan'], [375, 812, 'plan'], [960, 1040, 'live'], [375, 812, 'live'], [1920, 1080, 'onair']]) {
         await check(`実データ data/ ${route} ${w}×${hh}`, async () => {

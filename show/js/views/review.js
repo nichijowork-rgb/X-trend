@@ -8,7 +8,8 @@ export function renderReview(app) {
   const wk = app.weekState();
   const lists = reviewLists(wk.live, app.cues);
   const root = h('div', { class: 'review wrap' });
-  root.append(h('div', { class: 'sec-head' }, h('h2', { class: 'sec-title' }, '振り返り'), h('p', { class: 'sec-note' }, currentTitle(app))));
+  root.append(h('div', { class: 'sec-head' }, h('h2', { class: 'sec-title' }, '振り返り'), h('p', { class: 'sec-note' }, currentTitle(app)),
+    h('p', { class: 'sec-note', dataset: { key: 'review-range' } }, `対象期間：${app.range ? app.range.label : ''}`)));
   const cols = h('div', { class: 'review-cols' });
   for (const [key, label, color] of [['done', '読んだ', 'main'], ['skipped', '飛ばした', 'review'], ['carried', '来週へ', 'kabuki'], ['todo', 'まだ', 'white']]) {
     const items = lists[key];
@@ -22,7 +23,7 @@ export function renderReview(app) {
 
   const args = {
     title: currentTitle(app), week: app.week, rundown: wk.rundown, topicsById: app.topicsById, script: wk.script,
-    notes: wk.notes, postsById: app.postsById, refTs: app.ds.refTs,
+    notes: wk.notes, postsById: app.postsById, refTs: app.ds.refTs, rangeLabel: app.range ? app.range.label : null,
   };
   for (const [mode, label, note] of [
     ['public', '告知・概要欄用', '見出し・リード文・チャプター・投稿URL（話すポイントやメモは入りません）'],

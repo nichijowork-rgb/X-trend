@@ -1021,3 +1021,16 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 /* 保留（保留する言葉に一致） */
 .rm-hold { color: var(--warn); }
 .hold-note { padding: 8px 12px; border-radius: 10px; background: #2b2610; border: 1px solid var(--warn); font-size: 14px; margin-bottom: 8px; }
+
+/* 対象期間（台本づくりのデータ収集期間。編成・振り返りのヘッダー） */
+.range-box { display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap; min-width: 0; }
+.range-box[hidden] { display: none; }
+.range-box select { width: auto; max-width: 100%; }
+.range-label { color: var(--text-2); font-size: 13px; }
+.range-custom { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.range-custom[hidden] { display: none; }
+.range-in { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; min-width: 0; }
+.range-in input { width: 16em; max-width: calc(100vw - 80px); color-scheme: dark; }
+.range-msg { color: var(--warn); font-size: 13px; }
+.badge-out { background: var(--surface-2); color: var(--warn); border-color: var(--warn); }
+.rm-out { color: var(--warn); }

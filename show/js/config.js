@@ -118,7 +118,7 @@ export const STORAGE_KEY = 'xtrend-show';
  * 4: フォルダ型の編成（v2 段階1）。メインは枠（メイン1〜3・空き枠は null）、メイン候補 mainCand、
  *    投稿のジャンル上書き genreOverrides（投稿 id ごと・全週）を追加（無ければ空）
  */
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5; // 版 5: 番組週ごとの対象期間（range）
 /** 候補・ブックマーク・進行の表示（埋め込み／カード）を覚えておく localStorage キー */
 export const VIEW_PREF_KEY = 'xtrend-show-view';
 /** 編成画面の「構成と台本」サイドパネルの開閉を覚えておく localStorage キー */
@@ -176,3 +176,16 @@ export const GENRE_PRIORITY = Object.freeze({
 
 /** 保留する言葉の初期値（YouTuber 関連など。本文・アカウント・話題名に一致したら「保留」フォルダへ） */
 export const DEFAULT_HOLD_TERMS = Object.freeze(['ヒカル', '加藤神楽', '今森茉耶', 'YouTuber', 'ユーチューバー', 'ぎし', 'みゆみゆ', '堀大輔', '高須', 'あおちゃんぺ']);
+
+/** 台本づくりの対象期間（番組週ごとに選ぶ。「今」はデータの基準時刻 generated_at） */
+export const RANGE_PRESETS = Object.freeze([
+  Object.freeze({ mode: 'week', label: '番組週（前回配信〜今回配信）' }),
+  Object.freeze({ mode: 'since', label: '前回配信から今まで' }),
+  Object.freeze({ mode: 'd3', label: '直近3日', days: 3 }),
+  Object.freeze({ mode: 'd7', label: '直近7日', days: 7 }),
+  Object.freeze({ mode: 'd14', label: '直近14日', days: 14 }),
+  Object.freeze({ mode: 'd30', label: '直近30日', days: 30 }),
+  Object.freeze({ mode: 'custom', label: 'カスタム（日時を指定）' }),
+]);
+/** 一般のバズの「おすすめ」件数は期間の日数に比例（7日で generalRecommendN 件）。下限・上限 */
+export const RECOMMEND_SCALE = Object.freeze({ baseDays: 7, min: 10, max: 120 });

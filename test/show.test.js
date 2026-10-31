@@ -1705,3 +1705,86 @@ test('ボットへの修正（feedback）に保留する言葉と戻した例外
   assert.deepEqual(fb.hold_exceptions, ['2110000000000000005', 'bot-1', 'd:d-hostcall']);
   assert.deepEqual(buildFeedback({ saved: defaultSaved(), weekKey: 'w', topics: [], nowMs: 0 }).hold_terms, [...DEFAULT_HOLD_TERMS]);
 });
+
+// ================================================================ 追加: 対象期間（台本づくりのデータ収集期間）
+import { resolveRange, sanitizeRange, defaultRange, recommendCount, toJstInput, fromJstInput, placedPostIds } from '../show/js/logic.js';
+import { RANGE_PRESETS, RECOMMEND_SCALE } from '../show/js/config.js';
+
+test('対象期間: 番組週（既定）・前回配信から今まで・直近 N 日・カスタム（終了なし＝今）・不正は番組週', () => {
+  const w = weekByKey('2026-10-17');
+  const now = ts('2026-10-16T00:09:00+09:00');
+  const wk = resolveRange(undefined, w, now);
+  assert.deepEqual([wk.mode, wk.start, wk.end, wk.isWeek], ['week', w.start, w.end, true]);
+  const since = resolveRange({ mode: 'since' }, w, now);
+  assert.deepEqual([since.start, since.end], [w.start, now + 1], '前回配信（番組週の始まり）〜 今（含む）');
+  assert.match(since.label, /^10\/10\(土\) 1:00 〜 今（10\/16\(金\) 0:09）$/);
+  for (const [mode, days] of [['d3', 3], ['d7', 7], ['d14', 14], ['d30', 30]]) {
+    const r = resolveRange({ mode }, w, now);
+    assert.equal(r.end - r.start, days * 86400 + 1, mode);
+    assert.equal(r.end, now + 1);
+  }
+  const from = ts('2026-10-01T12:00:00+09:00');
+  const to = ts('2026-10-05T12:00:00+09:00');
+  assert.deepEqual([resolveRange({ mode: 'custom', from, to }, w, now).start, resolveRange({ mode: 'custom', from, to }, w, now).end], [from, to]);
+  assert.equal(resolveRange({ mode: 'custom', from, to: null }, w, now).end, now + 1, '終了が空なら今');
+  assert.equal(resolveRange({ mode: 'custom', from: now + 999999 }, w, now).end > now, true);
+  for (const bad of [null, { mode: 'x' }, { mode: 'custom' }, { mode: 'custom', from: 'a' }]) assert.equal(resolveRange(bad, w, now).mode, 'week', JSON.stringify(bad));
+  assert.deepEqual(sanitizeRange({ mode: 'custom', from: 100, to: 50 }), { mode: 'custom', from: 100, to: null }, '終了が開始より前なら今まで');
+  assert.deepEqual(sanitizeRange({ mode: 'd7', from: 1, to: 2 }), { mode: 'd7', from: null, to: null });
+  assert.deepEqual(defaultRange(), { mode: 'week', from: null, to: null });
+  assert.equal(RANGE_PRESETS.length, 7);
+  // 投稿のしぼり込み（start ≦ ts ＜ end）
+  const ps = [post({ ts: ts('2026-10-09T12:00:00+09:00') }), post({ ts: ts('2026-10-14T12:00:00+09:00') }), post({ ts: now })];
+  assert.equal(postsInWeek(ps, wk).length, 2);
+  assert.equal(postsInWeek(ps, resolveRange({ mode: 'd14' }, w, now)).length, 3, '今ちょうどの投稿も入る');
+  assert.equal(postsInWeek(ps, resolveRange({ mode: 'd3' }, w, now)).length, 2);
+});
+
+test('対象期間: おすすめ件数は日数に比例（7日で 30 件・上限つき）・datetime-local（JST）の変換', () => {
+  assert.equal(recommendCount(7), 30);
+  assert.equal(recommendCount(14), 60);
+  assert.equal(recommendCount(3), 13);
+  assert.equal(recommendCount(30), RECOMMEND_SCALE.max);
+  assert.equal(recommendCount(0.1), RECOMMEND_SCALE.min);
+  assert.equal(recommendCount(undefined), 30);
+  const t = ts('2026-10-14T12:34:00+09:00');
+  assert.equal(toJstInput(t), '2026-10-14T12:34');
+  assert.equal(fromJstInput('2026-10-14T12:34'), t);
+  assert.equal(fromJstInput(''), null);
+  assert.equal(fromJstInput('bad'), null);
+  assert.equal(toJstInput(null), '');
+});
+
+test('対象期間: 番組週ごとに保存・書き出し、版 4 以前は番組週に移行', () => {
+  const s = defaultSaved();
+  s.weeks['2026-10-17'] = defaultWeek();
+  assert.deepEqual(s.weeks['2026-10-17'].range, defaultRange());
+  s.weeks['2026-10-17'].range = { mode: 'custom', from: 1790000000, to: null };
+  s.weeks['2026-10-10'] = { ...defaultWeek(), range: { mode: 'd14', from: null, to: null } };
+  const back = parseSaved(serializeSaved(s)).state;
+  assert.deepEqual(back.weeks['2026-10-17'].range, { mode: 'custom', from: 1790000000, to: null });
+  assert.equal(back.weeks['2026-10-10'].range.mode, 'd14');
+  assert.equal(JSON.parse(serializeSaved(s)).v, 5);
+  const v4 = parseSaved(JSON.stringify({ app: 'xtrend-show', v: 4, weeks: { '2026-10-17': { rundown: { corners: [{ key: 'main', min: 45, items: ['d:x', null, null] }] } } } })).state;
+  assert.deepEqual(v4.weeks['2026-10-17'].range, defaultRange(), '版 4 は番組週');
+  assert.equal(v4.weeks['2026-10-17'].rundown.corners[0].items[0], 'd:x', '編成はそのまま');
+});
+
+test('対象期間: 番組構成の話題は期間外になっても残し「期間外」の数を付ける（勝手に外さない）', () => {
+  const inR = post({ text: 'シャンパンコールの話', categories: ['ホスト'], ts: ts('2026-10-14T12:00:00+09:00') });
+  const out1 = post({ text: 'コールの掛け声の話', categories: ['ホスト'], ts: ts('2026-10-02T12:00:00+09:00') });
+  const out2 = post({ text: '別の単発の話', categories: ['ホスト'], ts: ts('2026-10-02T13:00:00+09:00') });
+  const out3 = post({ text: '関係ない話', categories: ['ホスト'], ts: ts('2026-10-02T14:00:00+09:00') });
+  const ids = placedPostIds({ placedIds: ['d:d-hostcall', `p:${out2.id}`, 'm:1'], candidates: [out1, out2, out3], dict: DEFAULT_DICT, overrides: { moves: { [out3.id]: 'm:1' } } });
+  assert.deepEqual([...ids].sort(), [out1.id, out2.id, out3.id].sort(), '辞書の話題・1件・手で移した投稿');
+  assert.equal(placedPostIds({ placedIds: [], candidates: [out1] }).size, 0);
+  assert.ok(placedPostIds({ placedIds: ['g:b'], botTopics: [{ id: 'b', postIds: ['99999'] }] }).has('99999'));
+  assert.ok(placedPostIds({ placedIds: ['d:dst'], overrides: { merges: { [`p:${out2.id}`]: 'd:dst' } } }).has(out2.id), '結合元も');
+  const d = ds([inR, out1, out2]);
+  const topics = buildTopics({ posts: [d.posts[0]], extraPosts: d.posts.slice(1), dict: DEFAULT_DICT, refTs: d.refTs, outsideIds: new Set([out1.id, out2.id]), pinnedIds: new Set(['d:d-hostcall', `p:${out2.id}`]) });
+  const call = topics.find((t) => t.id === 'd:d-hostcall');
+  assert.equal(call.postIds.length, 2);
+  assert.equal(call.outsideCount, 1, '一部が期間外');
+  assert.equal(topics.find((t) => t.id === `p:${out2.id}`).outsideCount, 1, 'すべて期間外');
+  assert.ok(buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs }).every((t) => t.outsideCount === 0));
+});

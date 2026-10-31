@@ -14,7 +14,7 @@ import {
   renameTopic, isFolderTopic, placeOf, isNightGenre, topicsOfRows,
 } from '../folders.js';
 import { h, btn, badge, field, postCard, linkCard, genreSticker, embedHost, isEditable } from '../dom.js';
-import { scriptFor, topicMarks, refYear, mainTopics, currentTitle, bmInfo, statsLine, botMarks, pickReason } from './common.js';
+import { scriptFor, topicMarks, refYear, mainTopics, currentTitle, bmInfo, statsLine, botMarks, pickReason, outsideLabel } from './common.js';
 import { beginPointer, isDragging } from './dnd.js';
 import { contextMenu, moveDialog, nameDialog } from './menu.js';
 import { toolsDialog } from './tools.js';
@@ -179,7 +179,7 @@ function topBar(app, wk) {
     h('div', { class: 'pt-row' },
       btn('≡ フォルダ', () => { u.treeDrawer = !u.treeDrawer; app.render(); }, 'btn btn-small btn-ghost tree-drawer-btn', { 'data-key': 'tree-drawer', 'aria-expanded': String(Boolean(u.treeDrawer)) }),
       h('h2', { class: 'pt-title' }, `${app.weekKey.slice(5).replace('-', '/')}(土) の編成`),
-      h('span', { class: 'pt-sub' }, `投稿 ${app.weekPostIds.length}件・まとまり ${app.visibleTopics.filter(isFolderTopic).length}`),
+      h('span', { class: 'pt-sub', dataset: { key: 'pt-count' } }, `投稿 ${app.rangePostCount ?? app.weekPostIds.length}件・まとまり ${app.visibleTopics.filter(isFolderTopic).length}${app.range && !app.range.isWeek ? `（対象：${app.range.label}）` : ''}`),
       h('label', { class: 'pt-titlebox' }, h('span', { class: 'sr-only' }, '配信タイトル'), titleInput),
       isAuto ? null : btn('自動に戻す', () => app.update((w) => { w.title = null; }), 'btn btn-small btn-ghost', { 'data-key': 'title-auto' })),
     h('div', { class: 'pt-row' },
@@ -246,7 +246,7 @@ function listPane(app, wk, hidden) {
   const info = u.rowsInfo;
   const pane = h('section', { class: `list-pane${hidden ? ' is-hidden' : ''}`, attrs: { 'aria-label': '一覧' }, dataset: { keep: 'list-pane' } });
   const generalToggle = (key === 'inbox' || key === 'group:general')
-    ? btn(u.generalAll ? `一般のバズ：すべて表示中（おすすめだけにする）` : `一般のバズ：おすすめ ${PLAN_V2.generalRecommendN}件だけ（すべて表示）`,
+    ? btn(u.generalAll ? `一般のバズ：すべて表示中（おすすめだけにする）` : `一般のバズ：おすすめ ${app.recommendN || PLAN_V2.generalRecommendN}件だけ（すべて表示）`,
       () => { u.generalAll = !u.generalAll; app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'general-toggle', 'aria-pressed': String(Boolean(u.generalAll)), title: '一般のバズは話題性の高い順の上位だけを表示しています' })
     : null;
   const head = h('div', { class: 'lp-head' },
@@ -354,6 +354,7 @@ function rowEl(app, row, index) {
     const pl = t ? placeOf(app.weekState(), t.id) : null;
     if (pl) meta.push(h('span', { class: 'rm-place' }, pl.label));
     if (app.newInfo && app.newInfo.posts.has(row.id)) meta.push(h('span', { class: 'rm-new' }, 'NEW'));
+    if (app.outsideIds && app.outsideIds.has(row.id)) meta.push(h('span', { class: 'rm-out', attrs: { title: '対象期間の外（番組構成に入っているので残しています）' } }, '期間外'));
     const pr = pickReason(app, row.id);
     if (pr != null) meta.push(h('span', { class: 'rm-pick', attrs: { title: pr ? `雑談おすすめ（Grok）：${pr}` : '雑談おすすめ（Grok）' } }, pr ? `雑談おすすめ：${pr}` : '雑談おすすめ'));
   } else if (row.type === 'topic') {
@@ -366,6 +367,7 @@ function rowEl(app, row, index) {
       if (t.suggested) meta.push(h('span', { class: 'rm-suggest' }, '同じ話題かも？'));
       if (t.kind === 'carried') meta.push(h('span', { class: 'rm-tag' }, '持ち越し'));
       if (t.bot) meta.push(...botMarks(t, true));
+      if (t.outsideCount) meta.push(h('span', { class: 'rm-out', attrs: { title: '対象期間の外（番組構成に入っているので残しています）' } }, outsideLabel(t)));
       const pick = t.postIds.find((id) => app.pickIds.has(id));
       if (pick) { const pr = pickReason(app, pick); meta.push(h('span', { class: 'rm-pick', attrs: { title: pr || '雑談おすすめ（Grok）' } }, pr ? `雑談おすすめ：${pr}` : '雑談おすすめ')); }
       const nw = app.newInfo && app.newInfo.topics.get(t.id);

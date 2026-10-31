@@ -50,8 +50,18 @@ export function topicMarks(app, topic) {
   if (topic.bookmark) marks.push(badge(`★ブックマーク ${topic.bookmarkCount}件`, 'badge-bm'));
   if (topic.personal && topic.postIds.some((id) => app.weekState().personal.some((p) => p.id === id)) || (topic.kind === 'link' && app.weekState().personal.some((p) => p.id === topic.linkId))) marks.push(badge('自分で追加', 'badge-me'));
   if (topic.suggested) marks.push(badge('同じ話題かも？', 'badge-suggest'));
+  if (topic.outsideCount) marks.push(outsideBadge(topic));
   marks.push(...botMarks(topic));
   return marks;
+}
+
+/** 「期間外」の印（対象期間の外の投稿を、番組構成に入っているので残している） */
+export function outsideLabel(topic) {
+  if (!topic || !topic.outsideCount) return null;
+  return topic.outsideCount >= (topic.stats ? topic.stats.count : topic.postIds.length) ? '期間外' : `期間外 ${topic.outsideCount}件`;
+}
+export function outsideBadge(topic) {
+  return h('span', { class: 'badge badge-out', attrs: { title: '対象期間の外の投稿です（番組構成に入っているので残しています）' } }, outsideLabel(topic));
 }
 
 /** ボット（Grok）がまとめた話題の印。自信が低いものは「要確認」 */
