@@ -334,6 +334,60 @@ export function genreOfCategory(cat) {
   return g ? g.key : null;
 }
 
+/** ジャンル → データ上のカテゴリ名（上書き用） */
+export function categoryOfGenre(g) {
+  const x = GENRES.find((y) => y.key === g);
+  return x ? x.cats[0] : '夜職その他';
+}
+
+/** 投稿 1 件のジャンル（上書きがあればそれ） */
+export function postGenre(post) {
+  if (!post) return 'general';
+  return post._genreOverride || majorityGenre([post]);
+}
+
+/**
+ * 投稿のジャンル上書きを当てる。上書きのある投稿だけ複製して categories を差し替える（元は _origCategories）。
+ * cache（Map）を渡すと同じ複製を使い回す。
+ */
+export function applyGenreOverrides(posts, overrides, cache = new Map()) {
+  if (!overrides || !Object.keys(overrides).length) return posts;
+  return posts.map((p) => {
+    const o = p && overrides[p.id];
+    if (!o) return p;
+    const key = `${p.id}:${o.genre}`;
+    let c = cache.get(key);
+    if (!c || c._base !== p) {
+      c = { ...p, categories: [categoryOfGenre(o.genre), ...p.categories.filter((x) => !genreOfCategory(x))], _origCategories: p.categories, _genreOverride: o.genre, _base: p };
+      cache.set(key, c);
+    }
+    return c;
+  });
+}
+
+/**
+ * 投稿のジャンルを上書き（投稿 id ごと・全週に効く）。元のジャンルと同じなら上書きを消す。
+ * origGenreOf(id) で元のジャンル（データのカテゴリから）を引く。saved を書き換えて返す。
+ */
+export function setPostGenre(saved, ids, genre, nowMs, origGenreOf) {
+  if (!GENRE_KEYS.includes(genre)) return saved;
+  const next = { ...(saved.genreOverrides || {}) };
+  for (const id of ids) {
+    if (!ID_RE.test(String(id))) continue;
+    const from = origGenreOf ? origGenreOf(id) : null;
+    if (from && from === genre) delete next[id];
+    else next[id] = { genre, at: isNum(nowMs) ? nowMs : null, from: from || null };
+  }
+  saved.genreOverrides = next;
+  return saved;
+}
+
+/** ジャンル上書きの一覧（段階3でボットへ返す形） */
+export function genreOverrideList(saved) {
+  return Object.entries(saved.genreOverrides || {}).map(([id, o]) => ({ id, genre: o.genre, from: o.from, at: o.at }))
+    .sort((a, b) => compareIds(a.id, b.id));
+}
+
 export function isNightPost(post) {
   return (post.categories || []).some((c) => NIGHT_GENRES.includes(genreOfCategory(c)));
 }
@@ -721,22 +775,92 @@ export function canBeMain(topic) {
   return Boolean(topic) && (!MAIN_NIGHT_ONLY || NIGHT_GENRES.includes(topic.genre));
 }
 
-/** 話題をコーナーへ入れる（他のコーナーからは外す）。メインは最大本数まで */
+/** 末尾の空き枠（null）を落とす */
+function trimSlots(items) {
+  const out = [...items];
+  while (out.length && out[out.length - 1] == null) out.pop();
+  return out;
+}
+
+/** コーナーから外す（メインは枠の位置を保つため null にする） */
+function dropFrom(c, topicId) {
+  if (c.key === 'main') c.items = trimSlots(c.items.map((x) => (x === topicId ? null : x)));
+  else c.items = c.items.filter((x) => x !== topicId);
+}
+
+/**
+ * 話題をコーナーへ入れる（他のコーナーからは外す）。メインは最大本数まで（満杯なら null）。
+ * メインは「メイン1〜3」の枠で、空き枠（null）があればそこへ入る。index を渡すとその位置へ。
+ */
 export function assignTopic(rundown, topicId, cornerKey, index = null) {
   const r = cloneRundown(rundown);
-  for (const c of r.corners) c.items = c.items.filter((x) => x !== topicId);
+  for (const c of r.corners) dropFrom(c, topicId);
   const c = r.corners.find((x) => x.key === cornerKey);
   const def = cornerDef(cornerKey);
   if (!c || !def || (def.kind !== 'main' && def.kind !== 'news')) return r;
-  if (def.maxItems && c.items.length >= def.maxItems) return null; // 満杯
+  if (def.kind === 'main') {
+    const slots = [...c.items];
+    while (slots.length < def.maxItems) slots.push(null);
+    if (index != null && index >= 0 && index < def.maxItems && slots[index] == null) slots[index] = topicId;
+    else {
+      const hole = slots.indexOf(null);
+      if (hole < 0) return null; // 満杯
+      slots[hole] = topicId;
+    }
+    c.items = trimSlots(slots);
+    return r;
+  }
   if (index == null || index < 0 || index > c.items.length) c.items.push(topicId);
   else c.items.splice(index, 0, topicId);
   return r;
 }
 
+/**
+ * メインの枠（0〜2 = メイン1〜3）に入れる。入っていた話題は displaced で返す（メイン候補へ戻す用）。
+ * 返り値: { rundown, displaced: topicId | null }
+ */
+export function setMainSlot(rundown, topicId, slot) {
+  const def = cornerDef('main');
+  if (!(slot >= 0 && slot < def.maxItems)) return { rundown, displaced: null };
+  const r = cloneRundown(rundown);
+  const fromMain = r.corners.find((x) => x.key === 'main').items.indexOf(topicId);
+  for (const c of r.corners) dropFrom(c, topicId);
+  const c = r.corners.find((x) => x.key === 'main');
+  const slots = [...c.items];
+  while (slots.length < def.maxItems) slots.push(null);
+  let displaced = slots[slot] && slots[slot] !== topicId ? slots[slot] : null;
+  // メインの中での入れ替え（メイン1 → メイン3 など）は位置を交換する
+  if (displaced && fromMain >= 0) { slots[fromMain] = displaced; displaced = null; }
+  slots[slot] = topicId;
+  c.items = trimSlots(slots);
+  return { rundown: r, displaced };
+}
+
+/** メインの枠ごとの話題 id（長さ 3。空き枠は null） */
+export function mainSlots(rundown) {
+  const c = rundown.corners.find((x) => x.key === 'main');
+  const out = [...(c ? c.items : [])];
+  while (out.length < cornerDef('main').maxItems) out.push(null);
+  return out.slice(0, cornerDef('main').maxItems);
+}
+
 export function removeTopic(rundown, topicId) {
   const r = cloneRundown(rundown);
-  for (const c of r.corners) c.items = c.items.filter((x) => x !== topicId);
+  for (const c of r.corners) dropFrom(c, topicId);
+  return r;
+}
+
+/** コーナー内の位置へ移す（並べ替え。メインは枠の入れ替え） */
+export function moveToIndex(rundown, cornerKey, topicId, index) {
+  if (cornerKey === 'main') return setMainSlot(rundown, topicId, index).rundown;
+  const r = cloneRundown(rundown);
+  const c = r.corners.find((x) => x.key === cornerKey);
+  if (!c) return r;
+  const i = c.items.indexOf(topicId);
+  if (i < 0) return assignTopic(rundown, topicId, cornerKey, index) || rundown;
+  c.items.splice(i, 1);
+  const j = Math.max(0, Math.min(index > i ? index - 1 : index, c.items.length));
+  c.items.splice(j, 0, topicId);
   return r;
 }
 
@@ -757,7 +881,8 @@ export function replaceTopicId(rundown, from, to) {
   const r = cloneRundown(rundown);
   for (const c of r.corners) {
     const seen = new Set();
-    c.items = c.items.map((x) => (x === from ? to : x)).filter((x) => (seen.has(x) ? false : seen.add(x)));
+    c.items = c.items.map((x) => (x === from ? to : x)).map((x) => (x == null ? null : seen.has(x) ? (c.key === 'main' ? null : undefined) : (seen.add(x), x))).filter((x) => x !== undefined);
+    if (c.key === 'main') c.items = trimSlots(c.items);
   }
   return r;
 }
@@ -766,9 +891,9 @@ function cloneRundown(r) {
   return { corners: r.corners.map((c) => ({ key: c.key, min: c.min, items: [...c.items] })) };
 }
 
-/** 構成で使っている話題 id */
+/** 構成で使っている話題 id（メインの空き枠は除く） */
 export function usedTopicIds(rundown) {
-  return rundown.corners.flatMap((c) => c.items);
+  return rundown.corners.flatMap((c) => c.items).filter(Boolean);
 }
 
 /** 合計の分数 */
@@ -786,7 +911,7 @@ export function buildCues(rundown, topicsById) {
     const def = cornerDef(c.key);
     if (!def) return;
     if (def.kind === 'main' || def.kind === 'news') {
-      const items = c.items.filter((id) => topicsById.has(id));
+      const items = c.items.filter((id) => id && topicsById.has(id));
       if (!items.length) { cues.push({ id: c.key, cornerKey: c.key, cornerIndex: ci, kind: 'empty' }); return; }
       items.forEach((tid, k) => cues.push({ id: `${c.key}:${tid}`, cornerKey: c.key, cornerIndex: ci, kind: 'topic', topicId: tid, n: k + 1, of: items.length }));
     } else {
@@ -797,7 +922,8 @@ export function buildCues(rundown, topicsById) {
 }
 
 export function defaultLive() {
-  return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {} };
+  // cardVisible: 映す用に投稿カードを出しているか（段階2で OBS のパーツ表示と連動する）
+  return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {}, cardVisible: true };
 }
 
 const LIVE_STATUS = ['done', 'skipped', 'carried'];
@@ -864,6 +990,9 @@ export function liveReduce(live, action, cues) {
       if (i >= 0 && i < cues.length) s.index = i;
       return enter(s);
     }
+    case 'toggleCard':
+      s.cardVisible = typeof action.visible === 'boolean' ? action.visible : !s.cardVisible;
+      return s;
     default:
       return s;
   }
@@ -1006,6 +1135,7 @@ export function defaultWeek() {
     carriedOut: [], // 来週に回した話題のスナップショット
     usedPostIds: [], // 進行で「読んだ」話題の投稿 id（次の週以降のブックマーク枠で「使用済み」）
     shelved: [], // 片付けた話題（この週は候補に出さない）。[{ topicId, name, genre, postIds, at, corner }]
+    mainCand: [], // メイン候補（メイン1〜3に入れる前の置き場）。話題 id の並び
   };
 }
 
@@ -1014,6 +1144,8 @@ export function defaultSaved() {
     v: SCHEMA_VERSION, showName: SHOW_DEFAULTS.showName, dict: DEFAULT_DICT.map((e) => ({ ...e, words: [...e.words], people: [...e.people] })), weeks: {}, activeWeek: null, savedAt: null,
     trash: [], // 削除した話題（ゴミ箱。今後の週にも出さない）。[{ id, topicId, name, genre, postIds, week, at, corner }]
     hiddenPosts: [], // 削除（非表示）にした投稿。[{ id, week, at, topicName }]
+    // 投稿のジャンルの上書き（投稿 id ごと・全週に効く。段階3でボットへ返す）。{ [postId]: { genre, at, from } }
+    genreOverrides: {},
   };
 }
 
@@ -1056,7 +1188,11 @@ function sanitizeRundown(v, ver = SCHEMA_VERSION) {
     // 版 1（7 コーナー時代）の分数は使わない（構成が変わったため新しい既定 45/30/15 分にする）
     if (ver >= 2 && isNum(src.min) && src.min >= 0 && src.min <= 240) c.min = Math.round(src.min);
     const def = cornerDef(c.key);
-    if (def.kind === 'main' || def.kind === 'news') {
+    if (def.kind === 'main') {
+      // メインは枠（メイン1〜3）。空き枠は null で残す
+      const raw = Array.isArray(src.items) ? src.items.slice(0, def.maxItems) : [];
+      c.items = trimSlots(raw.map((x) => (typeof x === 'string' && x.trim() && !used.has(x.trim()) ? (used.add(x.trim()), x.trim().slice(0, 200)) : null)));
+    } else if (def.kind === 'news') {
       c.items = strList(src.items, 50).filter((x) => (used.has(x) ? false : used.add(x)));
       if (def.maxItems) c.items = c.items.slice(0, def.maxItems);
     }
@@ -1076,6 +1212,7 @@ function sanitizeLive(v, ver = SCHEMA_VERSION) {
   d.history = strList(o.history, 500).filter((id) => d.status[id]);
   const en = obj(o.enteredAt) || {};
   for (const [k, x] of Object.entries(en)) if (isNum(x) && cornerDef(k)) d.enteredAt[k] = x;
+  d.cardVisible = o.cardVisible !== false;
   return d;
 }
 
@@ -1131,6 +1268,8 @@ function sanitizeWeek(v, ver = SCHEMA_VERSION) {
   w.usedPostIds = (Array.isArray(o.usedPostIds) ? o.usedPostIds : []).filter((id) => typeof id === 'string' && ID_RE.test(id)).slice(0, 5000);
   const seenS = new Set();
   w.shelved = (Array.isArray(o.shelved) ? o.shelved : []).map(sanitizeShelf).filter((x) => x && (seenS.has(x.topicId) ? false : seenS.add(x.topicId))).slice(0, 2000);
+  const inRundown = new Set(usedTopicIds(w.rundown));
+  w.mainCand = strList(o.mainCand, 200).filter((id) => !inRundown.has(id));
   return w;
 }
 
@@ -1188,6 +1327,11 @@ export function parseSaved(input) {
   s.hiddenPosts = (Array.isArray(o.hiddenPosts) ? o.hiddenPosts : [])
     .map((x) => (obj(x) && ID_RE.test(String(x.id)) ? { id: String(x.id), week: typeof x.week === 'string' && weekByKey(x.week) ? x.week : null, at: isNum(x.at) ? x.at : null, topicName: str(x.topicName, 120) || '' } : null))
     .filter((x) => x && (seenH.has(x.id) ? false : seenH.add(x.id))).slice(0, 5000);
+  for (const [id, x] of Object.entries(obj(o.genreOverrides) || {})) {
+    const e = obj(x);
+    if (!ID_RE.test(id) || !e || !GENRE_KEYS.includes(e.genre)) continue;
+    s.genreOverrides[id] = { genre: e.genre, at: isNum(e.at) ? e.at : null, from: GENRE_KEYS.includes(e.from) ? e.from : null };
+  }
   return { state: s, ok: true, reason: v > SCHEMA_VERSION ? '新しい版の保存データです（読める部分だけ読み込みました）' : undefined };
 }
 

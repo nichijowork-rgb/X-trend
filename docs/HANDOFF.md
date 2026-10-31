@@ -130,5 +130,6 @@ PW_DIR=/tmp/qa/node_modules node test/e2e/dashboard-e2e.mjs
 
 - 公開URL: https://www.x-yoru-buzz.com/show/ 。ダッシュボードとはヘッダー上部の［ダッシュボード｜番組］タブで行き来（ダッシュボード側の変更は `index.html` のタブと `dashboard.css` 末尾のスタイルだけ）。
 - 週1回（土 1:00、約90分）のニュース形式トーク配信の台本・進行サイト。画面は ①編成 `#plan` ②進行 `#live` ③映す用 `#onair`（1920×1080・OBS 用）④振り返り `#review`。
-- データは `data/posts.json`・`reports.json`・`bookmarks.json` を読むだけ。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
+- **v2 段階1（2026-10-31）**: 画面半分（960×1040）基準。編成は**フォルダ型**（左の木＝番組構成〈メイン1〜3・メイン候補・カテゴリ別・雑談〉／まとまり／受信箱／★ブクマ／NEW／片付け／ゴミ箱、右＝行リスト＋プレビュー）。pointer events のドラッグ＆ドロップ・複数選択・一括操作・右クリック・「移動先…」・常設検索・新しいまとまり・名前変更・ジャンル上書き（投稿 ID で全週）・元に戻す/やり直す（Ctrl+Z/Y）・一般のバズはおすすめ 30 件・仕分けモード（1/2/3/G/X/→/←）。進行は縦 1 列。進行状態は `show/js/events.js` から 1 か所で発行（段階2で OBS WebSocket へ）。計画は [SHOW_V2_PLAN.md](SHOW_V2_PLAN.md)。純粋ロジックは `show/js/logic.js` と `show/js/folders.js`。
+- データは `data/posts.json`・`bookmarks.json` を読むだけ（`show_pick: true` が付いた投稿は雑談おすすめの最優先＝段階3の受け口）。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
 - 仕様・ファイル構成・保存データの形・使い方は [SHOW_SPEC.md](SHOW_SPEC.md) の「実装メモ」。テストは `npm test`（`test/show.test.js` を含む）と `PW_DIR=… node test/e2e/show-e2e.mjs`。サンプルは `sample/show/`（`node tools/make-show-sample.mjs`）。

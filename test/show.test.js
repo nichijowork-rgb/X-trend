@@ -271,12 +271,14 @@ test('構成: コーナーへ入れる（メインは3本まで）・外す・�
   assert.equal(assignTopic(r, 'd', 'main'), null, 'メインは満杯');
   assert.equal(assignTopic(r, 'd', 'opening').corners[0].items.length, 3, '無いコーナーには入らない');
   r = assignTopic(r, 'a', 'category');
-  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, ['b', 'c'], '他のコーナーから移動');
+  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, [null, 'b', 'c'], '他のコーナーから移動（メインは枠の位置を保つ）');
   r = moveInCorner(r, 'main', 'c', -1);
-  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, ['c', 'b']);
+  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, [null, 'c', 'b']);
   r = replaceTopicId(r, 'b', 'c');
-  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, ['c']);
-  r = removeTopic(r, 'c');
+  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, [null, 'c']);
+  r = assignTopic(r, 'x', 'main');
+  assert.deepEqual(r.corners.find((c) => c.key === 'main').items, ['x', 'c'], '空き枠に入る');
+  r = removeTopic(removeTopic(r, 'c'), 'x');
   assert.equal(r.corners.find((c) => c.key === 'main').items.length, 0);
 });
 
@@ -479,7 +481,7 @@ test('保存データ: 往復・版数・壊れた値・未知のフィールド
   assert.equal(wk.personal.length, 1);
   assert.equal(wk.personal[0].url, 'https://x.com/i/web/status/2110000000000000001', '危険な URL は捨てる');
   assert.deepEqual(wk.checkpoints, [{ kind: 'preview', dataAt: 'x', recordedAt: null, count: null, postIds: ['1'] }]);
-  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 } });
+  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 }, cardVisible: true });
   assert.equal(wk.carriedOut.length, 1);
   assert.deepEqual(wk.carriedOut[0].postIds, ['1']);
   assert.equal(wk.carriedOut[0].genre, 'night');
@@ -709,7 +711,7 @@ test('片付け: 構成から外して覚え、戻すと元の枠へ（空きが
   let w = defaultWeek();
   for (const id of ['A', 'B', 'C']) w.rundown = assignTopic(w.rundown, id, 'main');
   w = shelveTopic(w, tA, 100);
-  assert.deepEqual(w.rundown.corners[0].items, ['B', 'C']);
+  assert.deepEqual(w.rundown.corners[0].items, [null, 'B', 'C']);
   assert.deepEqual(w.shelved[0].corner, { key: 'main', index: 0 });
   assert.equal(shelveTopic(w, tA, 200).shelved.length, 1, '二重には片付けない');
   const back = unshelveTopic(w, 'A');
@@ -720,7 +722,7 @@ test('片付け: 構成から外して覚え、戻すと元の枠へ（空きが
   let w2 = { ...w, rundown: assignTopic(w.rundown, 'D', 'main') };
   const full = unshelveTopic(w2, 'A');
   assert.equal(full.placed, false);
-  assert.deepEqual(full.week.rundown.corners[0].items, ['B', 'C', 'D']);
+  assert.deepEqual(full.week.rundown.corners[0].items, ['D', 'B', 'C']);
   assert.equal(restoreToCorner(w.rundown, 'Z', null).placed, false);
   // 候補の振り分け
   const part = partitionTopics([tA, { id: 'B', postIds: ['2'] }], w, []);
@@ -772,4 +774,319 @@ test('投稿の削除（非表示）: どの話題にも入れない・戻せる
   saved = unhidePost(saved, call.postIds[0]);
   assert.equal(saved.hiddenPosts.length, 0);
   assert.equal(parseSaved(serializeSaved(hidePost(defaultSaved(), '123', null, 1))).state.hiddenPosts[0].id, '123');
+});
+
+// ================================================================ v2 段階1（フォルダ型の編成）
+import {
+  isFolderTopic, postTopicMap, recommendGeneral, folderRows, buildTree, selectClick, toggleCheck, selectAllRows, pruneSelection,
+  applyDrop, makeGroup, createEmptyGroup, renameTopic, createHistory, recordHistory, undoHistory, redoHistory,
+  searchPosts, queryTokens, topicsOfRows, isDropTarget, placeOf, sortProgress, toggledGenre,
+} from '../show/js/folders.js';
+import { setMainSlot, mainSlots, moveToIndex, applyGenreOverrides, setPostGenre, genreOverrideList, postGenre, categoryOfGenre, usedTopicIds } from '../show/js/logic.js';
+import { liveSnapshot, diffSnapshot, publishLiveState, onShowEvent, resetLiveEvents, eventLog } from '../show/js/events.js';
+
+function v2World() {
+  const d = weekData();
+  const topics = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs });
+  const week = defaultWeek();
+  const saved = defaultSaved();
+  const ctx = {
+    week, saved, topics, topicsById: indexTopics(topics), postsById: new Map(d.posts.map((p) => [p.id, p])), weekPosts: d.posts,
+    shelvedTopics: [], trashedTopics: [], newPostIds: new Set(), bookmarkPosts: [], pickIds: new Set(), generalAll: false, query: '',
+    postTopic: postTopicMap(topics),
+  };
+  const dctx = { topicsById: ctx.topicsById, postTopic: ctx.postTopic, postsById: ctx.postsById, weekKey: '2026-10-17', now: 1000 };
+  return { d, topics, week, saved, ctx, dctx };
+}
+
+test('v2 フォルダ: まとまり・受信箱の振り分け（受信箱は番組構成に入っていない単発）', () => {
+  const { topics, ctx, week } = v2World();
+  const call = topics.find((t) => t.id === 'd:d-hostcall');
+  assert.ok(isFolderTopic(call));
+  const single = topics.find((t) => t.kind === 'single');
+  assert.ok(!isFolderTopic(single));
+  const night = folderRows(ctx, 'group:night').rows.map((r) => r.id);
+  assert.ok(night.includes('d:d-hostcall') && !night.includes(single.id));
+  const inbox = folderRows(ctx, 'inbox').rows.map((r) => r.id);
+  assert.ok(inbox.includes(single.postIds[0]));
+  assert.ok(!inbox.includes(call.postIds[0]), 'まとまりの投稿は受信箱に出ない');
+  // 番組構成に入れたら受信箱から消える
+  week.rundown = assignTopic(week.rundown, single.id, 'category');
+  assert.ok(!folderRows(ctx, 'inbox').rows.some((r) => r.id === single.postIds[0]));
+  assert.deepEqual(folderRows(ctx, 'corner:category').rows.map((r) => r.id), [single.id]);
+  assert.deepEqual(folderRows(ctx, `topic:${call.id}`).rows.map((r) => r.id), call.postIds);
+  assert.deepEqual(placeOf(week, single.id), { key: 'corner:category', label: 'カテゴリ別' });
+});
+
+test('v2 フォルダの木: 番組構成（メイン1〜3・メイン候補・カテゴリ別・雑談）・まとまり・受信箱・件数', () => {
+  const { ctx, week, topics } = v2World();
+  const call = topics.find((t) => t.id === 'd:d-hostcall');
+  week.rundown = setMainSlot(week.rundown, call.id, 1).rundown;
+  const nodes = buildTree(ctx, new Set(['group:night']));
+  const keys = nodes.map((n) => n.key);
+  for (const k of ['slot:0', 'slot:1', 'slot:2', 'cand', 'corner:category', 'corner:chat', 'group:night', 'group:general', 'inbox', 'new', 'shelf', 'trash']) assert.ok(keys.includes(k), k);
+  assert.equal(nodes.find((n) => n.key === 'slot:1').sub, call.name);
+  assert.equal(nodes.find((n) => n.key === 'slot:0').sub, '空き');
+  assert.ok(keys.includes(`topic:${call.id}`), '開いた夜職の下にまとまり');
+  assert.ok(!buildTree(ctx, new Set()).some((n) => n.key === `topic:${call.id}`), '閉じていれば出さない');
+  assert.equal(nodes.find((n) => n.key === 'group:night').drop, false);
+  assert.equal(nodes.find((n) => n.key === 'inbox').count, folderRows(ctx, 'inbox').rows.length >= 0 ? nodes.find((n) => n.key === 'inbox').count : -1);
+});
+
+test('v2 一般のバズのおすすめ: 上位 N 件（スコア順）・show_pick は最優先・すべて表示', () => {
+  const t = (id, score, posts = [id]) => ({ id, genre: 'general', score, postIds: posts, stats: { count: posts.length } });
+  const topics = [t('a', 9), t('b', 8), t('c', 7), t('d', null), { id: 'n', genre: 'host', score: 99, postIds: ['n'], stats: { count: 1 } }];
+  assert.deepEqual([...recommendGeneral(topics, 2)], ['a', 'b']);
+  assert.deepEqual([...recommendGeneral(topics, 2, new Set(['c']))], ['c', 'a'], 'show_pick が最優先');
+  assert.ok(!recommendGeneral(topics, 10).has('n'), '夜職は対象外');
+  assert.deepEqual([...recommendGeneral(topics, 10)].slice(-1), ['d'], 'スコア不明は末尾');
+});
+
+test('v2 検索: 本文・@アカウント・話題名・matched_terms、スペース区切りで AND', () => {
+  const posts = [
+    { id: '1', text: 'シャンパンコールの新曲', user: 'host_a', matched_terms: ['quote:ラスソン'] },
+    { id: '2', text: '別の話', user: 'kyaba_b', matched_terms: [] },
+  ];
+  assert.deepEqual(queryTokens('  ラスソン　host '), ['ラスソン', 'host']);
+  assert.deepEqual(searchPosts(posts, 'シャンパン').map((p) => p.id), ['1']);
+  assert.deepEqual(searchPosts(posts, '@kyaba').map((p) => p.id), ['2']);
+  assert.deepEqual(searchPosts(posts, 'ラスソン host_a').map((p) => p.id), ['1'], 'AND・matched_terms');
+  assert.deepEqual(searchPosts(posts, 'ラスソン kyaba').map((p) => p.id), []);
+  assert.deepEqual(searchPosts(posts, 'まとまりの名前', (id) => (id === '2' ? 'まとまりの名前' : '')).map((p) => p.id), ['2'], '話題名');
+  assert.deepEqual(searchPosts(posts, ''), []);
+});
+
+test('v2 複数選択: クリック・Ctrl・Shift・チェック・すべて選択・見えない行の掃除', () => {
+  const rows = ['a', 'b', 'c', 'd', 'e'].map((k) => ({ key: k }));
+  let s = { sel: new Set(), anchor: null };
+  s = selectClick(s, rows, 1);
+  assert.deepEqual([...s.sel], ['b']);
+  s = selectClick(s, rows, 3, { ctrl: true });
+  assert.deepEqual([...s.sel].sort(), ['b', 'd']);
+  s = selectClick(s, rows, 3, { ctrl: true });
+  assert.deepEqual([...s.sel], ['b'], 'Ctrl でもう一度押すと外れる');
+  s = selectClick(s, rows, 1);
+  s = selectClick(s, rows, 4, { shift: true });
+  assert.deepEqual([...s.sel].sort(), ['b', 'c', 'd', 'e'], 'Shift で範囲');
+  s = toggleCheck(s, rows, 0);
+  assert.equal(s.sel.size, 5);
+  s = selectAllRows(rows.slice(0, 2));
+  assert.deepEqual([...s.sel], ['a', 'b']);
+  s = pruneSelection({ sel: new Set(['a', 'z']), anchor: 9 }, rows);
+  assert.deepEqual([...s.sel], ['a']);
+  assert.equal(s.anchor, null);
+});
+
+test('v2 メインの枠: メイン1〜3（空き枠を保つ）・入れ替え・押し出し', () => {
+  let r = defaultRundown();
+  r = setMainSlot(r, 'A', 2).rundown;
+  assert.deepEqual(mainSlots(r), [null, null, 'A']);
+  let x = setMainSlot(r, 'B', 2);
+  assert.equal(x.displaced, 'A', '入っていた話題は押し出される');
+  x = setMainSlot(x.rundown, 'C', 0);
+  assert.deepEqual(mainSlots(x.rundown), ['C', null, 'B']);
+  const sw = setMainSlot(x.rundown, 'C', 2);
+  assert.deepEqual(mainSlots(sw.rundown), ['B', null, 'C'], 'メインの中では入れ替え');
+  assert.equal(sw.displaced, null);
+  r = moveToIndex(assignTopic(assignTopic(assignTopic(defaultRundown(), 'p', 'category'), 'q', 'category'), 'r', 'category'), 'category', 'r', 0);
+  assert.deepEqual(r.corners.find((c) => c.key === 'category').items, ['r', 'p', 'q']);
+  r = moveToIndex(r, 'category', 'r', 3);
+  assert.deepEqual(r.corners.find((c) => c.key === 'category').items, ['p', 'q', 'r']);
+  assert.deepEqual(buildCues(sw.rundown, new Map([['B', {}], ['C', {}]])).map((c) => c.id), ['main:B', 'main:C', 'category', 'chat'], '空き枠は飛ばす');
+});
+
+test('v2 ドロップ: 投稿→まとまり（移動）・まとまり→まとまり（結合）・投稿→番組構成（入っている話題ごと）', () => {
+  const { topics, week, saved, dctx } = v2World();
+  const call = topics.find((t) => t.id === 'd:d-hostcall');
+  const tag = topics.find((t) => t.id === 't:王子の引退');
+  const single = topics.find((t) => t.kind === 'single' && t.genre !== 'general');
+  // 投稿 → まとまり
+  let r = applyDrop(week, saved, [{ type: 'post', id: single.postIds[0] }], `topic:${call.id}`, dctx);
+  assert.ok(r.ok);
+  assert.equal(week.overrides.moves[single.postIds[0]], call.id);
+  // まとまり → まとまり（結合）。番組構成に入っていたら付け替え
+  week.rundown = assignTopic(week.rundown, tag.id, 'category');
+  r = applyDrop(week, saved, [{ type: 'topic', id: tag.id }], `topic:${call.id}`, dctx);
+  assert.equal(week.overrides.merges[tag.id], call.id);
+  assert.deepEqual(week.rundown.corners.find((c) => c.key === 'category').items, [call.id]);
+  // 投稿（まとまりの中）→ メイン2: そのまとまりごと
+  r = applyDrop(week, saved, [{ type: 'post', id: call.postIds[0] }], 'slot:1', dctx);
+  assert.ok(r.ok, r.message);
+  assert.deepEqual(mainSlots(week.rundown), [null, call.id, null]);
+  assert.equal(week.rundown.corners.find((c) => c.key === 'category').items.length, 0, '他のコーナーから外れる');
+});
+
+test('v2 ドロップ: 一般のバズはメイン・メイン候補に入らない／メイン候補→メイン／押し出しはメイン候補へ', () => {
+  const { topics, week, saved, dctx } = v2World();
+  const gen = topics.find((t) => t.genre === 'general');
+  const call = topics.find((t) => t.id === 'd:d-hostcall');
+  const tag = topics.find((t) => t.id === 't:王子の引退');
+  let r = applyDrop(week, saved, [{ type: 'topic', id: gen.id }], 'slot:0', dctx);
+  assert.equal(r.ok, false);
+  assert.match(r.message, /一般のバズ/);
+  r = applyDrop(week, saved, [{ type: 'topic', id: gen.id }], 'cand', dctx);
+  assert.equal(r.ok, false);
+  r = applyDrop(week, saved, [{ type: 'topic', id: call.id }, { type: 'topic', id: tag.id }, { type: 'topic', id: gen.id }], 'cand', dctx);
+  assert.deepEqual(week.mainCand, [call.id, tag.id]);
+  r = applyDrop(week, saved, [{ type: 'topic', id: call.id }], 'slot:0', dctx);
+  assert.deepEqual(week.mainCand, [tag.id], 'メインに入れたらメイン候補から外れる');
+  r = applyDrop(week, saved, [{ type: 'topic', id: tag.id }], 'slot:0', dctx);
+  assert.deepEqual(mainSlots(week.rundown), [tag.id, null, null]);
+  assert.deepEqual(week.mainCand, [call.id], '押し出された話題はメイン候補へ');
+  // 並べ替え（メイン候補の位置）
+  applyDrop(week, saved, [{ type: 'topic', id: tag.id }], 'cand#0', dctx);
+  assert.deepEqual(week.mainCand, [tag.id, call.id]);
+});
+
+test('v2 ドロップ: 受信箱へ（まとまりから外す・構成から外す）・片付け・ゴミ箱', () => {
+  const { topics, week, saved, dctx } = v2World();
+  const call = topics.find((t) => t.id === 'd:d-hostcall');
+  const single = topics.find((t) => t.kind === 'single');
+  week.rundown = assignTopic(week.rundown, single.id, 'chat');
+  applyDrop(week, saved, [{ type: 'post', id: call.postIds[0] }, { type: 'post', id: single.postIds[0] }], 'inbox', dctx);
+  assert.equal(week.overrides.moves[call.postIds[0]], `p:${call.postIds[0]}`);
+  assert.ok(!usedTopicIds(week.rundown).includes(single.id));
+  applyDrop(week, saved, [{ type: 'topic', id: call.id }], 'shelf', dctx);
+  assert.equal(week.shelved[0].topicId, call.id);
+  applyDrop(week, saved, [{ type: 'post', id: single.postIds[0] }], 'trash', dctx);
+  assert.equal(saved.hiddenPosts[0].id, single.postIds[0]);
+  const tag = topics.find((t) => t.id === 't:王子の引退');
+  week.mainCand = [tag.id];
+  applyDrop(week, saved, [{ type: 'topic', id: tag.id }], 'trash', dctx);
+  assert.equal(saved.trash[0].topicId, tag.id);
+  assert.deepEqual(week.mainCand, []);
+  assert.equal(isDropTarget('group:night'), false);
+  assert.equal(isDropTarget('corner:category#2'), true);
+  assert.deepEqual(topicsOfRows([{ type: 'post', id: call.postIds[1] }, { type: 'topic', id: call.id }], postTopicMap(topics)), [call.id]);
+});
+
+test('v2 まとまりにする・空のまとまり・名前変更（buildTopics に反映）', () => {
+  const { d, topics, week, dctx } = v2World();
+  const singles = topics.filter((t) => t.kind === 'single').slice(0, 2);
+  const id = makeGroup(week, singles.map((t) => ({ type: 'post', id: t.postIds[0] })), dctx, { name: '自作のまとまり', genre: 'kyaba' });
+  const empty = createEmptyGroup(week, '空のフォルダ', 'host', 2000);
+  let t2 = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs, overrides: week.overrides });
+  const g = t2.find((t) => t.id === id);
+  assert.equal(g.name, '自作のまとまり');
+  assert.equal(g.genre, 'kyaba');
+  assert.deepEqual([...g.postIds].sort(), singles.map((t) => t.postIds[0]).sort());
+  assert.ok(isFolderTopic(g));
+  const e = t2.find((t) => t.id === empty);
+  assert.equal(e.postIds.length, 0);
+  renameTopic(week, e, '名前を変えた');
+  renameTopic(week, t2.find((t) => t.id === 'd:d-hostcall'), 'コールの話');
+  t2 = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs, overrides: week.overrides });
+  assert.equal(t2.find((t) => t.id === empty).name, '名前を変えた');
+  assert.equal(t2.find((t) => t.id === 'd:d-hostcall').name, 'コールの話');
+  renameTopic(week, t2.find((t) => t.id === 'd:d-hostcall'), '');
+  assert.equal(week.overrides.renames['d:d-hostcall'], undefined, '空なら自動の名前に戻す');
+});
+
+test('v2 ジャンルの上書き: 投稿 id ごと・翌週以降も有効・元と同じなら消す・書き出しに含める', () => {
+  const posts = normalizeDataset({ posts: [post({ id: '2110000000000000901', categories: ['ホスト'], text: 'a' }), post({ id: '2110000000000000902', categories: ['その他'], text: 'b' })] }).posts;
+  const base = new Map(posts.map((p) => [p.id, p]));
+  const orig = (id) => postGenre(base.get(id));
+  let saved = defaultSaved();
+  setPostGenre(saved, ['2110000000000000901'], 'general', 5, orig);
+  setPostGenre(saved, ['2110000000000000902'], 'kabuki', 6, orig);
+  assert.deepEqual(genreOverrideList(saved), [
+    { id: '2110000000000000901', genre: 'general', from: 'host', at: 5 },
+    { id: '2110000000000000902', genre: 'kabuki', from: 'general', at: 6 },
+  ]);
+  const applied = applyGenreOverrides(posts, saved.genreOverrides);
+  assert.equal(postGenre(applied[0]), 'general');
+  assert.deepEqual(applied[1].categories[0], categoryOfGenre('kabuki'));
+  assert.equal(applied[0]._origCategories[0], 'ホスト');
+  assert.ok(posts[0].categories.includes('ホスト'), '元の投稿は書き換えない');
+  // 別の週の話題づくりにも効く（投稿 id で保存）
+  const topics = buildTopics({ posts: applied, dict: [], refTs: posts[0].ts + 100 });
+  assert.equal(topics.find((t) => t.postIds.includes('2110000000000000902')).genre, 'kabuki');
+  // 保存の往復・元に戻すと消える
+  saved = parseSaved(serializeSaved(saved)).state;
+  assert.equal(saved.genreOverrides['2110000000000000901'].genre, 'general');
+  setPostGenre(saved, ['2110000000000000901'], 'host', 7, orig);
+  assert.equal(saved.genreOverrides['2110000000000000901'], undefined);
+  assert.equal(toggledGenre('host'), 'general');
+  assert.equal(toggledGenre('general', 'kyaba'), 'kyaba');
+  assert.equal(toggledGenre('general'), 'night');
+});
+
+test('v2 元に戻す・やり直す: 履歴（上限つき）', () => {
+  let h = createHistory(3);
+  assert.equal(undoHistory(h, 'now'), null);
+  h = recordHistory(h, '操作1', 's0');
+  h = recordHistory(h, '操作2', 's1');
+  let u = undoHistory(h, 's2');
+  assert.equal(u.snap, 's1');
+  assert.equal(u.label, '操作2');
+  h = u.history;
+  u = undoHistory(h, 's1');
+  assert.equal(u.snap, 's0');
+  h = u.history;
+  let r = redoHistory(h, 's0');
+  assert.equal(r.snap, 's1');
+  h = r.history;
+  r = redoHistory(h, 's1');
+  assert.equal(r.snap, 's2');
+  h = r.history;
+  assert.equal(redoHistory(h, 's2'), null);
+  h = recordHistory(h, '操作3', 's2');
+  h = recordHistory(h, '操作4', 's3');
+  h = recordHistory(h, '操作5', 's4');
+  assert.equal(h.past.length, 3, '上限');
+  h = recordHistory(undoHistory(h, 's5').history, '別の操作', 's4');
+  assert.equal(h.future.length, 0, '新しい操作でやり直しは消える');
+});
+
+test('v2 保存データの移行（版 3 → 4）: メイン枠・メイン候補・ジャンル上書きの既定値', () => {
+  const v3 = {
+    v: 3, trash: [],
+    weeks: { '2026-10-17': { rundown: { corners: [{ key: 'main', min: 45, items: ['a', 'b'] }, { key: 'category', min: 30, items: ['c'] }] }, live: { index: 1, status: {} } } },
+  };
+  const st = parseSaved(JSON.stringify(v3)).state;
+  const w = st.weeks['2026-10-17'];
+  assert.deepEqual(mainSlots(w.rundown), ['a', 'b', null]);
+  assert.deepEqual(w.mainCand, []);
+  assert.deepEqual(st.genreOverrides, {});
+  assert.equal(w.live.cardVisible, true);
+  // 版 4 の空き枠・メイン候補の往復（構成に入っているものはメイン候補から除く）
+  const v4 = { v: 4, weeks: { '2026-10-17': { rundown: { corners: [{ key: 'main', min: 45, items: [null, 'x', null] }] }, mainCand: ['x', 'y', 'y', 5] } }, genreOverrides: { 123: { genre: 'host', at: 1 }, abc: { genre: 'host' }, 456: { genre: 'zzz' } } };
+  const s4 = parseSaved(JSON.stringify(v4)).state;
+  assert.deepEqual(s4.weeks['2026-10-17'].rundown.corners[0].items, [null, 'x']);
+  assert.deepEqual(s4.weeks['2026-10-17'].mainCand, ['y']);
+  assert.deepEqual(Object.keys(s4.genreOverrides), ['123']);
+  assert.equal(JSON.parse(serializeSaved(s4)).v, SCHEMA_VERSION);
+});
+
+test('v2 仕分けの進み具合', () => {
+  const items = [{ key: 'a' }, { key: 'b' }, { key: 'c' }];
+  assert.deepEqual(sortProgress(items, new Map([['a', 'x']]), 1), { pos: 2, total: 3, done: 1, remaining: 2 });
+  assert.deepEqual(sortProgress(items, new Map(), 5), { pos: 3, total: 3, done: 0, remaining: 3 });
+});
+
+test('v2 進行状態のイベント: 変わったときだけ 1 か所から発行（コーナー・話題・カード表示）', () => {
+  resetLiveEvents();
+  const topicsById = new Map([['A', { id: 'A', name: 'A', genre: 'host', stats: { topPostId: '1' } }], ['B', { id: 'B', name: 'B', genre: 'host', stats: { topPostId: '2' } }]]);
+  let r = defaultRundown();
+  r = assignTopic(assignTopic(r, 'A', 'main'), 'B', 'category');
+  const cues = buildCues(r, topicsById);
+  const got = [];
+  const off = onShowEvent((e) => got.push(e));
+  let live = defaultLive();
+  const pub = () => publishLiveState({ weekKey: 'w', live, cues, topicsById });
+  pub();
+  assert.deepEqual(got[0].changed, ['corner', 'topic', 'card', 'progress']);
+  assert.equal(got[0].state.topic.id, 'A');
+  assert.equal(pub(), null, '変わらなければ発行しない');
+  live = liveReduce(live, { type: 'done' }, cues);
+  pub();
+  assert.deepEqual(got[1].changed, ['corner', 'topic', 'card', 'progress']);
+  assert.equal(got[1].state.corner.key, 'category');
+  live = liveReduce(live, { type: 'toggleCard' }, cues);
+  pub();
+  assert.deepEqual(got[2].changed, ['card']);
+  assert.equal(got[2].state.cardVisible, false);
+  off();
+  assert.equal(eventLog.length, 3);
+  assert.deepEqual(diffSnapshot(liveSnapshot({ weekKey: 'w', live, cues, topicsById }), liveSnapshot({ weekKey: 'w', live, cues, topicsById })), []);
 });

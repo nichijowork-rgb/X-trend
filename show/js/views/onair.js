@@ -84,6 +84,8 @@ function cueBody(app, cue, wk, color) {
     // 代表投稿は X 埋め込み（失敗・読み込み中・カード表示設定のときは自前の表示）
     const id = st.topPostId || t.linkId || null;
     const right = app.ui.view !== 'card' && id ? h('div', { class: 'oa-post-wrap', dataset: { keep: 'post' } }, embedHost(id, own, 'oa-embed')) : own;
+    // 進行画面の「投稿カード：隠し中」なら代表投稿は出さない（段階2で OBS のパーツと連動）
+    if (wk.live.cardVisible === false) return h('div', { class: 'oa-split is-nocard', dataset: { keep: `s:${cue.id}:nocard` } }, left);
     return h('div', { class: 'oa-split', dataset: { keep: `s:${cue.id}` } }, left, right);
   }
   return h('div', { class: 'oa-title' }, h('span', { class: 'oa-big-icon' }, genreIcon(color)), h('h1', { class: 'oa-title-main' }, cue.kind === 'empty' ? def.name : cueTitle(app, cue)), h('p', { class: 'oa-title-sub' }, def.sub));

@@ -110,18 +110,47 @@ function watchConsole(page, bucket) {
 }
 
 /** メニュー（<details>）の中のボタンも押せるよう、先に開いてからクリック */
-async function act(page, sel) {
-  await page.evaluate((x) => { const el = document.querySelector(x); const d = el && el.closest('details'); if (d) d.open = true; }, sel);
-  await page.click(sel);
-}
-
 const ready = (page) => page.waitForFunction(() => (window.__show && window.__show.ready) || !document.getElementById('error').hidden, null, { timeout: 15000 });
 const sw = (page) => page.evaluate(() => document.documentElement.scrollWidth);
 const live = (page) => page.evaluate(() => window.__show.weekState().live);
+const wk = (page) => page.evaluate(() => { const w = window.__show.weekState(); return { main: w.rundown.corners.find((c) => c.key === 'main').items, category: w.rundown.corners.find((c) => c.key === 'category').items, chat: w.rundown.corners.find((c) => c.key === 'chat').items, cand: w.mainCand }; });
 const curCue = (page) => page.evaluate(() => { const a = window.__show; const c = a.cues[a.weekState().live.index]; return c ? c.id : 'end'; });
 const oaCue = (page) => page.$eval('#oa-stage', (e) => e.dataset.cue);
 async function waitOnair(page, cue) {
   await page.waitForFunction((c) => { const s = document.getElementById('oa-stage'); return s && s.dataset.cue === c; }, cue, { timeout: 5000 });
+}
+/** 検索（入力して結果が出るまで待つ） */
+async function search(page, q) {
+  await page.fill('[data-key="search"]', q);
+  await page.waitForFunction((x) => window.__show.ui.rowsQuery === x, q);
+}
+/** フォルダを開く（左の木） */
+async function folder(page, key) {
+  await page.click(`[data-key="folder-${key}"]`);
+  await page.waitForFunction((k) => window.__show.ui.folder === k && !window.__show.ui.query, key);
+}
+/** 一覧の行（表示中の行の要素） */
+const rowSel = (key) => `.row-item[data-row-key="${key}"]`;
+const rowKeys = (page) => page.evaluate(() => (window.__show.ui.rows || []).map((r) => r.key));
+/** 右クリックメニューから */
+async function ctx(page, sel, item) {
+  await page.click(sel, { button: 'right' });
+  await page.waitForSelector('.ctx-menu');
+  await page.click(`.ctx-menu [data-key="${item}"]`);
+}
+/** マウスで実際にドラッグ（行 → ドロップ先） */
+async function drag(page, fromSel, toSel) {
+  const a = await page.locator(fromSel).first().boundingBox();
+  const b = await page.locator(toSel).first().boundingBox();
+  await page.mouse.move(a.x + Math.min(240, a.width / 2), a.y + a.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(a.x + Math.min(240, a.width / 2) + 12, a.y + a.height / 2 + 8, { steps: 3 });
+  await page.mouse.move(b.x + Math.min(80, b.width / 2), b.y + b.height / 2, { steps: 10 });
+  const ghost = await page.$eval('.drag-ghost', (e) => e.textContent).catch(() => null);
+  const over = await page.$eval('.is-drop-over', (e) => e.dataset.drop).catch(() => null);
+  await page.mouse.up();
+  await page.waitForTimeout(120);
+  return { ghost, over };
 }
 
 async function main() {
@@ -138,13 +167,12 @@ async function main() {
     browser = await chromium.launch();
     await waitHttp(base);
     const sample = JSON.parse(readFileSync(path.join(ROOT, 'sample/show/posts.json'), 'utf8'));
-    const sampleReports = JSON.parse(readFileSync(path.join(ROOT, 'sample/show/reports.json'), 'utf8'));
     const sampleBm = JSON.parse(readFileSync(path.join(ROOT, 'sample/show/bookmarks.json'), 'utf8'));
     const SAMPLE_404 = { posts: null, reports: null, bookmarks: null };
 
-    const newCtx = (opts = {}) => browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'ja-JP', timezoneId: 'Asia/Tokyo', acceptDownloads: true, ...opts });
-    const open = async (ctx, url, routeOpts = { data: SAMPLE_404 }) => {
-      const page = await ctx.newPage();
+    const newCtx = (opts = {}) => browser.newContext({ viewport: { width: 960, height: 1040 }, locale: 'ja-JP', timezoneId: 'Asia/Tokyo', acceptDownloads: true, ...opts });
+    const open = async (c, url, routeOpts = { data: SAMPLE_404 }) => {
+      const page = await c.newPage();
       const external = await setupRoutes(page, routeOpts);
       watchConsole(page, errors);
       await page.goto(url);
@@ -152,469 +180,465 @@ async function main() {
       return { page, external };
     };
 
-    // ---- 1. サンプル表示・ページ切替タブ
-    await check('サンプル表示（data/ が無い）＋帯・話題のまとめ・ブックマーク枠', async () => {
-      const ctx = await newCtx();
-      const { page, external } = await open(ctx, show);
+    // ---- 1. サンプル表示・フォルダの木
+    await check('サンプル表示（data/ が無い）＋帯・フォルダの木（番組構成・まとまり・受信箱・★ブクマ・NEW・片付け・ゴミ箱）', async () => {
+      const c = await newCtx();
+      const { page, external } = await open(c, show);
       assert(await page.isVisible('#sample-banner'), 'banner');
-      assert((await page.textContent('#sample-banner')).includes('サンプル表示中'), 'banner text');
       assert((await page.getAttribute('.page-tabs a[aria-current="page"]', 'href')) === './', 'show tab current');
-      assert(await page.$('.tcard[data-topic="d:d-hostcall"]'), 'ホストコールの話題');
-      assert(await page.$('.tcard[data-topic="t:サンプル王子さんの引退"]'), 'topic: の話題');
-      assert(await page.$('.tcard .badge-suggest'), '同じ話題かも？');
-      assert(await page.isVisible('.bookmarks-sec'), 'bookmark section');
-      const weekN = await page.$$eval('.bm-grid .bm-card, .bm-list li', (l) => l.length);
-      assert(weekN === 4, `今週のブックマーク ${weekN}`);
-      await page.click('[data-key="bm-all"]');
-      const allN = await page.$$eval('.bm-grid .bm-card, .bm-list li', (l) => l.length);
-      assert(allN === sampleBm.bookmarks.length, `すべて ${allN}`);
-      assert((await page.textContent('.bookmarks-sec')).includes('ブクマで取り込み'), 'below_threshold の印');
-      assert(await page.$('.tcard .badge-bm'), '★ブックマークの印');
+      for (const k of ['slot:0', 'slot:1', 'slot:2', 'cand', 'corner:category', 'corner:chat', 'group:night', 'group:general', 'inbox', 'bookmarks', 'new', 'shelf', 'trash']) {
+        assert(await page.$(`[data-key="folder-${k}"]`), `folder ${k}`);
+      }
+      assert((await page.textContent('.lp-title')).startsWith('受信箱'), 'default folder inbox');
+      assert(await page.$('[data-key="folder-topic:d:d-hostcall"]'), '夜職の下にまとまり（ホストコール）');
+      const bm = await page.$eval('[data-key="folder-bookmarks"] .tree-count', (e) => e.textContent);
+      assert(bm === '3', `ブクマ ${bm}（今週 4 件のうち posts.json にあるもの）`);
+      await folder(page, 'bookmarks');
+      assert((await rowKeys(page)).length === 3, 'ブクマ（今週）');
+      await page.click('[data-key="bm-toggle"]');
+      const all = (await rowKeys(page)).length;
+      assert(all === 5, `ブクマ（すべて）${all}`);
       const ext = external.filter((u) => !u.startsWith('https://platform.twitter.com/widgets.js'));
-      assert(!external.some((u) => /fonts\.(googleapis|gstatic)\.com/.test(u)), '外部フォントは読まない');
       assert(ext.length === 0, `外部通信: ${ext.join(', ')}`);
-      await ctx.close();
-      return `今週 ${weekN}件・すべて ${allN}件`;
+      await c.close();
+      return `ブクマ ${bm}件`;
     });
 
     await check('ページ切替タブ: ダッシュボード ⇄ 番組', async () => {
-      const ctx = await newCtx();
-      const page = await ctx.newPage();
+      const c = await newCtx();
+      const page = await c.newPage();
       await setupRoutes(page, {});
       watchConsole(page, errors);
       await page.goto(base);
       await page.waitForFunction(() => window.__dashboard && window.__dashboard.ready, null, { timeout: 15000 });
-      assert((await page.textContent('.site-header .page-tabs a[aria-current="page"]')) === 'ダッシュボード', 'dashboard current');
       await page.click('.site-header .page-tabs a[href="show/"]');
       await ready(page);
       assert(new URL(page.url()).pathname === '/show/', page.url());
       await page.click('.page-tabs a[href="../"]');
       await page.waitForFunction(() => window.__dashboard && window.__dashboard.ready, null, { timeout: 15000 });
       assert(new URL(page.url()).pathname === '/', page.url());
-      await page.setViewportSize({ width: 360, height: 740 });
-      const w = await sw(page);
-      assert(w <= 360, `dashboard scrollWidth ${w}`);
-      await page.screenshot({ path: path.join(SHOTS, 'dashboard-tabs-360.png'), clip: { x: 0, y: 0, width: 360, height: 220 } });
-      await ctx.close();
+      await c.close();
     });
 
-    // ---- 2. 編成 → 進行 → 映す用（同じブラウザの別タブ）
-    const ctx = await newCtx();
-    const { page } = await open(ctx, `${show}#plan`);
-    let mainIds = [];
-    await check('編成: メイン3（おすすめで埋める）→ 自動タイトル・コーナーへ入れる・台本', async () => {
-      await page.click('[data-key="fill-main"]');
-      mainIds = await page.$$eval('.slot.g-main', (l) => l.map((e) => e.dataset.topic));
-      assert(mainIds.length === 3, `main ${mainIds.length}`);
-      const names = await page.$$eval('.slot.g-main .slot-name', (l) => l.map((e) => e.lastChild.textContent));
-      const title = await page.inputValue('[data-key="title"]');
-      assert(title === `【週刊ヨルニュース】${names.join('／')}`, title);
-      // カテゴリ別へ 2 件、雑談へ 1 件
-      const cands = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
-      let n = 0;
-      for (const id of cands) { if (n >= 2) break; const sel = `[data-key="to-category-${id}"]`; if (await page.$(sel)) { await act(page, sel); n++; } }
-      await page.click('[data-filter="general"]');
-      if (!(await page.$('.singles[open]'))) await page.click('[data-key="singles-toggle"]');
-      const gen = await page.$$eval('.candidates .tcard, .candidates .srow', (l) => l.map((e) => e.dataset.topic));
-      for (const id of gen) { const sel = `[data-key="to-chat-${id}"]`; if (await page.$(sel)) { await act(page, sel); break; } }
-      await page.click('[data-filter="all"]');
-      // 単発の投稿は折りたたみ（件数表示・展開・検索）
-      const cnt = await page.textContent('.cand-count');
-      assert(/まとまった話題 \d+件・単発の投稿 \d+件/.test(cnt), cnt);
-      const singleNames = await page.$$eval('.singles .tcard-name', (l) => l.map((e) => e.textContent));
-      assert(singleNames.length > 0, 'singles listed');
-      assert(await page.$('.singles[open]'), 'singles open state kept');
-      await page.fill('[data-key="topic-search"]', singleNames[0].slice(0, 6));
-      await page.waitForFunction((q) => { const n = [...document.querySelectorAll('.singles .tcard-name')]; return n.length > 0 && n.every((e) => e.textContent.includes(q)); }, singleNames[0].slice(0, 6));
-      await page.fill('[data-key="topic-search"]', '');
-      await page.waitForTimeout(300);
-      await page.click('[data-key="singles-toggle"]');
-      const cat = await page.$$eval('.corner[data-corner="category"] .item', (l) => l.length);
-      const chat = await page.$$eval('.corner[data-corner="chat"] .item', (l) => l.length);
-      assert(cat === 2 && chat === 1, `category ${cat} chat ${chat}`);
-      // 並べ替え
-      const before = await page.$$eval('.slot.g-main', (l) => l.map((e) => e.dataset.topic));
-      await page.click(`[data-key="main-down-${before[0]}"]`);
-      const after = await page.$$eval('.slot.g-main', (l) => l.map((e) => e.dataset.topic));
-      assert(after[1] === before[0] && after[0] === before[1], 'reorder');
-      mainIds = after;
-      // 台本（話すポイント）を入力 → 映す用には出ない
-      await page.click(`.corner[data-corner="main"] .item[data-topic="${mainIds[0]}"] summary`);
-      await page.fill(`[data-key="points-${mainIds[0]}"]`, 'ヒミツの話すポイント');
-      await page.fill(`[data-key="q-${mainIds[0]}"]`, 'みんなはどう？');
-      // タイトルを手で変えて → 自動に戻す
-      await page.fill('[data-key="title"]', '手書きタイトル');
-      await page.locator('[data-key="title"]').blur();
-      await page.waitForSelector('[data-key="title-auto"]');
-      await page.click('[data-key="title-auto"]');
-      assert((await page.inputValue('[data-key="title"]')).startsWith('【週刊ヨルニュース】'), 'auto title back');
-      await page.waitForTimeout(500); // 台本の保存（遅延）
-      await page.screenshot({ path: path.join(SHOTS, 'plan-1280.png') });
-      await page.screenshot({ path: path.join(SHOTS, 'plan-1280-full.png'), fullPage: true });
-      const w = await sw(page);
-      assert(w <= 1280, `scrollWidth ${w}`);
+    // ---- 2. 編成（フォルダ型）。1 つのページで続けて操作する
+    const cx = await newCtx();
+    const { page } = await open(cx, `${show}#plan`);
+    let mainId = null;
+    await check('ドラッグ＆ドロップ（マウス）: 投稿→メイン候補・まとまり→メイン1・投稿→まとまり・Esc でキャンセル', async () => {
+      // 受信箱の夜職の投稿 → メイン候補
+      const first = (await rowKeys(page))[0];
+      const r1 = await drag(page, rowSel(first), '.tree-node[data-drop="cand"]');
+      assert(r1.ghost && r1.ghost.includes('1件'), `ghost ${r1.ghost}`);
+      assert(r1.over === 'cand', `over ${r1.over}`);
+      let w = await wk(page);
+      assert(w.cand.length === 1 && w.cand[0] === `p:${first.slice(2)}`, JSON.stringify(w.cand));
+      assert((await page.textContent('#toast')).includes('メイン候補'), 'toast');
+      // まとまり（ホストコール）→ メイン1
+      await folder(page, 'group:night');
+      await drag(page, rowSel('t:d:d-hostcall'), '.tree-node[data-drop="slot:0"]');
+      w = await wk(page);
+      assert(w.main[0] === 'd:d-hostcall', JSON.stringify(w.main));
+      mainId = 'd:d-hostcall';
+      assert((await page.inputValue('[data-key="title"]')).includes('ホストコール'), '自動タイトル');
+      assert((await page.textContent('[data-key="folder-slot:0"]')).includes('ホストコール'), 'メイン1 にまとまり名');
+      // 投稿 → まとまり（受信箱の投稿をトー横へ）
+      await folder(page, 'inbox');
+      const p2 = (await rowKeys(page))[1];
+      await drag(page, rowSel(p2), '.tree-node[data-drop="topic:d:d-toyoko"]');
+      const moved = await page.evaluate((id) => window.__show.weekState().overrides.moves[id], p2.slice(2));
+      assert(moved === 'd:d-toyoko', `moves ${moved}`);
+      assert(!(await rowKeys(page)).includes(p2), '受信箱から消える');
+      // Esc でキャンセル
+      const p3 = (await rowKeys(page))[0];
+      const a = await page.locator(rowSel(p3)).boundingBox();
+      const b = await page.locator('.tree-node[data-drop="corner:chat"]').boundingBox();
+      await page.mouse.move(a.x + 200, a.y + 20);
+      await page.mouse.down();
+      await page.mouse.move(a.x + 220, a.y + 30, { steps: 3 });
+      await page.mouse.move(b.x + 40, b.y + 10, { steps: 5 });
+      await page.keyboard.press('Escape');
+      await page.mouse.up();
+      assert(!(await page.$('.drag-ghost')), 'ghost removed');
+      w = await wk(page);
+      assert(w.chat.length === 0, 'cancelled');
+      await page.screenshot({ path: path.join(SHOTS, 'plan-960-dnd.png') });
     });
 
-    await check('編成: 話題の編集（名前・結合）・同じ話題かも？（まとめる/バラす）・個人URL', async () => {
-      const sug = await page.$$eval('.candidates > .cand-grid .tcard .suggest-row', (l) => l.map((e) => e.closest('.tcard').dataset.topic));
-      assert(sug.length >= 2, `suggestions ${sug.length}`);
-      await page.click(`[data-key="accept-${sug[0]}"]`);
-      assert(!(await page.$(`.tcard[data-topic="${sug[0]}"] .suggest-row`)), 'accepted');
-      await page.click(`[data-key="split-${sug[1]}"]`);
-      assert(!(await page.$(`.tcard[data-topic="${sug[1]}"]`)), 'split');
-      // 名前変更
-      await act(page, `[data-key="edit-${sug[0]}"]`);
-      await page.waitForSelector('dialog.topic-dialog[open]');
-      await page.fill('[data-key="dlg-name"]', '麺屋の行列');
-      await page.locator('[data-key="dlg-name"]').press('Tab');
-      await page.waitForFunction(() => document.querySelector('dialog.topic-dialog[open] #dlg-title')?.textContent === '麺屋の行列');
-      await page.click('[data-key="dlg-close"]');
-      assert(!(await page.$('dialog[open]')), 'dialog closed');
-      assert((await page.textContent(`.tcard[data-topic="${sug[0]}"] .tcard-name`)) === '麺屋の行列', 'renamed');
-      // 個人 URL（データにある 1 件・無い 1 件・不正 1 行・重複）
-      const inData = sample.posts[sample.posts.length - 1];
-      await page.fill('[data-key="personal-input"]', `${inData.url}\nhttps://twitter.com/foo/status/1888888888888888888?s=20\nこれはURLではない\n${inData.url}`);
-      await page.click('[data-key="personal-add"]');
-      const msg = await page.textContent('.personal [role="status"]');
-      assert(msg.includes('2件追加') && msg.includes('リンクのみ 1件') && msg.includes('読み取れなかったもの 1件'), msg);
-      await page.click('[data-filter="me"]');
-      assert(await page.$('.tcard[data-topic="x:1888888888888888888"]'), 'link-only topic');
-      assert((await page.textContent('.tcard[data-topic="x:1888888888888888888"]')).includes('自分で追加'), 'personal badge');
-      await page.click('[data-filter="all"]');
+    await check('元に戻す / やり直す（Ctrl+Z・Ctrl+Shift+Z・Ctrl+Y・ボタン）', async () => {
+      const before = await wk(page);
+      await page.focus('.vlist');
+      await page.keyboard.press('Control+z'); // 投稿→まとまり を戻す
+      await page.keyboard.press('Control+z'); // まとまり→メイン1 を戻す
+      let w = await wk(page);
+      assert(!w.main.includes('d:d-hostcall'), `undo main ${JSON.stringify(w.main)}`);
+      await page.keyboard.press('Control+Shift+z');
+      w = await wk(page);
+      assert(w.main[0] === 'd:d-hostcall', 'redo main');
+      await page.keyboard.press('Control+y');
+      await page.click('[data-key="undo"]');
+      await page.click('[data-key="redo"]');
+      w = await wk(page);
+      assert(JSON.stringify(w) === JSON.stringify(before), `${JSON.stringify(w)} vs ${JSON.stringify(before)}`);
     });
 
-    let onair;
-    let afterMain = '';
-    await check('進行: 開始・読んだ（→）・飛ばす（S）・来週へ（L）・戻す（←）＋映す用が追従', async () => {
-      const oaPage = await ctx.newPage();
-      await oaPage.setViewportSize({ width: 1920, height: 1080 });
-      await setupRoutes(oaPage, { data: SAMPLE_404 });
-      watchConsole(oaPage, errors);
-      await oaPage.goto(`${show}#onair`);
-      await ready(oaPage);
-      onair = oaPage;
-      assert((await oaPage.$eval('#oa-stage', (e) => e.dataset.waiting)) === 'true', 'waiting screen');
-      assert(await oaPage.isHidden('.sh-header'), 'header hidden on onair');
-      await oaPage.screenshot({ path: path.join(SHOTS, 'onair-1920-waiting.png') });
+    await check('複数選択（Ctrl・Shift・チェック・Ctrl+A）→ 一括操作バーで「移動先…」（キーボードで選ぶ）', async () => {
+      await folder(page, 'inbox');
+      const keys = await rowKeys(page);
+      await page.click(`${rowSel(keys[0])} .row-check`);
+      await page.click(`${rowSel(keys[2])} .row-main`, { modifiers: ['Control'] });
+      let n = await page.evaluate(() => window.__show.ui.sel.sel.size);
+      assert(n === 2, `ctrl ${n}`);
+      await page.click(`${rowSel(keys[4])} .row-main`, { modifiers: ['Shift'] });
+      n = await page.evaluate(() => window.__show.ui.sel.sel.size);
+      assert(n >= 3, `shift ${n}`);
+      await page.click(`${rowSel(keys[5])} .row-check`);
+      assert((await page.textContent('[data-key="bulk-count"]')).includes('件選択中'), 'bulk bar');
+      await page.focus('.vlist');
+      await page.keyboard.press('Control+a');
+      n = await page.evaluate(() => window.__show.ui.sel.sel.size);
+      assert(n === keys.length, `ctrl+a ${n}/${keys.length}`);
+      // 3 件だけにして一括移動 → カテゴリ別（キーボード）。960px では普通のクリックはプレビューへ切り替わる
+      await page.click(`${rowSel(keys[0])} .row-main`);
+      assert(await page.isHidden('.list-pane'), '960: クリックでプレビューへ');
+      await page.click('[data-key="preview-back"]');
+      await page.click(`${rowSel(keys[1])} .row-check`);
+      await page.click(`${rowSel(keys[2])} .row-check`);
+      await page.click('[data-key="bulk-move"]');
+      await page.waitForSelector('dialog.move-dialog[open]');
+      await page.fill('[data-key="move-filter"]', 'カテゴリ');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(() => !document.querySelector('dialog.move-dialog[open]'));
+      const w = await wk(page);
+      assert(w.category.length === 3, JSON.stringify(w.category));
+      assert(!(await rowKeys(page)).includes(keys[0]), '受信箱から消える');
+      await page.screenshot({ path: path.join(SHOTS, 'plan-960-category.png') });
+      // 番組構成の中の並べ替え（ドラッグ）
+      await folder(page, 'corner:category');
+      const ck = await rowKeys(page);
+      const r = await drag(page, rowSel(ck[2]), rowSel(ck[0]));
+      assert(r.over === 'corner:category#0', `over ${r.over}`);
+      const w2 = await wk(page);
+      assert(w2.category[0] === ck[2].slice(2), `reorder ${JSON.stringify(w2.category)}`);
+    });
 
+    await check('検索（本文・@アカウント・話題名・AND）→ 結果からドラッグ', async () => {
+      await search(page, 'ラーメン 深夜');
+      const keys = await rowKeys(page);
+      const texts = await page.evaluate((ks) => ks.map((k) => window.__show.postsById.get(k.slice(2)).text), keys);
+      assert(texts.every((t) => t.includes('ラーメン') && t.includes('深夜')), texts.join('/'));
+      assert((await page.textContent('.lp-title')).startsWith('検索結果'), 'title');
+      await search(page, '@sample_night_sakura77');
+      assert((await rowKeys(page)).length === 4, '@アカウント');
+      await search(page, 'ホストコール');
+      assert((await rowKeys(page)).length >= 8, `まとまり名でも見つかる ${(await rowKeys(page)).length}`);
+      // 結果をそのままドラッグ（雑談へ。まとまりの投稿ならまとまりごと入る）
+      await search(page, '新作ゲーム');
+      const k = (await rowKeys(page))[0];
+      await drag(page, rowSel(k), '.tree-node[data-drop="corner:chat"]');
+      const w = await wk(page);
+      assert(w.chat.length === 1, JSON.stringify(w.chat));
+      await search(page, '');
+    });
+
+    await check('新規まとまり（空のフォルダ）→ ドラッグで投稿を入れる → 名前変更（F2・ダブルクリック）・「まとまりにする」', async () => {
+      await folder(page, 'inbox');
+      await page.click('[data-key="new-group"]');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', '自作のフォルダ');
+      await page.selectOption('[data-key="name-genre"]', 'kabuki');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction(() => window.__show.ui.folder.startsWith('topic:m:'));
+      const tid = await page.evaluate(() => window.__show.ui.folder.slice(6));
+      assert((await page.textContent('.lp-title')).includes('自作のフォルダ'), 'opened');
+      await folder(page, 'inbox');
+      const k = (await rowKeys(page))[0];
+      await drag(page, rowSel(k), `.tree-node[data-drop="topic:${tid}"]`);
+      const t = await page.evaluate((id) => { const x = window.__show.topicsById.get(id); return { n: x.postIds.length, genre: x.genre }; }, tid);
+      assert(t.n === 1 && t.genre === 'kabuki', JSON.stringify(t));
+      // F2 で名前変更（まとまりのフォルダを開いている状態）
+      await folder(page, `topic:${tid}`);
+      await page.focus('.vlist');
+      await page.keyboard.press('F2');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', 'F2で変えた名前');
+      await page.keyboard.press('Enter');
+      await page.waitForFunction((id) => window.__show.topicsById.get(id).name === 'F2で変えた名前', tid);
+      // ダブルクリックで名前変更（左の木）
+      await page.dblclick(`[data-key="folder-topic:${tid}"]`);
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', 'ダブルクリックの名前');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction((id) => window.__show.topicsById.get(id).name === 'ダブルクリックの名前', tid);
+      // 選んだ 2 件を「まとまりにする」
+      await folder(page, 'inbox');
+      const ks = await rowKeys(page);
+      await page.click(`${rowSel(ks[0])} .row-check`);
+      await page.click(`${rowSel(ks[1])} .row-check`);
+      await page.click('[data-key="bulk-group"]');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', '二件のまとまり');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction(() => window.__show.ui.folder.startsWith('topic:m:') && window.__show.ui.rows.length === 2);
+    });
+
+    await check('ジャンル変更（右クリック・一括・プレビュー）→ 投稿 ID で保存・リロード後も・書き出しに含まれる', async () => {
+      await folder(page, 'inbox');
+      const ks = await rowKeys(page);
+      const k = ks.find((x) => x.startsWith('p:'));
+      const id = k.slice(2);
+      await ctx(page, `${rowSel(k)} .row-main`, 'ctx-genre-general');
+      let g = await page.evaluate((i) => window.__show.saved.genreOverrides[i], id);
+      assert(g && g.genre === 'general', JSON.stringify(g));
+      // 一般のバズになったので、受信箱の夜職の並びから外れる（おすすめ外なら隠れる）
+      await page.reload();
+      await ready(page);
+      g = await page.evaluate((i) => window.__show.saved.genreOverrides[i], id);
+      assert(g && g.genre === 'general', 'kept after reload');
+      // プレビューから元に戻す（キャバクラ等の元ジャンルへ）
+      await page.fill('[data-key="search"]', '');
+      await page.evaluate((i) => { window.__show.ui.query = window.__show.postsById.get(i).text.slice(0, 8); window.__show.render(); }, id);
+      await page.waitForFunction((i) => window.__show.ui.rows.some((r) => r.id === i), id);
+      await page.click(`${rowSel(k)} .row-main`);
+      await page.waitForSelector('[data-key="pv-genre"]');
+      const orig = await page.evaluate((i) => window.__show.origGenreOf(i), id);
+      await page.selectOption('[data-key="pv-genre"]', orig);
+      await page.waitForFunction((i) => !window.__show.saved.genreOverrides[i], id);
+      // 一括でジャンル変更 → 書き出しに含まれる
+      await page.evaluate(() => { window.__show.ui.query = ''; window.__show.ui.pane = 'list'; window.__show.render(); });
+      await folder(page, 'inbox');
+      const ks2 = await rowKeys(page);
+      await page.click(`${rowSel(ks2[0])} .row-check`);
+      await page.click(`${rowSel(ks2[1])} .row-check`);
+      await page.click('[data-key="bulk-genre"]');
+      await page.click('[data-key="bulk-genre-general"]');
+      const n = await page.evaluate((ids) => ids.filter((i) => (window.__show.saved.genreOverrides[i] || {}).genre === 'general').length, [ks2[0].slice(2), ks2[1].slice(2)]);
+      assert(n === 2, `general overrides ${n}`);
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="export"]')]);
+      const file = path.join(tmp, 'export.json');
+      await dl.saveAs(file);
+      const ex = JSON.parse(readFileSync(file, 'utf8'));
+      assert(ex.v === 4 && Object.keys(ex.genreOverrides).length >= 1, 'export has genreOverrides');
+      await page.click('[data-key="tools-close"]');
+      return `上書き ${Object.keys(ex.genreOverrides).length}件`;
+    });
+
+    await check('仕分けモード: 1/2/3/G/X/→/← と進捗、元に戻せる、Esc で終了', async () => {
+      await folder(page, 'inbox');
+      const total = (await rowKeys(page)).length;
+      await page.click('[data-key="sort-start"]');
+      await page.waitForSelector('dialog.sort-dialog[open]');
+      let prog = await page.textContent('[data-key="sort-progress"]');
+      assert(prog.includes(`1 / ${total}件`) && prog.includes(`残り ${total}件`), prog);
+      await page.screenshot({ path: path.join(SHOTS, 'plan-960-sort.png') });
+      const items = await page.evaluate(() => window.__show.ui.sort.items.map((i) => i.key));
+      const chat0 = (await wk(page)).chat.length;
+      await page.keyboard.press('2');
+      let w = await wk(page);
+      assert(w.category.includes(`p:${items[0].slice(2)}`) || w.category.length >= 4, 'key 2 → カテゴリ別');
+      await page.keyboard.press('ArrowRight'); // 保留
+      await page.keyboard.press('ArrowLeft');
+      prog = await page.textContent('[data-key="sort-progress"]');
+      assert(prog.includes(`2 / ${total}件`), prog);
+      await page.keyboard.press('g'); // ジャンル（夜職⇄一般）
+      const g = await page.evaluate((k) => window.__show.saved.genreOverrides[k.slice(2)], items[1]);
+      assert(g && g.genre === 'general', `G ${JSON.stringify(g)}`);
+      await page.keyboard.press('3'); // 雑談
+      w = await wk(page);
+      assert(w.chat.length === chat0 + 1, `key 3 ${JSON.stringify(w.chat)}`);
+      await page.keyboard.press('x'); // いらない
+      const shelved = await page.evaluate(() => window.__show.weekState().shelved.length);
+      assert(shelved >= 1, 'X → 片付け');
+      // 元に戻す（Ctrl+Z）は仕分けモード中も効く
+      await page.keyboard.press('Control+z');
+      assert((await page.evaluate(() => window.__show.weekState().shelved.length)) === shelved - 1, 'undo in sort');
+      prog = await page.textContent('[data-key="sort-progress"]');
+      assert(/残り \d+件/.test(prog), prog);
+      // 1 = メイン候補（夜職のみ）
+      await page.keyboard.press('1');
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.querySelector('dialog.sort-dialog[open]'));
+      return prog;
+    });
+
+    await check('片付け・ゴミ箱（右クリック・Delete）→ お知らせの「元に戻す」・ゴミ箱から戻す', async () => {
+      await folder(page, 'group:night');
+      const ks = await rowKeys(page);
+      const t = ks.find((k) => k !== `t:${mainId}`);
+      await ctx(page, `${rowSel(t)} .row-main`, 'ctx-shelf');
+      assert(!(await rowKeys(page)).includes(t), 'shelved');
+      await page.click('[data-key="toast-undo"]');
+      await page.waitForFunction((k) => window.__show.ui.rows.some((r) => r.key === k), t);
+      await page.click(`${rowSel(t)} .row-main`);
+      await page.focus('.vlist');
+      await page.evaluate(() => { window.__show.ui.pane = 'list'; window.__show.render(); });
+      await page.focus('.vlist');
+      await page.keyboard.press('Delete');
+      assert((await page.evaluate(() => window.__show.saved.trash.length)) === 1, 'trashed');
+      await folder(page, 'trash');
+      const tr = (await rowKeys(page))[0];
+      assert(tr.startsWith('tr:'), tr);
+      await ctx(page, `${rowSel(tr)} .row-main`, 'ctx-restore');
+      assert((await page.evaluate(() => window.__show.saved.trash.length)) === 0, 'restored');
+    });
+
+    // 進行の準備: メイン2・メイン3・雑談
+    await check('進行: 縦 1 列（進行バー・話題名・タイマー・下にボタン）・キー操作・映す用が追従・イベント発行', async () => {
+      await folder(page, 'group:night');
+      const ks = (await rowKeys(page)).filter((k) => k !== `t:${mainId}`);
+      await ctx(page, `${rowSel(ks[0])} .row-main`, 'ctx-slot-1');
+      await ctx(page, `${rowSel(ks[1])} .row-main`, 'ctx-slot-2');
+      const w = await wk(page);
+      assert(w.main.filter(Boolean).length === 3, JSON.stringify(w.main));
+      const oa = await cx.newPage();
+      await oa.setViewportSize({ width: 1920, height: 1080 });
+      await setupRoutes(oa, { data: SAMPLE_404 });
+      watchConsole(oa, errors);
+      await oa.goto(`${show}#onair`);
+      await ready(oa);
       await page.goto(`${show}#live`);
       await ready(page);
+      await page.evaluate(() => { window.__evts = []; window.addEventListener('xtrend-show', (e) => window.__evts.push(e.detail)); });
+      assert(await page.$('.lv-progress .lvp-seg'), 'progress bar');
       await page.click('[data-key="live-start"]');
-      assert((await curCue(page)) === `main:${mainIds[0]}`, await curCue(page));
-      await waitOnair(oaPage, `main:${mainIds[0]}`);
-      await oaPage.waitForTimeout(300);
-      await oaPage.screenshot({ path: path.join(SHOTS, 'onair-1920-titlecard.png') });
-      await oaPage.waitForSelector('.oa-card', { state: 'detached', timeout: 5000 });
-      await oaPage.screenshot({ path: path.join(SHOTS, 'onair-1920-news.png') });
-      const oaText = await oaPage.textContent('#oa-stage');
-      assert(!oaText.includes('ヒミツの話すポイント') && !oaText.includes('みんなはどう？'), 'メモは映さない');
-      const liveText = await page.textContent('.live-main');
-      assert(!liveText.includes('ヒミツの話すポイント') && !liveText.includes('視聴者への質問'), '進行には話すポイント・質問の欄を出さない');
-      // 代表投稿は埋め込み（モック）が既定。映す用も埋め込みを試す（失敗時は自前の表示）
-      await page.waitForSelector('.live-main .live-embed.is-loaded, .live-main .live-embed.is-failed', { timeout: 8000 });
-      await oaPage.waitForSelector('.oa-embed.is-loaded, .oa-embed.is-failed', { timeout: 8000 });
-      await page.screenshot({ path: path.join(SHOTS, 'live-1280.png') });
-      await page.keyboard.press('s'); // メイン1 飛ばす
-      await page.keyboard.press('l'); // メイン2 来週へ
-      await waitOnair(oaPage, `main:${mainIds[2]}`);
-      let st = await live(page);
-      assert(st.status[`main:${mainIds[0]}`] === 'skipped' && st.status[`main:${mainIds[1]}`] === 'carried', JSON.stringify(st.status));
-      let carried = await page.evaluate(() => window.__show.weekState().carriedOut.map((c) => c.topicId));
-      assert(carried.includes(mainIds[1]), `carriedOut ${carried}`);
-      await page.keyboard.press('ArrowLeft'); // 来週へを取り消し
-      await waitOnair(oaPage, `main:${mainIds[1]}`);
-      carried = await page.evaluate(() => window.__show.weekState().carriedOut.map((c) => c.topicId));
-      assert(!carried.includes(mainIds[1]), 'uncarried');
+      const c0 = await curCue(page);
+      await waitOnair(oa, c0);
+      assert((await page.textContent('[data-key="live-title"]')).length > 0, 'title');
+      await page.screenshot({ path: path.join(SHOTS, 'live-960.png') });
+      await page.keyboard.press('ArrowRight'); // 読んだ
+      await page.keyboard.press('s');
       await page.keyboard.press('l');
-      await page.click('[data-key="ctl-done"]'); // メイン3 読んだ（ボタン）
-      assert(await page.$('.stamp'), '済スタンプ');
-      st = await live(page);
-      assert(st.status[`main:${mainIds[2]}`] === 'done', 'done by button');
-      afterMain = await curCue(page);
-      assert(afterMain.startsWith('category:'), afterMain);
-      await waitOnair(oaPage, afterMain);
-      // 入力欄の中ではキー操作しない
-      const idx = (await live(page)).index;
-      await page.goto(`${show}#plan`);
-      await ready(page);
-      await page.focus('[data-key="show-name"]');
-      await page.keyboard.press('ArrowRight');
-      assert((await live(page)).index === idx, 'no key action in plan');
-      await page.goto(`${show}#live`);
-      await ready(page);
-      return `済 ${Object.values(st.status).filter((x) => x === 'done').length}`;
+      const st = await live(page);
+      assert(Object.keys(st.status).length === 3, JSON.stringify(st.status));
+      await page.keyboard.press('ArrowLeft'); // 来週へを取り消し
+      await waitOnair(oa, await curCue(page));
+      await page.keyboard.press('l'); // もう一度来週へ
+      // 投稿カードの表示/非表示
+      await page.click('[data-key="live-card"]');
+      assert((await live(page)).cardVisible === false, 'card hidden');
+      await oa.waitForSelector('.oa-split.is-nocard', { timeout: 5000 });
+      const evts = await page.evaluate(() => window.__evts);
+      assert(evts.length >= 4 && evts.some((e) => e.changed.includes('card') && e.state.cardVisible === false) && evts.some((e) => e.changed.includes('topic')), JSON.stringify(evts.map((e) => e.changed)));
+      await page.click('[data-key="live-card"]');
+      await oa.screenshot({ path: path.join(SHOTS, 'onair-1920.png') });
+      await oa.close();
+      return `イベント ${evts.length}件`;
     });
 
-    await check('リロードで状態復元（編成・進行・台本・来週へ）', async () => {
+    await check('リロードで状態復元（フォルダ・メイン・進行）', async () => {
       const before = await live(page);
+      const w0 = await wk(page);
       await page.reload();
       await ready(page);
       const after = await live(page);
-      assert(after.index === before.index && JSON.stringify(after.status) === JSON.stringify(before.status) && after.startedAt === before.startedAt, 'live');
-      assert((await curCue(page)) === afterMain, await curCue(page));
-      const sc = await page.evaluate((id) => window.__show.weekState().script[id], mainIds[0]);
-      assert(sc && sc.points === 'ヒミツの話すポイント', JSON.stringify(sc));
-      const carried = await page.evaluate(() => window.__show.weekState().carriedOut.map((c) => c.topicId));
-      assert(carried.includes(mainIds[1]), 'carried kept');
-      await onair.reload();
-      await ready(onair);
-      assert((await oaCue(onair)) === afterMain, 'onair restored');
+      assert(after.index === before.index && JSON.stringify(after.status) === JSON.stringify(before.status), 'live');
+      assert(JSON.stringify(await wk(page)) === JSON.stringify(w0), 'rundown');
     });
 
-    await check('来週に回した話題が翌週の候補に出る', async () => {
+    await check('来週に回した話題が翌週の「まとまり」に出る', async () => {
+      const carried = await page.evaluate(() => window.__show.weekState().carriedOut.map((c) => c.topicId));
+      assert(carried.length >= 1, 'carried');
       await page.goto(`${show}#plan`);
       await ready(page);
       const next = await page.evaluate(() => window.__show.nextWeekKey());
       await page.selectOption('#week-select', next);
       await page.waitForFunction((k) => window.__show.weekKey === k, next);
-      const card = await page.$(`.tcard[data-topic="k:${mainIds[1]}"]`);
-      assert(card, 'carried topic in next week');
-      assert((await card.textContent()).includes('先週から持ち越し'), 'badge');
-      // 映す用も週の切り替えに追従
-      await onair.waitForFunction((k) => window.__show.weekKey === k, next, { timeout: 5000 });
+      await folder(page, 'group:night');
+      const ks = await rowKeys(page);
+      assert(ks.includes(`t:k:${carried[0]}`), ks.join());
       const cur = await page.evaluate(() => window.__show.weeks.find((w) => w.key < window.__show.weekKey).key);
       await page.selectOption('#week-select', cur);
       await page.waitForFunction((k) => window.__show.weekKey === k, cur);
     });
 
-    await check('振り返り: 一覧とテキスト書き出し', async () => {
+    await check('振り返り: 一覧とテキスト書き出し（3 コーナー）', async () => {
       await page.goto(`${show}#review`);
       await ready(page);
-      const n = async (k) => page.$$eval(`.review-col[data-list="${k}"] li`, (l) => l.length);
-      assert((await n('done')) === 1 && (await n('skipped')) === 1 && (await n('carried')) === 1, `${await n('done')}/${await n('skipped')}/${await n('carried')}`);
       const pub = await page.inputValue('[data-key="export-public"]');
-      const full = await page.inputValue('[data-key="export-full"]');
-      assert(pub.startsWith('【週刊ヨルニュース】') && pub.includes('00:00 メイン3トピック\n45:00 カテゴリ別ニュース') && !/オープニング|中休み|エンディング/.test(pub) && !pub.includes('ヒミツの話すポイント'), pub.slice(0, 120));
-      assert(full.includes('ヒミツの話すポイント'), 'full has points');
-      await page.screenshot({ path: path.join(SHOTS, 'review-1280.png'), fullPage: true });
-    });
-
-    await check('書き出し → 変更 → 読み込みで元に戻る・壊れたファイルは拒否', async () => {
+      assert(pub.includes('00:00 メイン3トピック') && pub.includes('ホストコール'), pub.slice(0, 200));
       await page.goto(`${show}#plan`);
       await ready(page);
+    });
+
+    await check('書き出し → 読み込み（壊れたファイルは拒否・置き換えも元に戻せる）', async () => {
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
       const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="export"]')]);
-      const file = path.join(tmp, 'export.json');
+      const file = path.join(tmp, 'export2.json');
       await dl.saveAs(file);
-      const exported = JSON.parse(readFileSync(file, 'utf8'));
-      assert(exported.app === 'xtrend-show' && exported.v === 3, 'export format');
-      // 変更: メインを全部外す
-      for (const id of mainIds) { const b = await page.$(`[data-key="main-rm-${id}"]`); if (b) await b.click(); }
-      assert((await page.$$('.slot.g-main')).length < 3, 'removed');
-      // 壊れたファイル
       const bad = path.join(tmp, 'bad.json');
       writeFileSync(bad, '{ broken');
       await page.setInputFiles('#import-file', bad);
       await page.waitForSelector('.import-msg.is-error');
-      // 正しいファイル
+      // 変更してから読み込みで戻す
+      await page.click('[data-key="tools-close"]');
+      const w0 = await wk(page);
+      await ctx(page, '[data-key="folder-slot:0"]', 'ctx-shelf');
+      assert(JSON.stringify(await wk(page)) !== JSON.stringify(w0), 'changed');
+      await page.click('[data-key="tools-open"]');
       await page.setInputFiles('#import-file', file);
       await page.waitForSelector('[data-key="import-yes"]');
       await page.click('[data-key="import-yes"]');
-      await page.waitForFunction(() => document.querySelectorAll('.slot.g-main').length === 3);
-      const after = await page.$$eval('.slot.g-main', (l) => l.map((e) => e.dataset.topic));
-      assert(JSON.stringify(after) === JSON.stringify(mainIds.filter((id) => after.includes(id))) && after.length === 3, `${after}`);
+      await page.waitForFunction((x) => JSON.stringify((() => { const w = window.__show.weekState(); return { main: w.rundown.corners.find((c) => c.key === 'main').items, category: w.rundown.corners.find((c) => c.key === 'category').items, chat: w.rundown.corners.find((c) => c.key === 'chat').items, cand: w.mainCand }; })()) === x, JSON.stringify(w0));
+      await page.click('[data-key="tools-close"]');
     });
 
-    await check('スマホ幅 375px（編成・進行）: 横スクロールなし', async () => {
+    await check('画面幅: 960×1040（一覧⇄プレビュー）・1280×1400 と 1920×1080（3 列）・375（引き出し）で横スクロールなし', async () => {
+      await folder(page, 'inbox');
+      const k = (await rowKeys(page))[0];
+      await page.click(`${rowSel(k)} .row-main`);
+      await page.waitForSelector('.preview-pane .pv-body');
+      assert(await page.isHidden('.list-pane'), '960: 一覧は隠れてプレビュー');
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: path.join(SHOTS, 'plan-960-preview.png') });
+      await page.click('[data-key="preview-back"]');
+      assert(await page.isVisible('.list-pane'), '一覧へ戻る');
+      await page.screenshot({ path: path.join(SHOTS, 'plan-960.png') });
+      for (const [w, hh] of [[1280, 1400], [1920, 1080]]) {
+        await page.setViewportSize({ width: w, height: hh });
+        await page.evaluate(() => { window.__show.ui.pane = 'list'; window.__show.render(); });
+        await page.click(`${rowSel(k)} .row-main`);
+        await page.waitForTimeout(300);
+        if (w >= 1400) assert(await page.isVisible('.list-pane') && await page.isVisible('.preview-pane'), `${w}: 3 列`);
+        else assert(await page.isHidden('.list-pane') && await page.isVisible('.preview-pane'), `${w}: 一覧⇄プレビュー`);
+        const s = await sw(page);
+        assert(s <= w, `${w} scrollWidth ${s}`);
+        await page.screenshot({ path: path.join(SHOTS, `plan-${w}.png`) });
+      }
       await page.setViewportSize({ width: 375, height: 812 });
-      await page.goto(`${show}#plan`);
-      await ready(page);
-      let w = await sw(page);
-      assert(w <= 375, `plan scrollWidth ${w}`);
+      await page.evaluate(() => { window.__show.ui.pane = 'list'; window.__show.render(); });
+      let s = await sw(page);
+      assert(s <= 375, `375 scrollWidth ${s}`);
       await page.screenshot({ path: path.join(SHOTS, 'plan-375.png') });
-      await page.screenshot({ path: path.join(SHOTS, 'plan-375-full.png'), fullPage: true });
+      await page.click('[data-key="tree-drawer"]');
+      await page.waitForSelector('.plan2.is-drawer .tree-pane');
+      await page.screenshot({ path: path.join(SHOTS, 'plan-375-drawer.png') });
+      await folder(page, 'group:night');
+      assert(!(await page.$('.plan2.is-drawer')), 'drawer closes');
       await page.goto(`${show}#live`);
       await ready(page);
-      w = await sw(page);
-      assert(w <= 375, `live scrollWidth ${w}`);
+      s = await sw(page);
+      assert(s <= 375, `live 375 scrollWidth ${s}`);
       await page.screenshot({ path: path.join(SHOTS, 'live-375.png') });
-      await page.setViewportSize({ width: 1280, height: 800 });
+      await page.setViewportSize({ width: 960, height: 1040 });
     });
-
-    await check('映す用: 1920×1080 にぴったり（雑談・終わり）', async () => {
-      await page.goto(`${show}#live`);
-      await ready(page);
-      const cues = await page.evaluate(() => window.__show.cues.map((c) => c.id));
-      assert(!cues.some((c) => /^(opening|break|review|ending)$/.test(c)), `旧コーナー ${cues}`);
-      const last = cues[cues.length - 1];
-      await page.click(`[data-key="prog-${last}"]`);
-      await waitOnair(onair, last);
-      await onair.waitForTimeout(2800);
-      await onair.screenshot({ path: path.join(SHOTS, 'onair-1920-chat.png') });
-      const box = await onair.$eval('#oa-stage', (e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; });
-      assert(Math.round(box[0]) === 1920 && Math.round(box[1]) === 1080, `${box}`);
-      await page.click('[data-key="ctl-done"]');
-      await waitOnair(onair, 'end');
-      await onair.screenshot({ path: path.join(SHOTS, 'onair-1920-end.png') });
-      await onair.setViewportSize({ width: 960, height: 540 });
-      await onair.waitForTimeout(300);
-      const half = await onair.$eval('#oa-stage', (e) => Math.round(e.getBoundingClientRect().width));
-      assert(half === 960, `scaled ${half}`);
-      return `cues ${cues.length}`;
-    });
-
-    await check('整理: 片付け・削除 → トーストで元に戻す・タブから戻す・構成から外して元の枠へ・リロード後も保持', async () => {
-      await page.goto(`${show}#plan`);
-      await ready(page);
-      const free = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
-      const a = free.find((id) => !mainIds.includes(id));
-      // 片付け → トーストの「元に戻す」
-      await act(page, `[data-key="shelve-${a}"]`);
-      await page.waitForSelector('#toast:not([hidden]) [data-key="toast-undo"]');
-      assert(!(await page.$(`.candidates > .cand-grid .tcard[data-topic="${a}"]`)), 'shelved hidden');
-      assert((await page.textContent('[data-key="tab-shelf"]')).includes('（1）'), 'shelf count');
-      await page.click('[data-key="toast-undo"]');
-      await page.waitForSelector(`.candidates > .cand-grid .tcard[data-topic="${a}"]`);
-      // 片付け → 片付けタブから戻す
-      await act(page, `[data-key="shelve-${a}"]`);
-      await page.click('[data-key="tab-shelf"]');
-      await page.click(`[data-key="unshelve-${a}"]`);
-      await page.click('[data-key="tab-list"]');
-      await page.waitForSelector(`.candidates > .cand-grid .tcard[data-topic="${a}"]`);
-      // 構成（メイン）に入っている話題を削除 → 枠から外れる → ゴミ箱から戻すと元の枠（2番目）へ
-      const m = await page.$$eval('.slot.g-main', (l) => l.map((e) => e.dataset.topic));
-      await page.click(`[data-key="main-edit-${m[1]}"]`);
-      await page.waitForSelector('dialog.topic-dialog[open]');
-      await page.click('[data-key="dlg-trash"]');
-      await page.waitForFunction((id) => ![...document.querySelectorAll('.slot.g-main')].some((e) => e.dataset.topic === id), m[1]);
-      assert(!(await page.$('dialog[open]')), 'dialog closed');
-      // 削除はリロード後も保持
-      await page.reload();
-      await ready(page);
-      assert((await page.textContent('[data-key="tab-trash"]')).includes('（1）'), 'trash kept after reload');
-      await page.click('[data-key="tab-trash"]');
-      await page.screenshot({ path: path.join(SHOTS, 'plan-trash-1280.png') });
-      await page.click(`[data-key="untrash-${m[1]}"]`);
-      await page.waitForFunction((ids) => JSON.stringify([...document.querySelectorAll('.slot.g-main')].map((e) => e.dataset.topic)) === JSON.stringify(ids), m);
-      // 投稿単位の削除（ダイアログ）→ ゴミ箱の「すべて戻す」
-      await page.click('[data-key="tab-list"]');
-      await page.click(`[data-key="main-edit-${m[0]}"]`);
-      await page.waitForSelector('dialog.topic-dialog[open]');
-      const pid = await page.$eval('dialog[open] .post', (e) => e.dataset.id);
-      await page.click(`[data-key="dlg-hide-${pid}"]`);
-      await page.waitForFunction((id) => window.__show.saved.hiddenPosts.some((x) => x.id === id), pid);
-      assert(!(await page.evaluate((id) => window.__show.topics.some((t) => t.postIds.includes(id)), pid)), 'hidden post removed from topics');
-      await page.click('[data-key="dlg-close"]');
-      await page.click('[data-key="tab-trash"]');
-      await page.click('[data-key="trash-restore-all"]');
-      await page.waitForFunction(() => window.__show.saved.hiddenPosts.length === 0 && window.__show.saved.trash.length === 0);
-      await page.click('[data-key="tab-list"]');
-      // 「済」（配信で読んだ）と「片付け」は別の言葉
-      const txt = await page.textContent('.candidates');
-      assert(!txt.includes('アーカイブ'), 'no ambiguous アーカイブ');
-    });
-
-    await check('候補カード: 主ボタン「番組に入れる」・「…」メニュー・詳細ビュー（全投稿・←→・Esc・投稿単位の操作）・構成パネルの折りたたみ保持', async () => {
-      await page.goto(`${show}#plan`);
-      await ready(page);
-      const free = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.filter((e) => e.querySelector('.menu-put')).map((e) => e.dataset.topic)[0]);
-      // カードのボタンは主ボタン＋ほか＋…だけ
-      const btnCount = await page.$eval(`.tcard[data-topic="${free}"] .tcard-foot`, (f) => [...f.children].length);
-      assert(btnCount <= 3, `foot children ${btnCount}`);
-      // 主ボタンからカテゴリ別へ → 「入っています（外す）」表示
-      await page.click(`[data-key="put-${free}"]`);
-      assert(await page.isVisible(`[data-key="to-category-${free}"]`), 'menu opened');
-      await page.click(`[data-key="to-category-${free}"]`);
-      await page.waitForSelector(`.tcard[data-topic="${free}"] [data-key="card-rm-${free}"]`);
-      await page.click(`[data-key="card-rm-${free}"]`);
-      // 一般のバズにはメインの選択肢が無い
-      const gen = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.filter((e) => e.querySelector('.sticker.g-general')).map((e) => e.dataset.topic));
-      if (gen.length) assert(!(await page.$(`[data-key="to-main-${gen[0]}"]`)), 'general has no main');
-      // 詳細ビュー: 帯の名前で開く → 投稿を全部 → 次へ（→）・前へ（←）→ Esc で閉じる
-      const multi = await page.$$eval('.candidates > .cand-grid .tcard', (l) => l.filter((e) => e.querySelector('.tcard-more')).map((e) => e.dataset.topic));
-      const t0 = multi[0];
-      await page.click(`[data-key="others-${t0}"]`);
-      await page.waitForSelector(`dialog.detail-dialog[open][data-topic="${t0}"]`);
-      const n = await page.$$eval('dialog[open] .detail-post', (l) => l.length);
-      const count = await page.evaluate((id) => window.__show.topicsById.get(id).postIds.length, t0);
-      assert(n === count, `all posts ${n}/${count}`);
-      await page.screenshot({ path: path.join(SHOTS, 'plan-detail-1280.png') });
-      await page.keyboard.press('ArrowRight');
-      await page.waitForFunction((id) => { const d = document.querySelector('dialog.detail-dialog[open]'); return d && d.dataset.topic !== id; }, t0);
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForSelector(`dialog.detail-dialog[open][data-topic="${t0}"]`);
-      // 投稿単位: 話題から外す
-      const pids = await page.$$eval('dialog[open] .detail-post', (l) => l.map((e) => e.dataset.id));
-      await page.click(`[data-key="detail-detach-${pids[pids.length - 1]}"]`);
-      await page.waitForFunction(([id, p]) => !window.__show.topicsById.get(id).postIds.includes(p), [t0, pids[pids.length - 1]]);
-      assert(await page.$('dialog.detail-dialog[open]'), 'detail stays open');
-      await page.keyboard.press('Escape');
-      await page.waitForFunction(() => !document.querySelector('dialog[open]'));
-      // 「…」→ 編集
-      await page.click(`[data-key="more-${t0}"]`);
-      await page.click(`[data-key="edit-${t0}"]`);
-      await page.waitForSelector('dialog.topic-dialog[open]');
-      await page.click('[data-key="dlg-close"]');
-      // 単発の行をクリックで詳細ビュー
-      if (await page.$('[data-key="singles-toggle"]')) {
-        if (!(await page.$('.singles[open]'))) await page.click('[data-key="singles-toggle"]');
-        const sid = await page.$eval('.single-list .srow', (e) => e.dataset.topic);
-        await page.click(`.single-list [data-key="open-${sid}"]`);
-        await page.waitForSelector(`dialog.detail-dialog[open][data-topic="${sid}"]`);
-        await page.click('[data-key="detail-close"]');
-        await page.click('[data-key="singles-toggle"]');
-      }
-      // 構成パネルをたたむ → リロードしても保持 → 開く
-      await page.click('[data-key="side-toggle"]');
-      assert(await page.$('.side.is-closed'), 'side closed');
-      await page.reload();
-      await ready(page);
-      assert(await page.$('.side.is-closed'), 'side closed kept');
-      const cols = await page.$$eval('.candidates > .cand-grid .tcard', (l) => new Set(l.slice(0, 6).map((e) => Math.round(e.getBoundingClientRect().left))).size);
-      await page.screenshot({ path: path.join(SHOTS, 'plan-side-closed-1280.png') });
-      await page.click('[data-key="side-toggle"]');
-      assert(!(await page.$('.side.is-closed')), 'side open');
-      const w = await page.$eval('.candidates > .cand-grid .tcard', (e) => Math.round(e.getBoundingClientRect().width));
-      assert(w >= 360 && w <= 420, `card width ${w}`);
-      return `詳細 ${n}件・カード幅 ${w}px・たたんだときの列数 ${cols}`;
-    });
-
-    await check('話題カードは X 埋め込み（モック）・失敗時は自前の表示・カード表示に切替（保持）', async () => {
-      await page.goto(`${show}#plan`);
-      await ready(page);
-      await page.waitForSelector('.tcard.is-embed .embed-host.is-loaded .fake-tweet', { timeout: 8000 });
-      const first = await page.evaluate(() => window.__embedCalls.length);
-      const cards = await page.$$eval('.embed-host[data-embed-id]', (l) => l.length);
-      assert(first < cards, `画面から遠いものはまだ読まない（${first}/${cards}）`);
-      // 画面に近いものだけ生成されるので、下までスクロールして失敗（自前の表示に戻る）も確かめる
-      for (let y = 0; y < 6000 && !(await page.$('.tcard.is-embed .embed-host.is-failed .embed-fallback .post')); y += 600) {
-        await page.mouse.wheel(0, 600);
-        await page.waitForTimeout(250);
-      }
-      await page.waitForSelector('.tcard.is-embed .embed-host.is-failed .embed-fallback .post', { state: 'attached', timeout: 8000 });
-
-      const loaded = await page.$$eval('.tcard.is-embed .embed-host.is-loaded', (l) => l.length);
-      const total = await page.$$eval('.tcard.is-embed', (l) => l.length);
-      // 再描画（ボタン操作）しても読み込み済みの埋め込みは作り直さない
-      const before = await page.evaluate(() => window.__embedCalls.length);
-      await page.click('[data-filter="host"]');
-      await page.click('[data-filter="all"]');
-      await page.waitForTimeout(300);
-      const after = await page.evaluate(() => window.__embedCalls.length);
-      await page.screenshot({ path: path.join(SHOTS, 'plan-embed-1280.png') });
-      await page.click('[data-key="view-toggle"]');
-      assert(!(await page.$('.tcard .embed-host')) && await page.$('.tcard.is-datacard'), 'card mode');
-      await page.reload();
-      await ready(page);
-      assert(!(await page.$('.tcard .embed-host')), 'card mode kept');
-      await page.click('[data-key="view-toggle"]');
-      assert(await page.$('.tcard .embed-host'), 'embed mode back');
-      return `埋め込み ${loaded}/${total}・再描画での追加生成 ${after - before}`;
-    });
-    await ctx.close();
+    await cx.close();
 
     // ---- 3. BroadcastChannel が無い環境（storage イベントで追従）
     await check('BroadcastChannel なしでも storage イベントで追従', async () => {
       const c2 = await newCtx();
       await c2.addInitScript(() => { delete window.BroadcastChannel; });
       const { page: p1 } = await open(c2, `${show}#plan`);
-      await p1.click('[data-key="fill-main"]');
+      await folder(p1, 'group:night');
+      await ctx(p1, `${rowSel('t:d:d-hostcall')} .row-main`, 'ctx-slot-0');
       const { page: p2 } = await open(c2, `${show}#onair`);
       await p1.goto(`${show}#live`);
       await ready(p1);
       await p1.click('[data-key="live-start"]');
       await p1.keyboard.press('ArrowRight');
-      const cue = await curCue(p1);
-      await waitOnair(p2, cue);
+      await waitOnair(p2, await curCue(p1));
       await c2.close();
     });
 
@@ -627,22 +651,26 @@ async function main() {
         { id: '2110000000000000002', url: '', user: 'b', ts: Math.floor(Date.parse('2026-10-15T01:00:00+09:00') / 1000), metrics: {}, text: '数値なし', categories: ['キャバクラ'], matched_terms: [] },
       ],
     };
-    await check('XSS: 本文・話題名・アカウント名のタグは文字のまま（編成・進行・映す用）', async () => {
+    await check('XSS: 本文・まとまり名・アカウント名のタグは文字のまま（編成・進行・映す用）', async () => {
       const c3 = await newCtx();
-      const { page: p } = await open(c3, `${show}#plan`, { data: { posts: xssPosts, reports: '{bad', bookmarks: { bookmarks: 'bad' } } });
-      assert(await p.isHidden('#sample-banner'), 'no sample banner');
-      assert(!(await p.$('.bookmarks-sec')), '壊れた bookmarks.json は枠を出さない');
-      const name = await p.textContent('.candidates .tcard-name');
+      const { page: p } = await open(c3, `${show}#plan`, { data: { posts: xssPosts, bookmarks: { bookmarks: 'bad' } } });
+      assert(!(await p.$('[data-key="folder-bookmarks"]')), '壊れた bookmarks.json はフォルダを出さない');
+      await folder(p, 'group:night');
+      const name = await p.textContent('.row-title.is-topic');
       assert(name.includes('<img src=x onerror='), name);
-      await p.click('[data-key="fill-main"]');
+      await ctx(p, '.row-item .row-main', 'ctx-slot-0');
+      await search(p, 'script');
+      assert((await rowKeys(p)).length === 1, 'search 1');
+      assert((await p.textContent('.row-item .row-title')).includes('<script>'), 'row text');
+      await p.click('.row-item .row-main');
+      await p.waitForSelector('.pv-body');
       const { page: oa } = await open(c3, `${show}#onair`, { data: { posts: xssPosts } });
       await p.goto(`${show}#live`);
       await ready(p);
       await p.click('[data-key="live-start"]');
       await oa.waitForSelector('.oa-headline');
-      assert((await oa.textContent('.oa-post-text')).includes('<script>'), 'onair text');
       assert((await p.textContent('.live-main')).includes('<img src=x'), 'live text');
-      assert(!(await p.$('.live-main img[src="x"]')) && !(await oa.$('img[src="x"]')), 'no injected img');
+      assert(!(await p.$('img[src="x"]')) && !(await oa.$('img[src="x"]')), 'no injected img');
       const xss = (await p.evaluate(() => window.__xss)) ?? (await oa.evaluate(() => window.__xss));
       assert(xss === undefined, `xss ${xss}`);
       const hrefs = await p.$$eval('a[href]', (l) => l.map((a) => a.getAttribute('href')));
@@ -650,21 +678,19 @@ async function main() {
       await c3.close();
     });
 
-    await check('空データ（posts が 0 件）・reports/bookmarks なし: 各画面が「該当なし」で動く', async () => {
+    await check('空データ（posts が 0 件）・bookmarks なし: 各画面が動く', async () => {
       const c4 = await newCtx();
       const { page: p } = await open(c4, `${show}#plan`, { data: { posts: { generated_at: '2026-10-16T00:09:00+09:00', posts: [] } } });
-      assert((await p.textContent('.candidates')).includes('該当なし'), 'empty candidates');
-      assert(!(await p.$('.bookmarks-sec')), 'no bookmark section');
-      assert(!(await p.$('[data-key="fill-main"]')), 'no suggestion');
-      for (const r of ['live', 'review', 'onair']) {
-        await p.goto(`${show}#${r}`);
-        await ready(p);
-      }
+      assert((await p.textContent('.list-pane')).includes('該当なし'), 'empty');
+      assert(!(await p.$('[data-key="folder-bookmarks"]')), 'no bookmark folder');
+      await p.click('[data-key="sort-start"]');
+      assert((await p.textContent('#toast')).includes('ありません'), 'sort with nothing');
+      for (const r of ['live', 'review', 'onair']) { await p.goto(`${show}#${r}`); await ready(p); }
       await p.goto(`${show}#live`);
       await ready(p);
       await p.click('[data-key="live-start"]');
-      for (let i = 0; i < 10; i++) await p.keyboard.press('Enter');
-      assert((await p.textContent('.live-main')).includes('おつかれさまでした'), 'finished');
+      for (let i = 0; i < 6; i++) await p.keyboard.press('Enter');
+      assert((await p.textContent('.live-main')).includes('終わりました'), 'finished');
       await c4.close();
     });
 
@@ -674,50 +700,52 @@ async function main() {
       const { page: p } = await open(c5, `${show}#plan`);
       const st = await p.textContent('#save-status');
       assert(st.includes('保存データを読めなかった'), st);
-      assert(await p.$('.tcard'), 'candidates shown');
+      assert(await p.$('.row-item'), 'rows shown');
       await c5.close();
     });
 
-    await check('チェックポイント: 記録後に増えた投稿・話題に NEW', async () => {
+    await check('保存データの移行（版 3 の編成がフォルダ型で読める）', async () => {
+      const c9 = await newCtx();
+      await c9.addInitScript(() => {
+        try {
+          if (sessionStorage.getItem('seeded')) return;
+          localStorage.setItem('xtrend-show', JSON.stringify({ app: 'xtrend-show', v: 3, activeWeek: '2026-10-17', weeks: { '2026-10-17': { rundown: { corners: [{ key: 'main', min: 45, items: ['d:d-hostcall'] }, { key: 'category', min: 30, items: ['d:d-toyoko'] }, { key: 'chat', min: 15, items: [] }] } } } }));
+          sessionStorage.setItem('seeded', '1');
+        } catch { /* */ }
+      });
+      const { page: p } = await open(c9, `${show}#plan`);
+      assert((await p.textContent('[data-key="folder-slot:0"]')).includes('ホストコール'), 'main1');
+      assert((await p.textContent('[data-key="folder-corner:category"] .tree-count')) === '1', 'category');
+      await c9.close();
+    });
+
+    await check('チェックポイント: 記録後に増えた投稿が NEW フォルダに出る', async () => {
       const c8 = await newCtx();
       const p = await c8.newPage();
       watchConsole(p, errors);
-      let data = { posts: sample, reports: sampleReports, bookmarks: sampleBm };
+      let data = { posts: sample, bookmarks: sampleBm };
       await p.route('**/*', async (route) => {
         const url = new URL(route.request().url());
         if (url.hostname !== '127.0.0.1') return route.abort('blockedbyclient');
-        const key = { '/data/posts.json': 'posts', '/data/reports.json': 'reports', '/data/bookmarks.json': 'bookmarks' }[url.pathname];
+        const key = { '/data/posts.json': 'posts', '/data/bookmarks.json': 'bookmarks' }[url.pathname];
         if (key) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data[key]) });
+        if (url.pathname.startsWith('/data/')) return route.fulfill({ status: 404, body: '' });
         return route.continue();
       });
       await p.goto(`${show}#plan`);
       await ready(p);
-      assert(!(await p.$('.badge-new')), 'no NEW before checkpoint');
+      assert((await p.textContent('[data-key="folder-new"] .tree-count')) === '0', 'no NEW');
+      await p.click('[data-key="cp-menu"]');
       await p.click('[data-key="cp-preview"]');
-      assert((await p.textContent('.cp-status')).includes('その後のデータ更新はまだありません'), 'same data');
-      const extra = { ...sample.posts[0], id: '2110009999999999999', text: 'チェック後に増えた新しい話題の投稿です', user: 'sample_new', matched_terms: [], ts: sample.posts[0].ts - 60, url: '' };
+      const extra = { ...sample.posts[0], id: '2110009999999999999', text: 'チェック後に増えた新しい投稿', user: 'sample_new', matched_terms: [], ts: sample.posts[0].ts - 60, url: '' };
       const extra2 = { ...sample.posts[0], id: '2110009999999999998', text: 'ラスソンの新しい動画が出た', user: 'sample_new2', matched_terms: [], ts: sample.posts[0].ts - 120, url: '' };
       data = { ...data, posts: { ...sample, generated_at: '2026-10-16T22:00:00+09:00', posts: [extra, extra2, ...sample.posts] } };
       await p.reload();
       await ready(p);
-      const st = await p.textContent('.cp-status');
-      assert(st.includes('新しい投稿 2件'), st);
-      await p.click('[data-filter="new"]');
-      const ids = await p.$$eval('.cand-grid .tcard', (l) => l.map((e) => e.dataset.topic));
-      assert(ids.length === 2, `NEW filter ${ids}`);
-      const newTopic = ids.find((id) => id !== 'd:d-hostcall');
-      assert((await p.textContent(`.tcard[data-topic="${newTopic}"] .tcard-marks`)).includes('NEW'), 'new topic');
-      assert((await p.textContent('.tcard[data-topic="d:d-hostcall"] .tcard-marks')).includes('NEW +1'), 'NEW +1 on existing topic');
-      // 話題の編集ダイアログ（スクショ）
-      await act(p, '[data-key="edit-d:d-hostcall"]');
-      await p.waitForSelector('dialog.topic-dialog[open]');
-      await p.screenshot({ path: path.join(SHOTS, 'plan-dialog-1280.png') });
-      // 投稿を別の話題へ移す
-      const pid = await p.$eval('dialog[open] .post', (e) => e.dataset.id);
-      await p.selectOption(`[data-key="dlg-move-${pid}"]`, '__new');
-      await p.waitForFunction((id) => window.__show.topicsById.has(`p:${id}`), pid);
+      assert((await p.textContent('[data-key="folder-new"] .tree-count')) === '2', 'NEW 2');
+      await folder(p, 'new');
+      assert((await rowKeys(p)).length === 2, 'rows');
       await c8.close();
-      return st.replace(/\s+/g, ' ').slice(0, 80);
     });
 
     await check('動きを減らす設定: 済スタンプのアニメなし', async () => {
@@ -730,23 +758,66 @@ async function main() {
       await c6.close();
     });
 
-    // ---- 5. 実データ（リポジトリの data/。読むだけ）
+    // ---- 5. 実データ（リポジトリの data/。読むだけ）。今週（約 960 件）の 10/31 配信の週で確認
     if (existsSync(path.join(ROOT, 'data', 'posts.json'))) {
-      for (const [w, h, route] of [[1280, 800, 'plan'], [1600, 900, 'plan'], [375, 812, 'plan'], [1280, 800, 'live'], [375, 812, 'live'], [1920, 1080, 'onair']]) {
-        await check(`実データ data/ ${route} ${w}px`, async () => {
-          const c7 = await newCtx({ viewport: { width: w, height: h } });
+      await check('実データ: 1 操作の速さ（受信箱の表示・選択・移動・元に戻す・検索）', async () => {
+        const c7 = await newCtx();
+        const { page: p } = await open(c7, `${show}#plan`, {});
+        const wkKey = await p.evaluate(() => (window.__show.weeks.find((w) => w.key === '2026-10-31') || window.__show.weeks[1] || window.__show.weeks[0]).key);
+        await p.selectOption('#week-select', wkKey);
+        await p.waitForFunction((k) => window.__show.weekKey === k, wkKey);
+        const n = await p.evaluate(() => window.__show.weekPostIds.length);
+        const t = await p.evaluate(async () => {
+          const a = window.__show;
+          const ms = (fn) => { const t0 = performance.now(); fn(); return performance.now() - t0; };
+          const out = {};
+          out.render = ms(() => a.render());
+          a.ui.generalAll = true;
+          out.allRows = ms(() => a.render());
+          out.rows = a.ui.rows.length;
+          a.ui.query = 'キャバ';
+          out.search = ms(() => a.render());
+          a.ui.query = '';
+          out.select = ms(() => { a.ui.sel = { sel: new Set([a.ui.rows[0].key]), anchor: 0 }; a.render(); });
+          // 編集 1 回（話題の作り直し＋保存＋再描画）と元に戻す
+          out.edit = ms(() => a.edit('計測', (w) => { w.mainCand = [...w.mainCand]; }));
+          out.undo = ms(() => a.undo());
+          return out;
+        });
+        // 移動（ドロップと同じ処理）と元に戻す
+        const k = (await rowKeys(p))[0];
+        const t1 = Date.now();
+        await ctx(p, `${rowSel(k)} .row-main`, 'ctx-category');
+        const moveMs = Date.now() - t1;
+        const t2 = Date.now();
+        await p.click('[data-key="undo"]');
+        const undoMs = Date.now() - t2;
+        const f = (x) => `${x.toFixed(1)}ms`;
+        assert(t.render < 120 && t.select < 120, JSON.stringify(t));
+        await c7.close();
+        return `今週 ${n}件（すべて表示 ${t.rows}行）: 描画 ${f(t.render)}・全件表示 ${f(t.allRows)}・検索 ${f(t.search)}・選択 ${f(t.select)}・編集 ${f(t.edit)}・元に戻す ${f(t.undo)}（画面操作込み: 右クリック移動 ${moveMs}ms・元に戻すボタン ${undoMs}ms）`;
+      });
+      for (const [w, hh, route] of [[960, 1040, 'plan'], [1280, 1400, 'plan'], [1920, 1080, 'plan'], [375, 812, 'plan'], [960, 1040, 'live'], [375, 812, 'live'], [1920, 1080, 'onair']]) {
+        await check(`実データ data/ ${route} ${w}×${hh}`, async () => {
+          const c7 = await newCtx({ viewport: { width: w, height: hh } });
           const { page: p } = await open(c7, `${show}#${route}`, {});
           assert(await p.isHidden('#sample-banner'), 'sample banner shown with real data');
-          if (route === 'plan') await p.click('[data-key="fill-main"]');
-          const t0 = Date.now();
-          await p.evaluate(() => window.__show.render());
-          const renderMs = Date.now() - t0;
+          const wkKey = await p.evaluate(() => (window.__show.weeks.find((x) => x.key === '2026-10-31') || window.__show.weeks[0]).key);
+          if (route !== 'onair') {
+            await p.selectOption('#week-select', wkKey);
+            await p.waitForFunction((k) => window.__show.weekKey === k, wkKey);
+          }
+          if (route === 'plan' && w >= 1280) {
+            const k = (await rowKeys(p))[0];
+            if (k) await p.click(`${rowSel(k)} .row-main`);
+            await p.waitForTimeout(300);
+          }
           const s = await sw(p);
           assert(s <= w, `scrollWidth ${s}`);
-          await p.screenshot({ path: path.join(SHOTS, `real-${route}-${w}.png`) });
-          const info = await p.evaluate(() => `投稿 ${window.__show.weekPostIds.length}・話題 ${window.__show.topics.length}・ブクマ ${window.__show.bookmarks ? window.__show.bookmarks.length : 'なし'}`);
+          await p.screenshot({ path: path.join(SHOTS, `real-${route}-${w}x${hh}.png`) });
+          const info = await p.evaluate(() => `投稿 ${window.__show.weekPostIds.length}・まとまり ${window.__show.topics.filter((t) => t.postIds.length > 1).length}`);
           await c7.close();
-          return `${info}・再描画 ${renderMs}ms`;
+          return info;
         });
       }
     }

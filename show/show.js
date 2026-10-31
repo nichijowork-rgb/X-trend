@@ -6,11 +6,14 @@ import {
   showWeekOf, weekByKey, shiftWeekKey, listWeeks, postsInWeek, buildTopics, indexTopics, buildCues, getWeek,
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
   partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
+  applyGenreOverrides, majorityGenre, pastUsedIds,
 } from './js/logic.js';
+import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
+import { publishLiveState } from './js/events.js';
 import { loadSaved, saveState, openSync } from './js/store.js';
 import { h, clear, isEditable, startEmbeds } from './js/dom.js';
 import { patchView } from './js/patch.js';
-import { renderPlan, planKeydown } from './js/views/plan.js';
+import { renderPlan, planKeydown, planPointerDown } from './js/views/plan.js';
 import { renderLive, tickLive, liveKeydown } from './js/views/live.js';
 import { renderOnair, tickOnair } from './js/views/onair.js';
 import { renderReview } from './js/views/review.js';
@@ -38,6 +41,11 @@ const app = {
   route: 'plan',
   ui: { filter: 'all', query: '', shown: 30, openScript: new Set(), bmMode: 'week', view: loadViewPref(), sideClosed: loadSidePref() },
   bmFlags: new Map(),
+  pickIds: new Set(), // ボットの雑談おすすめ（show_pick: true）。段階3の受け口
+  basePostsById: new Map(), // 上書き前の投稿
+  postTopic: new Map(),
+  recommended: new Set(),
+  history: createHistory(),
   embedder: null,
   ready: false,
   clusterCache: {},
@@ -78,12 +86,15 @@ async function loadData() {
     const ds = normalizeDataset(posts.value); // 形式不正は例外
     // ブックマークで取り込まれた投稿の印（normalizeDataset は未知のフィールドを落とすので別に持つ）
     const bmFlags = new Map();
+    const pickIds = new Set();
     for (const p of posts.value.posts) {
       if (p && p.in_bookmarks === true) bmFlags.set(String(p.id), { below: p.below_threshold === true });
+      if (p && p.show_pick === true) pickIds.add(String(p.id)); // 段階3: ボットの雑談おすすめ
     }
     return {
       ds,
       bmFlags,
+      pickIds,
       bookmarks: bookmarks.status === 'fulfilled' ? normalizeBookmarks(bookmarks.value) : null,
     };
   };
@@ -113,9 +124,14 @@ function weekBookmarks() {
   return bookmarkList(app.bookmarks, app.week, app.postsById, new Set(), 'week');
 }
 
+const overrideCache = new Map();
+
 function recompute() {
   const wk = getWeek(app.saved, app.weekKey);
-  const weekPosts = postsInWeek(app.ds.posts, app.week);
+  // 投稿のジャンル上書き（投稿 id ごと・全週）を当てた投稿で話題を作る
+  const allPosts = applyGenreOverrides(app.ds.posts, app.saved.genreOverrides, overrideCache);
+  app.postsById = allPosts === app.ds.posts ? app.basePostsById : new Map(allPosts.map((p) => [p.id, p]));
+  const weekPosts = postsInWeek(allPosts, app.week);
   const inWeek = new Set(weekPosts.map((p) => p.id));
   const bms = weekBookmarks();
   const personalIds = new Set(wk.personal.map((p) => p.id));
@@ -142,8 +158,20 @@ function recompute() {
   app.trashedTopics = part.trashed;
   app.cues = buildCues(wk.rundown, app.topicsById);
   app.weekPostIds = [...weekPosts.map((p) => p.id), ...extraPosts.map((p) => p.id)];
+  app.weekPosts = [...weekPosts, ...extraPosts];
   app.newInfo = newSince(wk, app.weekPostIds, app.topics);
+  app.postTopic = postTopicMap(app.topics);
+  app.recommended = recommendGeneral(app.visibleTopics, undefined, app.pickIds);
+  app.bookmarkPosts = app.bookmarks ? bms.map((b) => app.postsById.get(b.id)).filter(Boolean) : null;
+  app.bookmarkPostsAll = app.bookmarks ? app.bookmarks.map((b) => app.postsById.get(b.id)).filter(Boolean) : null;
+  app.usedBefore = pastUsedIds(app.saved, app.weekKey);
 }
+
+/** 元のジャンル（上書き前。データのカテゴリから） */
+app.origGenreOf = (id) => {
+  const p = app.basePostsById.get(id);
+  return p ? majorityGenre([p]) : null;
+};
 
 app.weekState = () => getWeek(app.saved, app.weekKey);
 app.prevWeekKey = () => shiftWeekKey(app.weekKey, -1);
@@ -174,7 +202,63 @@ app.update = (mut, opts = {}) => {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(persist, 400);
   } else persist();
+  publishLive();
   if (render) renderRoute();
+};
+
+/** 進行状態の変化を 1 か所から発行（段階2で OBS WebSocket へ流す） */
+function publishLive() {
+  if (!app.saved || !app.weekKey) return;
+  publishLiveState({ weekKey: app.weekKey, live: app.weekState().live, cues: app.cues, topicsById: app.topicsById });
+}
+app.publishLive = publishLive;
+
+// ================================================================ 元に戻す・やり直す（編成のすべての編集操作）
+
+function updateHistoryButtons() {
+  for (const b of document.querySelectorAll('[data-key="undo"]')) { b.disabled = !app.history.past.length; b.title = app.history.past.length ? `元に戻す：${app.history.past[app.history.past.length - 1].label}（Ctrl+Z）` : '元に戻す（Ctrl+Z）'; }
+  for (const b of document.querySelectorAll('[data-key="redo"]')) { b.disabled = !app.history.future.length; b.title = app.history.future.length ? `やり直す：${app.history.future[0].label}（Ctrl+Shift+Z / Ctrl+Y）` : 'やり直す（Ctrl+Shift+Z / Ctrl+Y）'; }
+}
+app.updateHistoryButtons = updateHistoryButtons;
+
+/**
+ * 編集操作（元に戻せる）。label は「元に戻す」の説明。opts は app.update と同じ（既定で話題を作り直す）。
+ * toastText を渡すと「元に戻す」つきのお知らせを出す。
+ */
+app.edit = (label, mut, opts = {}) => {
+  const before = serializeSaved(app.saved);
+  app.history = recordHistory(app.history, label, before);
+  app.update(mut, { topics: true, ...opts });
+  if (opts.toastText) toast(opts.toastText, () => app.undo());
+  updateHistoryButtons();
+};
+
+function restoreSnap(snap) {
+  const r = parseSaved(snap);
+  if (!r.ok) return false;
+  app.saved = r.state;
+  recompute();
+  persist();
+  publishLive();
+  renderRoute();
+  return true;
+}
+
+app.undo = () => {
+  const r = undoHistory(app.history, serializeSaved(app.saved));
+  if (!r) { toast('元に戻せる操作はありません'); return; }
+  app.history = r.history;
+  restoreSnap(r.snap);
+  toast(`元に戻しました：${r.label}`);
+  updateHistoryButtons();
+};
+app.redo = () => {
+  const r = redoHistory(app.history, serializeSaved(app.saved));
+  if (!r) { toast('やり直せる操作はありません'); return; }
+  app.history = r.history;
+  restoreSnap(r.snap);
+  toast(`やり直しました：${r.label}`);
+  updateHistoryButtons();
 };
 
 function persist() {
@@ -191,6 +275,7 @@ function persist() {
 
 /** 読み込んだ保存データで置き換える（書き出しファイルの読み込み） */
 app.replaceSaved = (state) => {
+  app.history = recordHistory(app.history, 'ファイルの読み込み', serializeSaved(app.saved));
   app.saved = state;
   if (state.activeWeek && app.weeks.some((w) => w.key === state.activeWeek)) setWeek(state.activeWeek, false);
   app.clusterCache = {};
@@ -232,52 +317,50 @@ function toast(text, onUndo = null) {
 }
 app.toast = toast;
 
-/** 操作の前の状態を覚えておき、直後のトーストから「元に戻す」 */
-function withUndo(message, mutate) {
-  const before = serializeSaved(app.saved);
-  app.update(mutate, { topics: true });
-  toast(message, () => {
-    const r = parseSaved(before);
-    if (r.ok) { app.replaceSaved(r.state); toast('元に戻しました'); }
-  });
-}
-
-app.shelve = (topic) => withUndo(`「${topic.name}」を片付けました（この週の候補から外しました）`, (w) => {
+app.shelve = (topic) => app.edit(`片付け「${topic.name}」`, (w) => {
   Object.assign(w, shelveTopic(w, topic, Date.now()));
-});
+  w.mainCand = (w.mainCand || []).filter((x) => x !== topic.id);
+}, { toastText: `「${topic.name}」を片付けました（この週の候補から外しました）` });
 app.unshelve = (topicId) => {
   let placed = false;
-  app.update((w) => { const r = unshelveTopic(w, topicId); Object.assign(w, r.week); placed = r.placed; }, { topics: true });
+  app.edit('片付けから戻す', (w) => { const r = unshelveTopic(w, topicId); Object.assign(w, r.week); placed = r.placed; });
   toast(placed ? '候補に戻し、元の枠にも戻しました' : '候補に戻しました');
 };
-app.trash = (topic) => withUndo(`「${topic.name}」を削除しました（ゴミ箱へ。今後の週にも出しません）`, (w, s) => {
+app.trash = (topic) => app.edit(`削除「${topic.name}」`, (w, s) => {
   const r = trashTopic(s, w, topic, app.weekKey, Date.now());
   s.trash = r.saved.trash;
   Object.assign(w, r.week);
-});
+  w.mainCand = (w.mainCand || []).filter((x) => x !== topic.id);
+}, { toastText: `「${topic.name}」を削除しました（ゴミ箱へ。今後の週にも出しません）` });
 app.restoreTrash = (ids) => {
   let placed = 0;
-  app.update((w, s) => {
+  app.edit('ゴミ箱から戻す', (w, s) => {
     for (const id of ids) {
       const r = restoreTrash(s, w, id, app.weekKey);
       s.trash = r.saved.trash;
       Object.assign(w, r.week);
       if (r.placed) placed++;
     }
-  }, { topics: true });
+  });
   toast(placed ? `ゴミ箱から戻しました（${placed}件は元の枠にも戻しました）` : 'ゴミ箱から戻しました');
 };
-app.hidePost = (postId, topicName) => withUndo('投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）', (w, s) => {
+app.hidePost = (postId, topicName) => app.edit('投稿の削除', (w, s) => {
   s.hiddenPosts = hidePost(s, postId, app.weekKey, Date.now(), topicName).hiddenPosts;
-});
+}, { toastText: '投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）' });
 app.unhidePost = (postId) => {
-  app.update((w, s) => { s.hiddenPosts = unhidePost(s, postId).hiddenPosts; }, { topics: true });
+  app.edit('投稿を戻す', (w, s) => { s.hiddenPosts = unhidePost(s, postId).hiddenPosts; });
   toast('投稿を戻しました');
 };
 app.restoreAllTrash = () => {
-  const ids = app.saved.trash.map((x) => x.id);
-  app.restoreTrash(ids);
-  app.update((w, s) => { s.hiddenPosts = []; }, { topics: true });
+  app.edit('ゴミ箱をすべて戻す', (w, s) => {
+    for (const e of [...s.trash]) {
+      const r = restoreTrash(s, w, e.id, app.weekKey);
+      s.trash = r.saved.trash;
+      Object.assign(w, r.week);
+    }
+    s.hiddenPosts = [];
+  });
+  toast('ゴミ箱をすべて戻しました');
 };
 
 function setSaveStatus(text, kind = 'ok') {
@@ -341,8 +424,12 @@ function renderRoute() {
   app.afterRender = null;
   const fresh = view(app);
   if (!(sameScreen && patchView(old, fresh))) { clear(root); root.append(fresh); }
-  startEmbeds(root, app.embedder);
+  // 編成画面は画面の高さいっぱいに（ヘッダーの高さを CSS へ）
+  const hdr = document.querySelector('.sh-header');
+  if (hdr) document.documentElement.style.setProperty('--hdr', `${hdr.offsetHeight + (document.getElementById('sample-banner')?.hidden ? 0 : document.getElementById('sample-banner').offsetHeight)}px`);
   if (app.afterRender) app.afterRender();
+  startEmbeds(root, app.embedder);
+  updateHistoryButtons();
   if (lastFocusKey) {
     const el = root.querySelector(`[data-key="${CSS.escape(lastFocusKey)}"]`);
     if (el && !el.disabled) el.focus({ preventScroll: true });
@@ -357,6 +444,7 @@ function onRemoteState(state) {
   app.saved = state;
   if (state.activeWeek && state.activeWeek !== app.weekKey && weekByKey(state.activeWeek) && app.weeks.some((w) => w.key === state.activeWeek)) setWeek(state.activeWeek, false);
   recompute();
+  publishLive();
   if (isEditable(document.activeElement) && app.route !== 'onair') { pendingRemote = true; return; }
   renderRoute();
 }
@@ -375,8 +463,10 @@ async function main() {
     app.ds = d.ds;
     app.bookmarks = d.bookmarks;
     app.bmFlags = d.bmFlags;
+    app.pickIds = d.pickIds || new Set();
     app.isSample = d.isSample;
-    app.postsById = new Map(d.ds.posts.map((p) => [p.id, p]));
+    app.basePostsById = new Map(d.ds.posts.map((p) => [p.id, p]));
+    app.postsById = app.basePostsById;
     if (d.isSample) {
       $('sample-banner').hidden = false;
       $('sample-banner').querySelector('strong').textContent = TEXT.sampleBanner;
@@ -406,6 +496,7 @@ async function main() {
 
   app.embedder = createEmbedder({ getTheme: () => 'dark' });
   recompute();
+  publishLive();
   sync = openSync(onRemoteState);
 
   $('week-select').addEventListener('change', (e) => {
@@ -418,6 +509,7 @@ async function main() {
     if (app.route === 'live') liveKeydown(app, e);
     else if (app.route === 'plan') planKeydown(app, e);
   });
+  document.addEventListener('pointerdown', (e) => { if (app.route === 'plan') planPointerDown(app, e); }, true);
   // 開いたメニュー（番組に入れる ▾ / …）は外側をクリックしたら閉じる
   document.addEventListener('click', (e) => {
     for (const d of document.querySelectorAll('details.menu[open]')) if (!d.contains(e.target)) d.open = false;

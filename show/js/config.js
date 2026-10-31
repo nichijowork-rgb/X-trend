@@ -115,8 +115,10 @@ export const STORAGE_KEY = 'xtrend-show';
 /**
  * 2: 番組構成を 3 コーナーに改定（旧コーナーは読み込み時に取り除く）
  * 3: 話題の整理（週ごとの片付け shelved、ゴミ箱 trash、削除した投稿 hiddenPosts）を追加（無ければ空）
+ * 4: フォルダ型の編成（v2 段階1）。メインは枠（メイン1〜3・空き枠は null）、メイン候補 mainCand、
+ *    投稿のジャンル上書き genreOverrides（投稿 id ごと・全週）を追加（無ければ空）
  */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 /** 候補・ブックマーク・進行の表示（埋め込み／カード）を覚えておく localStorage キー */
 export const VIEW_PREF_KEY = 'xtrend-show-view';
 /** 編成画面の「構成と台本」サイドパネルの開閉を覚えておく localStorage キー */
@@ -133,4 +135,16 @@ export const TEXT = Object.freeze({
   suggestion: '同じ話題かも？',
   noReports: '答え合わせのデータはまだありません（reports.json の週間まとめが届くと表示されます）',
   onairWaiting: 'まもなく配信開始',
+});
+
+/** 編成画面（フォルダ型）の設定 */
+export const PLAN_V2 = Object.freeze({
+  /** 一般のバズは既定で「おすすめ」上位 N 件だけ表示（話題性スコア順。show_pick: true は最優先） */
+  generalRecommendN: 30,
+  /** 一覧の 1 行の高さ（px）。仮想スクロールで見えている分だけ描く */
+  rowHeight: 56,
+  /** 元に戻せる回数 */
+  historyLimit: 40,
+  /** これ以上動かしたらドラッグ開始（px） */
+  dragThreshold: 6,
 });

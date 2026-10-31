@@ -24,24 +24,26 @@ export function renderLive(app) {
   const cue = cues[live.index] || null;
   const color = cue ? cueColor(app, cue) : 'white';
   const def = cue ? cornerDef(cue.cornerKey) : null;
-  const root = h('div', { class: 'live', dataset: { keep: `live:${app.weekKey}` } });
+  const topic = cue && cue.kind === 'topic' ? app.topicsById.get(cue.topicId) : null;
+  // 画面半分（960px）向けの縦 1 列: 細い進行バー → 現在の話題（大）＋タイマー → 代表投稿 → 下にボタン固定。全画面では右に一覧
+  const root = h('div', { class: 'live live2', dataset: { keep: `live:${app.weekKey}` } });
 
   const startArea = live.startedAt == null
-    ? btn('▶ 配信開始（計測スタート）', () => app.liveAction('start'), 'btn btn-start', { 'data-key': 'live-start' })
+    ? btn('▶ 配信開始', () => app.liveAction('start'), 'btn btn-start', { 'data-key': 'live-start', title: '計測スタート' })
     : (app.ui.confirmReset
-      ? h('span', { class: 'row' }, h('span', {}, '進行を最初からやり直しますか？'),
+      ? h('span', { class: 'row' }, h('span', {}, '最初からやり直しますか？'),
         btn('やり直す', () => { app.ui.confirmReset = false; app.liveAction('reset'); }, 'btn btn-small btn-dark', { 'data-key': 'live-reset-yes' }),
         btn('やめる', () => { app.ui.confirmReset = false; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset-no' }))
-      : btn('進行をリセット', () => { app.ui.confirmReset = true; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset' }));
+      : btn('リセット', () => { app.ui.confirmReset = true; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset' }));
+  const cardOn = live.cardVisible !== false;
+  const cardToggle = btn(cardOn ? '投稿カード：表示中' : '投稿カード：隠し中', () => app.liveAction('toggleCard'), `btn btn-small ${cardOn ? 'btn-dark' : 'btn-ghost-dark'}`, { 'data-key': 'live-card', 'aria-pressed': String(cardOn), title: '映す用に代表投稿のカードを出す／隠す（段階2で OBS と連動）' });
 
-  root.append(h('section', { class: `live-bar g-${color}`, attrs: { 'aria-label': '現在のコーナー' } },
-    h('div', { class: 'live-corner' },
-      h('span', { class: 'live-icon' }, genreIcon(color)),
-      h('div', {},
-        h('p', { class: 'live-kicker' }, def ? def.name : '配信終了', def && cue.kind === 'topic' ? h('span', { class: 'live-count' }, `${cue.n} / ${cue.of}`) : null),
-        h('p', { class: 'live-sub' }, def ? def.sub : 'おつかれさまでした'))),
-    h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }),
-    h('div', { class: 'live-start' }, startArea)));
+  root.append(progressBar(app, cues, live));
+  root.append(h('section', { class: `live-head g-${color}`, attrs: { 'aria-label': '現在の話題' } },
+    h('p', { class: 'lh-corner' }, h('span', { class: 'live-icon' }, genreIcon(color)),
+      h('span', {}, def ? def.name : '配信終了', def && cue.kind === 'topic' ? h('span', { class: 'live-count' }, `${cue.n} / ${cue.of}`) : null)),
+    h('h2', { class: 'live-headline lh-title', dataset: { key: 'live-title' } }, topic ? topic.name : (cue ? (cue.kind === 'empty' ? `${def.name}（話題が未設定）` : def.name) : 'おつかれさまでした')),
+    h('div', { class: 'lh-row' }, h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }), h('div', { class: 'live-start' }, cardToggle, startArea))));
 
   const mainCard = h('section', { class: 'live-main', dataset: { keep: 'main' }, attrs: { 'aria-label': '今読むニュース' } });
   mainCard.append(cueContent(app, cue, wk));
@@ -58,11 +60,29 @@ export function renderLive(app) {
   return root;
 }
 
+/** 上の細い進行バー（コーナーごとの区切り。済・現在・残り） */
+function progressBar(app, cues, live) {
+  const states = cueStates(live, cues);
+  const bar = h('nav', { class: 'lv-progress', attrs: { 'aria-label': '番組の進行' } });
+  let last = null;
+  cues.forEach((c, i) => {
+    if (c.cornerKey !== last) { bar.append(h('span', { class: 'lvp-corner' }, cornerDef(c.cornerKey).name)); last = c.cornerKey; }
+    const st = states[i];
+    bar.append(h('button', {
+      type: 'button', class: `lvp-seg is-${st} g-${cueColor(app, c)}`, dataset: { key: `seg-${c.id}` },
+      attrs: { title: `${cueTitle(app, c)}（${STATUS_LABEL[st] || '残り'}）`, 'aria-label': `${cueTitle(app, c)}：${STATUS_LABEL[st] || '残り'}`, 'aria-current': st === 'current' ? 'step' : null },
+      on: { click: () => app.liveAction('goto', { index: i }) },
+    }));
+  });
+  const done = states.filter((x) => x === 'done').length;
+  bar.append(h('span', { class: 'lvp-count' }, `済 ${done} / ${cues.length}`));
+  return bar;
+}
+
 function cueContent(app, cue, wk) {
   const box = h('div', { class: 'live-content', dataset: { keep: cue ? `c:${cue.id}` : 'end' } });
   if (!cue) {
-    box.append(h('h2', { class: 'live-headline' }, 'おつかれさまでした！'),
-      h('p', { class: 'live-lead' }, 'すべてのコーナーが終わりました。'),
+    box.append(h('p', { class: 'live-lead' }, 'すべてのコーナーが終わりました。'),
       h('a', { class: 'btn', href: '#review' }, '振り返りを見る'));
     return box;
   }
@@ -70,9 +90,7 @@ function cueContent(app, cue, wk) {
   if (cue.kind === 'topic') {
     const t = app.topicsById.get(cue.topicId);
     if (!t) { box.append(h('p', {}, '話題が見つかりません')); return box; }
-    box.append(h('div', { class: 'live-tags' }, genreSticker(t.genre), topicMarks(app, t)));
-    box.append(h('h2', { class: 'live-headline' }, t.name));
-    box.append(h('p', { class: 'stats stats-lg' }, statsLine(t)));
+    box.append(h('div', { class: 'live-tags' }, genreSticker(t.genre), topicMarks(app, t), h('p', { class: 'stats' }, statsLine(t))));
     box.append(h('p', { class: 'live-lead' }, leadFor(app, t)));
     // 話すポイント・視聴者への質問の欄は表示しない（オーナー指定）。コーナーのメモは書いてあるときだけ
     const notesBox = notes ? h('div', { class: 'live-notes' }, h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)) : null;
@@ -89,10 +107,9 @@ function cueContent(app, cue, wk) {
     return box;
   }
   if (cue.kind === 'empty') {
-    box.append(h('h2', { class: 'live-headline' }, cornerDef(cue.cornerKey).name),
-      h('p', { class: 'live-lead' }, 'このコーナーにはまだ話題が入っていません（編成で追加できます）。'));
+    box.append(h('p', { class: 'live-lead' }, 'このコーナーにはまだ話題が入っていません（編成で追加できます）。'));
   } else {
-    box.append(h('h2', { class: 'live-headline' }, cornerDef(cue.cornerKey).name), h('p', { class: 'live-lead' }, cornerDef(cue.cornerKey).sub));
+    box.append(h('p', { class: 'live-lead' }, cornerDef(cue.cornerKey).sub));
   }
   if (notes) box.append(h('div', { class: 'live-notes' }, h('h3', {}, 'メモ'), h('p', { class: 'pre' }, notes)));
   return box;

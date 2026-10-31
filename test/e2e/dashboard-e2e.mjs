@@ -545,6 +545,8 @@ async function main() {
       assert((await page.inputValue('#rweek')) === '2026-09-26_2026-10-03', 'rweek restore');
       assert(!(await page.$eval('#report-weekly', (e) => e.open)), 'closed restore');
       await page.click('#report-weekly > summary');
+      // 開閉（toggle イベント）が URL に反映されてから次の操作へ（反映前に再描画すると閉じた状態に戻るため）
+      await page.waitForFunction(() => !location.hash.includes('rc=weekly'));
       await page.selectOption('#rdate', '2026-10-11');
       await page.selectOption('#rweek', '2026-10-03_2026-10-10');
       // 見張り候補クリックでアカウント絞り込み
