@@ -934,3 +934,48 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .lvp-seg.g-review { background-color: var(--g-review); }
 .lvp-seg.g-white { background-color: var(--g-white); }
 .oa-split.is-nocard { grid-template-columns: minmax(0, 1fr); }
+
+/* ================================================================ 段階2: OBS 連動（状態ピル・接続ダイアログ・セットアップガイド） */
+.obs-pill { all: unset; box-sizing: border-box; cursor: pointer; font-size: 12px; font-weight: 800; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-2); background: var(--surface-2); white-space: nowrap; }
+.obs-pill[hidden] { display: none; }
+.obs-pill:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.obs-pill[data-state="connected"] { background: var(--ok); border-color: var(--ok); color: var(--ink); }
+.obs-pill[data-state="connecting"] { background: var(--warn); border-color: var(--warn); color: var(--ink); }
+.obs-pill[data-state="error"] { background: #5a1410; border-color: var(--over); color: #fff; }
+.check-line { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 14px; cursor: pointer; }
+.check-line input { width: 18px; height: 18px; accent-color: var(--g-main); }
+
+.obs-dialog { border: 0; border-radius: 20px; padding: 0; background: var(--surface); color: var(--text); width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 32px); overflow: auto; }
+.obs-dialog::backdrop { background: rgba(0, 0, 0, .7); }
+.obs-body { padding: 4px 16px 16px; }
+.obs-body > p { margin-top: 10px; font-size: 14px; }
+.obs-grid { display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 0 10px; }
+.obs-state { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); font-size: 14px; }
+.obs-state.is-connected { border-color: var(--ok); }
+.obs-state.is-connecting { border-color: var(--warn); }
+.obs-state.is-error { border-color: var(--over); background: #2c1110; }
+.obs-reason { display: block; margin-top: 4px; color: var(--text-2); font-weight: 400; }
+.obs-warn { margin-top: 12px; padding: 8px 12px; border-radius: 10px; background: #2b2610; border: 1px solid var(--warn); color: var(--text); font-size: 13px; }
+.obs-help { margin-top: 12px; font-size: 13px; color: var(--text-2); }
+.obs-help summary { cursor: pointer; font-weight: 800; color: var(--text); }
+.obs-help ul { margin: 6px 0 0 18px; display: grid; gap: 4px; }
+
+.obs-setup { padding-top: 16px; padding-bottom: 40px; max-width: 1100px; }
+.obs-setup .sec-head { align-items: center; }
+.setup-steps { margin: 0 0 8px 20px; display: grid; gap: 8px; font-size: 15px; line-height: 1.6; }
+.setup-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.setup-part { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; min-width: 0; }
+.setup-part h3 { font-size: 16px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.setup-part > p { font-size: 13px; margin-top: 4px; }
+.setup-size { font-size: 13px; color: var(--yellow); font-weight: 800; }
+.setup-url { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.setup-url .input { flex: 1 1 100%; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.obs-setup code { background: var(--surface-2); padding: 1px 6px; border-radius: 6px; font-size: 13px; }
+.setup-fig { margin: 0; }
+.setup-canvas { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #26262e; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.setup-box { position: absolute; box-sizing: border-box; border-radius: 6px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2px; font-size: clamp(9px, 1.2vw, 13px); font-weight: 800; line-height: 1.25; overflow: hidden; }
+.setup-box.is-other { background: rgba(255, 255, 255, .08); border: 1px dashed #8a8a96; color: var(--text-2); }
+.setup-box.is-ours { border: 2px solid #fff; color: #fff; z-index: 1; }
+.setup-box.part-card { background: rgba(31, 95, 224, .75); }
+.setup-box.part-topicbar { background: rgba(224, 42, 27, .8); }
+.setup-fig figcaption { margin-top: 6px; font-size: 13px; }

@@ -3,6 +3,7 @@ import { computeTimer, formatClock, cornerDef, cueStates } from '../logic.js';
 import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
 import { cueColor, leadFor, topicPosts, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
+import { obsDialog } from './obsui.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
 
@@ -36,7 +37,7 @@ export function renderLive(app) {
         btn('やめる', () => { app.ui.confirmReset = false; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset-no' }))
       : btn('リセット', () => { app.ui.confirmReset = true; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset' }));
   const cardOn = live.cardVisible !== false;
-  const cardToggle = btn(cardOn ? '投稿カード：表示中' : '投稿カード：隠し中', () => app.liveAction('toggleCard'), `btn btn-small ${cardOn ? 'btn-dark' : 'btn-ghost-dark'}`, { 'data-key': 'live-card', 'aria-pressed': String(cardOn), title: '映す用に代表投稿のカードを出す／隠す（段階2で OBS と連動）' });
+  const cardToggle = btn(cardOn ? '投稿カード：表示中' : '投稿カード：隠し中', () => app.liveAction('toggleCard'), `btn btn-small ${cardOn ? 'btn-dark' : 'btn-ghost-dark'}`, { 'data-key': 'live-card', 'aria-pressed': String(cardOn), title: '映す用・OBS の投稿カードを出す／隠す' });
 
   root.append(progressBar(app, cues, live));
   root.append(h('section', { class: `live-head g-${color}`, attrs: { 'aria-label': '現在の話題' } },
@@ -56,6 +57,10 @@ export function renderLive(app) {
 
   root.append(h('div', { class: 'live-grid', dataset: { keep: 'grid' } }, mainCard, progressList(app, cues, live)));
   root.append(controls(app, cue, live));
+  if (app.ui.obsDlg) {
+    root.append(obsDialog(app));
+    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
+  }
   tickLive(app, root);
   return root;
 }

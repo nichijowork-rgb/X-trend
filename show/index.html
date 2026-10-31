@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <!-- 通信先は自サイトのみ。例外は X 埋め込み（platform.twitter.com ほか。話題の候補・進行・映す用で画面に入ったものだけ）と、
-       X の画像・動画（pbs/video.twimg.com）。フォントは端末の標準ゴシック（外部フォントは読まない）。
+  <!-- 通信先は自サイトのみ。例外は X 埋め込み（platform.twitter.com ほか。プレビュー・進行・映す用で表示するものだけ）、
+       X の画像・動画（pbs/video.twimg.com）、この PC の OBS WebSocket（ws://127.0.0.1 / ws://localhost。進行画面で「接続」したときだけ）。
+       フォントは端末の標準ゴシック（外部フォントは読まない）。
        widgets.js が iframe に style 属性を付けるため style-src に 'unsafe-inline' を許可（本文は常に textContent で挿入） -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com ws://127.0.0.1:* ws://localhost:*; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark">
@@ -39,13 +40,14 @@
         <a href="#live" data-route="live">進行</a>
         <a href="#onair" data-route="onair" target="_blank" rel="noopener" title="配信画面用（別タブで開きます）">映す用</a>
         <a href="#review" data-route="review">振り返り</a>
+        <a href="#obs-setup" data-route="obs-setup">OBS</a>
       </nav>
       <div class="week-box">
         <label for="week-select" class="week-label">番組週</label>
         <select id="week-select" class="input input-sm"></select>
         <span id="week-range" class="week-range"></span>
       </div>
-      <p class="sh-meta"><span id="data-time"></span> <span id="save-status" class="save-status" role="status"></span></p>
+      <p class="sh-meta"><button type="button" id="obs-pill" class="obs-pill" data-key="obs-pill" data-state="idle" hidden>OBS：未接続</button> <span id="data-time"></span> <span id="save-status" class="save-status" role="status"></span></p>
     </div>
   </header>
 

@@ -3,12 +3,15 @@
 // 実行方法（依存ゼロ方針のため playwright はリポジトリに入れない。dashboard-e2e.mjs と同じ）:
 //   PW_DIR=/path/to/qa/node_modules node test/e2e/show-e2e.mjs
 //   スクリーンショットの出力先は SHOTS_DIR（既定: OS の一時ディレクトリ/x-trend-show-shots）
+//   OBS_REF_IMAGE=参考の配信画面（png/jpg/webp）を渡すと、オーバーレイを重ねた合成スクショも撮る
+//   OBS WebSocket は page.routeWebSocket で偽の OBS に置き換える（本物の OBS には接続しない）
 //
 // リポジトリ直下を `python3 -m http.server`（空きポート）で配信し、終了時に停止する。
 // data/ は page.route で差し替える（リポジトリの data/ は読むだけ・変更しない）。
 // 外部通信（Google Fonts・X 埋め込み・画像）はすべて page.route でモック／遮断する。
 
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import net from 'node:net';
@@ -18,6 +21,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SHOTS = process.env.SHOTS_DIR || path.join(os.tmpdir(), 'x-trend-show-shots');
+// 参考の配信画面の画像（任意）。あればオーバーレイ全部入りを重ねた合成スクショも撮る
+const REF_IMAGE = process.env.OBS_REF_IMAGE || '';
 mkdirSync(SHOTS, { recursive: true });
 
 async function loadPlaywright() {
@@ -51,6 +56,7 @@ async function waitHttp(url, ms = 10000) {
 const results = [];
 let failed = 0;
 async function check(name, fn) {
+  if (process.env.ONLY && !name.includes(process.env.ONLY)) return; // 開発用: 名前に ONLY を含むものだけ（前のチェックに依存するものは単独では動かない）
   try {
     const info = await fn();
     results.push(`ok   ${name}${info ? ` — ${info}` : ''}`);
@@ -756,6 +762,206 @@ async function main() {
       const cls = await p.$eval('.stamp', (e) => e.className);
       assert(!cls.includes('is-anim'), cls);
       await c6.close();
+    });
+
+    // ---- 4b. OBS 連動（段階2）。偽の OBS（routeWebSocket）で Hello/Identify/CallVendorRequest を往復し、
+    //      受け取った emit_event を各パーツのページへ window の CustomEvent として配る（OBS のブラウザソースと同じ）
+    await check('OBS 連動: パスワード違い→接続・CallVendorRequest(emit_event) でトピック帯/投稿カード/タイトル・後から開いたパーツ・テスト表示', async () => {
+      const PASS = 'ob$-パス';
+      const auth = { salt: 'c2FsdC12YWx1ZQ==', challenge: 'Y2hhbGxlbmdlLXZhbHVl' };
+      const h64 = (x) => createHash('sha256').update(x).digest('base64');
+      const expectAuth = h64(h64(PASS + auth.salt) + auth.challenge);
+      const obs = { conns: 0, identify: [], requests: [], payloads: [], targets: [] };
+      const c = await newCtx();
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      watchConsole(page, errors);
+      let n = 0;
+      await page.routeWebSocket(/^ws:\/\/127\.0\.0\.1:4455/, (ws) => {
+        obs.conns++;
+        ws.send(JSON.stringify({ op: 0, d: { obsWebSocketVersion: '5.5.2', rpcVersion: 1, authentication: auth } }));
+        ws.onMessage((raw) => {
+          const m = JSON.parse(String(raw));
+          if (m.op === 1) {
+            obs.identify.push(m.d);
+            if (m.d.authentication !== expectAuth) { ws.close({ code: 4009, reason: 'Authentication failed.' }); return; }
+            ws.send(JSON.stringify({ op: 2, d: { negotiatedRpcVersion: 1 } }));
+          } else if (m.op === 6) {
+            obs.requests.push(m.d);
+            ws.send(JSON.stringify({ op: 7, d: { requestType: m.d.requestType, requestId: m.d.requestId, requestStatus: { result: true, code: 100 } } }));
+            const rd = m.d.requestData || {};
+            if (m.d.requestType === 'CallVendorRequest' && rd.vendorName === 'obs-browser' && rd.requestType === 'emit_event') {
+              const ev = rd.requestData;
+              obs.payloads.push(ev.event_data);
+              n++;
+              const detail = n % 2 ? ev.event_data : JSON.stringify(ev.event_data); // オブジェクトと文字列の両方
+              for (const t of obs.targets) t.evaluate(([name, d]) => window.dispatchEvent(new CustomEvent(name, { detail: d })), [ev.event_name, detail]).catch(() => {});
+            }
+          }
+        });
+      });
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      assert(await page.isHidden('#obs-pill'), '編成画面ではピルを出さない');
+      // メイン 1・2 に話題を入れておく
+      await folder(page, 'group:night');
+      const ks = await rowKeys(page);
+      await ctx(page, `${rowSel(ks[0])} .row-main`, 'ctx-slot-0');
+      await ctx(page, `${rowSel(ks[1])} .row-main`, 'ctx-slot-1');
+      await page.goto(`${show}#live`);
+      await ready(page);
+      assert((await page.textContent('#obs-pill')) === 'OBS：未接続', 'pill');
+      // パスワード違い
+      await page.click('#obs-pill');
+      await page.waitForSelector('.obs-dialog[open]');
+      assert((await page.textContent('.obs-warn')).includes('暗号化せずに保存'), '保存の注意');
+      await page.fill('[data-key="obs-password"]', 'wrong');
+      await page.click('[data-key="obs-connect"]');
+      await page.waitForFunction(() => (document.querySelector('[data-key="obs-state"]') || {}).textContent?.includes('パスワードが違います'), null, { timeout: 5000 });
+      assert((await page.getAttribute('#obs-pill', 'data-state')) === 'error', 'pill error');
+      assert(await page.inputValue('[data-key="obs-password"]') === 'wrong', '入力は残る');
+      await page.screenshot({ path: path.join(SHOTS, 'obs-dialog-error-960.png') });
+      // 正しいパスワード
+      await page.fill('[data-key="obs-password"]', PASS);
+      await page.click('[data-key="obs-connect"]');
+      await page.waitForFunction(() => document.getElementById('obs-pill').dataset.state === 'connected', null, { timeout: 5000 });
+      const idf = obs.identify.at(-1);
+      assert(idf.rpcVersion === 1 && idf.authentication === expectAuth, JSON.stringify(idf));
+      assert((await page.textContent('[data-key="obs-state"]')).includes('5.5.2'), 'version');
+      await page.screenshot({ path: path.join(SHOTS, 'obs-dialog-960.png') });
+      const prefs = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-obs')));
+      assert(prefs.password === PASS && prefs.enabled === true && prefs.port === 4455, JSON.stringify(prefs));
+      await page.click('[data-key="obs-close"]');
+      await page.waitForFunction(() => !document.querySelector('.obs-dialog'));
+      // パーツ（別のブラウザ＝BroadcastChannel は届かない。OBS 経由だけ）
+      const oc = await newCtx();
+      const openPart = async (q, w, hh) => {
+        const p = await oc.newPage();
+        await p.setViewportSize({ width: w, height: hh });
+        await setupRoutes(p, { data: SAMPLE_404 });
+        watchConsole(p, errors);
+        await p.goto(`${show}overlay.html?${q}`);
+        await p.waitForFunction(() => window.__overlay);
+        obs.targets.push(p);
+        return p;
+      };
+      const tb = await openPart('part=topicbar', 1300, 150);
+      const cd = await openPart('part=card', 640, 760);
+      const tt = await openPart('part=title', 1920, 1080);
+      const curTopic = () => page.evaluate(() => { const a = window.__show; const cu = a.cues[a.weekState().live.index]; return cu && cu.kind === 'topic' ? a.topicsById.get(cu.topicId).name : null; });
+      const tbName = (p) => p.evaluate(() => { const e = document.querySelector('.tb'); return e && !e.hidden ? document.querySelector('.tb-name').textContent : null; });
+      assert((await tbName(tb)) === null, '開始前はトピック帯なし');
+      await page.click('[data-key="live-start"]');
+      const t0 = await curTopic();
+      assert(t0, '最初は話題');
+      await tb.waitForFunction((x) => document.querySelector('.tb-name')?.textContent === x && !document.querySelector('.tb').hidden, t0, { timeout: 5000 });
+      // タイトル: 大きく出て数秒で消える
+      const corner0 = await page.evaluate(() => document.querySelector('.lh-corner').textContent);
+      await tt.waitForFunction(() => !document.querySelector('.tt').hidden, null, { timeout: 5000 });
+      const ttText = await tt.textContent('.tt-name');
+      assert(corner0.includes(ttText), `${ttText} / ${corner0}`);
+      await tt.screenshot({ path: path.join(SHOTS, 'obs-live-title.png'), omitBackground: true });
+      // 投稿カード: 表示 → 隠す → 出す
+      await cd.waitForSelector('.cd[data-visible="true"]', { timeout: 5000 });
+      assert((await cd.textContent('.cd-user')).startsWith('@'), 'user');
+      await page.click('[data-key="live-card"]');
+      await cd.waitForSelector('.cd[data-visible="false"]', { timeout: 5000 });
+      await page.click('[data-key="live-card"]');
+      await cd.waitForSelector('.cd[data-visible="true"]', { timeout: 5000 });
+      await tt.waitForFunction(() => document.querySelector('.tt').hidden, null, { timeout: 7000 });
+      // 次の話題へ → トピック帯が切り替わる
+      await page.keyboard.press('ArrowRight');
+      const t1 = await curTopic();
+      assert(t1 && t1 !== t0, `${t0} → ${t1}`);
+      await tb.waitForFunction((x) => document.querySelector('.tb-name')?.textContent === x, t1, { timeout: 5000 });
+      // 後から開いたパーツは再送（5 秒おき）で追いつく
+      const late = await openPart('part=topicbar&motion=off', 1300, 150);
+      const tLate = Date.now();
+      await late.waitForFunction((x) => document.querySelector('.tb-name')?.textContent === x && !document.querySelector('.tb').hidden, t1, { timeout: 8000 });
+      const lateMs = Date.now() - tLate;
+      // 送ったもの: CallVendorRequest / obs-browser / emit_event、seq は増えるだけ（再送は同じ seq）
+      assert(obs.requests.every((r) => r.requestType === 'CallVendorRequest' && r.requestData.vendorName === 'obs-browser' && r.requestData.requestType === 'emit_event' && r.requestData.requestData.event_name === 'xtrend-show'), 'request shape');
+      const seqs = obs.payloads.map((x) => x.seq);
+      assert(seqs.every((x, i) => i === 0 || x >= seqs[i - 1]) && new Set(obs.payloads.map((x) => x.sid)).size === 1, JSON.stringify(seqs));
+      assert(seqs.length > new Set(seqs).size, '再送あり');
+      // テスト表示
+      await page.click('#obs-pill');
+      await page.waitForSelector('.obs-dialog[open]');
+      await page.click('[data-key="obs-test"]');
+      await tb.waitForFunction(() => document.querySelector('.tb-name')?.textContent.startsWith('テスト表示'), null, { timeout: 5000 });
+      // XSS: パーツは文字のまま表示
+      const evil = '<img src=x onerror="window.__xss=1">';
+      const bad = { v: 1, type: 'state', sid: 'evil', seq: 1, at: Date.now() + 60000, show: { name: evil, title: evil }, live: { started: true, finished: false, index: 0, total: 1 },
+        corner: { key: 'main', name: evil, sub: evil, color: 'x" onmouseover="1', n: 1, of: 1 }, topic: { id: 'e', name: evil, genre: '<b>', color: 'main', stats: {} }, next: { name: evil, corner: evil },
+        card: { visible: true, post: { id: 'e', user: evil, text: evil, metrics: { impression_count: 1 }, thumb: 'https://evil.example/x.png' } }, title: { id: 'e', text: evil, sub: evil, color: 'main', at: Date.now() + 60000, duration: 4000 }, effect: null };
+      for (const p of [late, cd, tt]) await p.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: JSON.stringify(d) })), bad);
+      await late.waitForFunction(() => window.__overlay.last && window.__overlay.last.sid === 'evil');
+      assert((await late.textContent('.tb-name')) === evil, 'tb text');
+      assert((await cd.textContent('.cd-text')) === evil, 'card text');
+      for (const p of [late, cd, tt]) {
+        assert(!(await p.$('#stage img:not(.cd-img)')), 'no injected img');
+        assert(await p.evaluate(() => window.__xss === undefined), 'xss');
+      }
+      assert(await cd.evaluate(() => document.querySelector('.cd-img').hidden), 'pbs 以外の画像は出さない');
+      await oc.close();
+      await c.close();
+      return `接続 ${obs.conns} 回・送信 ${obs.payloads.length} 件（seq ${seqs[0]}〜${seqs.at(-1)}）・後から開いたパーツ ${lateMs}ms で追いつく`;
+    });
+
+    await check('OBS セットアップガイド（#obs-setup）: パーツの URL・推奨サイズ・参考配置図、横スクロールなし', async () => {
+      for (const [w, hh] of [[960, 1040], [375, 812]]) {
+        const c = await newCtx({ viewport: { width: w, height: hh } });
+        const { page } = await open(c, `${show}#obs-setup`);
+        for (const k of ['topicbar', 'card', 'title']) {
+          const u = new URL(await page.inputValue(`[data-key="url-${k}"]`));
+          assert(u.pathname === '/show/overlay.html' && u.searchParams.get('part') === k, u.href);
+        }
+        assert((await page.$$('.setup-box')).length >= 7, 'figure');
+        assert(await page.isVisible('#obs-pill'), 'pill');
+        const s2 = await sw(page);
+        assert(s2 <= w, `scrollWidth ${s2}`);
+        await page.screenshot({ path: path.join(SHOTS, `obs-setup-${w}.png`), fullPage: true });
+        await c.close();
+      }
+    });
+
+    await check('オーバーレイのパーツ（見本・背景透明）を推奨サイズで撮る＋?scale・?motion=off', async () => {
+      const c = await newCtx();
+      for (const [k, w, hh] of [['topicbar', 1300, 150], ['card', 640, 760], ['title', 1920, 1080], ['all', 1920, 1080]]) {
+        const p = await c.newPage();
+        await p.setViewportSize({ width: w, height: hh });
+        await setupRoutes(p, { data: SAMPLE_404 });
+        watchConsole(p, errors);
+        await p.goto(`${show}overlay.html?part=${k}&demo=1&motion=off`);
+        await p.waitForFunction(() => window.__overlay && window.__overlay.received === 1);
+        const bg = await p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+        assert(bg === 'rgba(0, 0, 0, 0)', `透明 ${bg}`);
+        assert(await p.evaluate(() => document.documentElement.classList.contains('no-motion')), 'motion=off');
+        await p.screenshot({ path: path.join(SHOTS, `overlay-${k}-${w}x${hh}.png`), omitBackground: true });
+        await p.close();
+      }
+      // ?scale=2（小さなソース枠でも拡大）
+      const p = await c.newPage();
+      await p.setViewportSize({ width: 650, height: 75 });
+      await p.goto(`${show}overlay.html?part=topicbar&demo=1&scale=2`);
+      const tf = await p.$eval('#stage', (e) => e.style.transform);
+      assert(tf === 'scale(1)', tf);
+      if (REF_IMAGE && existsSync(REF_IMAGE)) {
+        // 参考の配信画面に全部入りを重ねる（data: URI の背景。CSP の img-src data: で許可済み）
+        const ext = path.extname(REF_IMAGE).slice(1).replace('jpg', 'jpeg');
+        const uri = `data:image/${ext};base64,${readFileSync(REF_IMAGE).toString('base64')}`;
+        const q = await c.newPage();
+        await q.setViewportSize({ width: 1920, height: 1080 });
+        await setupRoutes(q, { data: SAMPLE_404 });
+        await q.goto(`${show}overlay.html?part=all&demo=1&motion=off`);
+        await q.waitForFunction(() => window.__overlay && window.__overlay.received === 1);
+        await q.evaluate((u) => { document.body.style.setProperty('background', `url("${u}") 0 0 / 100% 100% no-repeat`, 'important'); document.body.style.height = '1080px'; }, uri);
+        await q.screenshot({ path: path.join(SHOTS, 'overlay-composite-1920.png') });
+        await q.evaluate(() => { document.querySelector('.tt').hidden = true; });
+        await q.screenshot({ path: path.join(SHOTS, 'overlay-composite-notitle-1920.png') });
+      }
+      await c.close();
+      return REF_IMAGE ? '合成スクショあり' : '合成スクショなし（OBS_REF_IMAGE 未指定）';
     });
 
     // ---- 5. 実データ（リポジトリの data/。読むだけ）。今週（約 960 件）の 10/31 配信の週で確認

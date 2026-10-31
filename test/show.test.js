@@ -1090,3 +1090,215 @@ test('v2 進行状態のイベント: 変わったときだけ 1 か所から発
   assert.equal(eventLog.length, 3);
   assert.deepEqual(diffSnapshot(liveSnapshot({ weekKey: 'w', live, cues, topicsById }), liveSnapshot({ weekKey: 'w', live, cues, topicsById })), []);
 });
+
+// ================================================================ 段階2: OBS オーバーレイ（payload.js・obs.js）
+import { createHash } from 'node:crypto';
+import { buildPayload, samePayload, shouldAccept, readDetail, titleVisible, smallThumb, demoPayload, TITLE_DURATION_MS, PAYLOAD_VERSION } from '../show/js/payload.js';
+import { obsAuthString, obsUrl, obsCloseReason, createObsClient, parseObsPrefs, OBS_DEFAULTS } from '../show/js/obs.js';
+import { OVERLAY_PARTS, LAYOUT_GUIDE } from '../show/js/overlayinfo.js';
+import { cornerDef } from '../show/js/logic.js';
+
+test('OBS 認証文字列: obs-websocket v5 の既知の例と node:crypto の計算に一致', async () => {
+  const pw = 'supersecretpassword';
+  const salt = 'lM1GncleQOaCu9lT1yeUZhFYnqhsLLP1G5lAGo3ixaI=';
+  const challenge = '+IxH4CnCiqpX1rM9scsNynZzbOe4KhDeYcTNS3PDaeY=';
+  const got = await obsAuthString(pw, salt, challenge);
+  assert.equal(got, '1Ct943GAT+6YQUUX47Ia/ncufilbe6+oD6lY+5kaCu4=');
+  const h = (s) => createHash('sha256').update(s).digest('base64');
+  assert.equal(await obsAuthString('パスワード', 'abc', 'xyz'), h(h('パスワードabc') + 'xyz'), 'UTF-8 のパスワード');
+});
+
+test('OBS 接続先・閉じた理由・保存設定', () => {
+  assert.equal(obsUrl('127.0.0.1', 4455), 'ws://127.0.0.1:4455');
+  assert.equal(obsUrl(' localhost ', '4455'), 'ws://localhost:4455');
+  assert.equal(obsUrl('::1', 4455), 'ws://[::1]:4455');
+  for (const [h, p] of [['', 4455], ['a b', 4455], ['x/y', 1], ['host', 0], ['host', 70000], ['host', 1.5]]) assert.equal(obsUrl(h, p), null, `${h}:${p}`);
+  assert.match(obsCloseReason(4009), /パスワードが違います/);
+  assert.match(obsCloseReason(1006, { everOpened: false }), /起動していない.*WebSocket.*デバイス上のアプリ/);
+  assert.match(obsCloseReason(1006, { everOpened: true, identified: true }), /切れました/);
+  assert.deepEqual(parseObsPrefs(null), { ...OBS_DEFAULTS });
+  assert.deepEqual(parseObsPrefs('{壊れた'), { ...OBS_DEFAULTS });
+  assert.deepEqual(parseObsPrefs(JSON.stringify({ host: 'localhost', port: '4456', password: 'p', auto: false, enabled: true })), { host: 'localhost', port: 4456, password: 'p', auto: false, enabled: true });
+  assert.equal(parseObsPrefs({ port: 99999 }).port, 4455);
+});
+
+/** 偽の WebSocket（OBS 役）。送られたものを記録し、テストから受信・切断を起こす */
+function fakeObs({ auth = null, onIdentify = null } = {}) {
+  const socks = [];
+  class FakeWS {
+    constructor(url) { this.url = url; this.sent = []; socks.push(this); queueMicrotask(() => { this.onopen && this.onopen(); this.recv({ op: 0, d: { obsWebSocketVersion: '5.5.0', rpcVersion: 1, ...(auth ? { authentication: auth } : {}) } }); }); }
+    send(s) { const m = JSON.parse(s); this.sent.push(m); if (m.op === 1 && onIdentify) onIdentify(this, m); }
+    recv(m) { this.onmessage && this.onmessage({ data: JSON.stringify(m) }); }
+    close(code = 1000) { if (this.closed) return; this.closed = true; this.onclose && this.onclose({ code }); }
+  }
+  return { FakeWS, socks };
+}
+const tick = () => new Promise((r) => setTimeout(r, 5));
+
+test('OBS クライアント: Hello → Identify（認証）→ Identified → CallVendorRequest(emit_event) → 応答', async () => {
+  const auth = { salt: 's', challenge: 'c' };
+  const expect = await obsAuthString('pw', 's', 'c');
+  const { FakeWS, socks } = fakeObs({ auth, onIdentify: (ws, m) => (m.d.authentication === expect ? ws.recv({ op: 2, d: { negotiatedRpcVersion: 1 } }) : ws.close(4009)) });
+  const states = [];
+  const timers = [];
+  const cl = createObsClient({ WebSocketImpl: FakeWS, onStatus: (s) => states.push(s.state), setTimer: (fn, ms) => { timers.push({ fn, ms }); return timers.length; }, clearTimer: () => {} });
+  cl.connect({ host: '127.0.0.1', port: 4455, password: 'pw' });
+  await tick(); await tick();
+  assert.equal(socks[0].url, 'ws://127.0.0.1:4455');
+  assert.equal(socks[0].sent[0].op, 1);
+  assert.equal(socks[0].sent[0].d.rpcVersion, 1);
+  assert.equal(socks[0].sent[0].d.authentication, expect);
+  assert.equal(cl.status().state, 'connected');
+  assert.equal(cl.status().obsVersion, '5.5.0');
+  const p = cl.emit('xtrend-show', { v: 1, x: '<b>' });
+  const req = socks[0].sent[1];
+  assert.equal(req.op, 6);
+  assert.equal(req.d.requestType, 'CallVendorRequest');
+  assert.deepEqual(req.d.requestData, { vendorName: 'obs-browser', requestType: 'emit_event', requestData: { event_name: 'xtrend-show', event_data: { v: 1, x: '<b>' } } });
+  socks[0].recv({ op: 7, d: { requestType: 'CallVendorRequest', requestId: req.d.requestId, requestStatus: { result: true, code: 100 } } });
+  assert.equal(await p, true);
+  // 失敗の応答は理由を出す
+  const p2 = cl.emit('xtrend-show', {});
+  socks[0].recv({ op: 7, d: { requestId: socks[0].sent[2].d.requestId, requestStatus: { result: false, code: 604, comment: 'no vendor' } } });
+  assert.equal(await p2, false);
+  assert.match(cl.status().reason, /no vendor/);
+  // 切れたら自動でつなぎ直す（2 秒後）
+  socks[0].close(1006);
+  assert.equal(cl.status().state, 'error');
+  assert.match(cl.status().reason, /切れました/);
+  assert.equal(timers.at(-1).ms, 2000);
+  timers.at(-1).fn();
+  await tick(); await tick();
+  assert.equal(socks.length, 2);
+  assert.equal(cl.status().state, 'connected');
+  // 手動で切断 → 未接続。送信は false
+  cl.disconnect();
+  assert.equal(cl.status().state, 'idle');
+  assert.equal(await cl.emit('xtrend-show', {}), false);
+  assert.ok(states.includes('connecting'));
+});
+
+test('OBS クライアント: パスワード違い（4009）は日本語の理由で、つなぎ直さない／OBS が無い', async () => {
+  const { FakeWS } = fakeObs({ auth: { salt: 's', challenge: 'c' }, onIdentify: (ws) => ws.close(4009) });
+  const timers = [];
+  const cl = createObsClient({ WebSocketImpl: FakeWS, setTimer: (fn, ms) => { timers.push(ms); return 1; }, clearTimer: () => {} });
+  cl.connect({ password: 'wrong' });
+  await tick(); await tick();
+  assert.equal(cl.status().state, 'error');
+  assert.match(cl.status().reason, /パスワードが違います/);
+  assert.equal(timers.length, 0);
+  // 接続そのものができない（OBS が起動していない等）
+  class DeadWS { constructor() { queueMicrotask(() => this.onclose({ code: 1006 })); } send() {} close() {} }
+  const cl2 = createObsClient({ WebSocketImpl: DeadWS, setTimer: (fn, ms) => { timers.push(ms); return 1; }, clearTimer: () => {} });
+  cl2.connect({});
+  await tick();
+  assert.match(cl2.status().reason, /OBS が起動していない/);
+  assert.equal(timers.at(-1), 2000);
+  const cl3 = createObsClient({ WebSocketImpl: DeadWS });
+  cl3.connect({ host: 'a b' });
+  assert.match(cl3.status().reason, /ホスト名かポート番号/);
+});
+
+function payloadFixture() {
+  const p1 = post({ text: '本文<script>x</script>', user: 'u1', media: [{ type: 'photo', url: 'https://pbs.twimg.com/media/ABC.jpg' }] });
+  const p2 = post({ text: '二つ目', media: [{ type: 'photo', url: 'https://evil.example/x.jpg' }] });
+  const topicsById = new Map([
+    ['A', { id: 'A', name: '話題A', genre: 'host', stats: { topPostId: p1.id, count: 3, totalImp: 9000, maxImp: 5000, maxPace: 100 } }],
+    ['B', { id: 'B', name: '話題B', genre: 'kyaba', stats: { topPostId: p2.id, count: 1, totalImp: 10, maxImp: 10, maxPace: null } }],
+  ]);
+  let r = defaultRundown();
+  r = assignTopic(assignTopic(r, 'A', 'main'), 'B', 'category');
+  const cues = buildCues(r, topicsById);
+  const postsById = new Map([[p1.id, p1], [p2.id, p2]]);
+  return { topicsById, cues, postsById, p1, p2 };
+}
+
+test('オーバーレイのペイロード: コーナー・話題・次・投稿カード・タイトル（自己完結）', () => {
+  const { topicsById, cues, postsById, p1 } = payloadFixture();
+  let live = defaultLive();
+  const base = { cues, topicsById, postsById, showName: '番組', title: '' };
+  let p = buildPayload({ ...base, live, now: 1000 });
+  assert.equal(p.v, PAYLOAD_VERSION);
+  assert.equal(p.type, 'state');
+  assert.equal(p.live.started, false);
+  assert.equal(p.title, null, '開始前はタイトルなし');
+  assert.equal(p.corner.key, 'main');
+  assert.equal(p.corner.color, 'main');
+  assert.deepEqual([p.corner.n, p.corner.of], [1, 1]);
+  assert.equal(p.topic.name, '話題A');
+  assert.equal(p.topic.genre, 'host');
+  assert.equal(p.topic.stats.totalImp, 9000);
+  assert.deepEqual(p.next, { name: '話題B', corner: cornerDef('category').name });
+  assert.equal(p.card.visible, true);
+  assert.equal(p.card.post.user, 'u1');
+  assert.equal(p.card.post.text, '本文<script>x</script>', '文字のまま（表示側で textContent）');
+  assert.equal(p.card.post.thumb, 'https://pbs.twimg.com/media/ABC?format=jpg&name=small');
+  assert.equal(p.effect, null, '段階4の空き');
+  assert.equal(JSON.parse(JSON.stringify(p)).card.post.id, p1.id, 'JSON にできる');
+  // 開始 → タイトル（コーナーに入った時刻から数秒）
+  live = liveReduce(live, { type: 'start', now: 5000 }, cues);
+  p = buildPayload({ ...base, live, now: 5100 });
+  assert.equal(p.live.started, true);
+  assert.deepEqual([p.title.id, p.title.text, p.title.at, p.title.duration], ['main@5000', cornerDef('main').name, 5000, TITLE_DURATION_MS]);
+  assert.ok(titleVisible(p.title, 5100) && !titleVisible(p.title, 5000 + TITLE_DURATION_MS));
+  // 次へ → 別コーナー・画像は pbs.twimg.com 以外は使わない
+  live = liveReduce(live, { type: 'done', now: 9000 }, cues);
+  p = buildPayload({ ...base, live, now: 9000 });
+  assert.equal(p.corner.key, 'category');
+  assert.equal(p.topic.color, 'kyaba');
+  assert.equal(p.title.id, 'category@9000');
+  assert.equal(p.card.post.thumb, null);
+  // 投稿カードを隠す
+  live = liveReduce(live, { type: 'toggleCard' }, cues);
+  assert.equal(buildPayload({ ...base, live }).card.visible, false);
+  // 最後まで → finished
+  live = liveReduce(liveReduce(live, { type: 'done', now: 1 }, cues), { type: 'done', now: 2 }, cues);
+  live = liveReduce(live, { type: 'done', now: 3 }, cues);
+  p = buildPayload({ ...base, live });
+  assert.equal(p.live.finished, true);
+  assert.equal(p.corner, null);
+  assert.equal(p.title, null);
+});
+
+test('オーバーレイ: 再送の判定（samePayload）と受け手の seq・sid', () => {
+  const { topicsById, cues, postsById } = payloadFixture();
+  const live = defaultLive();
+  const a = buildPayload({ live, cues, topicsById, postsById, now: 1 });
+  const b = buildPayload({ live, cues, topicsById, postsById, now: 2 });
+  assert.ok(samePayload({ ...a, seq: 1, sid: 'x' }, { ...b, seq: 2, sid: 'y' }), '時刻・seq だけ違うのは同じ');
+  assert.ok(!samePayload(a, buildPayload({ live: { ...live, cardVisible: false }, cues, topicsById, postsById })));
+  assert.ok(!samePayload(a, null));
+  const m = (sid, seq, at) => ({ v: 1, type: 'state', sid, seq, at });
+  assert.ok(shouldAccept(null, m('s', 1, 10)));
+  assert.ok(shouldAccept(m('s', 1, 10), m('s', 2, 5)), '同じ送り手は seq で判断');
+  assert.ok(!shouldAccept(m('s', 2, 10), m('s', 2, 20)), '同じ seq（再送）は使わない');
+  assert.ok(!shouldAccept(m('s', 3, 10), m('s', 2, 20)), '古い seq');
+  assert.ok(shouldAccept(m('s', 9, 10), m('t', 1, 11)), '送り手が変わったら時刻で');
+  assert.ok(!shouldAccept(m('s', 9, 10), m('t', 1, 9)));
+  assert.ok(!shouldAccept(null, { ...m('s', 1, 1), v: 2 }), '版が違う');
+  assert.ok(!shouldAccept(null, { ...m('s', 1, 1), type: 'effect' }));
+  assert.ok(!shouldAccept(null, null));
+  assert.deepEqual(readDetail('{"v":1}'), { v: 1 });
+  assert.deepEqual(readDetail({ v: 1 }), { v: 1 });
+  assert.equal(readDetail('壊れた'), null);
+  assert.equal(readDetail(3), null);
+  assert.equal(readDetail(null), null);
+  assert.equal(smallThumb({ media: [{ type: 'video', preview: 'https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/x.jpg' }] }), 'https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/x?format=jpg&name=small');
+  assert.equal(smallThumb({ media: [] }), null);
+  assert.equal(smallThumb({}), null);
+  const d = demoPayload(100);
+  assert.ok(shouldAccept(null, d) && titleVisible(d.title, 200));
+});
+
+test('オーバーレイのパーツと参考配置', () => {
+  assert.deepEqual(OVERLAY_PARTS.map((p) => [p.key, p.w, p.h]), [['topicbar', 1300, 150], ['card', 640, 760], ['title', 1920, 1080]]);
+  const ours = LAYOUT_GUIDE.filter((g) => g.ours);
+  const others = LAYOUT_GUIDE.filter((g) => !g.ours && !/吹き出し/.test(g.label));
+  const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  for (const o of ours) {
+    assert.ok(o.x >= 0 && o.y >= 0 && o.x + o.w <= 1920 && o.y + o.h <= 1080, `${o.label} 画面内`);
+    const part = OVERLAY_PARTS.find((p) => p.key === o.key);
+    assert.ok(Math.abs(o.w / o.h - part.w / part.h) < 0.05, `${o.label} 縦横比`);
+    for (const x of others) assert.ok(!overlap(o, x), `${o.label} と ${x.label} が重なる`);
+  }
+});

@@ -1,0 +1,76 @@
+/* OBS 用オーバーレイ（パーツ別・背景透明）。色はジャンル色（show.css と同じ値。コントラスト AA 確認済み） */
+:root {
+  --ink: #111111;
+  --g-main: #e02a1b;    --g-main-ink: #ffffff;
+  --g-host: #1f5fe0;    --g-host-ink: #ffffff;
+  --g-kyaba: #e0157a;   --g-kyaba-ink: #ffffff;
+  --g-kabuki: #7b2ff2;  --g-kabuki-ink: #ffffff;
+  --g-night: #23c25b;   --g-night-ink: #111111;
+  --g-general: #fff1d0; --g-general-ink: #111111;
+  --g-review: #b8b8b8;  --g-review-ink: #111111;
+  --g-white: #ffffff;   --g-white-ink: #111111;
+  --yellow: #ffd60a;
+  --font: system-ui, -apple-system, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI', 'Yu Gothic', 'Meiryo', sans-serif;
+}
+html, body { margin: 0; padding: 0; background: transparent !important; overflow: hidden; }
+body { font-family: var(--font); color: #fff; }
+* { box-sizing: border-box; }
+.ov-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.g-main { background: var(--g-main); color: var(--g-main-ink); }
+.g-host { background: var(--g-host); color: var(--g-host-ink); }
+.g-kyaba { background: var(--g-kyaba); color: var(--g-kyaba-ink); }
+.g-kabuki { background: var(--g-kabuki); color: var(--g-kabuki-ink); }
+.g-night { background: var(--g-night); color: var(--g-night-ink); }
+.g-general { background: var(--g-general); color: var(--g-general-ink); }
+.g-review { background: var(--g-review); color: var(--g-review-ink); }
+.g-white { background: var(--g-white); color: var(--g-white-ink); }
+
+/* ---------------- トピック帯（1300×150） */
+.tb { position: absolute; inset: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: stretch; gap: 0; }
+.tb[hidden] { display: none; }
+.tb-corner { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; min-width: 210px; padding: 0 22px; border-radius: 28px 0 0 28px; border: 5px solid var(--ink); border-right: 0; font-weight: 800; }
+.tb-corner-name { font-size: 26px; line-height: 1.15; white-space: nowrap; }
+.tb-corner-n { font-size: 22px; opacity: .95; }
+.tb-main { position: relative; overflow: hidden; border-radius: 0 28px 28px 0; border: 5px solid var(--ink); background: rgba(17, 17, 17, .92); display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+.tb-topic { display: flex; align-items: center; gap: 16px; padding: 10px 26px 0; min-width: 0; }
+.tb-dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; }
+.tb-name { font-size: 52px; font-weight: 800; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 3px 0 rgba(0,0,0,.6); }
+.tb-next { padding: 0 26px 10px 64px; font-size: 22px; font-weight: 700; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-next b { color: var(--yellow); margin-right: 8px; }
+.tb.is-enter .tb-topic, .tb.is-enter .tb-next { animation: tb-in .55s cubic-bezier(.2, .9, .3, 1.2) both; }
+@keyframes tb-in { from { transform: translateY(110%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ---------------- 投稿カード（640×760） */
+.cd { position: absolute; inset: 0; padding: 14px; transition: transform .45s cubic-bezier(.2, .9, .3, 1.1), opacity .35s; }
+.cd.is-out { transform: translateX(110%); opacity: 0; }
+.cd-box { height: 100%; display: flex; flex-direction: column; gap: 16px; background: #fff; color: var(--ink); border: 6px solid var(--ink); border-radius: 36px; box-shadow: 8px 8px 0 rgba(0,0,0,.65); padding: 28px 30px; overflow: hidden; }
+.cd-band { display: flex; align-items: center; gap: 10px; margin: -28px -30px 0; padding: 14px 26px; border-bottom: 5px solid var(--ink); font-weight: 800; font-size: 24px; }
+.cd-band .cd-x { margin-left: auto; font-size: 18px; opacity: .9; }
+.cd-user { font-size: 28px; font-weight: 800; }
+.cd-text { font-size: 30px; line-height: 1.55; white-space: pre-wrap; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 9; overflow-wrap: anywhere; }
+.cd-text.has-img { -webkit-line-clamp: 5; }
+.cd-img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 18px; border: 3px solid var(--ink); background: #eee; }
+.cd-metrics { margin-top: auto; display: flex; gap: 22px; flex-wrap: wrap; font-size: 24px; font-weight: 700; }
+.cd-metrics b { font-size: 30px; }
+
+/* ---------------- コーナータイトル（1920×1080） */
+.tt { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.tt[hidden] { display: none; }
+.tt-card { min-width: 1100px; max-width: 1700px; padding: 60px 110px; border-radius: 64px; border: 10px solid var(--ink); box-shadow: 14px 14px 0 rgba(0,0,0,.6); text-align: center; }
+.tt-kicker { font-size: 40px; font-weight: 800; letter-spacing: .1em; opacity: .95; margin: 0 0 8px; }
+.tt-name { font-size: 140px; font-weight: 800; line-height: 1.1; margin: 0; }
+.tt-sub { font-size: 44px; font-weight: 700; margin: 18px 0 0; }
+.tt.is-show .tt-card { animation: tt-in .6s cubic-bezier(.2, .9, .3, 1.25) both; }
+.tt.is-leave .tt-card { animation: tt-out .5s ease-in both; }
+@keyframes tt-in { from { transform: scale(.6) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes tt-out { to { transform: translateY(-40px) scale(.95); opacity: 0; } }
+
+/* ---------------- 全部入り（確認用・1920×1080） */
+.al-part { position: absolute; overflow: hidden; }
+.al-guide { position: absolute; border: 3px dashed rgba(255,255,255,.55); color: rgba(255,255,255,.85); font-size: 22px; font-weight: 700; display: grid; place-items: center; text-align: center; background: rgba(0,0,0,.25); }
+
+/* 動きを抑える（OS の設定か ?motion=off） */
+.no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

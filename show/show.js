@@ -10,6 +10,9 @@ import {
 } from './js/logic.js';
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
+import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload } from './js/payload.js';
+import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
+import { obsStatusLabel, renderObsSetup, refreshObsDialog } from './js/views/obsui.js';
 import { loadSaved, saveState, openSync } from './js/store.js';
 import { h, clear, isEditable, startEmbeds } from './js/dom.js';
 import { patchView } from './js/patch.js';
@@ -18,7 +21,7 @@ import { renderLive, tickLive, liveKeydown } from './js/views/live.js';
 import { renderOnair, tickOnair } from './js/views/onair.js';
 import { renderReview } from './js/views/review.js';
 
-const ROUTES = ['plan', 'live', 'onair', 'review'];
+const ROUTES = ['plan', 'live', 'onair', 'review', 'obs-setup'];
 const $ = (id) => document.getElementById(id);
 
 const app = {
@@ -210,8 +213,103 @@ app.update = (mut, opts = {}) => {
 function publishLive() {
   if (!app.saved || !app.weekKey) return;
   publishLiveState({ weekKey: app.weekKey, live: app.weekState().live, cues: app.cues, topicsById: app.topicsById });
+  sendOverlay();
 }
 app.publishLive = publishLive;
+
+// ================================================================ OBS オーバーレイへの送信（段階2）
+// 送り手は進行画面（#live）と OBS セットアップ画面だけ。同じブラウザ内は BroadcastChannel、OBS へは WebSocket（emit_event）。
+// 変化したときに seq を進めて送り、RESEND_MS ごとに同じものを再送（後から開いたパーツが追いつく）。
+
+// コーナータイトルの時刻は進行の記録（live.enteredAt＝そのコーナーに初めて入った時刻）を使うので、開き直しても出し直さない
+const overlay = { sid: Math.random().toString(36).slice(2, 10), seq: 0, last: null, bc: null };
+try { if ('BroadcastChannel' in window) overlay.bc = new BroadcastChannel(OVERLAY_CHANNEL); } catch { overlay.bc = null; }
+
+function isSender() {
+  return app.ready && (app.route === 'live' || app.route === 'obs-setup');
+}
+
+function currentPayload() {
+  const wk = app.weekState();
+  return buildPayload({
+    live: wk.live, cues: app.cues, topicsById: app.topicsById, postsById: app.postsById, showName: app.saved.showName,
+    title: typeof wk.title === 'string' && wk.title.trim() ? wk.title : '',
+  });
+}
+
+function transmit(p) {
+  if (overlay.bc) { try { overlay.bc.postMessage(p); } catch { /* 無視 */ } }
+  if (app.obs && app.obs.status().state === 'connected') app.obs.emit(OBS_EVENT_NAME, p).then(() => updateObsPill());
+}
+
+function sendOverlay(force = false) {
+  if (!isSender() || !app.saved) return;
+  const p = currentPayload();
+  if (!force && samePayload(p, overlay.last)) return;
+  p.sid = overlay.sid;
+  p.seq = ++overlay.seq;
+  overlay.last = p;
+  app.lastPayload = p;
+  transmit(p);
+}
+app.sendOverlay = sendOverlay;
+
+function resendOverlay() {
+  if (!isSender()) return;
+  if (!overlay.last) { sendOverlay(true); return; }
+  transmit(overlay.last);
+}
+
+// ---------------------------------------------------------------- OBS 接続（設定は localStorage）
+
+function loadObsPrefs() {
+  try { return parseObsPrefs(localStorage.getItem(OBS_PREF_KEY)); } catch { return parseObsPrefs(null); }
+}
+app.obsPrefs = loadObsPrefs();
+app.obsSavePrefs = (prefs) => {
+  app.obsPrefs = { ...app.obsPrefs, ...prefs };
+  try { localStorage.setItem(OBS_PREF_KEY, JSON.stringify(app.obsPrefs)); } catch { /* 保存できなくても動く */ }
+};
+
+function updateObsPill() {
+  const pill = $('obs-pill');
+  if (!pill) return;
+  const st = app.obs ? app.obs.status() : { state: 'idle' };
+  pill.hidden = !(app.route === 'live' || app.route === 'obs-setup');
+  pill.textContent = obsStatusLabel(st);
+  pill.dataset.state = st.state;
+  pill.title = st.reason || 'OBS との連動の設定';
+}
+
+function ensureObs() {
+  if (app.obs) return app.obs;
+  app.obs = createObsClient({
+    onStatus: (st) => {
+      updateObsPill();
+      if (st.state === 'connected') { sendOverlay(true); }
+      if (app.ui.obsDlg) refreshObsDialog(st);
+    },
+  });
+  return app.obs;
+}
+app.obsConnect = (prefs) => {
+  app.obsSavePrefs({ ...prefs, enabled: true });
+  ensureObs().connect(app.obsPrefs);
+};
+app.obsDisconnect = () => {
+  app.obsSavePrefs({ enabled: false });
+  if (app.obs) app.obs.disconnect();
+};
+/** テスト表示（見本の話題・投稿カード・コーナータイトル）。数秒後に今の進行状態に戻す */
+app.obsTest = () => {
+  const p = demoPayload();
+  p.sid = overlay.sid;
+  p.seq = ++overlay.seq;
+  transmit(p);
+  const on = app.obs && app.obs.status().state === 'connected';
+  toast(on ? 'テスト表示を OBS に送りました（8 秒後に今の進行状態に戻します）' : 'OBS に接続していないので、このブラウザで開いたパーツにだけテスト表示を送りました');
+  setTimeout(() => sendOverlay(true), 8000);
+};
 
 // ================================================================ 元に戻す・やり直す（編成のすべての編集操作）
 
@@ -416,7 +514,7 @@ function renderRoute() {
   // 再描画してもフォーカスを失わないよう、data-key でたどる
   const active = document.activeElement;
   lastFocusKey = active && root.contains(active) && active.dataset ? active.dataset.key || null : null;
-  const view = { plan: renderPlan, live: renderLive, onair: renderOnair, review: renderReview }[app.route];
+  const view = { plan: renderPlan, live: renderLive, onair: renderOnair, review: renderReview, 'obs-setup': renderObsSetup }[app.route];
   // 同じ画面・同じ週の再描画は差し替え（patch.js）で、表示済みの X 埋め込みを作り直さない
   const old = root.firstElementChild;
   const sameScreen = old && old.dataset.keep && old.dataset.keep === `${app.route}:${app.weekKey}`;
@@ -434,7 +532,11 @@ function renderRoute() {
     const el = root.querySelector(`[data-key="${CSS.escape(lastFocusKey)}"]`);
     if (el && !el.disabled) el.focus({ preventScroll: true });
   }
-  document.title = `${{ plan: '編成', live: '進行', onair: '映す用', review: '振り返り' }[app.route]}｜${app.saved.showName}`;
+  document.title = `${{ plan: '編成', live: '進行', onair: '映す用', review: '振り返り', 'obs-setup': 'OBS セットアップ' }[app.route]}｜${app.saved.showName}`;
+  // 進行画面に来たら（前に接続していれば）OBS へつなぐ。状態ピル
+  if ((app.route === 'live' || app.route === 'obs-setup') && app.obsPrefs.enabled && app.obsPrefs.auto && !app.obs) ensureObs().connect(app.obsPrefs);
+  updateObsPill();
+  sendOverlay();
 }
 app.render = renderRoute;
 
@@ -518,6 +620,8 @@ async function main() {
     if (app.route === 'live') tickLive(app);
     else if (app.route === 'onair') tickOnair(app);
   }, 1000);
+  setInterval(resendOverlay, RESEND_MS);
+  $('obs-pill').addEventListener('click', () => { app.ui.obsDlg = true; renderRoute(); });
   window.addEventListener('resize', () => { if (app.route === 'onair') tickOnair(app, true); });
 
   $('loading').hidden = true;

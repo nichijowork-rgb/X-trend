@@ -49,7 +49,7 @@
 | `test/e2e/dashboard-e2e.mjs` | E2E（Playwright。リポジトリに依存は入れない） |
 | `CNAME` | 独自ドメイン `www.x-yoru-buzz.com`。**消さない** |
 | `data/` | 収集botの管轄。読むだけ |
-| `show/` | **配信番組サイト**（台本・進行・映す用。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
+| `show/` | **配信番組サイト**（台本・進行・映す用・OBS オーバーレイ `show/overlay.html`。下記 10 章・[SHOW_SPEC.md](SHOW_SPEC.md)） |
 
 ## 4. データ（収集botとの取り決め）
 
@@ -131,5 +131,6 @@ PW_DIR=/tmp/qa/node_modules node test/e2e/dashboard-e2e.mjs
 - 公開URL: https://www.x-yoru-buzz.com/show/ 。ダッシュボードとはヘッダー上部の［ダッシュボード｜番組］タブで行き来（ダッシュボード側の変更は `index.html` のタブと `dashboard.css` 末尾のスタイルだけ）。
 - 週1回（土 1:00、約90分）のニュース形式トーク配信の台本・進行サイト。画面は ①編成 `#plan` ②進行 `#live` ③映す用 `#onair`（1920×1080・OBS 用）④振り返り `#review`。
 - **v2 段階1（2026-10-31）**: 画面半分（960×1040）基準。編成は**フォルダ型**（左の木＝番組構成〈メイン1〜3・メイン候補・カテゴリ別・雑談〉／まとまり／受信箱／★ブクマ／NEW／片付け／ゴミ箱、右＝行リスト＋プレビュー）。pointer events のドラッグ＆ドロップ・複数選択・一括操作・右クリック・「移動先…」・常設検索・新しいまとまり・名前変更・ジャンル上書き（投稿 ID で全週）・元に戻す/やり直す（Ctrl+Z/Y）・一般のバズはおすすめ 30 件・仕分けモード（1/2/3/G/X/→/←）。進行は縦 1 列。進行状態は `show/js/events.js` から 1 か所で発行（段階2で OBS WebSocket へ）。計画は [SHOW_V2_PLAN.md](SHOW_V2_PLAN.md)。純粋ロジックは `show/js/logic.js` と `show/js/folders.js`。
+- **v2 段階2（2026-10-31）OBS オーバーレイ**: `show/overlay.html?part=topicbar|card|title|all`（背景透明・推奨 1300×150／640×760／1920×1080）を OBS のブラウザソースに貼る。［進行］画面がヘッダーの「OBS：…」ピル → ダイアログから obs-websocket v5（127.0.0.1:4455・パスワードは localStorage `xtrend-show-obs` に平文、注意書きあり）へ接続し、進行状態を `CallVendorRequest`（obs-browser の `emit_event`、event_name `xtrend-show`）で全ブラウザソースへ送る（変化時＋5 秒おき再送、受け手は sid/seq で古いものを無視）。同じブラウザ内は `BroadcastChannel('xtrend-show-overlay')`。ペイロードの形は SHOW_SPEC.md「⑤ OBS 連動」（`show/js/payload.js`、`effect` は段階4用の空き）。セットアップガイドは［OBS］タブ（`#obs-setup`）。CSP の connect-src に `ws://127.0.0.1:* ws://localhost:*`。本物の OBS での確認は未（E2E は偽の OBS＝`page.routeWebSocket`）。
 - データは `data/posts.json`・`bookmarks.json` を読むだけ（`show_pick: true` が付いた投稿は雑談おすすめの最優先＝段階3の受け口）。番組の状態（編成・台本・進行・持ち越し・辞書）は**ブラウザの localStorage** に保存＋JSON の書き出し/読み込み。公開ファイルには書かない。
-- 仕様・ファイル構成・保存データの形・使い方は [SHOW_SPEC.md](SHOW_SPEC.md) の「実装メモ」。テストは `npm test`（`test/show.test.js` を含む）と `PW_DIR=… node test/e2e/show-e2e.mjs`。サンプルは `sample/show/`（`node tools/make-show-sample.mjs`）。
+- 仕様・ファイル構成・保存データの形・使い方は [SHOW_SPEC.md](SHOW_SPEC.md) の「実装メモ」。テストは `npm test`（`test/show.test.js` を含む）と `PW_DIR=… node test/e2e/show-e2e.mjs`（`OBS_REF_IMAGE=参考の配信画面の画像` で合成スクショ、`ONLY=名前の一部` で一部だけ実行）。サンプルは `sample/show/`（`node tools/make-show-sample.mjs`）。
