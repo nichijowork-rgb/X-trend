@@ -21,6 +21,7 @@ export const PERIODS = [
   { key: '24h', label: '24時間', seconds: 86400 },
   { key: '3d', label: '3日', seconds: 3 * 86400 }, // 72 時間
   { key: '7d', label: '7日', seconds: 7 * 86400 },
+  { key: '14d', label: '14日', seconds: 14 * 86400 },
   { key: '30d', label: '30日', seconds: 30 * 86400 },
 ];
 

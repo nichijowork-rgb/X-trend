@@ -682,7 +682,7 @@ async function main() {
       assert((await page.textContent('#meta-next')) === '毎日23:59（JST）', 'next update');
       assert(await page.isHidden('#meta-delay'), 'delay hidden in sample');
       const labels = await page.$$eval('#period-group button', (l) => l.map((b) => b.textContent));
-      assert(labels.join('/') === '24時間/3日/7日/30日', labels.join('/'));
+      assert(labels.join('/') === '24時間/3日/7日/14日/30日', labels.join('/'));
       const sub = await page.textContent('#chart-day-sub');
       assert(sub.startsWith('9/11〜10/11') && !sub.includes('90日'), sub);
       assert((await page.$$eval('#chart-day svg .col', (l) => l.length)) === 31, '30d bars');

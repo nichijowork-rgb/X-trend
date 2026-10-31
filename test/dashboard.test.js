@@ -223,7 +223,7 @@ test('chartDayRange: 期間に合わせる（最大 30 日）', () => {
 });
 
 test('期間: 24時間／3日（72時間）／7日／30日。「すべて」は無く、旧 period=all は 30 日として扱う', () => {
-  assert.deepEqual(PERIODS.map((p) => [p.key, p.label, p.seconds]), [['24h', '24時間', 86400], ['3d', '3日', 259200], ['7d', '7日', 604800], ['30d', '30日', 2592000]]);
+  assert.deepEqual(PERIODS.map((p) => [p.key, p.label, p.seconds]), [['24h', '24時間', 86400], ['3d', '3日', 259200], ['7d', '7日', 604800], ['14d', '14日', 1209600], ['30d', '30日', 2592000]]);
   assert.equal(LEGACY_PERIOD_ALIASES.all, '30d');
   assert.equal(parseState('period=all').period, '30d');
   assert.equal(parseState('#period=all&sort=new').period, '30d');
