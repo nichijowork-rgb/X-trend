@@ -1906,3 +1906,12 @@ test('台本ファイル: BOM・コードブロック・前後の文章つきで
     assert.equal(r.ok, true, t.slice(0, 20));
   }
 });
+
+test('OBS: 別のパソコンのアドレスでも接続先を作れ、理由に別PC向けの案内が出る', async () => {
+  const { obsUrl, obsCloseReason, isLoopbackHost } = await import('../show/js/obs.js');
+  assert.equal(obsUrl('192.168.1.20', 4455), 'ws://192.168.1.20:4455');
+  assert.equal(isLoopbackHost('127.0.0.1'), true);
+  assert.equal(isLoopbackHost('192.168.1.20'), false);
+  assert.match(obsCloseReason(1006, { host: '192.168.1.20' }), /別のパソコン.*ファイアウォール/);
+  assert.match(obsCloseReason(1006, { host: '127.0.0.1' }), /デバイス上のアプリ/);
+});

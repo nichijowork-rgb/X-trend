@@ -32,13 +32,20 @@ export function obsUrl(host, port) {
   return `ws://${h.includes(':') && !h.startsWith('[') ? `[${h}]` : h}:${p}`;
 }
 
+/** 同じパソコン（ループバック）を指すホストか */
+export function isLoopbackHost(host) {
+  const h = String(host || '').trim().toLowerCase().replace(/^\[|\]$/g, '');
+  return h === 'localhost' || h === '::1' || /^127\./.test(h);
+}
+
 /** 閉じたときの理由（日本語）。closeCode は WebSocket の close コード */
-export function obsCloseReason(closeCode, { everOpened = false, identified = false } = {}) {
+export function obsCloseReason(closeCode, { everOpened = false, identified = false, host = '' } = {}) {
   if (closeCode === 4009) return 'パスワードが違います（OBS の「WebSocket サーバー設定」のパスワードを確認してください）';
   if (closeCode === 4010) return 'OBS の WebSocket の版が合いません（OBS 28 以降の obs-websocket v5 が必要です）';
   if (closeCode === 4011) return 'OBS 側から接続を切られました';
   if (closeCode === 4008 || closeCode === 4007 || closeCode === 4006) return 'OBS とのやりとりに失敗しました（版の違いの可能性）';
   if (identified) return 'OBS との接続が切れました（OBS を閉じた・WebSocket を止めた可能性）';
+  if (!everOpened && host && !isLoopbackHost(host)) return `別のパソコンの OBS（${host}）に接続できません。OBS が起動していない／「WebSocket サーバーを有効にする」がオフ／IP アドレスかポート番号が違う／OBS 側の Windows ファイアウォールがポートを止めている／ブラウザが「ローカル ネットワーク」への接続を許可していない、のどれかの可能性があります`;
   if (!everOpened) return 'OBS に接続できません。OBS が起動していない／「WebSocket サーバーを有効にする」がオフ／ポート番号が違う／ブラウザが「デバイス上のアプリ」への接続を許可していない、のどれかの可能性があります';
   return `OBS との接続が切れました（コード ${closeCode}）`;
 }
@@ -80,7 +87,7 @@ export function createObsClient(opts = {}) {
     let everOpened = false;
     let identified = false;
     let sock;
-    try { sock = new WS(url); } catch { set({ state: 'error', reason: obsCloseReason(1006), url }); scheduleRetry(); return; }
+    try { sock = new WS(url); } catch { set({ state: 'error', reason: obsCloseReason(1006, { host: cfg.host }), url }); scheduleRetry(); return; }
     ws = sock;
     set({ state: 'connecting', reason: '', url });
     sock.onopen = () => { everOpened = true; };
@@ -119,7 +126,7 @@ export function createObsClient(opts = {}) {
       for (const p of pending.values()) p(false);
       pending.clear();
       if (manual) { set({ state: 'idle', reason: '' }); return; }
-      const reason = obsCloseReason(ev && ev.code, { everOpened, identified });
+      const reason = obsCloseReason(ev && ev.code, { everOpened, identified, host: cfg.host });
       set({ state: 'error', reason });
       if (ev && ev.code === 4009) return; // パスワード違いは再接続しない
       scheduleRetry();
