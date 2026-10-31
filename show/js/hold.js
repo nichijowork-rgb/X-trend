@@ -36,17 +36,19 @@ export function postHoldTerm(post, prepared) {
 
 /**
  * 保留する投稿（1 回目の話題づくりの結果から決める）。
- * input: { posts, topics, prepared, exceptions: Set, protectedTopicIds: Set, protectedPostIds: Set }
+ * input: { posts, topics, prepared, exceptions: Set, protectedTopicIds: Set, protectedPostIds: Set, forced: Map（投稿 id → 理由。台本の保留） }
  * 返り値: Map（投稿 id → 一致した言葉）
  */
 export function heldPostsOf(input) {
-  const { posts = [], topics = [], prepared = [], exceptions = new Set(), protectedTopicIds = new Set(), protectedPostIds = new Set() } = input;
+  const { posts = [], topics = [], prepared = [], exceptions = new Set(), protectedTopicIds = new Set(), protectedPostIds = new Set(), forced = new Map() } = input;
   const out = new Map();
-  if (!prepared.length) return out;
+  if (!prepared.length && !forced.size) return out;
   const safe = new Set(protectedPostIds);
   for (const t of topics) if (protectedTopicIds.has(t.id) || t.kind === 'manual' || t.kind === 'carried') for (const id of t.postIds) safe.add(id);
   for (const p of posts) {
     if (!p || safe.has(p.id) || exceptions.has(p.id) || out.has(p.id)) continue;
+    // 台本ファイルの「保留」（投稿 id で指定）
+    if (forced.has(p.id)) { out.set(p.id, forced.get(p.id)); continue; }
     const term = postHoldTerm(p, prepared);
     if (term) out.set(p.id, term);
   }

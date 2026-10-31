@@ -5,6 +5,8 @@ import { h, btn, field, downloadText, genreSticker } from '../dom.js';
 import { feedbackCounts } from '../feedback.js';
 import { BOT, GENRE_PRIORITY, DEFAULT_HOLD_TERMS } from '../config.js';
 import { parseHoldTerms } from '../hold.js';
+import { parseScriptFile, planScriptImport } from '../scriptimport.js';
+import { getWeek, weekByKey, weekLabel, resolveRange, genreLabel } from '../logic.js';
 
 const splitList = (s) => s.split(/[,、，\n]/).map((x) => x.trim()).filter(Boolean);
 
@@ -55,6 +57,7 @@ export function toolsDialog(app) {
     }
   }
   body.append(io);
+  body.append(scriptSection(app));
 
   // 自分で集めた投稿（URL）
   const ta = h('textarea', { class: 'input', rows: 3, placeholder: 'https://x.com/…/status/… を1行に1つずつ貼り付け', dataset: { key: 'personal-input' }, value: app.ui.personalDraft || '' });
@@ -202,5 +205,77 @@ function prioritySection(app) {
       btn('保留する言葉を保存', () => app.setHoldTerms(parseHoldTerms(ta.value)), 'btn btn-small', { 'data-key': 'hold-save' }),
       btn('最初の言葉に戻す', () => app.setHoldTerms([...DEFAULT_HOLD_TERMS]), 'btn btn-small btn-ghost', { 'data-key': 'hold-reset' }),
       s.holdExceptions.length ? btn(`戻した例外 ${s.holdExceptions.length}件をやめる`, () => app.edit('保留の例外をやめる', (w, x) => { x.holdExceptions = []; }), 'btn btn-small btn-ghost', { 'data-key': 'hold-clear-exceptions' }) : null));
+  return sec;
+}
+
+// ---------------------------------------------------------------- 台本ファイル（xtrend-script）の取り込み
+
+function scriptSection(app) {
+  const u = app.ui;
+  const sec = h('section', { class: 'tools-sec script-sec', dataset: { key: 'script-sec' } }, h('h3', {}, '台本ファイルを取り込む'),
+    h('p', { class: 'muted' }, '監督者が作った台本ファイル（xtrend-script の JSON）から、メイン1〜3・カテゴリ別・雑談の話題（まとまり）、リード文・メモ、対象期間、配信タイトル、保留をまとめて入れます。取り込む前に一覧で確認できます。'));
+  const check = (textValue, fileName = '') => {
+    const r = parseScriptFile(textValue);
+    if (!r.ok) {
+      u.scriptPending = null;
+      u.scriptMsg = { kind: 'error', text: `取り込めません：${r.errors.join('／')}` };
+      app.render();
+      requestAnimationFrame(() => { const el = document.querySelector('[data-key="script-msg"]'); if (el) el.scrollIntoView({ block: 'nearest' }); });
+      return;
+    }
+    u.scriptPending = { script: r.script, warnings: r.warnings, fileName };
+    u.scriptMsg = null;
+    app.render();
+    // 確認の一覧を見えるところへ
+    requestAnimationFrame(() => { const el = document.querySelector('[data-key="script-confirm"]'); if (el) el.scrollIntoView({ block: 'nearest' }); });
+  };
+  const file = h('input', { type: 'file', accept: 'application/json,.json', class: 'sr-only', id: 'script-file', dataset: { key: 'script-file' } });
+  file.addEventListener('change', async () => {
+    const f = file.files && file.files[0];
+    if (!f) return;
+    let t = '';
+    try { t = await f.text(); } catch { u.scriptMsg = { kind: 'error', text: 'ファイルを読めませんでした' }; app.render(); return; }
+    check(t, f.name);
+  });
+  const ta = h('textarea', { class: 'input', rows: 3, placeholder: '台本ファイルの中身（{ "app": "xtrend-script", … }）を貼り付けても取り込めます', dataset: { key: 'script-paste' }, value: u.scriptDraft || '' });
+  ta.addEventListener('input', () => { u.scriptDraft = ta.value; });
+  sec.append(h('div', { class: 'row' },
+    h('label', { class: 'btn btn-small', attrs: { for: 'script-file' } }, '台本ファイルを選ぶ'), file),
+    field('または貼り付け', ta),
+    h('div', { class: 'row' }, btn('貼り付けた台本を確認', () => check(ta.value, '貼り付け'), 'btn btn-small', { 'data-key': 'script-check' })));
+  if (u.scriptMsg) sec.append(h('p', { class: `import-msg is-${u.scriptMsg.kind}`, attrs: { role: 'status' }, dataset: { key: 'script-msg' } }, u.scriptMsg.text));
+  const pend = u.scriptPending;
+  if (pend) {
+    const sc = pend.script;
+    const target = getWeek(app.saved, sc.week);
+    const w = weekByKey(sc.week);
+    // 今その枠にある話題の名前（別の番組週でも、名前の変更・手のまとまり・辞書・話題名から分かる範囲で）
+    const nameOf = (id) => {
+      const t = sc.week === app.weekKey ? app.topicsById.get(id) : null;
+      if (t) return t.name;
+      if (target.overrides.renames[id]) return target.overrides.renames[id];
+      const m = target.overrides.manual.find((x) => x.id === id);
+      if (m) return m.name;
+      if (id.startsWith('d:')) { const d = app.saved.dict.find((x) => x.id === id.slice(2)); if (d) return d.name; }
+      if (id.startsWith('t:')) return id.slice(2);
+      const any = app.topicsById.get(id);
+      return any ? any.name : null;
+    };
+    const plan = planScriptImport(sc, target, { postsById: app.basePostsById, nameOf });
+    const box = h('div', { class: 'script-confirm', dataset: { key: 'script-confirm' }, attrs: { role: 'group', 'aria-label': '取り込みの確認' } });
+    box.append(h('p', {}, h('b', {}, '取り込み先：'), `${sc.week.slice(5).replace('-', '/')} 配信の番組週（${weekLabel(w)}）`, sc.week !== app.weekKey ? '　※ この番組週に切り替えます' : ''));
+    if (sc.title) box.append(h('p', {}, h('b', {}, '配信タイトル：'), sc.title));
+    if (sc.range) box.append(h('p', {}, h('b', {}, '対象期間：'), resolveRange({ mode: 'custom', from: sc.range.from, to: sc.range.to }, w, app.ds.refTs).label));
+    box.append(h('ul', { class: 'script-list' }, plan.map((x) => h('li', { dataset: { key: `script-item-${x.corner}-${x.slot ?? ''}` } },
+      h('span', { class: 'script-slot' }, x.label), h('span', { class: 'script-name' }, x.name),
+      h('span', { class: 'muted' }, `${x.genre ? genreLabel(x.genre) : 'ジャンルは投稿から'}・投稿 ${x.posts}件${x.missing ? `・データに無い ${x.missing}件` : ''}${x.update ? '・前に取り込んだものを更新' : ''}`),
+      x.replaces ? h('span', { class: 'script-replace' }, `今の「${x.replaces}」はメイン候補へ移します`) : null))));
+    if (sc.hold.length) box.append(h('p', {}, h('b', {}, '保留：'), sc.hold.map((x) => `${x.name}（${x.postIds.length}件）`).join('、')));
+    if (pend.warnings.length) box.append(h('ul', { class: 'script-warn' }, pend.warnings.map((x) => h('li', {}, x))));
+    box.append(h('div', { class: 'row' },
+      btn(`取り込む（${plan.length}本）`, () => { u.scriptPending = null; u.scriptDraft = ''; u.tools = false; app.importScript(sc); }, 'btn btn-small btn-red', { 'data-key': 'script-import-yes' }),
+      btn('やめる', () => { u.scriptPending = null; app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'script-import-no' })));
+    sec.append(box);
+  }
   return sec;
 }

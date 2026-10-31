@@ -12,6 +12,7 @@ import {
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { applyScriptImport } from './js/scriptimport.js';
 import { prepareHoldTerms, heldPostsOf, heldTopicsOf, removeHoldTerm } from './js/hold.js';
 import { makeEffect, createCooldown, EFFECT_TTL_MS, effectDef } from './js/effects.js';
 import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBACK_SENT_KEY } from './js/feedback.js';
@@ -206,6 +207,8 @@ function recompute() {
   app.heldPosts = heldPostsOf({
     posts: [...weekPosts, ...extraPosts], topics: app.topics, prepared, exceptions, protectedTopicIds: placed,
     protectedPostIds: new Set([...Object.keys(wk.overrides.moves), ...personalIds, ...outsideIds]),
+    // 台本ファイルの「保留」（投稿 id で指定）
+    forced: new Map((wk.scriptHold || []).flatMap((x) => x.postIds.map((id) => [id, `台本：${x.name}`]))),
   });
   for (const id of hidden) app.heldPosts.delete(id);
   if (app.heldPosts.size) app.topics = build(new Set([...hidden, ...app.heldPosts.keys()]));
@@ -585,6 +588,26 @@ app.restoreTrash = (ids) => {
 app.hidePost = (postId, topicName) => app.edit('投稿の削除', (w, s) => {
   s.hiddenPosts = hidePost(s, postId, app.weekKey, Date.now(), topicName).hiddenPosts;
 }, { toastText: '投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）' });
+// ---------------------------------------------------------------- 台本ファイル（xtrend-script）の取り込み
+
+/** 取り込む（指定の番組週へ切り替え → 1 回の編集として当てる。Ctrl+Z で元に戻せる） */
+app.importScript = (script) => {
+  if (script.week !== app.weekKey) {
+    const w = weekByKey(script.week);
+    if (!w) return null;
+    if (!app.weeks.some((x) => x.key === w.key)) app.weeks = [...app.weeks, w].sort((a, b) => (a.key < b.key ? 1 : -1));
+    setWeek(w.key);
+    recompute();
+  }
+  let result = null;
+  app.edit('台本の取り込み', (w, s) => { result = applyScriptImport(w, s, script, { postsById: app.basePostsById }); },
+    { toastText: '台本を取り込みました（Ctrl+Z で元に戻せます）' });
+  app.ui.folder = 'slot:0';
+  app.ui.query = '';
+  app.render();
+  return result;
+};
+
 // ---------------------------------------------------------------- 保留する言葉・優先ジャンル（保存・書き出しに含む）
 
 /** 保留から戻す（その投稿・話題だけ。言葉に一致しても保留しない例外に入れる） */

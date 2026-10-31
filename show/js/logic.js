@@ -773,7 +773,11 @@ export function buildTopics(input) {
   for (const id of missingIds) add('x:' + id, { kind: 'link', autoName: '追加した投稿（中身はXで確認）', linkId: id, fixedGenre: null });
 
   // 6. 手動の話題
-  for (const m of ov.manual) if (m && m.id) add(m.id, { kind: 'manual', autoName: m.name || '新しい話題', fixedGenre: GENRE_KEYS.includes(m.genre) ? m.genre : null });
+  for (const m of ov.manual) {
+    if (!m || !m.id) continue;
+    const miss = Array.isArray(m.missing) ? m.missing.filter((id) => !byId.has(id)) : [];
+    add(m.id, { kind: 'manual', autoName: m.name || '新しい話題', fixedGenre: GENRE_KEYS.includes(m.genre) ? m.genre : null, ...(miss.length ? { missingIds: miss, linkId: miss[0] } : {}), ...(m.source ? { source: m.source } : {}) });
+  }
 
   // 7. 投稿の移動
   for (const [pid, target] of Object.entries(ov.moves)) {
@@ -1308,6 +1312,7 @@ export function defaultWeek() {
     shelved: [], // 片付けた話題（この週は候補に出さない）。[{ topicId, name, genre, postIds, at, corner }]
     mainCand: [], // メイン候補（メイン1〜3に入れる前の置き場）。話題 id の並び
     range: defaultRange(), // 台本づくりの対象期間（版 5。既定は番組週）
+    scriptHold: [], // 台本ファイルの「保留」（[{ name, postIds }]。保留フォルダへ入れる）
   };
 }
 
@@ -1400,8 +1405,16 @@ function sanitizeOverrides(v) {
   const merges = {};
   for (const [k, x] of Object.entries(obj(o.merges) || {})) if (typeof x === 'string' && x !== k && k !== '__proto__') merges[k] = x.slice(0, 200);
   const manual = (Array.isArray(o.manual) ? o.manual : [])
-    .map((m) => obj(m) && typeof m.id === 'string' && m.id.startsWith('m:') ? { id: m.id.slice(0, 60), name: (str(m.name, 80) || '新しい話題').trim() || '新しい話題', genre: GENRE_KEYS.includes(m.genre) ? m.genre : 'night' } : null)
-    .filter(Boolean).slice(0, 100);
+    .map((m) => {
+      if (!obj(m) || typeof m.id !== 'string' || !m.id.startsWith('m:')) return null;
+      const e = { id: m.id.slice(0, 60), name: (str(m.name, 80) || '新しい話題').trim() || '新しい話題', genre: GENRE_KEYS.includes(m.genre) ? m.genre : 'night' };
+      // 台本の取り込みで作ったまとまり: posts.json に無い投稿 id（データに無い投稿として持つ）と出どころ
+      const missing = Array.isArray(m.missing) ? [...new Set(m.missing.filter((x) => typeof x === 'string' && ID_RE.test(x)))].slice(0, 300) : [];
+      if (missing.length) e.missing = missing;
+      if (m.source === 'script') e.source = 'script';
+      return e;
+    })
+    .filter(Boolean).slice(0, 200);
   return { renames: strMap(o.renames, 80), genres, moves, merges, accepted: strList(o.accepted), split: strList(o.split), manual };
 }
 
@@ -1421,6 +1434,7 @@ function sanitizeWeek(v, ver = SCHEMA_VERSION) {
   if (!o) return w;
   w.title = typeof o.title === 'string' ? o.title.slice(0, 200) : null;
   w.range = sanitizeRange(o.range); // 版 4 以前は無い → 番組週
+  w.scriptHold = (Array.isArray(o.scriptHold) ? o.scriptHold : []).map((x) => (obj(x) ? { name: (str(x.name, 80) || '').trim(), postIds: (Array.isArray(x.postIds) ? x.postIds : []).filter((id) => typeof id === 'string' && ID_RE.test(id)).slice(0, 500) } : null)).filter((x) => x && x.postIds.length).slice(0, 100);
   w.rundown = sanitizeRundown(o.rundown, ver);
   w.script = sanitizeScript(o.script);
   w.notes = Object.fromEntries(Object.entries(strMap(o.notes, 4000)).filter(([k]) => cornerDef(k)));

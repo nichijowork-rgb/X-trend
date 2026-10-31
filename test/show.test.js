@@ -1788,3 +1788,112 @@ test('対象期間: 番組構成の話題は期間外になっても残し「期
   assert.equal(topics.find((t) => t.id === `p:${out2.id}`).outsideCount, 1, 'すべて期間外');
   assert.ok(buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs }).every((t) => t.outsideCount === 0));
 });
+
+// ================================================================ 追加: 台本ファイル（xtrend-script v1）の取り込み
+import { parseScriptFile, planScriptImport, applyScriptImport, scriptTopicId } from '../show/js/scriptimport.js';
+
+function scriptFixture() {
+  const a = post({ text: 'ホストの話A', categories: ['ホスト'] });
+  const b = post({ text: 'ホストの話B', categories: ['ホスト'] });
+  const c = post({ text: 'キャバの話', categories: ['キャバクラ'] });
+  const g = post({ text: '猫', categories: ['その他'] });
+  const postsById = new Map([a, b, c, g].map((p) => [p.id, p]));
+  const file = {
+    app: 'xtrend-script', v: 1, title: '【週刊ヨルニュース】台本', week: '2026-10-17',
+    range: { from: '2026-10-10T01:00:00+09:00', to: '2026-10-16T06:00:00+09:00' },
+    corners: {
+      main: [{ name: '台本の話題1', genre: 'ホスト', post_ids: [a.id, b.id, '1999999999999999991'], lead: 'リード1', notes: 'メモ1' }, { name: '台本の話題2', post_ids: [c.id] }],
+      category: [{ name: 'カテゴリの話', genre: 'キャバクラ', post_ids: [c.id] }],
+      chat: [{ name: '雑談の話', genre: 'その他', post_ids: [g.id], lead: '猫の話です' }],
+    },
+    hold: [{ name: 'YouTuber 関連', post_ids: [g.id, 'x'] }],
+  };
+  return { a, b, c, g, postsById, file };
+}
+
+test('台本ファイル: 読み込み（正しい形・日本語のエラーと注意）', () => {
+  const { file } = scriptFixture();
+  const r = parseScriptFile(JSON.stringify(file));
+  assert.ok(r.ok, r.errors.join());
+  assert.equal(r.script.week, '2026-10-17');
+  assert.equal(r.script.title, '【週刊ヨルニュース】台本');
+  assert.deepEqual(r.script.range, { from: ts('2026-10-10T01:00:00+09:00'), to: ts('2026-10-16T06:00:00+09:00') });
+  assert.equal(r.script.corners.main[0].genre, 'host');
+  assert.equal(r.script.corners.main[1].genre, null);
+  assert.equal(r.script.corners.chat[0].genre, 'general');
+  assert.deepEqual(r.script.hold[0].postIds.length, 1, '不正な id は捨てる');
+  const bad = (x) => parseScriptFile(x);
+  assert.match(bad('{壊れ').errors[0], /JSON として読めません/);
+  assert.match(bad({ ...file, app: 'xtrend-show' }).errors[0], /台本ファイルではありません/);
+  assert.match(bad({ ...file, v: 2 }).errors.join(), /対応していません/);
+  assert.match(bad({ ...file, week: '2026-10-16' }).errors.join(), /番組週/);
+  assert.match(bad({ ...file, corners: null }).errors.join(), /corners/);
+  assert.match(bad({ ...file, corners: { main: [{ post_ids: [] }] } }).errors.join(), /1 本もありません/);
+  const w = parseScriptFile({ ...file, corners: { ...file.corners, main: [...file.corners.main, { name: '台本の話題1' }, { name: 'x' }, { name: 'y' }], chat: 'x' }, range: { from: 'bad' } });
+  assert.ok(w.ok);
+  assert.equal(w.script.corners.main.length, 2, '3 本目は名前が重複なので読み飛ばし、4 本目以降は最大を超える');
+  assert.ok(w.warnings.some((x) => /2 回あります/.test(x)) && w.warnings.some((x) => /最大 3 本/.test(x)) && w.warnings.some((x) => /配列ではない/.test(x)) && w.warnings.some((x) => /range/.test(x)));
+  assert.equal(w.script.range, null);
+  assert.equal(scriptTopicId('2026-10-17', '台本の話題1'), scriptTopicId('2026-10-17', ' 台本の話題１ '.trim().replace('１', '1')));
+  assert.notEqual(scriptTopicId('2026-10-17', 'A'), scriptTopicId('2026-10-24', 'A'), '週が違えば別');
+  assert.match(scriptTopicId('w', 'x'), /^m:s-[0-9a-z]+$/);
+});
+
+test('台本ファイル: 取り込み（まとまり・メイン1〜3・カテゴリ別・雑談・退避・リード文・メモ・期間・タイトル・保留）と 2 回目で重複しない', () => {
+  const { a, b, c, g, postsById, file } = scriptFixture();
+  const sc = parseScriptFile(file).script;
+  const saved = defaultSaved();
+  let week = defaultWeek();
+  // 既存: メイン1 に別の話題、カテゴリ別に既存の話題、削除した同じ話題
+  week.rundown = assignTopic(week.rundown, 'd:old', 'main');
+  week.rundown = assignTopic(week.rundown, 'd:cat', 'category');
+  const id1 = scriptTopicId('2026-10-17', '台本の話題1');
+  saved.trash = [{ id: 'tr', topicId: id1, postIds: [], name: 'x', genre: 'host', week: null, at: 0, corner: null }];
+  const plan = planScriptImport(sc, week, { postsById, nameOf: (id) => (id === 'd:old' ? '前の話題' : null) });
+  assert.deepEqual(plan.map((x) => [x.label, x.name, x.posts, x.missing, x.replaces]), [
+    ['メイン1', '台本の話題1', 2, 1, '前の話題'], ['メイン2', '台本の話題2', 1, 0, null], ['カテゴリ別ニュース', 'カテゴリの話', 1, 0, null], ['雑談（一般のバズ）', '雑談の話', 1, 0, null],
+  ]);
+  const r = applyScriptImport(week, saved, sc, { postsById });
+  assert.deepEqual(r, { topics: 4, displaced: ['d:old'], held: 1 });
+  assert.deepEqual(mainSlots(week.rundown).slice(0, 2), [id1, scriptTopicId('2026-10-17', '台本の話題2')]);
+  assert.deepEqual(week.mainCand, ['d:old'], '押し出した話題はメイン候補へ');
+  assert.deepEqual(week.rundown.corners.find((x) => x.key === 'category').items, [scriptTopicId('2026-10-17', 'カテゴリの話'), 'd:cat'], '既存はそのまま後ろに');
+  const m1 = week.overrides.manual.find((m) => m.id === id1);
+  assert.deepEqual([m1.name, m1.genre, m1.missing, m1.source], ['台本の話題1', 'host', ['1999999999999999991'], 'script']);
+  assert.equal(week.overrides.manual.find((m) => m.name === '台本の話題2').genre, 'kyaba', 'ジャンルが無ければ投稿から');
+  assert.equal(week.overrides.moves[a.id], id1);
+  assert.equal(week.overrides.moves[c.id], scriptTopicId('2026-10-17', 'カテゴリの話'), '同じ投稿は後の項目へ');
+  assert.deepEqual([week.script[id1].lead, week.script[id1].points], ['リード1', 'メモ1']);
+  assert.equal(week.title, '【週刊ヨルニュース】台本');
+  assert.deepEqual(week.range, { mode: 'custom', from: sc.range.from, to: sc.range.to });
+  assert.deepEqual(week.scriptHold, [{ name: 'YouTuber 関連', postIds: [g.id] }]);
+  assert.deepEqual(saved.trash, [], '削除していた同じ話題は戻す');
+  // 話題として組み立てる（データに無い投稿も持つ）
+  const d = ds([a, b, c, g]);
+  const topics = buildTopics({ posts: d.posts, dict: [], refTs: d.refTs, overrides: week.overrides });
+  const t1 = topics.find((t) => t.id === id1);
+  assert.deepEqual([t1.name, t1.genre, t1.postIds.length, t1.missingIds], ['台本の話題1', 'host', 2, ['1999999999999999991']]);
+  // 保存して読み戻せる
+  const back = parseSaved(serializeSaved({ ...saved, weeks: { '2026-10-17': week } })).state.weeks['2026-10-17'];
+  assert.deepEqual(back.overrides.manual.find((m) => m.id === id1).missing, ['1999999999999999991']);
+  assert.deepEqual(back.scriptHold, week.scriptHold);
+  // 2 回目: 同じ内容なら変わらない（重複しない）
+  const snap = JSON.stringify(week);
+  applyScriptImport(week, saved, sc, { postsById });
+  assert.equal(JSON.stringify(week), snap, '2 回取り込んでも同じ');
+  assert.equal(week.overrides.manual.length, 4);
+  // 更新: 投稿を 1 件外した台本 → 外れる
+  const sc2 = parseScriptFile({ ...file, corners: { ...file.corners, main: [{ ...file.corners.main[0], post_ids: [a.id], lead: '新しいリード' }] } }).script;
+  applyScriptImport(week, saved, sc2, { postsById });
+  assert.equal(week.overrides.moves[b.id], undefined, '台本から外した投稿は外れる');
+  assert.equal(week.script[id1].lead, '新しいリード');
+  assert.equal(week.overrides.manual.filter((m) => m.name === '台本の話題1').length, 1);
+});
+
+test('台本の保留: 投稿 id で保留フォルダへ（手で置いた話題・戻した例外は除く）', () => {
+  const posts = [{ id: '11111', text: 'a' }, { id: '22222', text: 'b' }, { id: '33333', text: 'c' }];
+  const topics = [{ id: 'p:11111', kind: 'single', postIds: ['11111'] }, { id: 'p:22222', kind: 'single', postIds: ['22222'] }, { id: 'p:33333', kind: 'single', postIds: ['33333'] }];
+  const forced = new Map([['11111', '台本：x'], ['22222', '台本：x'], ['33333', '台本：x']]);
+  const held = heldPostsOf({ posts, topics, prepared: [], forced, protectedTopicIds: new Set(['p:22222']), exceptions: new Set(['33333']) });
+  assert.deepEqual([...held.entries()], [['11111', '台本：x']]);
+});

@@ -1306,6 +1306,117 @@ async function main() {
       return `番組週 ${s0.n}件 → 3日 ${s3.n}件 → 14日 ${s14.n}件（おすすめ ${s14.rec}件）→ カスタム ${sc.n}件・構成の期間外 ${outs.join('/')}件`;
     });
 
+    // ---- 4g. 台本ファイル（xtrend-script v1）の取り込み
+    await check('台本ファイルの取り込み: 不正は日本語エラー・確認一覧（置き換え）→ 番組週の切替・期間・タイトル・まとまり・配置・リード文・保留 → Ctrl+Z → 2 回目も重複しない・XSS', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      const inWeek = sample.posts.filter((p) => p.ts >= Date.parse('2026-10-10T01:00:00+09:00') / 1000);
+      const pick = (re) => inWeek.filter((p) => re.test(p.text)).map((p) => p.id);
+      const evil = '<img src=x onerror="window.__xss=1">雑談';
+      const file = {
+        app: 'xtrend-script', v: 1, title: '【週刊ヨルニュース】台本テスト', week: '2026-10-17',
+        range: { from: '2026-10-11T00:00:00+09:00', to: '2026-10-16T00:09:00+09:00' },
+        corners: {
+          main: [
+            { name: '台本：コールの話', genre: 'ホスト', post_ids: [...pick(/シャンパンコール|ラスソン/), '1999999999999999990'], lead: '台本のリード文です', notes: '切り口：店ごとの違い' },
+            { name: '台本：生誕祭', genre: 'キャバクラ', post_ids: pick(/生誕祭/) },
+          ],
+          category: [{ name: '台本：トー横', genre: '歌舞伎町', post_ids: pick(/トー横/) }],
+          chat: [{ name: evil, genre: 'その他', post_ids: pick(/新作ゲーム/) }],
+        },
+        hold: [{ name: 'YouTuber 関連', post_ids: pick(/猫が布団/) }],
+      };
+      // 既存: メイン1 に別の話題、今は前の番組週を表示
+      await page.evaluate(() => window.__show.edit('メイン1', (w) => { w.rundown.corners[0].items = ['d:d-hostcall']; }));
+      const prevKey = await page.evaluate(() => window.__show.weeks.find((w) => w.key !== '2026-10-17').key);
+      await page.selectOption('#week-select', prevKey);
+      await page.waitForFunction((k) => window.__show.weekKey === k, prevKey);
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      // 不正
+      await page.fill('[data-key="script-paste"]', '{"app":"xtrend-show","v":4}');
+      await page.click('[data-key="script-check"]');
+      await page.waitForSelector('[data-key="script-msg"]');
+      assert((await page.textContent('[data-key="script-msg"]')).includes('台本ファイルではありません'), 'error');
+      // ファイルを選ぶ → 確認
+      await page.setInputFiles('#script-file', { name: 'script.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(file)) });
+      await page.waitForSelector('[data-key="script-confirm"]');
+      const conf = await page.textContent('[data-key="script-confirm"]');
+      assert(conf.includes('10/17 配信の番組週') && conf.includes('この番組週に切り替えます') && conf.includes('台本：コールの話') && conf.includes('データに無い 1件') && conf.includes('YouTuber 関連（1件）'), conf);
+      assert(conf.includes(evil) && !(await page.$('[data-key="script-confirm"] img')), 'XSS（確認）');
+      await page.waitForTimeout(150);
+      await page.screenshot({ path: path.join(SHOTS, 'script-confirm-960.png') });
+      await page.click('[data-key="script-import-yes"]');
+      await page.waitForFunction(() => window.__show.weekKey === '2026-10-17' && window.__show.weekState().overrides.manual.some((m) => m.source === 'script'));
+      const st = () => page.evaluate(() => {
+        const a = window.__show;
+        const w = a.weekState();
+        const t = (id) => a.topicsById.get(id);
+        const main = w.rundown.corners[0].items;
+        return {
+          main: main.map((id) => (id && t(id) ? t(id).name : id)), cand: w.mainCand, title: w.title, range: w.range.mode, label: a.range.label,
+          manual: w.overrides.manual.filter((m) => m.source === 'script').length, missing: t(main[0]) ? t(main[0]).missingIds : null,
+          lead: w.script[main[0]] ? w.script[main[0]].lead : null, points: w.script[main[0]] ? w.script[main[0]].points : null,
+          cat: w.rundown.corners[1].items.map((id) => (t(id) ? t(id).name : id))[0], chat: w.rundown.corners[2].items.map((id) => (t(id) ? t(id).name : id))[0],
+          held: [...a.heldPosts.values()],
+        };
+      });
+      const s1 = await st();
+      assert(JSON.stringify(s1.main) === JSON.stringify(['台本：コールの話', '台本：生誕祭']) && s1.cand.includes('d:d-hostcall'), JSON.stringify(s1));
+      assert(s1.title === file.title && s1.range === 'custom' && s1.label.startsWith('10/11(日) 0:00'), JSON.stringify(s1));
+      assert(s1.manual === 4 && s1.missing && s1.missing[0] === '1999999999999999990', JSON.stringify(s1));
+      assert(s1.lead === '台本のリード文です' && s1.points === '切り口：店ごとの違い' && s1.cat === '台本：トー横' && s1.chat === evil, JSON.stringify(s1));
+      assert(s1.held.includes('台本：YouTuber 関連'), JSON.stringify(s1.held));
+      // メイン1 のフォルダ: データに無い投稿も行に出る
+      await page.waitForFunction(() => window.__show.ui.folder === 'slot:0');
+      const mid = await page.evaluate(() => window.__show.weekState().rundown.corners[0].items[0]);
+      await folder(page, `topic:${mid}`);
+      assert((await rowKeys(page)).includes('p:1999999999999999990'), 'missing row');
+      assert(await page.evaluate(() => window.__xss === undefined), 'xss');
+      await page.screenshot({ path: path.join(SHOTS, 'script-imported-960.png') });
+      // Ctrl+Z で 1 回で元に戻る
+      await page.focus('.vlist').catch(() => {});
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction(() => !window.__show.weekState().overrides.manual.some((m) => m.source === 'script'));
+      const s0 = await st();
+      assert(s0.main[0] !== '台本：コールの話' && s0.title !== file.title, JSON.stringify(s0));
+      // 2 回取り込んでも重複しない
+      for (let i = 0; i < 2; i++) {
+        await page.click('[data-key="tools-open"]');
+        await page.waitForSelector('dialog.tools-dialog[open]');
+        await page.fill('[data-key="script-paste"]', JSON.stringify(file));
+        await page.click('[data-key="script-check"]');
+        await page.waitForSelector('[data-key="script-confirm"]');
+        if (i === 1) assert((await page.textContent('[data-key="script-confirm"]')).includes('前に取り込んだものを更新'), 'update');
+        await page.click('[data-key="script-import-yes"]');
+        await page.waitForFunction(() => window.__show.weekState().overrides.manual.some((m) => m.source === 'script'));
+      }
+      const s2 = await st();
+      assert(s2.manual === 4 && JSON.stringify(s2.main) === JSON.stringify(s1.main), JSON.stringify(s2));
+      // 保存・書き出しに入る（リロード後も）
+      await page.reload();
+      await ready(page);
+      assert((await st()).manual === 4, 'reload');
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="export"]')]);
+      const f = path.join(tmp, 'script-export.json');
+      await dl.saveAs(f);
+      const ex = JSON.parse(readFileSync(f, 'utf8'));
+      const ew = ex.weeks['2026-10-17'];
+      assert(ew.overrides.manual.filter((m) => m.source === 'script').length === 4 && ew.scriptHold.length === 1 && ew.title === file.title, 'export');
+      // 375 幅
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.fill('[data-key="script-paste"]', JSON.stringify(file));
+      await page.click('[data-key="script-check"]');
+      await page.waitForSelector('[data-key="script-confirm"]');
+      await page.evaluate(() => document.querySelector('[data-key="script-confirm"]').scrollIntoView());
+      const ok375 = await page.evaluate(() => { const d = document.querySelector('dialog.tools-dialog'); return d.scrollWidth <= d.clientWidth + 1; });
+      assert(ok375, 'no horizontal scroll in dialog at 375');
+      await page.screenshot({ path: path.join(SHOTS, 'script-confirm-375.png') });
+      await c.close();
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';

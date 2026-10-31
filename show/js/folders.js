@@ -139,7 +139,7 @@ export function folderRows(ctx, key) {
   if (key.startsWith('topic:')) {
     const t = topicsById.get(key.slice(6));
     if (!t) return out([]);
-    const ids = t.postIds.length ? t.postIds : (t.linkId ? [t.linkId] : []);
+    const ids = t.missingIds ? [...t.postIds, ...t.missingIds] : (t.postIds.length ? t.postIds : (t.linkId ? [t.linkId] : []));
     return out(ids.map(postRow));
   }
   if (key === 'inbox') {

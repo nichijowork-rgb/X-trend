@@ -575,7 +575,7 @@ function menuItems(app, rows, opts) {
   const u = app.ui;
   const one = rows.length === 1 ? rows[0] : null;
   if (rows.every((r) => r.type === 'heldPost' || r.type === 'heldTopic')) {
-    const terms = [...new Set(rows.map((r) => holdTermOfRow(app, r)).filter(Boolean))];
+    const terms = [...new Set(rows.map((r) => holdTermOfRow(app, r)).filter((t) => t && !t.startsWith('台本：')))];
     return [
       { label: `保留から戻す（${rows.length}件。この${rows.length === 1 && rows[0].type === 'heldTopic' ? '話題' : '投稿'}だけ）`, key: 'ctx-unhold', run: () => restoreRows(app, rows) },
       ...terms.map((t) => ({ label: `言葉「${t}」を保留リストから外す`, key: 'ctx-unhold-term', run: () => app.removeHoldTerm(t) })),
@@ -716,10 +716,12 @@ function previewPane(app, wk) {
 function heldPreview(app, row) {
   const term = holdTermOfRow(app, row);
   const box = h('div', { class: 'pv-body', dataset: { keep: `pv:${row.key}` } });
-  box.append(h('p', { class: 'hold-note', dataset: { key: 'pv-hold-note' } }, h('b', {}, '保留中'), `：保留する言葉「${term}」に一致したので、候補・おすすめ・受信箱に出していません。`));
+  const byScript = term.startsWith('台本：');
+  box.append(h('p', { class: 'hold-note', dataset: { key: 'pv-hold-note' } }, h('b', {}, '保留中'),
+    byScript ? `：台本ファイルで保留に指定されました（${term.slice(3)}）。候補・おすすめ・受信箱に出していません。` : `：保留する言葉「${term}」に一致したので、候補・おすすめ・受信箱に出していません。`));
   box.append(h('div', { class: 'row' },
     btn(row.type === 'heldTopic' ? 'この話題を戻す' : 'この投稿を戻す', () => restoreRows(app, [row]), 'btn btn-small', { 'data-key': 'pv-unhold' }),
-    term ? btn(`言葉「${term}」を外す`, () => app.removeHoldTerm(term), 'btn btn-small btn-ghost', { 'data-key': 'pv-unhold-term' }) : null));
+    term && !byScript ? btn(`言葉「${term}」を外す`, () => app.removeHoldTerm(term), 'btn btn-small btn-ghost', { 'data-key': 'pv-unhold-term' }) : null));
   if (row.type === 'heldPost') {
     const p = app.postsById.get(row.id);
     if (p) box.append(h('div', { class: 'pv-post' }, postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), noActions: true, bm: bmInfo(app, p.id) })));

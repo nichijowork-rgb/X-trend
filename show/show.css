@@ -1034,3 +1034,12 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .range-msg { color: var(--warn); font-size: 13px; }
 .badge-out { background: var(--surface-2); color: var(--warn); border-color: var(--warn); }
 .rm-out { color: var(--warn); }
+
+/* 台本ファイルの取り込み（確認） */
+.script-confirm { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); font-size: 14px; display: grid; gap: 6px; }
+.script-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.script-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 4px 0; border-bottom: 1px dashed var(--line); min-width: 0; }
+.script-slot { flex: none; font-weight: 800; color: var(--yellow); min-width: 6.5em; }
+.script-name { font-weight: 800; overflow-wrap: anywhere; min-width: 0; }
+.script-replace { color: var(--warn); font-size: 13px; }
+.script-warn { margin: 0 0 0 18px; color: var(--warn); font-size: 13px; }
