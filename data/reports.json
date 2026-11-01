@@ -1,6 +1,180 @@
 {
- "generated_at": "2026-11-01T00:06:39+09:00",
+ "generated_at": "2026-11-02T00:04:22+09:00",
  "daily": [
+  {
+   "date": "2026-11-01",
+   "rising": [
+    {
+     "id": "2116864244281119110",
+     "views": 405698,
+     "hours_since_post": 2.3,
+     "views_per_hour": 180015,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2116880836091912208",
+     "views": 184257,
+     "hours_since_post": 1.2,
+     "views_per_hour": 159557,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2116855635199631785",
+     "views": 390389,
+     "hours_since_post": 2.8,
+     "views_per_hour": 138255,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2116869616194785416",
+     "views": 262102,
+     "hours_since_post": 1.9,
+     "views_per_hour": 138104,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2116856400655810639",
+     "views": 370141,
+     "hours_since_post": 2.8,
+     "views_per_hour": 133474,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2116870733595091182",
+     "views": 198245,
+     "hours_since_post": 1.8,
+     "views_per_hour": 108705,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2116868996025000258",
+     "views": 158349,
+     "hours_since_post": 1.9,
+     "views_per_hour": 81666,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2116759032170262921",
+     "views": 483820,
+     "hours_since_post": 9.2,
+     "views_per_hour": 52467,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2116865219695657257",
+     "views": 278320,
+     "hours_since_post": 2.2,
+     "views_per_hour": 127146,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコールのきほさん登場回の切り抜きで、同じ話題の投稿が軒並み伸びている"
+    },
+    {
+     "id": "2116844079078338706",
+     "views": 271431,
+     "hours_since_post": 3.6,
+     "views_per_hour": 75629,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "浜崎真緒さんの搬送報道への引用で、元の報道が100万超えで広がっている"
+    },
+    {
+     "id": "2116859735446368575",
+     "views": 152545,
+     "hours_since_post": 2.6,
+     "views_per_hour": 59768,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール出演者の星乃リアさんの動画紹介で、放送日の関心が高い"
+    },
+    {
+     "id": "2116854656790102320",
+     "views": 133383,
+     "hours_since_post": 2.9,
+     "views_per_hour": 46179,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ルナさんの翌日20時の発表予告で、卒業の話題が続いている"
+    },
+    {
+     "id": "2116816276152815832",
+     "views": 199329,
+     "hours_since_post": 5.4,
+     "views_per_hour": 36706,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "進撃のノアさんの暴露で、ルナさん卒業の話題と重なっている"
+    }
+   ],
+   "review": [
+    {
+     "id": "2116494780398236020",
+     "before_views": 411146,
+     "after_views": 1145197,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116471272439988448",
+     "before_views": 395111,
+     "after_views": 743996,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116388400584700323",
+     "before_views": 408815,
+     "after_views": 458772,
+     "crossed_500k": false,
+     "source": "rising"
+    },
+    {
+     "id": "2116473898925711409",
+     "before_views": 293593,
+     "after_views": 760899,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116477888866431216",
+     "before_views": 196167,
+     "after_views": 415521,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116456560058834969",
+     "before_views": 263060,
+     "after_views": 398305,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 3,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-10-31",
    "rising": [
