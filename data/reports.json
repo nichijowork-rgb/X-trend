@@ -1,6 +1,216 @@
 {
- "generated_at": "2026-11-02T00:04:22+09:00",
+ "generated_at": "2026-11-03T00:07:49+09:00",
  "daily": [
+  {
+   "date": "2026-11-02",
+   "rising": [
+    {
+     "id": "2117238362906210734",
+     "views": 347656,
+     "hours_since_post": 1.5,
+     "views_per_hour": 224939,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2117211411009188342",
+     "views": 458219,
+     "hours_since_post": 3.3,
+     "views_per_hour": 137580,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2117150200641011853",
+     "views": 461337,
+     "hours_since_post": 7.4,
+     "views_per_hour": 62476,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2117105352357626327",
+     "views": 485871,
+     "hours_since_post": 10.4,
+     "views_per_hour": 46923,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2117109509772706079",
+     "views": 452950,
+     "hours_since_post": 10.1,
+     "views_per_hour": 44939,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2117240504903692507",
+     "views": 136880,
+     "hours_since_post": 1.4,
+     "views_per_hour": 97519,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "かりんさんの匂わせの投稿が300万表示を超える中での、本人とみられるアカウントの否定のため"
+    },
+    {
+     "id": "2117214115500622327",
+     "views": 267981,
+     "hours_since_post": 3.2,
+     "views_per_hour": 85035,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "同じ話題の@8u07wxの投稿が7.5時間で300万表示を超えているため"
+    },
+    {
+     "id": "2117233009640546812",
+     "views": 144674,
+     "hours_since_post": 1.9,
+     "views_per_hour": 76144,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "引用元の@hirox246の投稿が3.8時間で88万表示を超えて議論が広がっているため"
+    },
+    {
+     "id": "2117201120997089345",
+     "views": 256327,
+     "hours_since_post": 4.0,
+     "views_per_hour": 63890,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "ラストコールの出演者の話題がキャバクラの上位に並んでいるため"
+    },
+    {
+     "id": "2117218307480735891",
+     "views": 148257,
+     "hours_since_post": 2.9,
+     "views_per_hour": 51592,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "同じ告白を紹介した@PIYOyesの投稿が3.3時間で45万表示を超えているため"
+    },
+    {
+     "id": "2117198771771826273",
+     "views": 153441,
+     "hours_since_post": 4.2,
+     "views_per_hour": 36818,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "引用元の投稿が90万表示を超えていて、議論が続いているため"
+    }
+   ],
+   "review": [
+    {
+     "id": "2116864244281119110",
+     "before_views": 405698,
+     "after_views": 1716474,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116880836091912208",
+     "before_views": 184257,
+     "after_views": 1789865,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116855635199631785",
+     "before_views": 390389,
+     "after_views": 1350142,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116869616194785416",
+     "before_views": 262102,
+     "after_views": 1393631,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116856400655810639",
+     "before_views": 370141,
+     "after_views": 1169086,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116870733595091182",
+     "before_views": 198245,
+     "after_views": 680062,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116868996025000258",
+     "before_views": 158349,
+     "after_views": 464347,
+     "crossed_500k": false,
+     "source": "rising"
+    },
+    {
+     "id": "2116759032170262921",
+     "before_views": 483820,
+     "after_views": 584247,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2116865219695657257",
+     "before_views": 278320,
+     "after_views": 587396,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116844079078338706",
+     "before_views": 271431,
+     "after_views": 315888,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116859735446368575",
+     "before_views": 152545,
+     "after_views": 817702,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116854656790102320",
+     "before_views": 133383,
+     "after_views": 218753,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2116816276152815832",
+     "before_views": 199329,
+     "after_views": 4759169,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 4,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 2,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-01",
    "rising": [
