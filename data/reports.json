@@ -1,6 +1,141 @@
 {
- "generated_at": "2026-11-03T00:07:49+09:00",
+ "generated_at": "2026-11-04T00:06:44+09:00",
  "daily": [
+  {
+   "date": "2026-11-03",
+   "rising": [
+    {
+     "id": "2117590696513442071",
+     "views": 418598,
+     "hours_since_post": 2.2,
+     "views_per_hour": 189126,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2117451713892208848",
+     "views": 435189,
+     "hours_since_post": 11.4,
+     "views_per_hour": 38115,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2117537520187822428",
+     "views": 296059,
+     "hours_since_post": 5.7,
+     "views_per_hour": 51623,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "見張りに近い既知アカウントの風俗の話題で、6時間足らずで約30万表示"
+    }
+   ],
+   "review": [
+    {
+     "id": "2117238362906210734",
+     "before_views": 347656,
+     "after_views": 6961293,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117211411009188342",
+     "before_views": 458219,
+     "after_views": 621633,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117150200641011853",
+     "before_views": 461337,
+     "after_views": 721377,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117105352357626327",
+     "before_views": 485871,
+     "after_views": 555779,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117109509772706079",
+     "before_views": 452950,
+     "after_views": 578883,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117240504903692507",
+     "before_views": 136880,
+     "after_views": 980044,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117214115500622327",
+     "before_views": 267981,
+     "after_views": 1301921,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117233009640546812",
+     "before_views": 144674,
+     "after_views": 504235,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117201120997089345",
+     "before_views": 256327,
+     "after_views": 809209,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117218307480735891",
+     "before_views": 148257,
+     "after_views": 792898,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117198771771826273",
+     "before_views": 153441,
+     "after_views": 274490,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 3,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-11-02",
    "rising": [
