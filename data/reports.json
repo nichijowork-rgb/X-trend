@@ -1,6 +1,105 @@
 {
- "generated_at": "2026-11-04T00:06:44+09:00",
+ "generated_at": "2026-11-05T00:06:04+09:00",
  "daily": [
+  {
+   "date": "2026-11-04",
+   "rising": [
+    {
+     "id": "2117941678480744704",
+     "views": 394219,
+     "hours_since_post": 2.9,
+     "views_per_hour": 134025,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2117924070520201423",
+     "views": 495736,
+     "hours_since_post": 4.1,
+     "views_per_hour": 120690,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2117930707519758729",
+     "views": 424415,
+     "hours_since_post": 3.7,
+     "views_per_hour": 115706,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2117826547688313235",
+     "views": 405299,
+     "hours_since_post": 10.6,
+     "views_per_hour": 38357,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2117942281517093340",
+     "views": 207362,
+     "hours_since_post": 2.9,
+     "views_per_hour": 71470,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "きゃにょんさんの母親への投稿の続き（病院に行った結果の報告）"
+    },
+    {
+     "id": "2117952267194413206",
+     "views": 140014,
+     "hours_since_post": 2.2,
+     "views_per_hour": 62498,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ゆいぴすさん本人の億女報告で、引用元も57万表示"
+    },
+    {
+     "id": "2117923600938479878",
+     "views": 231229,
+     "hours_since_post": 4.1,
+     "views_per_hour": 55871,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "堀大輔さんがキャバクラで語る動画"
+    }
+   ],
+   "review": [
+    {
+     "id": "2117590696513442071",
+     "before_views": 418598,
+     "after_views": 810884,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117451713892208848",
+     "before_views": 435189,
+     "after_views": 894859,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117537520187822428",
+     "before_views": 296059,
+     "after_views": 365830,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-03",
    "rising": [
