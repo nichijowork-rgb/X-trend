@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T00:24:39+09:00",
+ "generated_at": "2026-11-05T06:40:49+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -11,6 +11,72 @@
  ],
  "posts": [
   {
+   "id": "2118009814962122943",
+   "url": "https://x.com/ShinjukuSokai/status/2118009814962122943",
+   "user": "ShinjukuSokai",
+   "created_utc": "2026-11-04T15:57:45Z",
+   "created_jst": "2026-11-05T00:57:45+09:00",
+   "ts": 1793807865,
+   "metrics": {
+    "impression_count": 878685,
+    "like_count": 1198,
+    "retweet_count": 26,
+    "reply_count": 17,
+    "quote_count": 10,
+    "bookmark_count": 432
+   },
+   "text": "今年の七月から九月まで児ポを見まくってしまった高校一年生の君へ。 https://t.co/LCpwGsUx9I",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2117967336225615930",
+   "url": "https://x.com/Meowth_BTC/status/2117967336225615930",
+   "user": "Meowth_BTC",
+   "created_utc": "2026-11-04T13:08:57Z",
+   "created_jst": "2026-11-04T22:08:57+09:00",
+   "ts": 1793797737,
+   "metrics": {
+    "impression_count": 843671,
+    "like_count": 3004,
+    "retweet_count": 318,
+    "reply_count": 51,
+    "quote_count": 12,
+    "bookmark_count": 95
+   },
+   "text": "【衝撃】\nへずまりゅう VS 米山隆一\n400万円訴訟騒動\n\n冒険家ゆたぼんが、まさかの参戦\n\n米山の痛いところを突いてしまう https://t.co/VMFMtjXYVW",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2117961308645585242",
+   "url": "https://x.com/livedoornews/status/2117961308645585242",
+   "user": "livedoornews",
+   "created_utc": "2026-11-04T12:45:00Z",
+   "created_jst": "2026-11-04T21:45:00+09:00",
+   "ts": 1793796300,
+   "metrics": {
+    "impression_count": 587119,
+    "like_count": 3093,
+    "retweet_count": null,
+    "reply_count": 143,
+    "quote_count": 264,
+    "bookmark_count": 260
+   },
+   "text": "【発表】東京都の今年上半期の出生数、全国平均を大きく上回る\nhttps://t.co/VRKf9E1liI\n\n東京都によると、今年1月から6月までに、都内で生まれた日本人の子どもは4万1745人で、前の年の同じ時期より1864人、4.7％増えたという。また今年3月から6月までは、4カ月連続で大幅に増加した。 https://t.co/xHsyR5FzZx",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2117952267194413206",
    "url": "https://x.com/yuipis18/status/2117952267194413206",
    "user": "yuipis18",
@@ -18,12 +84,12 @@
    "created_jst": "2026-11-04T21:09:04+09:00",
    "ts": 1793794144,
    "metrics": {
-    "impression_count": 140014,
-    "like_count": 1581,
-    "retweet_count": null,
-    "reply_count": 22,
-    "quote_count": 12,
-    "bookmark_count": 30
+    "impression_count": 262970,
+    "like_count": 2843,
+    "retweet_count": 44,
+    "reply_count": 40,
+    "quote_count": 20,
+    "bookmark_count": 62
    },
    "text": "わーーーー億、売り上げちゃいました‼️💦💦 https://t.co/aZTNHM3SOx",
    "categories": [
@@ -40,6 +106,28 @@
    "below_threshold": true
   },
   {
+   "id": "2117944886536405215",
+   "url": "https://x.com/sennazli__/status/2117944886536405215",
+   "user": "sennazli__",
+   "created_utc": "2026-11-04T11:39:45Z",
+   "created_jst": "2026-11-04T20:39:45+09:00",
+   "ts": 1793792385,
+   "metrics": {
+    "impression_count": 315177,
+    "like_count": 1064,
+    "retweet_count": null,
+    "reply_count": 27,
+    "quote_count": 21,
+    "bookmark_count": 475
+   },
+   "text": "昔のテレビ、下ネタなんでもアリ過ぎておもろすぎwwwww https://t.co/j9hjFFTW4A",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2117942281517093340",
    "url": "https://x.com/canyong_1000000/status/2117942281517093340",
    "user": "canyong_1000000",
@@ -47,12 +135,12 @@
    "created_jst": "2026-11-04T20:29:24+09:00",
    "ts": 1793791764,
    "metrics": {
-    "impression_count": 207362,
-    "like_count": 691,
-    "retweet_count": null,
-    "reply_count": 35,
-    "quote_count": 22,
-    "bookmark_count": 114
+    "impression_count": 290395,
+    "like_count": 929,
+    "retweet_count": 36,
+    "reply_count": 64,
+    "quote_count": 37,
+    "bookmark_count": 151
    },
    "text": "コメント欄の皆さんに「病院に行ってみたら？」とアドバイスをいただき、早速本日行ってきました。\n\nその結果について話します。\n\nhttps://t.co/9waUXnmgeQ https://t.co/CH3jL0nOXI https://t.co/WszE7uqJ7p",
    "categories": [
@@ -77,6 +165,28 @@
    "below_threshold": true
   },
   {
+   "id": "2117942205310472385",
+   "url": "https://x.com/Hinjaku_hiin/status/2117942205310472385",
+   "user": "Hinjaku_hiin",
+   "created_utc": "2026-11-04T11:29:05Z",
+   "created_jst": "2026-11-04T20:29:05+09:00",
+   "ts": 1793791745,
+   "metrics": {
+    "impression_count": 2685236,
+    "like_count": 6393,
+    "retweet_count": null,
+    "reply_count": 93,
+    "quote_count": 219,
+    "bookmark_count": 752
+   },
+   "text": "汚い話だけど、私アトピー持ちなんです。\nトイレに行くたびに皮膚が落ちて便座を汚してしまう。\nだから出る前に毎回ティッシュで拭いて確認してから出てるんだけど、それでも今日職員さんに「皮膚落ちてるからね~」って言われた。\nどこに落ちてたんだろうと思って聞いたら、床だった。",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2117941678480744704",
    "url": "https://x.com/super_sachico/status/2117941678480744704",
    "user": "super_sachico",
@@ -84,12 +194,12 @@
    "created_jst": "2026-11-04T20:27:00+09:00",
    "ts": 1793791620,
    "metrics": {
-    "impression_count": 394219,
-    "like_count": 481,
+    "impression_count": 686234,
+    "like_count": 987,
     "retweet_count": null,
-    "reply_count": 3,
-    "quote_count": 7,
-    "bookmark_count": 118
+    "reply_count": 4,
+    "quote_count": 10,
+    "bookmark_count": 207
    },
    "text": "⚫︎ねおまる「私は1億使ってもらっても何も思わん」\n\n⚫︎あっすん「私は思う‼️見合った仕事を返したい」\n\n⚫︎ヒカル「あっすんの気持ちわかる」\n\n⚫︎林社長「あっすんバースデー、1億の予定だったけど、《✨2億タワー✨》に変更するゾォォ😤‼️」 https://t.co/YCB2zj5HgV https://t.co/ouy0oNc901",
    "categories": [
@@ -161,12 +271,12 @@
    "created_jst": "2026-11-04T20:25:11+09:00",
    "ts": 1793791511,
    "metrics": {
-    "impression_count": 415255,
-    "like_count": 1150,
-    "retweet_count": 38,
-    "reply_count": 74,
-    "quote_count": 24,
-    "bookmark_count": 367
+    "impression_count": 638134,
+    "like_count": 2011,
+    "retweet_count": 72,
+    "reply_count": 104,
+    "quote_count": 34,
+    "bookmark_count": 674
    },
    "text": "うつ病が腸活で治るのガチ？\n腸活で元気になった元うつの人いる？",
    "categories": [
@@ -183,12 +293,12 @@
    "created_jst": "2026-11-04T19:43:24+09:00",
    "ts": 1793789004,
    "metrics": {
-    "impression_count": 424415,
-    "like_count": 131,
+    "impression_count": 694636,
+    "like_count": 208,
     "retweet_count": null,
-    "reply_count": 3,
-    "quote_count": 1,
-    "bookmark_count": 23
+    "reply_count": 4,
+    "quote_count": 2,
+    "bookmark_count": 37
    },
    "text": "【🔥規格外🔥】あっすん《2億円》タワー🥂🥂🥂🖤‼️by林社長\n\n「林先生史上1番高額✨‼️」「協賛じゃない」\n\nひめかちゃんに圧勝🫪⁉️《凄すぎる》✨\n\n林社長はねおまるからあっすんへ、完全に乗り換えた感じだよね🫪？？\n#ラストコール https://t.co/3toQtiAsHh https://t.co/GRkH33XVsz",
    "categories": [
@@ -297,12 +407,12 @@
    "created_jst": "2026-11-04T19:17:02+09:00",
    "ts": 1793787422,
    "metrics": {
-    "impression_count": 495736,
-    "like_count": 959,
+    "impression_count": 754849,
+    "like_count": 1569,
     "retweet_count": null,
-    "reply_count": 8,
-    "quote_count": 2,
-    "bookmark_count": 206
+    "reply_count": 13,
+    "quote_count": 7,
+    "bookmark_count": 351
    },
    "text": "ひめかちゃんの先月のお給料は‥！\n異次元すぎるwwww\n\nせいはちゃん→1500万\nりりさん→1000万越え https://t.co/nnAZ3x1e3H",
    "categories": [
@@ -354,12 +464,12 @@
    "created_jst": "2026-11-04T19:15:10+09:00",
    "ts": 1793787310,
    "metrics": {
-    "impression_count": 231229,
-    "like_count": 264,
+    "impression_count": 414034,
+    "like_count": 526,
     "retweet_count": null,
-    "reply_count": 5,
-    "quote_count": 3,
-    "bookmark_count": 58
+    "reply_count": 8,
+    "quote_count": 7,
+    "bookmark_count": 109
    },
    "text": "堀大輔が丸の内レイナに振られてキャバクラで性について語りだしたwww\n@d_holi https://t.co/F4wO5yuu63",
    "categories": [
@@ -367,7 +477,8 @@
    ],
    "matched_terms": [
     "キャバクラ",
-    "キャバ"
+    "キャバ",
+    "report:キャバクラ"
    ],
    "is_watched": false,
    "media": [
@@ -407,8 +518,7 @@
    "in_reports": true,
    "report_refs": [
     "rising_watch"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2117916801455837269",
@@ -470,12 +580,12 @@
    "created_jst": "2026-11-04T17:26:15+09:00",
    "ts": 1793780775,
    "metrics": {
-    "impression_count": 573956,
-    "like_count": 1868,
+    "impression_count": 771204,
+    "like_count": 2272,
     "retweet_count": null,
-    "reply_count": 8,
-    "quote_count": 12,
-    "bookmark_count": 89
+    "reply_count": 13,
+    "quote_count": 17,
+    "bookmark_count": 106
    },
    "text": "ゆいぴす、ついに億女に！💎\n10月の指名189組ってすごい。\n知名度を売上につなげる影響力、強い https://t.co/g7evlmwLpt",
    "categories": [
@@ -500,6 +610,28 @@
      "height": 2048
     }
    ]
+  },
+  {
+   "id": "2117894745766903964",
+   "url": "https://x.com/DEATHDOL_NOTE/status/2117894745766903964",
+   "user": "DEATHDOL_NOTE",
+   "created_utc": "2026-11-04T08:20:30Z",
+   "created_jst": "2026-11-04T17:20:30+09:00",
+   "ts": 1793780430,
+   "metrics": {
+    "impression_count": 4555493,
+    "like_count": 18368,
+    "retweet_count": null,
+    "reply_count": 166,
+    "quote_count": 218,
+    "bookmark_count": 1694
+   },
+   "text": "【害悪度C】\n\n愛知県不動産\n雄也\n\n備考 : 人気バンド「緑黄色社会」の実家が売却されることをSNSに晒す https://t.co/iBQ2EDhg8d",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2117890249686933836",
@@ -698,12 +830,12 @@
    "created_jst": "2026-11-04T16:36:00+09:00",
    "ts": 1793777760,
    "metrics": {
-    "impression_count": 4610228,
-    "like_count": 15326,
-    "retweet_count": null,
-    "reply_count": 407,
-    "quote_count": 689,
-    "bookmark_count": 3405
+    "impression_count": 5579853,
+    "like_count": 17408,
+    "retweet_count": 470,
+    "reply_count": 450,
+    "quote_count": 783,
+    "bookmark_count": 3668
    },
    "text": "母親へ\nまだ私を責めるの？\n謝る気ないよね。\nそういうところだよ。\n\n返事返すことはない。\n一生関わることもない。\n身体以前に心の病気だよ。\n\nわかるよ、あなたも被害者だよね。\nそんな人に育てられたんで、\nきゃにょんは病気かもよって、\nフォロワーの皆が心配して教えてくれた。 https://t.co/Euf1QbttrH",
    "categories": [
@@ -841,6 +973,30 @@
    ]
   },
   {
+   "id": "2117849640326541600",
+   "url": "https://x.com/shibuyases2030/status/2117849640326541600",
+   "user": "shibuyases2030",
+   "created_utc": "2026-11-04T05:21:16Z",
+   "created_jst": "2026-11-04T14:21:16+09:00",
+   "ts": 1793769676,
+   "metrics": {
+    "impression_count": 629901,
+    "like_count": 2319,
+    "retweet_count": null,
+    "reply_count": 72,
+    "quote_count": 97,
+    "bookmark_count": 555
+   },
+   "text": "GMO熊谷さん、、、\n本命の家族の他にも、籍を入れていない家族多数。子供多数。内縁の妻、子供多数。\n\n西麻布の帝王の面白過ぎる姿がここまで取り上げられる日が来るとは。\n\nこれまで取り繕った仮面が剥がれる可能性大。 https://t.co/AmNg2dJx5b",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "report:夜職その他"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2117844790146654401",
    "url": "https://x.com/tgrouptax/status/2117844790146654401",
    "user": "tgrouptax",
@@ -907,12 +1063,12 @@
    "created_jst": "2026-11-04T14:00:01+09:00",
    "ts": 1793768401,
    "metrics": {
-    "impression_count": 4016638,
-    "like_count": 23059,
-    "retweet_count": 733,
-    "reply_count": 70,
-    "quote_count": 171,
-    "bookmark_count": 3549
+    "impression_count": 5256602,
+    "like_count": 31330,
+    "retweet_count": null,
+    "reply_count": 94,
+    "quote_count": 218,
+    "bookmark_count": 4647
    },
    "text": "ひろゆきのこういうところが大好き。\n\nひろゆきはお金持ちなはずなのに、社会的弱者に寄り添った意見をズバズバ言ってくれるのよね。\n\nさすが赤羽出身なだけはある。 https://t.co/mNqfrA2Sr8",
    "categories": [
@@ -1154,12 +1310,12 @@
    "created_jst": "2026-11-04T12:49:30+09:00",
    "ts": 1793764170,
    "metrics": {
-    "impression_count": 405299,
-    "like_count": 1896,
+    "impression_count": 517105,
+    "like_count": 2486,
     "retweet_count": null,
     "reply_count": 3,
-    "quote_count": 3,
-    "bookmark_count": 633
+    "quote_count": 6,
+    "bookmark_count": 819
    },
    "text": "このノアくんの接客ホストじゃなくてもキャバクラでもマジで使えそう\n\nあっすんも痛客設定忘れそうになるくらい全力で楽しんでる気がする😂 https://t.co/gQTv84KZTU",
    "categories": [
@@ -1379,6 +1535,28 @@
      "height": 1586
     }
    ]
+  },
+  {
+   "id": "2117793436699095190",
+   "url": "https://x.com/vF5Q4cou1GTYDie/status/2117793436699095190",
+   "user": "vF5Q4cou1GTYDie",
+   "created_utc": "2026-11-04T01:37:56Z",
+   "created_jst": "2026-11-04T10:37:56+09:00",
+   "ts": 1793756276,
+   "metrics": {
+    "impression_count": 1495563,
+    "like_count": 2747,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 52,
+    "bookmark_count": 227
+   },
+   "text": "しほちゃんの彼氏素敵だな👦🏻🩵 https://t.co/J09qkHXWNy",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2117786291471610093",
@@ -1644,12 +1822,12 @@
    "created_jst": "2026-11-04T08:12:06+09:00",
    "ts": 1793747526,
    "metrics": {
-    "impression_count": 1905783,
-    "like_count": 4356,
+    "impression_count": 2149145,
+    "like_count": 4968,
     "retweet_count": null,
-    "reply_count": 52,
-    "quote_count": 31,
-    "bookmark_count": 375
+    "reply_count": 55,
+    "quote_count": 37,
+    "bookmark_count": 429
    },
    "text": "ひめかちゃん突然のバースデーの売上は公表しません宣言。タワーも今までに比べてだいぶ小さいし、去年はヒカルタワーだしもう厳しいのかな… https://t.co/C9DActayBo",
    "categories": [
@@ -1930,12 +2108,12 @@
    "created_jst": "2026-11-04T00:35:36+09:00",
    "ts": 1793720136,
    "metrics": {
-    "impression_count": 3282003,
-    "like_count": 2093,
-    "retweet_count": null,
-    "reply_count": 26,
-    "quote_count": 63,
-    "bookmark_count": 321
+    "impression_count": 3502620,
+    "like_count": 2176,
+    "retweet_count": 44,
+    "reply_count": 27,
+    "quote_count": 65,
+    "bookmark_count": 330
    },
    "text": "ひめか「バースデーの売上は公表しません‼️」\n\n「言ったもの勝ちな現状」\n「（自分のせいもあり）インフレを起こしすぎている」\n「売上に価値を感じなくなった」\n\n「かけるん接待＆バーキン撫で撫で」を再現して、オジ達に笑われてまでシャンパンねだってたのに、、？とは思った（） https://t.co/AJVIbkMDJP https://t.co/A4UNrdUs4H",
    "categories": [
@@ -2069,12 +2247,12 @@
    "created_jst": "2026-11-03T23:47:26+09:00",
    "ts": 1793717246,
    "metrics": {
-    "impression_count": 2494985,
-    "like_count": 3139,
-    "retweet_count": null,
-    "reply_count": 2173,
-    "quote_count": 1118,
-    "bookmark_count": 498
+    "impression_count": 2717343,
+    "like_count": 3254,
+    "retweet_count": 209,
+    "reply_count": 2210,
+    "quote_count": 1169,
+    "bookmark_count": 518
    },
    "text": "AV女優って「普通じゃない仕事」なのかな。\n\nそもそも、仕事に「普通」「普通じゃない」っていうカテゴライズがあるんだろうか。\n\n私にとっては、数ある仕事のひとつ。\nという感覚なんだけど。\n\nこれもまた「普通じゃない感覚」になるのかな？\n\nそもそも「普通」ってなんだろう。 https://t.co/dc3dqFDSxz",
    "categories": [
@@ -2107,12 +2285,12 @@
    "created_jst": "2026-11-03T22:54:15+09:00",
    "ts": 1793714055,
    "metrics": {
-    "impression_count": 1433545,
-    "like_count": 934,
+    "impression_count": 1455231,
+    "like_count": 950,
     "retweet_count": 23,
-    "reply_count": 579,
-    "quote_count": 101,
-    "bookmark_count": 181
+    "reply_count": 582,
+    "quote_count": 103,
+    "bookmark_count": 186
    },
    "text": "「風俗に行く男ってキモいよね」\nの最強の返し方を教えて下さい。",
    "categories": [
@@ -2197,6 +2375,31 @@
      "height": 1905
     }
    ]
+  },
+  {
+   "id": "2117597158513709313",
+   "url": "https://x.com/epichan77/status/2117597158513709313",
+   "user": "epichan77",
+   "created_utc": "2026-11-03T12:38:00Z",
+   "created_jst": "2026-11-03T21:38:00+09:00",
+   "ts": 1793709480,
+   "metrics": {
+    "impression_count": 514283,
+    "like_count": 531,
+    "retweet_count": 11,
+    "reply_count": 47,
+    "quote_count": 34,
+    "bookmark_count": 185
+   },
+   "text": "今19歳のセクキャバ嬢です。\nお店で出会った30歳の男性精神科医のお客さんのことが好きになってしまいました。 https://t.co/LJvYpLXXUY",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ"
+   ],
+   "is_watched": false
   },
   {
    "id": "2117590696513442071",
@@ -3767,12 +3970,12 @@
    "created_jst": "2026-11-03T08:02:14+09:00",
    "ts": 1793660534,
    "metrics": {
-    "impression_count": 1662271,
-    "like_count": 1153,
+    "impression_count": 1667753,
+    "like_count": 1157,
     "retweet_count": 14,
     "reply_count": 34,
-    "quote_count": 40,
-    "bookmark_count": 271
+    "quote_count": 39,
+    "bookmark_count": 268
    },
    "text": "ご馳走様LINEしたら後から「PayPayで2000円貰っていい笑」ときました\nみなさんなら後から請求された際払いますか？ https://t.co/835PRpegMO",
    "categories": [
@@ -4181,29 +4384,28 @@
   },
   {
    "id": "2117271424402640912",
-   "url": "https://x.com/spana883709/status/2117271424402640912",
-   "user": "spana883709",
+   "url": "https://x.com/mizuagesaretai/status/2117271424402640912",
+   "user": "mizuagesaretai",
    "created_utc": "2026-11-02T15:03:39Z",
    "created_jst": "2026-11-03T00:03:39+09:00",
    "ts": 1793631819,
    "metrics": {
-    "impression_count": 4791171,
-    "like_count": 6874,
-    "retweet_count": null,
-    "reply_count": 74,
-    "quote_count": 56,
-    "bookmark_count": 1463
+    "impression_count": 5523361,
+    "like_count": 7581,
+    "retweet_count": 140,
+    "reply_count": 87,
+    "quote_count": 63,
+    "bookmark_count": 1559
    },
    "text": "あっすんが林先生の前で女出してるw\nいつもの漢って感じじゃないから新鮮💖\nでも林先生が人からお金借りてまで億のタワーするって事はそういう事だよね…？\n\n点と点が繋がる https://t.co/zTtllnyPhS",
    "categories": [
-    "キャバクラ",
-    "監視アカウント"
+    "キャバクラ"
    ],
    "matched_terms": [
     "あっすん",
     "report:キャバクラ"
    ],
-   "is_watched": true,
+   "is_watched": false,
    "media": [
     {
      "type": "video",
@@ -4412,6 +4614,28 @@
      "height": 2480
     }
    ]
+  },
+  {
+   "id": "2117231750493397403",
+   "url": "https://x.com/epichan77/status/2117231750493397403",
+   "user": "epichan77",
+   "created_utc": "2026-11-02T12:26:00Z",
+   "created_jst": "2026-11-02T21:26:00+09:00",
+   "ts": 1793622360,
+   "metrics": {
+    "impression_count": 4839117,
+    "like_count": 1265,
+    "retweet_count": 53,
+    "reply_count": 207,
+    "quote_count": 378,
+    "bookmark_count": 484
+   },
+   "text": "看護師をしておりますがどうしてもどうしても医師と結婚したいです。 https://t.co/x8zp4YSCpw",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2117227815703904613",
@@ -6026,12 +6250,12 @@
    "created_jst": "2026-11-02T16:27:00+09:00",
    "ts": 1793604420,
    "metrics": {
-    "impression_count": 1246981,
-    "like_count": 2026,
-    "retweet_count": 45,
+    "impression_count": 1250482,
+    "like_count": 2066,
+    "retweet_count": 46,
     "reply_count": 55,
-    "quote_count": 92,
-    "bookmark_count": 581
+    "quote_count": 93,
+    "bookmark_count": 588
    },
    "text": "世界一可愛い顔面を持つきょにょん https://t.co/ZQbKT55KG0",
    "categories": [
@@ -8686,12 +8910,12 @@
    "created_jst": "2026-11-01T22:58:45+09:00",
    "ts": 1793541525,
    "metrics": {
-    "impression_count": 1437217,
-    "like_count": 2512,
+    "impression_count": 1544901,
+    "like_count": 2541,
     "retweet_count": 72,
-    "reply_count": 124,
-    "quote_count": 48,
-    "bookmark_count": 273
+    "reply_count": 129,
+    "quote_count": 50,
+    "bookmark_count": 278
    },
    "text": "エンタメでもないし、台本もない。\n\n心から自分にできることをしたいし、二人が間違ってるところは反省してほしい。そう思って足を運んだんだけど、すぐに動画回そうとするから、正直、最初は気分が悪かったかな。 https://t.co/pMftBY3NBQ",
    "categories": [
@@ -18045,12 +18269,12 @@
    "created_jst": "2026-10-31T10:31:15+09:00",
    "ts": 1793410275,
    "metrics": {
-    "impression_count": 1762734,
-    "like_count": 4378,
-    "retweet_count": null,
-    "reply_count": 37,
-    "quote_count": 26,
-    "bookmark_count": 407
+    "impression_count": 2721652,
+    "like_count": 5942,
+    "retweet_count": 93,
+    "reply_count": 41,
+    "quote_count": 38,
+    "bookmark_count": 527
    },
    "text": "すすきので働いてる人であの女のヤバさ\n知らん人居ないと思うけどなぁ。\nネットが騒がしくて面白い。",
    "categories": [
@@ -68378,12 +68602,12 @@
    "created_jst": "2026-10-19T22:34:45+09:00",
    "ts": 1792416885,
    "metrics": {
-    "impression_count": 1927330,
-    "like_count": 1880,
+    "impression_count": 1943061,
+    "like_count": 1882,
     "retweet_count": 45,
     "reply_count": 3,
     "quote_count": 15,
-    "bookmark_count": 494
+    "bookmark_count": 495
    },
    "text": "【呪いレベルwww】\n\n「マジで神楽は、別格でいい彼女🫶」\n\n逆転勝訴&第二子出産で幸せオーラ満開のてんちむが、ヒカル家で神楽をベタ褒めしたら、涙の衝撃的事実が発覚し、謝罪することになりました...😢\n\n▼要点\n・てんちむ、プデュ見てた\n・等身ウォニョン\n・キャバ嬢で同属性w https://t.co/AQ4HZu0HH6 https://t.co/7g1gcJXqXL",
    "categories": [
@@ -96979,12 +97203,12 @@
    "created_jst": "2026-10-15T22:19:18+09:00",
    "ts": 1792070358,
    "metrics": {
-    "impression_count": 1460708,
-    "like_count": 3951,
+    "impression_count": 1466868,
+    "like_count": 3948,
     "retweet_count": 140,
     "reply_count": 0,
     "quote_count": 21,
-    "bookmark_count": 786
+    "bookmark_count": 785
    },
    "text": "「10分睡眠でも余裕だけどね」\nぷろたん元嫁レイナにガチ恋してる堀大輔\nBreaking Down サトルに喧嘩ふっかけたら\n朝倉未来の緊急電話でとんでもない展開にwww\n\n▼名(迷)言まとめ\n・スパチャ5000万\n・「寝てただろ」幻覚w\n・しゃもじ警察www\n・「嘘つき詐欺師」証明されてない\n・チュウまでwww https://t.co/ndzKH5PZXy https://t.co/BuOy8TPiPS",
    "categories": [
@@ -154615,6 +154839,33 @@
      "height": 486
     }
    ]
+  },
+  {
+   "id": "1797873230931546417",
+   "url": "https://x.com/bakausapipi2/status/1797873230931546417",
+   "user": "bakausapipi2",
+   "created_utc": "2024-06-04T06:09:15Z",
+   "created_jst": "2024-06-04T15:09:15+09:00",
+   "ts": 1717481355,
+   "metrics": {
+    "impression_count": 3986201,
+    "like_count": 8197,
+    "retweet_count": 643,
+    "reply_count": 70,
+    "quote_count": 612,
+    "bookmark_count": 4653
+   },
+   "text": "【アイドルとの5pしっかり王様ゲームをつけていたと話題】\n\n次々と飛び出すアイドルとの乱交マウントのストーリー晒しや流出！\n\n流れはこうだ！\n\n①アイドルとの飲み会に参加した六本木キャバ嬢やインスタ界隈の3人組ファン\n↓\n②六本木キャバ嬢の元カレスカウトマンが発狂して親しいを晒す\n↓ https://t.co/e7ljiKIJMN",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "六本木 キャバ"
+   ],
+   "is_watched": true
   },
   {
    "id": "1788542214429388963",
