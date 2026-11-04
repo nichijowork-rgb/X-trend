@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T00:06:04+09:00",
+ "generated_at": "2026-11-05T00:24:39+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -720,7 +720,8 @@
      "width": 448,
      "height": 2048
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117881151423676554",
@@ -5417,6 +5418,78 @@
      "height": 500
     }
    ]
+  },
+  {
+   "id": "2117183992915271786",
+   "url": "https://x.com/fuakawa_/status/2117183992915271786",
+   "user": "fuakawa_",
+   "created_utc": "2026-11-02T09:16:13Z",
+   "created_jst": "2026-11-02T18:16:13+09:00",
+   "ts": 1793610973,
+   "metrics": {
+    "impression_count": 2555012,
+    "like_count": 4051,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 176,
+    "bookmark_count": 690
+   },
+   "text": "天使優生くん♡とお互いの家族と顔合わせして、お互いの実家行き来したら本当に結婚してくれると思っちゃった⊂(  ᴖ ̫ᴖ)⊃🎶\n\n婚姻届も書いてくれて💒💕\n\n婚約指輪もくれて💍💕\n\n理想の旦那さんになってくれると思ったら家族ぐるみの結婚詐欺❣️\n\nホスト復帰したら教えてね❣️あ、ムショか❣️ https://t.co/8kmpDG7ioE",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホスト"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117183946576547840/img/WcQcMlsFDbcMNyon.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117183946576547840/vid/avc1/320x568/gZL4-zcEi3y2seUI.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117183946576547840/vid/avc1/480x852/YECPUPon_Jqxonvf.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117183946576547840/vid/avc1/720x1280/gkFe-tWvezyIDOun.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117183946576547840/pl/CpXk0wmSObqn7Bgs.m3u8"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWG_lQWbYAAiDR4.jpg",
+     "width": 1179,
+     "height": 1177
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWG_lQbaoAAQg0-.jpg",
+     "width": 1686,
+     "height": 945
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWG_lQWboAA2cy3.jpg",
+     "width": 945,
+     "height": 2048
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117183773704102364",
@@ -15444,12 +15517,12 @@
    "created_jst": "2026-10-31T17:37:30+09:00",
    "ts": 1793435850,
    "metrics": {
-    "impression_count": 581963,
-    "like_count": 357,
+    "impression_count": 586709,
+    "like_count": 363,
     "retweet_count": null,
     "reply_count": 7,
     "quote_count": 10,
-    "bookmark_count": 74
+    "bookmark_count": 73
    },
    "text": "【騒然】HOST CALLの次回予告で、あおいとアレスが一触即発の事態に\n\nあおい「なんやコラァお前！」\n↓\nアレスに激しく詰め寄る\n↓\nあおい「クレームきとんねん！」\n↓\nわちさん「まあまあまあ、あわてんなって…」\n↓\n一方、アレスは\n「やり返されても全然何も思わんす」 https://t.co/rWtnHYGRMr https://t.co/bB1Z4pzc12",
    "categories": [
@@ -17547,12 +17620,12 @@
    "created_jst": "2026-10-31T11:57:38+09:00",
    "ts": 1793415458,
    "metrics": {
-    "impression_count": 3941419,
-    "like_count": 6313,
+    "impression_count": 3943639,
+    "like_count": 6308,
     "retweet_count": null,
     "reply_count": 72,
     "quote_count": 52,
-    "bookmark_count": 995
+    "bookmark_count": 985
    },
    "text": "六本木界隈では有名だし、朝起きたらホテルでお金置いてあったらしいww不同意性行為すぎるww男もパニックだよ https://t.co/E3od2LwngA",
    "categories": [
@@ -67035,12 +67108,12 @@
    "created_jst": "2026-10-20T14:06:56+09:00",
    "ts": 1792472816,
    "metrics": {
-    "impression_count": 1643164,
-    "like_count": 668,
+    "impression_count": 1762507,
+    "like_count": 723,
     "retweet_count": null,
     "reply_count": 3,
-    "quote_count": 7,
-    "bookmark_count": 622
+    "quote_count": 9,
+    "bookmark_count": 663
    },
    "text": "NOT A HOTELは謎めいた会社だ。人里離れた静かな場所に、映画なら何か起こりそうなほどタダモノではない豪奢な建築物を建てている。最近公表された決算で粗利益率が65％に達することが判明。詳細が知られていない彼らのビジネスを探ると、驚愕の世界が現れた。",
    "categories": [

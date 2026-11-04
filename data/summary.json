@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-05T00:06:04+09:00",
+ "generated_at": "2026-11-05T00:24:39+09:00",
  "min_impressions": 300000,
- "total_posts": 4364,
+ "total_posts": 4365,
  "total_accounts": 2109,
  "below_threshold_posts": 48,
  "report_missing_ids": [],
@@ -133,14 +133,14 @@
  ],
  "by_category": {
   "ホスト": {
-   "posts": 259,
-   "impressions": 526984574,
-   "likes": 1429342
+   "posts": 260,
+   "impressions": 529539586,
+   "likes": 1433393
   },
   "キャバクラ": {
    "posts": 804,
-   "impressions": 1870356614,
-   "likes": 4482374
+   "impressions": 1870361360,
+   "likes": 4482380
   },
   "歌舞伎町": {
    "posts": 73,
@@ -159,8 +159,8 @@
   },
   "その他": {
    "posts": 3102,
-   "impressions": 8774450675,
-   "likes": 62395380
+   "impressions": 8774572238,
+   "likes": 62395430
   }
  },
  "by_account": [
@@ -1498,8 +1498,8 @@
    "user": "hcselection",
    "is_watched": false,
    "posts": 3,
-   "impressions": 3219341,
-   "likes": 8013
+   "impressions": 3224087,
+   "likes": 8019
   },
   {
    "user": "Wafm60z",
@@ -2438,6 +2438,13 @@
    "posts": 2,
    "impressions": 3059468,
    "likes": 5264
+  },
+  {
+   "user": "fuakawa_",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 2956568,
+   "likes": 5936
   },
   {
    "user": "mickey4671",
@@ -4995,18 +5002,18 @@
    "likes": 511
   },
   {
+   "user": "bakubijokintama",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 3943639,
+   "likes": 6308
+  },
+  {
    "user": "zVgIpXODC7n50CG",
    "is_watched": false,
    "posts": 1,
    "impressions": 3943176,
    "likes": 9245
-  },
-  {
-   "user": "bakubijokintama",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 3941419,
-   "likes": 6313
   },
   {
    "user": "Mike5260",
@@ -7326,6 +7333,13 @@
    "likes": 4378
   },
   {
+   "user": "NewsPicks",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1762507,
+   "likes": 723
+  },
+  {
    "user": "ENTPkaeru",
    "is_watched": false,
    "posts": 1,
@@ -7527,13 +7541,6 @@
    "posts": 1,
    "impressions": 1655111,
    "likes": 6926
-  },
-  {
-   "user": "NewsPicks",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1643164,
-   "likes": 668
   },
   {
    "user": "tarababagani",
@@ -13360,13 +13367,6 @@
    "likes": 4948
   },
   {
-   "user": "fuakawa_",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 401556,
-   "likes": 1885
-  },
-  {
    "user": "yuki_yuki224",
    "is_watched": false,
    "posts": 1,
@@ -17074,8 +17074,8 @@
   {
    "date": "2026-10-20",
    "posts": 87,
-   "impressions": 213810251,
-   "likes": 714659,
+   "impressions": 213929594,
+   "likes": 714714,
    "categories": {
     "ホスト": 3,
     "キャバクラ": 30,
@@ -17228,8 +17228,8 @@
   {
    "date": "2026-10-31",
    "posts": 183,
-   "impressions": 386897044,
-   "likes": 1749708,
+   "impressions": 386904010,
+   "likes": 1749709,
    "categories": {
     "ホスト": 9,
     "キャバクラ": 46,
@@ -17255,11 +17255,11 @@
   },
   {
    "date": "2026-11-02",
-   "posts": 107,
-   "impressions": 220757935,
-   "likes": 575731,
+   "posts": 108,
+   "impressions": 223312947,
+   "likes": 579782,
    "categories": {
-    "ホスト": 7,
+    "ホスト": 8,
     "キャバクラ": 27,
     "歌舞伎町": 0,
     "夜職その他": 10,
