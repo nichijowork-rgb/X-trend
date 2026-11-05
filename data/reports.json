@@ -1,6 +1,132 @@
 {
- "generated_at": "2026-11-05T00:06:04+09:00",
+ "generated_at": "2026-11-06T00:05:52+09:00",
  "daily": [
+  {
+   "date": "2026-11-05",
+   "rising": [
+    {
+     "id": "2118285947091533890",
+     "views": 432239,
+     "hours_since_post": 4.1,
+     "views_per_hour": 104280,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2118256718094434675",
+     "views": 451315,
+     "hours_since_post": 6.1,
+     "views_per_hour": 74219,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2118317049101652274",
+     "views": 267690,
+     "hours_since_post": 2.1,
+     "views_per_hour": 128371,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "星乃リアさんのホストコール出演の切り抜きで、2時間で26万表示を超えています"
+    },
+    {
+     "id": "2118291873299300389",
+     "views": 252284,
+     "hours_since_post": 3.8,
+     "views_per_hour": 67231,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "きゃにょんさんの親をめぐる投稿の続き。同じ流れの投稿が100万表示超え"
+    },
+    {
+     "id": "2118314105983655997",
+     "views": 139772,
+     "hours_since_post": 2.3,
+     "views_per_hour": 61296,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコール会場での引き抜きをめぐる大喧嘩の話題"
+    },
+    {
+     "id": "2118283983075357087",
+     "views": 215886,
+     "hours_since_post": 4.3,
+     "views_per_hour": 50500,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "きゃにょんさんとゆずずさんの騒動をまとめた投稿で、旦那さんへの飛び火も取り上げています"
+    }
+   ],
+   "review": [
+    {
+     "id": "2117941678480744704",
+     "before_views": 394219,
+     "after_views": 1117319,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117924070520201423",
+     "before_views": 495736,
+     "after_views": 1343237,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117930707519758729",
+     "before_views": 424415,
+     "after_views": 1115918,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117826547688313235",
+     "before_views": 405299,
+     "after_views": 642692,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2117942281517093340",
+     "before_views": 207362,
+     "after_views": 560207,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117952267194413206",
+     "before_views": 140014,
+     "after_views": 507464,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2117923600938479878",
+     "before_views": 231229,
+     "after_views": 658159,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-04",
    "rising": [
