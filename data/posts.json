@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-06T00:05:52+09:00",
+ "generated_at": "2026-11-06T00:25:00+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -1737,6 +1737,73 @@
    "is_watched": false
   },
   {
+   "id": "2118002838567805257",
+   "url": "https://x.com/yorudeki/status/2118002838567805257",
+   "user": "yorudeki",
+   "created_utc": "2026-11-04T15:30:01Z",
+   "created_jst": "2026-11-05T00:30:01+09:00",
+   "ts": 1793806201,
+   "metrics": {
+    "impression_count": 27985,
+    "like_count": 100,
+    "retweet_count": 11,
+    "reply_count": 4,
+    "quote_count": 4,
+    "bookmark_count": 19
+   },
+   "text": "【衝撃】歌舞伎町・トー横で緊縛師による刺激強めなパフォーマンスが行われる\n\n車いすに乗った人や小柄な人物なども縛られ、まるで見世物小屋のような異様な光景が広がっていたもよう。\n\n体調が悪いときに見る夢みたい。\n#ZIMA #縛師\nhttps://t.co/TI86JjjLm3 https://t.co/XfzkqN340P",
+   "categories": [
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "歌舞伎町",
+    "トー横"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117610315181596672/img/BFIS0S25pcfkcgY-.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117610315181596672/vid/avc1/320x568/ri6b-rQXqQg57fp0.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117610315181596672/vid/avc1/1080x1920/6JHmRoVBDeIlAlfa.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117610315181596672/pl/sxmH3DnlnnNyidZN.m3u8?v=cfc"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117610315181596672/vid/avc1/480x852/aFXToNYO4zpNjYDC.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117610315181596672/vid/avc1/720x1280/v1rkmDrUIDx4ySUP.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1920
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWNDXLFb0AAEFZp.jpg",
+     "width": 1536,
+     "height": 2048
+    }
+   ],
+   "in_bookmarks": true,
+   "below_threshold": true
+  },
+  {
    "id": "2118001511800471807",
    "url": "https://x.com/252996/status/2118001511800471807",
    "user": "252996",
@@ -1830,6 +1897,60 @@
    ],
    "matched_terms": [],
    "is_watched": false
+  },
+  {
+   "id": "2117972420351176849",
+   "url": "https://x.com/fuakawa_/status/2117972420351176849",
+   "user": "fuakawa_",
+   "created_utc": "2026-11-04T13:29:09Z",
+   "created_jst": "2026-11-04T22:29:09+09:00",
+   "ts": 1793798949,
+   "metrics": {
+    "impression_count": 61688,
+    "like_count": 348,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 10,
+    "bookmark_count": 65
+   },
+   "text": "「天使優生」じゃなくて「悪魔優生」にAVのグル勝手につくられてAV堕ちさせられそーになったんだろ、この顔から。\n\nAVしないって言ってるのに喧嘩した時母親に「ふあかわがAVしようとしてるけど風俗もとめてる」っ風バレさせられたし💦\n\n日高ってAVのスカウトもホストとグルだしまだこいついる？ https://t.co/vCiTIxx21l",
+   "categories": [
+    "ホスト",
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "風俗"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWSMsAAbkAAxuwK.jpg",
+     "width": 1152,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWSMr_6bYAAPgVk.jpg",
+     "width": 945,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWSMr_5bcAA6n0T.jpg",
+     "width": 2048,
+     "height": 1536
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWSMr_yaMAAVOOJ.jpg",
+     "width": 946,
+     "height": 2048
+    }
+   ],
+   "in_bookmarks": true,
+   "below_threshold": true
   },
   {
    "id": "2117967336225615930",
@@ -2459,6 +2580,64 @@
    ]
   },
   {
+   "id": "2117895182695936083",
+   "url": "https://x.com/hostcallch/status/2117895182695936083",
+   "user": "hostcallch",
+   "created_utc": "2026-11-04T08:22:14Z",
+   "created_jst": "2026-11-04T17:22:14+09:00",
+   "ts": 1793780534,
+   "metrics": {
+    "impression_count": 80432,
+    "like_count": 476,
+    "retweet_count": 14,
+    "reply_count": 1,
+    "quote_count": 0,
+    "bookmark_count": 123
+   },
+   "text": "【天才】アレスの煽りを完璧に打ち返し徳川流一のトークスキルが話題⋯\n\nアレス\n尊敬する人徳川??そこだけ引っかかってる\n↓\nアレス\nそれはホンマにせんすねぇな ﾟДﾟ)ｺﾞﾙｧ\n↓\n徳川流一\n初めてレベルで合格してほしいって思った\n↓\n僕をね尊敬してくれてるって言ってくれてたじゃないですか\n↓ https://t.co/U4u4cwG279 https://t.co/OlhDLwQVY2",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117891756675174400/img/rv7igid8BFlakrwU.jpg",
+     "variants": [
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117891756675174400/vid/avc1/1080x1080/BoGDn5nltSQaqqzg.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117891756675174400/pl/hbKkUL6XiKyJAJBy.m3u8?v=564"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117891756675174400/vid/avc1/720x720/YB6rsSiREwryMqTC.mp4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117891756675174400/vid/avc1/320x320/LwOiKbC8PN1lF8ac.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117891756675174400/vid/avc1/540x540/GR5L6CL8RunwGibc.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ],
+   "in_bookmarks": true,
+   "below_threshold": true
+  },
+  {
    "id": "2117894745766903964",
    "url": "https://x.com/DEATHDOL_NOTE/status/2117894745766903964",
    "user": "DEATHDOL_NOTE",
@@ -2714,6 +2893,34 @@
      "height": 2048
     }
    ],
+   "in_bookmarks": true
+  },
+  {
+   "id": "2117882689042969016",
+   "url": "https://x.com/oyffxew/status/2117882689042969016",
+   "user": "oyffxew",
+   "created_utc": "2026-11-04T07:32:36Z",
+   "created_jst": "2026-11-04T16:32:36+09:00",
+   "ts": 1793777556,
+   "metrics": {
+    "impression_count": 1221687,
+    "like_count": 8493,
+    "retweet_count": null,
+    "reply_count": 24,
+    "quote_count": 71,
+    "bookmark_count": 511
+   },
+   "text": "眉毛くそきめえしサングラスで鼻挟んで細くしようとしてんのかわからんけどにんにく鼻バレててクカなんよ😹 https://t.co/PgjWwrni3h",
+   "categories": [
+    "ホスト",
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "quote:ホスト 歌舞伎町",
+    "quote:ホスト",
+    "quote:歌舞伎町"
+   ],
+   "is_watched": false,
    "in_bookmarks": true
   },
   {
@@ -3110,6 +3317,30 @@
    "is_watched": false
   },
   {
+   "id": "2117829700047524248",
+   "url": "https://x.com/8u07wx/status/2117829700047524248",
+   "user": "8u07wx",
+   "created_utc": "2026-11-04T04:02:02Z",
+   "created_jst": "2026-11-04T13:02:02+09:00",
+   "ts": 1793764922,
+   "metrics": {
+    "impression_count": 101890,
+    "like_count": 1023,
+    "retweet_count": 83,
+    "reply_count": 40,
+    "quote_count": 17,
+    "bookmark_count": 33
+   },
+   "text": "バースデーで数億売ったとか\nほとんど嘘ですからね\n撮影用の空瓶並べているだけです\n\nフェイクのインスタに騙されないように",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "in_bookmarks": true,
+   "below_threshold": true
+  },
+  {
    "id": "2117829189885661272",
    "url": "https://x.com/fuyuyasumiminai/status/2117829189885661272",
    "user": "fuyuyasumiminai",
@@ -3443,6 +3674,43 @@
    ]
   },
   {
+   "id": "2117794819330420813",
+   "url": "https://x.com/fe_i6n/status/2117794819330420813",
+   "user": "fe_i6n",
+   "created_utc": "2026-11-04T01:43:26Z",
+   "created_jst": "2026-11-04T10:43:26+09:00",
+   "ts": 1793756606,
+   "metrics": {
+    "impression_count": 785052,
+    "like_count": 2870,
+    "retweet_count": null,
+    "reply_count": 8,
+    "quote_count": 90,
+    "bookmark_count": 1033
+   },
+   "text": "これって、まさかﾃﾞﾃﾞﾝ https://t.co/MQj9XYoFOY https://t.co/c920Bkzke0",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWPrKWga8AAlVc2.jpg",
+     "width": 1623,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWPrKWTaAAAWyzS.jpg",
+     "width": 1140,
+     "height": 2048
+    }
+   ],
+   "in_bookmarks": true
+  },
+  {
    "id": "2117793436699095190",
    "url": "https://x.com/vF5Q4cou1GTYDie/status/2117793436699095190",
    "user": "vF5Q4cou1GTYDie",
@@ -3463,6 +3731,32 @@
    ],
    "matched_terms": [],
    "is_watched": false
+  },
+  {
+   "id": "2117790823282884840",
+   "url": "https://x.com/angel_hime_lv/status/2117790823282884840",
+   "user": "angel_hime_lv",
+   "created_utc": "2026-11-04T01:27:33Z",
+   "created_jst": "2026-11-04T10:27:33+09:00",
+   "ts": 1793755653,
+   "metrics": {
+    "impression_count": 113726,
+    "like_count": 1307,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 5,
+    "bookmark_count": 327
+   },
+   "text": "これ売れっ子ホストすぎる\n生活に入り込んでくる感じ\n求めてるものがわかっててもキモくて言いたくないし客にいい思いさせたくないのにこれ出来るからホストは売れるしりりちゃんは捕まっちゃったんだな、、 https://t.co/qQHmbemSJj",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホスト"
+   ],
+   "is_watched": false,
+   "in_bookmarks": true,
+   "below_threshold": true
   },
   {
    "id": "2117786291471610093",
@@ -3789,7 +4083,8 @@
      "width": 1125,
      "height": 809
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117753697329377519",
@@ -4051,6 +4346,32 @@
    ]
   },
   {
+   "id": "2117720876204618185",
+   "url": "https://x.com/nanaseumai/status/2117720876204618185",
+   "user": "nanaseumai",
+   "created_utc": "2026-11-03T20:49:36Z",
+   "created_jst": "2026-11-04T05:49:36+09:00",
+   "ts": 1793738976,
+   "metrics": {
+    "impression_count": 1422552,
+    "like_count": 5493,
+    "retweet_count": null,
+    "reply_count": 22,
+    "quote_count": 10,
+    "bookmark_count": 203
+   },
+   "text": "億超えんかったんやろwプライド高 https://t.co/gpRgj38kHL",
+   "categories": [
+    "ホスト",
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "inherit:ref"
+   ],
+   "is_watched": false,
+   "in_bookmarks": true
+  },
+  {
    "id": "2117641854942666918",
    "url": "https://x.com/super_sachico/status/2117641854942666918",
    "user": "super_sachico",
@@ -4087,6 +4408,66 @@
      "height": 1945
     }
    ]
+  },
+  {
+   "id": "2117641149699793391",
+   "url": "https://x.com/attk_gossip/status/2117641149699793391",
+   "user": "attk_gossip",
+   "created_utc": "2026-11-03T15:32:48Z",
+   "created_jst": "2026-11-04T00:32:48+09:00",
+   "ts": 1793719968,
+   "metrics": {
+    "impression_count": 502473,
+    "like_count": 1118,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 56,
+    "bookmark_count": 194
+   },
+   "text": "ホストの社員旅行の闇ｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗｗ https://t.co/qPFulDxaa7",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホストの",
+    "ホスト"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117640767560974336/img/ujdnabsJ5zgkTi5E.jpg",
+     "variants": [
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117640767560974336/vid/avc1/480x772/IBze2Ts81gG6OtnU.mp4"
+      },
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117640767560974336/vid/avc1/320x514/sQhOtXoqx40evhoN.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117640767560974336/pl/M9RBh8qJv1_cNfnq.m3u8?v=612"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117640767560974336/vid/avc1/720x1160/pG_cwYszHGPqL_pG.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117640767560974336/vid/avc1/1206x1944/_C66q584T2LpReTZ.mp4"
+      }
+     ],
+     "width": 1206,
+     "height": 1944
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117638026306400672",
@@ -4187,7 +4568,8 @@
      "width": 888,
      "height": 496
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117629731105620469",
@@ -4388,6 +4770,31 @@
     "review",
     "rising"
    ]
+  },
+  {
+   "id": "2117588665757323569",
+   "url": "https://x.com/kimiwoteniireru/status/2117588665757323569",
+   "user": "kimiwoteniireru",
+   "created_utc": "2026-11-03T12:04:15Z",
+   "created_jst": "2026-11-03T21:04:15+09:00",
+   "ts": 1793707455,
+   "metrics": {
+    "impression_count": 557140,
+    "like_count": 7074,
+    "retweet_count": null,
+    "reply_count": 9,
+    "quote_count": 189,
+    "bookmark_count": 392
+   },
+   "text": "コンカフェ嬢するよりもまいばすけっとに鬼出勤した方がワンチャン稼げるような気がするんだけど絶対気のせいじゃないと思う",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "コンカフェ"
+   ],
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2117575515607613860",
@@ -4676,6 +5083,66 @@
    ],
    "matched_terms": [],
    "is_watched": false
+  },
+  {
+   "id": "2117543775853842809",
+   "url": "https://x.com/KxeSHkstW453827/status/2117543775853842809",
+   "user": "KxeSHkstW453827",
+   "created_utc": "2026-11-03T09:05:52Z",
+   "created_jst": "2026-11-03T18:05:52+09:00",
+   "ts": 1793696752,
+   "metrics": {
+    "impression_count": 482050,
+    "like_count": 539,
+    "retweet_count": null,
+    "reply_count": 43,
+    "quote_count": 18,
+    "bookmark_count": 134
+   },
+   "text": "【炎上中のホスト、ブチ切れ配信】\n\n進撃のノアが暴露した不倫疑惑で今や時の人となっているホストの鳳條隼人\n\n「俺はネットで生きてない。潰しにしか見えない」\n\n「風評被害すぎる」\n\nとブチ切れていらっしゃる。\n\nたださ、、これ不倫だからな？",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "ホストの",
+    "ホスト"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117512979243827201/img/-S8ynDs5TN-tsf0l.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117512979243827201/vid/avc1/320x446/WFH77AfAf3Gqrv26.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117512979243827201/vid/avc1/480x670/Sununob0p9qov5P-.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117512979243827201/vid/avc1/1168x1634/KVAgkimxf2Z6r03T.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117512979243827201/pl/ADbj9cYfm110raLN.m3u8?v=0d5"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117512979243827201/vid/avc1/720x1006/rDnALA7SL4oSylcQ.mp4"
+      }
+     ],
+     "width": 1168,
+     "height": 1634
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117543321921032270",
@@ -5160,7 +5627,32 @@
     "ヤマトリノ",
     "report:キャバクラ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "in_bookmarks": true
+  },
+  {
+   "id": "2117497326101299500",
+   "url": "https://x.com/TamagochanDa44/status/2117497326101299500",
+   "user": "TamagochanDa44",
+   "created_utc": "2026-11-03T06:01:18Z",
+   "created_jst": "2026-11-03T15:01:18+09:00",
+   "ts": 1793685678,
+   "metrics": {
+    "impression_count": 296011,
+    "like_count": 431,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 2,
+    "bookmark_count": 41
+   },
+   "text": "緩くなったのか知らんけど\n売上ってもう言っていいものなの?\n\n大台突破とかじゃないの? https://t.co/86vE8tMjmw",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "in_bookmarks": true,
+   "below_threshold": true
   },
   {
    "id": "2117490991615844422",
@@ -5559,6 +6051,37 @@
      "height": 900
     }
    ]
+  },
+  {
+   "id": "2117441268775297510",
+   "url": "https://x.com/PIYOyes/status/2117441268775297510",
+   "user": "PIYOyes",
+   "created_utc": "2026-11-03T02:18:33Z",
+   "created_jst": "2026-11-03T11:18:33+09:00",
+   "ts": 1793672313,
+   "metrics": {
+    "impression_count": 444283,
+    "like_count": 2004,
+    "retweet_count": null,
+    "reply_count": 18,
+    "quote_count": 21,
+    "bookmark_count": 88
+   },
+   "text": "今思返せばなんでコイツ合格にさせたん？😅笑笑 https://t.co/FzFQnmhyPS",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWKpm7tbAAAfo5a.jpg",
+     "width": 1170,
+     "height": 913
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117440441113268541",
@@ -6009,7 +6532,8 @@
      "width": 680,
      "height": 680
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2117382018463924279",
@@ -7631,12 +8155,12 @@
    "created_jst": "2026-11-02T18:16:13+09:00",
    "ts": 1793610973,
    "metrics": {
-    "impression_count": 2555012,
-    "like_count": 4051,
+    "impression_count": 2577325,
+    "like_count": 4064,
     "retweet_count": null,
     "reply_count": 0,
-    "quote_count": 176,
-    "bookmark_count": 690
+    "quote_count": 179,
+    "bookmark_count": 688
    },
    "text": "天使優生くん♡とお互いの家族と顔合わせして、お互いの実家行き来したら本当に結婚してくれると思っちゃった⊂(  ᴖ ̫ᴖ)⊃🎶\n\n婚姻届も書いてくれて💒💕\n\n婚約指輪もくれて💍💕\n\n理想の旦那さんになってくれると思ったら家族ぐるみの結婚詐欺❣️\n\nホスト復帰したら教えてね❣️あ、ムショか❣️ https://t.co/8kmpDG7ioE",
    "categories": [
@@ -69386,12 +69910,12 @@
    "created_jst": "2026-10-20T14:06:56+09:00",
    "ts": 1792472816,
    "metrics": {
-    "impression_count": 1762507,
-    "like_count": 723,
+    "impression_count": 1883327,
+    "like_count": 781,
     "retweet_count": null,
-    "reply_count": 3,
-    "quote_count": 9,
-    "bookmark_count": 663
+    "reply_count": 5,
+    "quote_count": 10,
+    "bookmark_count": 711
    },
    "text": "NOT A HOTELは謎めいた会社だ。人里離れた静かな場所に、映画なら何か起こりそうなほどタダモノではない豪奢な建築物を建てている。最近公表された決算で粗利益率が65％に達することが判明。詳細が知られていない彼らのビジネスを探ると、驚愕の世界が現れた。",
    "categories": [
