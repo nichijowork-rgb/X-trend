@@ -1,6 +1,115 @@
 {
- "generated_at": "2026-11-06T00:05:52+09:00",
+ "generated_at": "2026-11-07T00:18:56+09:00",
  "daily": [
+  {
+   "date": "2026-11-06",
+   "rising": [
+    {
+     "id": "2118691018518475164",
+     "views": 229306,
+     "hours_since_post": 1.4,
+     "views_per_hour": 163823,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2118677710998585536",
+     "views": 355067,
+     "hours_since_post": 2.3,
+     "views_per_hour": 155674,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2118656110290993228",
+     "views": 302828,
+     "hours_since_post": 3.7,
+     "views_per_hour": 81594,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2118630661049442505",
+     "views": 429734,
+     "hours_since_post": 5.4,
+     "views_per_hour": 79625,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2118667215113523690",
+     "views": 104043,
+     "hours_since_post": 3.0,
+     "views_per_hour": 34959,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "コンカフェのオーナー兼猟師のインタビュー記事が、投稿から3時間で10万表示を超えています"
+    }
+   ],
+   "review": [
+    {
+     "id": "2118285947091533890",
+     "before_views": 432239,
+     "after_views": 1673651,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2118256718094434675",
+     "before_views": 451315,
+     "after_views": 891413,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2118317049101652274",
+     "before_views": 267690,
+     "after_views": 1052365,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2118291873299300389",
+     "before_views": 252284,
+     "after_views": 345469,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2118314105983655997",
+     "before_views": 139772,
+     "after_views": 802795,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2118283983075357087",
+     "before_views": 215886,
+     "after_views": 977536,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 2,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-05",
    "rising": [
