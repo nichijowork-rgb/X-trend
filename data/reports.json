@@ -1,6 +1,89 @@
 {
- "generated_at": "2026-11-07T13:45:18+09:00",
+ "generated_at": "2026-11-07T23:36:39+09:00",
  "daily": [
+  {
+   "date": "2026-11-07",
+   "rising": [
+    {
+     "id": "2118985454632731088",
+     "views": 351462,
+     "hours_since_post": 5.7,
+     "views_per_hour": 61286,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2118941423513080273",
+     "views": 418499,
+     "hours_since_post": 8.7,
+     "views_per_hour": 48378,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2119000517519233189",
+     "views": 265182,
+     "hours_since_post": 4.7,
+     "views_per_hour": 55981,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "ハワイ入国審査でホステスと申告した日本人女性のまとめが、投稿から約5時間で26万表示を超えています"
+    }
+   ],
+   "review": [
+    {
+     "id": "2118691018518475164",
+     "before_views": 229306,
+     "after_views": 7641715,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2118677710998585536",
+     "before_views": 355067,
+     "after_views": 2139093,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2118656110290993228",
+     "before_views": 302828,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising"
+    },
+    {
+     "id": "2118630661049442505",
+     "before_views": 429734,
+     "after_views": 1038171,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2118667215113523690",
+     "before_views": 104043,
+     "after_views": 419311,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-06",
    "rising": [
