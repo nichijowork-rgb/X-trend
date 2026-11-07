@@ -7,16 +7,18 @@ import {
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
   partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
   applyGenreOverrides, majorityGenre, pastUsedIds, usedTopicIds, normalizePriorityGenre,
-  resolveRange, sanitizeRange, recommendCount, placedPostIds, toJstInput, fromJstInput,
+  resolveRange, sanitizeRange, recommendCount, placedPostIds, toJstInput, fromJstInput, topicItemIds, isImageItem,
 } from './js/logic.js';
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { IMAGE_LIMITS, checkImageFile, decodeImage, shrinkImage, canvasEncoder, shortHash, newImageId, validImageDataUrl } from './js/imaging.js';
+import { putImage, getImage, deleteImage, imageKeys } from './js/imagestore.js';
 import { applyScriptImport } from './js/scriptimport.js';
 import { prepareHoldTerms, heldPostsOf, heldTopicsOf, removeHoldTerm } from './js/hold.js';
 import { makeEffect, createCooldown, EFFECT_TTL_MS, effectDef } from './js/effects.js';
 import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBACK_SENT_KEY } from './js/feedback.js';
-import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload } from './js/payload.js';
+import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload, mediaPlan } from './js/payload.js';
 import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
 import { obsStatusLabel, renderObsSetup, refreshObsDialog } from './js/views/obsui.js';
 import { loadSaved, saveState, openSync } from './js/store.js';
@@ -188,6 +190,7 @@ function recompute() {
     posts: weekPosts, extraPosts, missingIds: missingIds.sort(compareIds), personalIds, bookmarkIds, carried,
     postsById: app.postsById, dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache,
     hiddenPostIds, botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk), priorityGenre: app.saved.priorityGenre,
+    postOrder: wk.postOrder,
   });
   app.topics = build(hidden);
   // 類似まとめ（c:）などで話題 id から投稿が分からず構成の話題が消えたときは、期間外の候補も入れて作り直し、その話題の投稿を戻す
@@ -288,6 +291,161 @@ app.sendFeedbackGitHub = async (v) => {
   }
 };
 
+// ---------------------------------------------------------------- 話題の中の並び・自分で追加した画像（進行の改修）
+
+/** 進行の並び（手動順 → 無ければ インプレ順／古い順。データに無い投稿と画像は後ろ） */
+app.itemsFor = (topic) => {
+  if (!topic || !app.saved) return [];
+  const wk = app.weekState();
+  const imgs = (wk.images || []).filter((x) => x.topicId === topic.id);
+  return topicItemIds(topic, { postsById: app.postsById, order: wk.live.order, manual: wk.postOrder[topic.id] || null, images: imgs });
+};
+app.topicImages = (topicId) => (app.weekState().images || []).filter((x) => x.topicId === topicId);
+
+/** 話題の中の手動順を保存（先頭が代表投稿。元に戻せる） */
+app.setItemOrder = (topicId, list, label = '投稿の並べ替え') => {
+  app.edit(label, (w) => { w.postOrder = { ...w.postOrder, [topicId]: [...list] }; });
+};
+/** 手動順をやめて インプレ順／古い順 に */
+app.setLiveOrder = (topicId, order) => {
+  const wk = app.weekState();
+  if (wk.postOrder[topicId]) app.edit('手動順をやめる', (w) => { const po = { ...w.postOrder }; delete po[topicId]; w.postOrder = po; w.live = liveReduce(w.live, { type: 'order', order }, app.cues); });
+  else app.liveAction('order', { order });
+};
+/** 話題から外す（投稿は 1 件の話題へ、データに無い投稿は外す、画像は消す） */
+app.removeItem = (topic, id) => {
+  app.edit('話題から外す', (w) => {
+    if (isImageItem(id)) w.images = w.images.filter((x) => `img:${x.id}` !== id);
+    else if ((topic.missingIds || []).includes(id)) w.overrides.manual = w.overrides.manual.map((m) => (m.id === topic.id ? { ...m, missing: (m.missing || []).filter((x) => x !== id) } : m));
+    else w.overrides.moves = { ...w.overrides.moves, [id]: `p:${id}` };
+    if (w.postOrder[topic.id]) w.postOrder = { ...w.postOrder, [topic.id]: w.postOrder[topic.id].filter((x) => x !== id) };
+  }, { toastText: isImageItem(id) ? '画像を外しました' : '話題から外しました（受信箱に戻りました）' });
+};
+/** この投稿を削除（非表示。画像は外す） */
+app.hideItem = (topic, id) => {
+  if (isImageItem(id)) { app.removeItem(topic, id); return; }
+  app.edit('投稿の削除', (w, s) => {
+    s.hiddenPosts = hidePost(s, id, app.weekKey, Date.now(), topic.name).hiddenPosts;
+    if (w.postOrder[topic.id]) w.postOrder = { ...w.postOrder, [topic.id]: w.postOrder[topic.id].filter((x) => x !== id) };
+  }, { toastText: '投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）' });
+};
+
+// 画像の中身（IndexedDB）のキャッシュ: id → { url（表示用 object URL）, obs（OBS 用 data URL） }
+app.imageCache = new Map();
+const imageLoads = new Map();
+let imageRenderTimer = null;
+app.imageData = (id) => app.imageCache.get(id) || null;
+app.loadImage = (id) => {
+  if (app.imageCache.has(id)) return Promise.resolve(app.imageCache.get(id));
+  if (imageLoads.has(id)) return imageLoads.get(id);
+  const pr = getImage(id).then((rec) => {
+    if (!rec) throw new Error('画像の中身が見つかりません（別のパソコン・ブラウザで追加した画像です）');
+    const v = { url: rec.full ? URL.createObjectURL(rec.full) : rec.obs, obs: rec.obs };
+    app.imageCache.set(id, v);
+    clearTimeout(imageRenderTimer);
+    imageRenderTimer = setTimeout(() => { if (!isEditable(document.activeElement)) renderRoute(); }, 30);
+    return v;
+  }).finally(() => imageLoads.delete(id));
+  imageLoads.set(id, pr);
+  return pr;
+};
+
+/** 画像を話題に追加（ファイル選択・ドラッグ＆ドロップ・貼り付け）。縮小して IndexedDB へ、情報は保存データへ（元に戻せる） */
+app.addImages = async (files, topicId) => {
+  const list = [...(files || [])].filter(Boolean);
+  if (!list.length || !topicId) return [];
+  const added = [];
+  const errors = [];
+  for (const f of list) {
+    const bad = checkImageFile(f);
+    if (bad) { errors.push(bad); continue; }
+    try {
+      const img = await decodeImage(f);
+      const srcType = f.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const full = await shrinkImage({ w: img.w, h: img.h, type: srcType }, { maxSide: IMAGE_LIMITS.storeSide, maxBytes: IMAGE_LIMITS.storeBytes }, canvasEncoder(img.source, 'blob'));
+      const obs = await shrinkImage({ w: img.w, h: img.h, type: srcType }, { maxSide: IMAGE_LIMITS.obsSide, maxBytes: IMAGE_LIMITS.obsDataUrl }, canvasEncoder(img.source, 'dataurl'));
+      const id = newImageId();
+      const hash = await shortHash(obs.data);
+      await putImage({ id, full: full.data, obs: obs.data, type: full.type, at: Date.now() });
+      app.imageCache.set(id, { url: URL.createObjectURL(full.data), obs: obs.data });
+      added.push({ id, topicId, caption: '', w: full.w, h: full.h, type: full.type, bytes: full.bytes, hash, at: Date.now() });
+    } catch (err) {
+      errors.push(err && err.message ? err.message : '画像を追加できませんでした');
+    }
+  }
+  if (added.length) {
+    app.edit('画像の追加', (w) => { w.images = [...(w.images || []), ...added]; }, { toastText: `画像を ${added.length}枚追加しました${errors.length ? `（${errors.length}枚は追加できませんでした：${errors[0]}）` : ''}` });
+  } else if (errors.length) toast(`画像を追加できませんでした：${errors[0]}`);
+  return added;
+};
+app.setImageCaption = (id, caption) => {
+  app.update((w) => { w.images = w.images.map((x) => (x.id === id ? { ...x, caption: String(caption || '').slice(0, 200) } : x)); }, { render: false, debounce: true });
+};
+/** 書き出しに入れる画像（data URL。保存用の大きさ） */
+app.exportImages = async () => {
+  const ids = new Set(Object.values(app.saved.weeks).flatMap((w) => (w.images || []).map((x) => x.id)));
+  const out = {};
+  for (const id of ids) {
+    try {
+      const rec = await getImage(id);
+      if (!rec) continue;
+      out[id] = rec.full ? await blobToDataUrl(rec.full) : rec.obs;
+      if (rec.obs) out[`${id}:obs`] = rec.obs;
+    } catch { /* 読めない画像は飛ばす */ }
+  }
+  return out;
+};
+/** 書き出しファイルの画像を取り込む */
+app.importImages = async (map) => {
+  let n = 0;
+  for (const [key, data] of Object.entries(map || {})) {
+    if (key.endsWith(':obs') || !/^[a-z0-9]{4,40}$/.test(key) || typeof data !== 'string' || !/^data:image\/(jpeg|png|webp);base64,/.test(data)) continue;
+    try {
+      const blob = dataUrlToBlob(data);
+      const obs = typeof map[`${key}:obs`] === 'string' && validImageDataUrl(map[`${key}:obs`]) ? map[`${key}:obs`] : data;
+      await putImage({ id: key, full: blob, obs, type: blob.type, at: Date.now() });
+      app.imageCache.delete(key);
+      n++;
+    } catch { /* 飛ばす */ }
+  }
+  return n;
+};
+function dataUrlToBlob(data) {
+  const [head, b64] = data.split(',');
+  const type = (/^data:([^;]+);/.exec(head) || [])[1] || 'image/jpeg';
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type });
+}
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(r.error); r.readAsDataURL(blob); });
+}
+/** 起動時: どの週からも使われていない画像の中身を消す（元に戻すの履歴は再読み込みで消えるので安全） */
+async function cleanupImages() {
+  try {
+    const used = new Set(Object.values(app.saved.weeks).flatMap((w) => (w.images || []).map((x) => x.id)));
+    for (const k of await imageKeys()) if (!used.has(k)) await deleteImage(k);
+  } catch { /* 使えないブラウザは何もしない */ }
+}
+
+/** 貼り付けた画像を入れる話題（進行は今の話題、編成はプレビュー中・開いているまとまり） */
+app.pasteTopicId = () => {
+  if (app.route === 'live') {
+    const cue = app.cues[app.weekState().live.index];
+    return cue && cue.kind === 'topic' ? cue.topicId : null;
+  }
+  if (app.route === 'plan') {
+    const u = app.ui;
+    const row = (u.rows || []).find((r) => r.key === u.focus);
+    if (row && row.type === 'topic') return row.id;
+    if (u.folder && u.folder.startsWith('topic:')) return u.folder.slice(6);
+  }
+  return null;
+};
+
+app.recompute = () => recompute(); // 計測・デバッグ用
+
 /** 元のジャンル（上書き前。データのカテゴリから） */
 app.origGenreOf = (id) => {
   const p = app.basePostsById.get(id);
@@ -330,7 +488,7 @@ app.update = (mut, opts = {}) => {
 /** 進行状態の変化を 1 か所から発行（段階2で OBS WebSocket へ流す） */
 function publishLive() {
   if (!app.saved || !app.weekKey) return;
-  publishLiveState({ weekKey: app.weekKey, live: app.weekState().live, cues: app.cues, topicsById: app.topicsById });
+  publishLiveState({ weekKey: app.weekKey, live: app.weekState().live, cues: app.cues, topicsById: app.topicsById, itemsFor: app.itemsFor });
   sendOverlay();
 }
 app.publishLive = publishLive;
@@ -354,12 +512,30 @@ function currentPayload() {
     title: typeof wk.title === 'string' && wk.title.trim() ? wk.title : '',
     // 段階4: 直近の演出（EFFECT_TTL_MS の間だけ載せる。受け手は id で二重に出さない）
     effect: overlay.effect && Date.now() - overlay.effect.at < EFFECT_TTL_MS ? overlay.effect : null,
+    // 進行の並び（手動順・古い順・画像）と画像の情報
+    itemsFor: app.itemsFor, imagesById: new Map((wk.images || []).map((x) => [x.id, x])),
   });
 }
 
-function transmit(p) {
-  if (overlay.bc) { try { overlay.bc.postMessage(p); } catch { /* 無視 */ } }
-  if (app.obs && app.obs.status().state === 'connected') app.obs.emit(OBS_EVENT_NAME, p).then(() => updateObsPill());
+// 「今の投稿」が画像のとき: 画像の本体（data URL）は id とハッシュで管理し、新しい画像に変わったときと、
+// 後から開いたパーツ向けに 30 秒おきにだけ media として付ける（5 秒おきの再送には付けない）
+let mediaState = { hash: null, at: 0 };
+function withMedia(p, force = false) {
+  const post = p && p.card && p.card.post;
+  if (!post || post.kind !== 'image' || !post.image) return p;
+  const data = app.imageData(post.image.id);
+  if (!data || !data.obs) { app.loadImage(post.image.id).then(() => { if (overlay.last === p) transmit(p, true); }).catch(() => {}); return p; }
+  const plan = mediaPlan(mediaState, post, Date.now(), force);
+  mediaState = plan.state;
+  if (!plan.attach) return p;
+  return { ...p, media: { id: post.image.id, hash: post.image.hash, dataUrl: data.obs } };
+}
+
+function transmit(p, forceMedia = false) {
+  const out = withMedia(p, forceMedia);
+  app.lastSent = out;
+  if (overlay.bc) { try { overlay.bc.postMessage(out); } catch { /* 無視 */ } }
+  if (app.obs && app.obs.status().state === 'connected') app.obs.emit(OBS_EVENT_NAME, out).then(() => updateObsPill());
 }
 
 function sendOverlay(force = false) {
@@ -815,6 +991,15 @@ async function main() {
     renderRoute();
   });
   window.addEventListener('hashchange', renderRoute);
+  // 画像の貼り付け（Ctrl+V）: 進行は今の話題、編成はプレビュー中の話題へ
+  document.addEventListener('paste', (e) => {
+    const files = [...((e.clipboardData && e.clipboardData.files) || [])].filter((f) => /^image\//.test(f.type));
+    if (!files.length) return;
+    const tid = app.pasteTopicId ? app.pasteTopicId() : null;
+    if (!tid) return;
+    e.preventDefault();
+    app.addImages(files, tid);
+  });
   document.addEventListener('keydown', (e) => {
     if (app.route === 'live') liveKeydown(app, e);
     else if (app.route === 'plan') planKeydown(app, e);
@@ -851,6 +1036,7 @@ async function main() {
   $('app').hidden = false;
   main.setAttribute('aria-busy', 'false');
   app.ready = true;
+  setTimeout(cleanupImages, 3000);
   renderRoute();
 }
 

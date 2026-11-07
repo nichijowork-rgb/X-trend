@@ -732,6 +732,29 @@ function heldPreview(app, row) {
   return box;
 }
 
+/** 話題の画像（編成のプレビュー） */
+function imagesSection(app, t) {
+  const imgs = app.topicImages(t.id);
+  const file = h('input', { type: 'file', accept: 'image/*', multiple: true, class: 'sr-only', id: `pv-img-file-${t.id}`, dataset: { key: 'pv-img-file' } });
+  file.addEventListener('change', () => { const fs = [...(file.files || [])]; file.value = ''; app.addImages(fs, t.id); });
+  const sec = h('div', { class: 'pv-images', dataset: { keep: `pv-images:${t.id}` } },
+    h('div', { class: 'row' }, h('h4', { class: 'pv-sub' }, `画像（${imgs.length}枚）`),
+      h('label', { class: 'btn btn-small btn-ghost', attrs: { for: `pv-img-file-${t.id}`, title: 'ファイルを選ぶ・ここへドラッグ・Ctrl+V で貼り付け' } }, '＋画像を追加'), file));
+  if (imgs.length) {
+    sec.append(h('ul', { class: 'pv-img-list' }, imgs.map((m) => {
+      const d = app.imageData(m.id);
+      if (!d) app.loadImage(m.id).catch(() => {});
+      return h('li', { dataset: { keep: `pvimg:${m.id}${d ? ':ok' : ''}` } },
+        d ? h('img', { src: d.url, alt: m.caption || '追加した画像', class: 'pv-img' }) : h('span', { class: 'muted' }, '読み込み中…'),
+        h('span', { class: 'pv-img-cap' }, m.caption || '（キャプションなし）'),
+        btn('外す', () => app.removeItem(t, `img:${m.id}`), 'btn btn-small btn-ghost', { 'data-key': `pv-img-remove-${m.id}` }));
+    })));
+  }
+  sec.addEventListener('dragover', (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
+  sec.addEventListener('drop', (e) => { if (e.dataTransfer && e.dataTransfer.files.length) { e.preventDefault(); app.addImages([...e.dataTransfer.files], t.id); } });
+  return sec;
+}
+
 function genreSelect(app, rows, cur, key) {
   const sel = h('select', { class: 'input input-sm', dataset: { key }, attrs: { 'aria-label': 'ジャンル' } }, GENRES.map((g) => h('option', { value: g.key, selected: g.key === cur }, g.label)));
   sel.addEventListener('change', () => setGenre(app, rows, sel.value));
@@ -807,7 +830,9 @@ function topicPreview(app, wk, row) {
     field('リード文', lead, botLead ? '（Grok のまとめ。書き換えできます）' : '（数字からの自動下書き。書き換えできます）'),
     botLead && !(typeof sc.lead === 'string' && sc.lead.trim()) ? h('p', { class: 'lead-mark-line' }, h('span', { class: 'lead-mark' }, 'Grok のまとめ'), 'リード文はボットの下書きです') : null,
     field('話すポイント', points)));
-  // 代表投稿
+  // 自分で追加した画像（進行でも出せる。Ctrl+V・ドラッグでも追加）
+  box.append(imagesSection(app, t));
+  // 代表投稿（先頭の投稿。進行で並べ替えたらその先頭）
   const id = t.stats.topPostId || t.linkId || null;
   if (id) {
     const p = app.postsById.get(id);

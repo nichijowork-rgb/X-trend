@@ -481,7 +481,7 @@ test('保存データ: 往復・版数・壊れた値・未知のフィールド
   assert.equal(wk.personal.length, 1);
   assert.equal(wk.personal[0].url, 'https://x.com/i/web/status/2110000000000000001', '危険な URL は捨てる');
   assert.deepEqual(wk.checkpoints, [{ kind: 'preview', dataAt: 'x', recordedAt: null, count: null, postIds: ['1'] }]);
-  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 }, cardVisible: true, shown: null });
+  assert.deepEqual(wk.live, { startedAt: null, index: 0, status: { 'main:a': 'done' }, history: ['main:a'], enteredAt: { main: 5 }, cardVisible: true, shown: null, order: 'imp' });
   assert.equal(wk.carriedOut.length, 1);
   assert.deepEqual(wk.carriedOut[0].postIds, ['1']);
   assert.equal(wk.carriedOut[0].genre, 'night');
@@ -1975,4 +1975,129 @@ test('これを映す: 並び（代表→インプレ順／新しい順）・選
   off();
   assert.deepEqual(got.at(-1).changed, ['card']);
   assert.equal(got.at(-1).state.postId, p3.id);
+});
+
+// ================================================================ 追加: 進行の改修（手動順・古い順・外す・画像・OBS の画像）
+import { topicItemIds, moveItemTo, isImageItem, sanitizeImages } from '../show/js/logic.js';
+import { mediaPlan, MEDIA_RESEND_MS } from '../show/js/payload.js';
+import { fitSize, shrinkImage, checkImageFile, validImageDataUrl, shortHash, IMAGE_LIMITS, newImageId } from '../show/js/imaging.js';
+
+function itemsFixture() {
+  const p1 = post({ ts: ts('2026-10-12T00:00:00+09:00'), metrics: { impression_count: 9000 } });
+  const p2 = post({ ts: ts('2026-10-14T00:00:00+09:00'), metrics: { impression_count: 5000 } });
+  const p3 = post({ ts: ts('2026-10-11T00:00:00+09:00'), metrics: { impression_count: 3000 } });
+  const postsById = new Map([p1, p2, p3].map((p) => [p.id, p]));
+  return { p1, p2, p3, postsById };
+}
+
+test('話題の中の並び: インプレ順・古い順・手動順（無いものは後ろ）・データに無い投稿と画像は後ろ・並べ替え', () => {
+  const { p1, p2, p3, postsById } = itemsFixture();
+  const t = { id: 'A', postIds: [p1.id, p2.id, p3.id], missingIds: ['1999999999999999993'], stats: { topPostId: p1.id } };
+  const images = [{ id: 'img2', at: 2 }, { id: 'img1', at: 1 }];
+  assert.deepEqual(topicItemIds(t, { postsById, images }), [p1.id, p2.id, p3.id, '1999999999999999993', 'img:img1', 'img:img2']);
+  assert.deepEqual(topicItemIds(t, { postsById, order: 'old' }).slice(0, 3), [p3.id, p1.id, p2.id], '古い順＝投稿日時の昇順');
+  assert.deepEqual(topicItemIds(t, { postsById, images, manual: ['img:img2', p3.id] }), ['img:img2', p3.id, p1.id, p2.id, '1999999999999999993', 'img:img1'], '手動順（無いものは元の並びで後ろ）');
+  assert.deepEqual(topicItemIds(t, { postsById, order: 'old', manual: [p2.id] })[0], p2.id, '手動順は古い順より優先');
+  assert.deepEqual(topicItemIds(null), []);
+  assert.deepEqual(moveItemTo(['a', 'b', 'c', 'd'], 'c', 0), ['c', 'a', 'b', 'd']);
+  assert.deepEqual(moveItemTo(['a', 'b', 'c', 'd'], 'a', 2), ['b', 'c', 'a', 'd'], '下へ動かすと置いた投稿の後ろ');
+  assert.deepEqual(moveItemTo(['a', 'b', 'c'], 'a', 99), ['b', 'c', 'a']);
+  assert.deepEqual(moveItemTo(['a', 'b'], 'x', 0), ['a', 'b']);
+  assert.ok(isImageItem('img:abc') && !isImageItem('123'));
+});
+
+test('手動順は編成にも反映（先頭の投稿が代表投稿）・保存と読み戻し・今の投稿は並びの先頭（話題が変わったら戻る）', () => {
+  const a = post({ text: 'シャンパンコールA', categories: ['ホスト'], metrics: { impression_count: 9000 } });
+  const b = post({ text: 'シャンパンコールB', categories: ['ホスト'], metrics: { impression_count: 100 } });
+  const d = ds([a, b]);
+  let topics = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs });
+  let t = topics.find((x) => x.id === 'd:d-hostcall');
+  assert.equal(t.stats.topPostId, a.id);
+  topics = buildTopics({ posts: d.posts, dict: DEFAULT_DICT, refTs: d.refTs, postOrder: { 'd:d-hostcall': ['img:zzzz', b.id] } });
+  t = topics.find((x) => x.id === 'd:d-hostcall');
+  assert.deepEqual(t.postIds, [b.id, a.id]);
+  assert.equal(t.stats.topPostId, b.id, '手で先頭にした投稿が代表投稿');
+  assert.ok(t.manualOrder);
+  assert.ok(t.score != null);
+  // 保存
+  const s = defaultSaved();
+  s.weeks['2026-10-17'] = { ...defaultWeek(), postOrder: { 'd:d-hostcall': [b.id, 'img:abcd1', 'bad id', b.id] }, images: [{ id: 'abcd1', topicId: 'd:d-hostcall', caption: 'キャプション', w: 10, h: 5, type: 'image/png', bytes: 100, hash: '0123456789abcdef', at: 1 }, { id: 'BAD!', topicId: 'x' }],
+    live: { ...defaultLive(), order: 'old', shown: { cueId: 'main:d:d-hostcall', postId: 'img:abcd1' } } };
+  const back = parseSaved(serializeSaved(s)).state.weeks['2026-10-17'];
+  assert.deepEqual(back.postOrder, { 'd:d-hostcall': [b.id, 'img:abcd1'] });
+  assert.deepEqual(back.images.map((x) => [x.id, x.caption, x.type, x.hash]), [['abcd1', 'キャプション', 'image/png', '0123456789abcdef']]);
+  assert.equal(back.live.order, 'old');
+  assert.equal(back.live.shown.postId, 'img:abcd1');
+  assert.deepEqual(sanitizeImages('x'), []);
+  // 今の投稿・古い順の切り替え
+  let r = assignTopic(defaultRundown(), 'd:d-hostcall', 'main');
+  const cues = buildCues(r, indexTopics(topics));
+  let live = liveReduce(defaultLive(), { type: 'start', now: 1 }, cues);
+  const items = topicItemIds(t, { manual: [b.id], images: [{ id: 'abcd1', at: 1 }] });
+  assert.equal(liveShownPost(live, cues[0], t, items), b.id, '先頭の投稿');
+  live = liveReduce(live, { type: 'show', postId: 'img:abcd1' }, cues);
+  assert.equal(liveShownPost(live, cues[0], t, items), 'img:abcd1', '画像も今の投稿にできる');
+  assert.equal(liveShownPost(live, cues[0], t, [a.id]), a.id, '並びに無ければ先頭');
+  live = liveReduce(live, { type: 'order', order: 'old' }, cues);
+  assert.equal(live.order, 'old');
+  assert.equal(liveReduce(live, { type: 'order', order: 'x' }, cues).order, 'imp');
+  r = null;
+});
+
+test('OBS の投稿カード: 今の投稿が画像ならその情報（中身は別）・画像の本体は新しい画像のときと 30 秒おきだけ', () => {
+  const { p1, postsById } = itemsFixture();
+  const A = { id: 'A', name: 'A', genre: 'host', postIds: [p1.id], stats: { topPostId: p1.id, count: 1 } };
+  const topicsById = new Map([['A', A]]);
+  const cues = buildCues(assignTopic(defaultRundown(), 'A', 'main'), topicsById);
+  let live = liveReduce(defaultLive(), { type: 'start', now: 1 }, cues);
+  const img = { id: 'abcd1', topicId: 'A', caption: '<b>キャプション</b>', w: 800, h: 600, type: 'image/jpeg', hash: '00ff00ff00ff00ff', at: 1 };
+  const itemsFor = (t) => topicItemIds(t, { images: t.id === 'A' ? [img] : [] });
+  const imagesById = new Map([[img.id, img]]);
+  assert.equal(buildPayload({ live, cues, topicsById, postsById, itemsFor, imagesById }).card.post.id, p1.id);
+  live = liveReduce(live, { type: 'show', postId: 'img:abcd1' }, cues);
+  const p = buildPayload({ live, cues, topicsById, postsById, itemsFor, imagesById });
+  assert.deepEqual(p.card.post.image, { id: 'abcd1', hash: '00ff00ff00ff00ff', w: 800, h: 600, type: 'image/jpeg' });
+  assert.equal(p.card.post.kind, 'image');
+  assert.equal(p.card.post.text, '<b>キャプション</b>', '文字のまま（表示は textContent）');
+  assert.equal(p.card.visible, true);
+  assert.ok(!('dataUrl' in p.card.post) && !JSON.stringify(p).includes('data:image'), 'ペイロードには本体を入れない');
+  // 画像の情報が消えたら投稿カードは空
+  assert.equal(buildPayload({ live, cues, topicsById, postsById, itemsFor: () => ['img:abcd1'], imagesById: new Map() }).card.post, null);
+  // 本体を付けるか
+  let st = { hash: null, at: 0 };
+  let r = mediaPlan(st, p.card.post, 1000);
+  assert.equal(r.attach, true, '新しい画像');
+  st = r.state;
+  assert.equal(mediaPlan(st, p.card.post, 6000).attach, false, '5 秒おきの再送には付けない');
+  assert.equal(mediaPlan(st, p.card.post, 6000, true).attach, true, '読み込み直後など');
+  assert.equal(mediaPlan(st, p.card.post, 1000 + MEDIA_RESEND_MS).attach, true, '30 秒おき');
+  assert.equal(mediaPlan(st, { ...p.card.post, image: { ...p.card.post.image, hash: 'ffffffffffffffff' } }, 1500).attach, true, '別の画像');
+  assert.equal(mediaPlan(st, { id: p1.id }, 1500).attach, false, '投稿は付けない');
+});
+
+test('画像の縮小: 長辺 1600/1280・1MB/1.5MB に収める（PNG→JPEG・画質→寸法）・受け付ける形式', async () => {
+  assert.deepEqual(fitSize(4000, 3000, 1600), { w: 1600, h: 1200 });
+  assert.deepEqual(fitSize(800, 600, 1600), { w: 800, h: 600 }, '小さければそのまま');
+  assert.deepEqual(fitSize(0, 10, 100), { w: 0, h: 0 });
+  // 偽の encode: 面積と画質で大きさが決まる
+  const calls = [];
+  const encode = async (w, h, type, q) => { calls.push([w, h, type, q]); const bytes = Math.round(w * h * (type === 'image/png' ? 1.2 : q * 0.6)); return { bytes, data: `${type}:${w}x${h}` }; };
+  const r = await shrinkImage({ w: 4000, h: 3000, type: 'image/png' }, { maxSide: IMAGE_LIMITS.storeSide, maxBytes: IMAGE_LIMITS.storeBytes }, encode);
+  assert.ok(r.bytes <= IMAGE_LIMITS.storeBytes && Math.max(r.w, r.h) <= 1600, JSON.stringify(r));
+  assert.equal(calls[0][2], 'image/png', 'PNG はまず PNG で');
+  assert.equal(r.type, 'image/jpeg', '大きければ JPEG に');
+  calls.length = 0;
+  const small = await shrinkImage({ w: 300, h: 200, type: 'image/png' }, { maxSide: 1280, maxBytes: IMAGE_LIMITS.obsDataUrl }, encode);
+  assert.deepEqual([small.type, small.w, small.h], ['image/png', 300, 200], '小さい PNG はそのまま');
+  const tiny = await shrinkImage({ w: 5000, h: 5000, type: 'image/jpeg' }, { maxSide: 1280, maxBytes: 200000 }, encode);
+  assert.ok(tiny.bytes <= 200000 && tiny.w < 1280, '画質で足りなければ寸法を下げる');
+  await assert.rejects(shrinkImage({ w: 100, h: 100, type: 'image/jpeg' }, { maxSide: 100, maxBytes: 1 }, encode), /小さくできませんでした/);
+  assert.equal(checkImageFile({ type: 'image/png', size: 100 }), null);
+  assert.match(checkImageFile({ type: 'text/plain', size: 1 }), /画像ファイル/);
+  assert.match(checkImageFile({ type: 'image/jpeg', size: IMAGE_LIMITS.sourceBytes + 1 }), /大きすぎます/);
+  assert.ok(validImageDataUrl('data:image/jpeg;base64,AAAA'));
+  assert.ok(!validImageDataUrl('data:text/html;base64,AAAA') && !validImageDataUrl('javascript:alert(1)') && !validImageDataUrl(`data:image/png;base64,${'A'.repeat(IMAGE_LIMITS.obsDataUrl + 200)}`));
+  assert.match(await shortHash('abc'), /^[0-9a-f]{16}$/);
+  assert.equal(await shortHash('abc'), await shortHash('abc'));
+  assert.match(newImageId(), /^[a-z0-9]{4,40}$/);
 });

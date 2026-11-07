@@ -26,17 +26,15 @@ body { font-family: var(--font); color: #fff; }
 .g-white { background: var(--g-white); color: var(--g-white-ink); }
 
 /* ---------------- トピック帯（1300×150） */
-.tb { position: absolute; inset: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: stretch; gap: 0; }
+.tb { position: absolute; inset: 0; display: grid; grid-template-columns: 14px minmax(0, 1fr); align-items: stretch; border: 5px solid var(--ink); border-radius: 28px; overflow: hidden; background: rgba(17, 17, 17, .92); }
 .tb[hidden] { display: none; }
-.tb-corner { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; min-width: 210px; padding: 0 22px; border-radius: 28px 0 0 28px; border: 5px solid var(--ink); border-right: 0; font-weight: 800; }
-.tb-corner-name { font-size: 26px; line-height: 1.15; white-space: nowrap; }
-.tb-corner-n { font-size: 22px; opacity: .95; }
-.tb-main { position: relative; overflow: hidden; border-radius: 0 28px 28px 0; border: 5px solid var(--ink); background: rgba(17, 17, 17, .92); display: grid; grid-template-rows: minmax(0, 1fr) auto; }
-.tb-topic { display: flex; align-items: center; gap: 16px; padding: 10px 26px 0; min-width: 0; }
-.tb-dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; }
-.tb-name { font-size: 52px; font-weight: 800; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 3px 0 rgba(0,0,0,.6); }
-.tb-next { padding: 0 26px 10px 64px; font-size: 22px; font-weight: 700; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tb-next b { color: var(--yellow); margin-right: 8px; }
+.tb-line { display: block; }
+.tb-main { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 8px 28px 8px 24px; min-width: 0; }
+.tb-topic { display: flex; align-items: center; min-width: 0; }
+.tb-name { font-size: 44px; font-weight: 800; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; text-shadow: 0 3px 0 rgba(0,0,0,.6); }
+.tb-next { font-size: 21px; font-weight: 700; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-next[hidden] { display: none; }
+.tb-next b { color: var(--yellow); margin-right: 4px; }
 .tb.is-enter .tb-topic, .tb.is-enter .tb-next { animation: tb-in .55s cubic-bezier(.2, .9, .3, 1.2) both; }
 @keyframes tb-in { from { transform: translateY(110%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -52,6 +50,12 @@ body { font-family: var(--font); color: #fff; }
 .cd-img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 18px; border: 3px solid var(--ink); background: #eee; }
 .cd-metrics { margin-top: auto; display: flex; gap: 22px; flex-wrap: wrap; font-size: 24px; font-weight: 700; }
 .cd-metrics b { font-size: 30px; }
+
+/* 自分で追加した画像（今の投稿が画像のとき） */
+.cd-photo { width: 100%; flex: 1 1 auto; min-height: 0; max-height: 560px; object-fit: contain; border-radius: 18px; border: 3px solid var(--ink); background: #111; }
+.cd-photo[hidden], .cd-wait[hidden], .cd-user[hidden], .cd-text[hidden] { display: none; }
+.cd-wait { margin: auto 0; font-size: 26px; font-weight: 700; color: #555; text-align: center; }
+.cd-box.is-image .cd-text { -webkit-line-clamp: 3; font-size: 28px; }
 
 /* ---------------- コーナータイトル（1920×1080） */
 .tt { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }

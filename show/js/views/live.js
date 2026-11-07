@@ -1,8 +1,9 @@
 // ② 進行（配信中）画面。キーボード: →/Enter 読んだ、← 戻す、S 飛ばす、L 来週へ、J/↓・K/↑ 映す投稿を次・前へ、Shift+1〜6 演出。
-import { computeTimer, formatClock, cornerDef, cueStates, showablePostIds, liveShownPost, stepShownPost, repPostId, statusUrl } from '../logic.js';
+import { computeTimer, formatClock, cornerDef, cueStates, liveShownPost, stepShownPost, statusUrl, isImageItem, moveItemTo } from '../logic.js';
 import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, linkCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
-import { cueColor, leadFor, leadIsBot, topicMarks, repPostCard, statsLine, refYear, bmInfo } from './common.js';
+import { cueColor, leadFor, leadIsBot, topicMarks, statsLine, refYear, bmInfo } from './common.js';
+import { beginPointer } from './dnd.js';
 import { obsDialog } from './obsui.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
@@ -145,17 +146,9 @@ function cueContent(app, cue, wk) {
     box.append(h('p', { class: 'live-lead' }, leadFor(app, t), leadIsBot(app, t) ? h('span', { class: 'lead-mark', attrs: { title: 'リード文は Grok（ボット）のまとめ。編成のプレビューで書き換えできます' } }, 'Grok のまとめ') : null));
     // 話すポイント・視聴者への質問の欄は表示しない（オーナー指定）。コーナーのメモは書いてあるときだけ
     const notesBox = notes ? h('div', { class: 'live-notes' }, h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)) : null;
-    // 代表投稿は X 埋め込みが既定（「カード表示」のときと、埋め込めなかったときは自前のカード）
-    const repId = t.stats.topPostId || t.linkId || (t.linkIds && t.linkIds[0]) || null;
-    const own = repPostCard(app, t);
-    const rep = app.ui.view !== 'card' && repId ? h('div', { dataset: { keep: 'rep' } }, embedHost(repId, own, 'live-embed')) : own;
-    // 「これを映す」: 今映している投稿（選んでいなければ代表投稿）
-    const shownId = liveShownPost(wk.live, cue, t);
-    const repWrap = h('div', { class: `live-post${repId && repId === shownId ? ' is-shown' : ''}`, dataset: { keep: 'rep-wrap', post: repId || '' } },
-      h('div', { class: 'lp-bar' }, h('h3', { class: 'live-h3' }, '代表投稿'), repId ? showButton(app, repId, shownId) : null),
-      rep || h('p', { class: 'muted' }, '該当なし'));
+    // 話題の投稿（代表投稿を含む全件・画像も）。クリックで「今の投稿」＝ OBS の投稿カード。つまみ・帯のドラッグで並べ替え
     box.append(h('div', { class: notesBox ? 'live-two' : 'live-two is-single', dataset: { keep: 'two' } },
-      h('div', { dataset: { keep: 'left' } }, repWrap, relatedList(app, t, repId, shownId)),
+      h('div', { dataset: { keep: 'left' } }, itemsList(app, t, cue, wk)),
       notesBox));
     return box;
   }
@@ -168,55 +161,131 @@ function cueContent(app, cue, wk) {
   return box;
 }
 
-const RELATED_FIRST = 5;
+const ITEMS_FIRST = 5;
 
-/** 「映す」ボタン（今映している投稿なら「映し中」） */
-function showButton(app, id, shownId) {
-  if (id === shownId) return h('span', { class: 'badge badge-shown', dataset: { key: `shown-${id}` } }, '映し中');
-  return btn('映す', () => app.liveAction('show', { postId: id }), 'btn btn-small btn-show', { 'data-key': `show-${id}`, title: 'この投稿を OBS の投稿カードに出す（J/↓・K/↑ でも切り替え）' });
-}
-
-/** 関連投稿: 最初に 5 件、「残り n件を表示」で全部（話題ごとに開いた状態を覚える）。インプレ順／新しい順 */
-function relatedList(app, t, repId, shownId) {
+/** 話題の投稿の一覧（最初に 5 件、「残り n件を表示」で全部）。DOM の順は固定（id 順）にして CSS の order で並べる＝並べ替えで埋め込みを作り直さない */
+function itemsList(app, t, cue, wk) {
   const u = app.ui;
   if (!u.relOpen) u.relOpen = new Set();
-  const order = u.relOrder === 'new' ? 'new' : 'imp';
-  const ids = showablePostIds(t, app.postsById, order).filter((id) => id !== repId);
-  if (!ids.length) return null;
+  const items = app.itemsFor(t);
+  const manual = Boolean(wk.postOrder[t.id]);
+  const order = wk.live.order === 'old' ? 'old' : 'imp';
+  const shownId = liveShownPost(wk.live, cue, t, items);
   const open = u.relOpen.has(t.id);
-  const shown = open ? ids : ids.slice(0, RELATED_FIRST);
-  const wrap = h('div', { class: 'live-related', dataset: { keep: 'related' } });
-  wrap.append(h('div', { class: 'lp-bar' },
-    h('h3', { class: 'live-h3' }, `関連投稿（${ids.length}件${open || ids.length <= RELATED_FIRST ? '' : `中 ${shown.length}件`}）`),
+  const visible = open ? items : items.slice(0, ITEMS_FIRST);
+  const pos = new Map(items.map((id, i) => [id, i]));
+  const wrap = h('section', { class: 'live-items', dataset: { keep: `items:${t.id}` }, attrs: { 'aria-label': '話題の投稿' } });
+  const file = h('input', { type: 'file', accept: 'image/*', multiple: true, class: 'sr-only', id: `img-file-${t.id}`, dataset: { key: 'img-file' } });
+  file.addEventListener('change', () => { const fs = [...(file.files || [])]; file.value = ''; app.addImages(fs, t.id); });
+  const ob = (key, label, on, title) => btn(label, () => app.setLiveOrder(t.id, key), `btn btn-small btn-ghost-dark${on ? ' is-on' : ''}`, { 'data-key': `rel-order-${key}`, 'aria-pressed': String(on), title });
+  wrap.append(h('div', { class: 'lp-bar li-head' },
+    h('h3', { class: 'live-h3' }, `投稿（${items.length}件${open || items.length <= ITEMS_FIRST ? '' : `中 ${visible.length}件`}）`),
     h('span', { class: 'rel-order', attrs: { role: 'group', 'aria-label': '並び順' } },
-      btn('インプレ順', () => { u.relOrder = 'imp'; app.render(); }, `btn btn-small btn-ghost-dark${order === 'imp' ? ' is-on' : ''}`, { 'data-key': 'rel-order-imp', 'aria-pressed': String(order === 'imp') }),
-      btn('新しい順', () => { u.relOrder = 'new'; app.render(); }, `btn btn-small btn-ghost-dark${order === 'new' ? ' is-on' : ''}`, { 'data-key': 'rel-order-new', 'aria-pressed': String(order === 'new') }))));
-  for (const id of shown) {
-    const p = app.postsById.get(id);
-    const card = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: app.embedder, compact: true, bm: bmInfo(app, p.id) }) : linkCard(id, statusUrl(id), null);
-    wrap.append(h('div', { class: `live-post is-compact${id === shownId ? ' is-shown' : ''}`, dataset: { keep: `rp:${id}`, post: id } },
-      h('div', { class: 'lp-bar' }, showButton(app, id, shownId)), card));
-  }
-  if (ids.length > RELATED_FIRST) {
+      ob('imp', 'インプレ順', !manual && order === 'imp', '表示が多い順'),
+      ob('old', '古い順', !manual && order === 'old', '投稿日時の古い順（時系列で読む）'),
+      manual ? h('span', { class: 'btn btn-small is-on rel-manual', dataset: { key: 'rel-order-manual' }, attrs: { title: '手で並べ替えた順（インプレ順・古い順を押すと解除）' } }, '手動順') : null),
+    h('label', { class: 'btn btn-small btn-ghost-dark li-add', attrs: { for: `img-file-${t.id}`, title: '画像を追加（ファイルを選ぶ・ここへドラッグ・Ctrl+V で貼り付け）' } }, '＋画像'), file));
+  const list = h('div', { class: 'li-list', dataset: { keep: 'li-list' } });
+  for (const id of [...visible].sort()) list.append(itemEl(app, t, id, pos.get(id), shownId, items));
+  const end = h('div', { class: 'li-end', dataset: { keep: 'li-end', drop: `li:${items.length}` } }, 'ここに置くと末尾へ');
+  end.style.order = String(items.length + 1);
+  list.append(end);
+  wrap.append(list);
+  if (items.length > ITEMS_FIRST) {
     wrap.append(open
       ? btn('たたむ', () => { u.relOpen.delete(t.id); app.render(); }, 'btn btn-small btn-ghost-dark rel-more', { 'data-key': 'rel-less' })
-      : btn(`残り ${ids.length - RELATED_FIRST}件を表示`, () => { u.relOpen.add(t.id); app.render(); }, 'btn btn-small rel-more', { 'data-key': 'rel-more' }));
+      : btn(`残り ${items.length - ITEMS_FIRST}件を表示`, () => { u.relOpen.add(t.id); app.render(); }, 'btn btn-small rel-more', { 'data-key': 'rel-more' }));
   }
+  // 画像ファイルをここへドラッグ
+  wrap.addEventListener('dragover', (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); wrap.classList.add('is-file-over'); } });
+  wrap.addEventListener('dragleave', () => wrap.classList.remove('is-file-over'));
+  wrap.addEventListener('drop', (e) => {
+    if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+    e.preventDefault();
+    wrap.classList.remove('is-file-over');
+    app.addImages([...e.dataTransfer.files], t.id);
+  });
   return wrap;
 }
 
-/** J/↓・K/↑: 映す投稿を次・前へ（今の並び順。たたんでいる投稿も含む）。動かしたら true */
+/** 1 件（投稿・データに無い投稿・画像）。帯（⋮⋮・番号・映し中・×・…）＋ 中身（投稿は常に X 埋め込み） */
+function itemEl(app, t, id, index, shownId, items) {
+  const isImg = isImageItem(id);
+  const el = h('div', { class: `live-post li-item${id === shownId ? ' is-shown' : ''}`, dataset: { keep: `li:${id}`, post: id, drop: `li:${index}` }, attrs: { 'aria-label': `${index + 1}件目` } });
+  el.style.order = String(index);
+  const handle = h('span', { class: 'li-handle', attrs: { 'aria-hidden': 'true', title: 'ドラッグで並べ替え' } }, '⋮⋮');
+  const menu = h('details', { class: 'menu li-menu' },
+    h('summary', { class: 'btn btn-small btn-ghost-dark li-more', dataset: { key: `li-menu-${id}` }, attrs: { 'aria-label': '操作' } }, '…'),
+    h('div', { class: 'menu-list' },
+      h('button', { type: 'button', class: 'menu-item', dataset: { key: `li-remove2-${id}` }, on: { click: () => app.removeItem(t, id) } }, '話題から外す'),
+      h('button', { type: 'button', class: 'menu-item', dataset: { key: `li-hide-${id}` }, on: { click: () => app.hideItem(t, id) } }, isImg ? '画像を削除' : 'この投稿を削除（非表示）'),
+      h('button', { type: 'button', class: 'menu-item', dataset: { key: `li-top-${id}` }, disabled: index === 0, on: { click: () => app.setItemOrder(t.id, moveItemTo(items, id, 0), '先頭へ') } }, '先頭へ（代表にする）'),
+      h('button', { type: 'button', class: 'menu-item', dataset: { key: `li-bottom-${id}` }, disabled: index === items.length - 1, on: { click: () => app.setItemOrder(t.id, moveItemTo(items, id, items.length), '末尾へ') } }, '末尾へ')));
+  const bar = h('div', { class: 'lp-bar li-bar', dataset: { key: `li-bar-${id}` } },
+    handle,
+    h('span', { class: 'li-no' }, index === 0 ? '先頭（代表）' : `${index + 1}`),
+    isImg ? h('span', { class: 'badge li-kind' }, '画像') : null,
+    id === shownId ? h('span', { class: 'badge badge-shown', dataset: { key: `shown-${id}` } }, '映し中') : null,
+    h('span', { class: 'li-sp' }),
+    btn('×', () => app.removeItem(t, id), 'btn btn-small btn-ghost-dark li-x', { 'data-key': `li-remove-${id}`, title: '話題から外す（Ctrl+Z で戻せます）', 'aria-label': '話題から外す', disabled: items.length <= 1 && !isImg }),
+    menu);
+  // 帯をドラッグで並べ替え（マウス・タッチ）。動かさずに離したら「今の投稿」
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button, summary, details, input, a')) return;
+    beginPointer(e, {
+      handle: true,
+      getRows: () => [{ key: id, id }],
+      label: () => (isImg ? '画像' : (app.postsById.get(id) || {}).text || id).slice(0, 30),
+      canDrop: (key) => key.startsWith('li:'),
+      onDrop: (key) => {
+        const to = Number(key.slice(3));
+        // 置いた先の投稿の位置へ（下へ動かすとその投稿の後ろ、上へ動かすと前）
+        const next = moveItemTo(items, id, to);
+        if (next.join() !== items.join()) app.setItemOrder(t.id, next);
+      },
+      onClick: () => app.liveAction('show', { postId: id }),
+    });
+  });
+  bar.style.touchAction = 'none';
+  // カード（余白）をクリック → 今の投稿
+  el.addEventListener('click', (e) => {
+    if (e.target.closest('button, summary, details, input, textarea, a, .li-bar')) return;
+    if (id !== shownId) app.liveAction('show', { postId: id });
+  });
+  if (isImg) el.append(bar, imageBody(app, id));
+  else {
+    const p = app.postsById.get(id);
+    const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, noActions: true, bm: bmInfo(app, p.id) }) : linkCard(id, statusUrl(id), null);
+    // 進行は常に X の埋め込み（画面に近いものから作る。失敗・データに無い投稿は自前のカード）
+    el.append(bar, p ? embedHost(id, own, 'live-embed') : own);
+  }
+  return el;
+}
+
+/** 画像の中身（IndexedDB から読む）とキャプション */
+function imageBody(app, id) {
+  const imgId = id.slice(4);
+  const meta = (app.weekState().images || []).find((x) => x.id === imgId) || {};
+  const data = app.imageData(imgId);
+  if (!data) app.loadImage(imgId).catch(() => {});
+  const img = data ? h('img', { class: 'li-img', src: data.url, alt: meta.caption || '追加した画像', decoding: 'async' }) : h('p', { class: 'muted li-img-wait' }, '画像を読み込み中…');
+  if (data && meta.w && meta.h) { img.width = meta.w; img.height = meta.h; }
+  const cap = h('input', { class: 'input input-sm li-cap', type: 'text', value: meta.caption || '', maxLength: 200, placeholder: 'キャプション（任意。OBS の投稿カードにも出ます）', dataset: { key: `cap-${imgId}` }, attrs: { 'aria-label': '画像のキャプション' } });
+  cap.addEventListener('input', () => app.setImageCaption(imgId, cap.value));
+  return h('figure', { class: 'li-figure', dataset: { keep: `fig:${imgId}` } }, h('div', { dataset: { keep: `imgbox:${imgId}${data ? ':ok' : ''}` } }, img), cap);
+}
+
+/** J/↓・K/↑: 今の投稿を次・前へ（今の並び。たたんでいる投稿も含む）。動かしたら true */
 function stepShow(app, delta) {
   const wk = app.weekState();
   const cue = app.cues[wk.live.index];
   const t = cue && cue.kind === 'topic' ? app.topicsById.get(cue.topicId) : null;
   if (!t) return false;
-  const order = app.ui.relOrder === 'new' ? 'new' : 'imp';
-  const list = showablePostIds(t, app.postsById, order);
-  const next = stepShownPost(list, liveShownPost(wk.live, cue, t), delta);
+  const list = app.itemsFor(t);
+  const next = stepShownPost(list, liveShownPost(wk.live, cue, t, list), delta);
   if (!next) return false;
-  // 次が 6 件目以降なら関連投稿を開いておく
-  if (list.indexOf(next) > RELATED_FIRST) { if (!app.ui.relOpen) app.ui.relOpen = new Set(); app.ui.relOpen.add(t.id); }
+  // 6 件目より先なら一覧を開いておく
+  if (list.indexOf(next) >= ITEMS_FIRST) { if (!app.ui.relOpen) app.ui.relOpen = new Set(); app.ui.relOpen.add(t.id); }
   app.liveAction('show', { postId: next });
   requestAnimationFrame(() => { const el = document.querySelector(`.live-post[data-post="${CSS.escape(next)}"]`); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); });
   return true;
@@ -269,6 +338,11 @@ function doAction(app, type) {
 }
 
 export function liveKeydown(app, e) {
+  // 元に戻す・やり直す（編成と共通の履歴）
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && !isEditable(e.target)) {
+    if (e.key === 'z' || e.key === 'Z') { e.preventDefault(); if (e.shiftKey) app.redo(); else app.undo(); return; }
+    if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); app.redo(); return; }
+  }
   if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || isEditable(e.target)) return;
   if (document.querySelector('dialog[open]')) return;
   // 演出: Shift+1〜6（入力欄にいるときは使わない。Stream Deck などからはこのキーを送る）

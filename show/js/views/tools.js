@@ -39,6 +39,8 @@ export function toolsDialog(app) {
     const r = parseSaved(text);
     if (!r.ok) { app.ui.importMsg = { kind: 'error', text: `読み込めませんでした（${r.reason}）` }; app.ui.pendingImport = null; } else {
       app.ui.pendingImport = r.state;
+      // 書き出しに入れた画像（任意）
+      try { const raw = JSON.parse(text); app.ui.pendingImages = raw && raw.images && typeof raw.images === 'object' ? raw.images : null; } catch { app.ui.pendingImages = null; }
       app.ui.importMsg = { kind: 'ok', text: `「${f.name}」：番組週 ${Object.keys(r.state.weeks).length}件・辞書 ${r.state.dict.length}件・ジャンル上書き ${Object.keys(r.state.genreOverrides).length}件${r.reason ? `（${r.reason}）` : ''}。今の内容をこのファイルで置き換えますか？` };
     }
     app.render();
@@ -46,13 +48,30 @@ export function toolsDialog(app) {
   const io = h('section', { class: 'tools-sec' }, h('h3', {}, '保存（書き出し・読み込み）'),
     h('p', { class: 'muted' }, `編成・メモ・進行・ジャンルの上書き（${genreOverrideList(app.saved).length}件）はこのブラウザに自動保存されます。別のパソコンへ移すときやバックアップは書き出してください。`),
     h('div', { class: 'row' },
-      btn('書き出し（JSON）', () => downloadText(`show-${app.weekKey}.json`, serializeSaved(app.saved, Date.now())), 'btn btn-small', { 'data-key': 'export' }),
+      btn('書き出し（JSON）', async () => {
+        const text = serializeSaved(app.saved, Date.now());
+        if (!app.ui.exportImages) { downloadText(`show-${app.weekKey}.json`, text); return; }
+        const images = await app.exportImages();
+        downloadText(`show-${app.weekKey}.json`, JSON.stringify({ ...JSON.parse(text), images }));
+      }, 'btn btn-small', { 'data-key': 'export' }),
       h('label', { class: 'btn btn-small', attrs: { for: 'import-file' } }, '読み込み'), file));
+  const imgCount = Object.values(app.saved.weeks).reduce((n, w) => n + (w.images || []).length, 0);
+  const withImg = h('input', { type: 'checkbox', checked: Boolean(app.ui.exportImages), dataset: { key: 'export-images' } });
+  withImg.addEventListener('change', () => { app.ui.exportImages = withImg.checked; });
+  io.append(h('label', { class: 'check-line' }, withImg, h('span', {}, `書き出しに自分で追加した画像（${imgCount}枚）も入れる`), h('span', { class: 'muted' }, '（入れるとファイルが大きくなります。入れないと画像は別のパソコンに移りません）')));
   if (app.ui.importMsg) {
     io.append(h('p', { class: `import-msg is-${app.ui.importMsg.kind}`, attrs: { role: 'status' } }, app.ui.importMsg.text));
     if (app.ui.pendingImport) {
       io.append(h('div', { class: 'row' },
-        btn('置き換える', () => { const s = app.ui.pendingImport; app.ui.pendingImport = null; app.ui.importMsg = { kind: 'ok', text: '読み込みました' }; app.replaceSaved(s); }, 'btn btn-small btn-red', { 'data-key': 'import-yes' }),
+        btn('置き換える', async () => {
+          const s = app.ui.pendingImport;
+          const imgs = app.ui.pendingImages;
+          app.ui.pendingImport = null;
+          app.ui.pendingImages = null;
+          const n = imgs ? await app.importImages(imgs) : 0;
+          app.ui.importMsg = { kind: 'ok', text: `読み込みました${n ? `（画像 ${n}枚）` : ''}` };
+          app.replaceSaved(s);
+        }, 'btn btn-small btn-red', { 'data-key': 'import-yes' }),
         btn('やめる', () => { app.ui.pendingImport = null; app.ui.importMsg = null; app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'import-no' })));
     }
   }

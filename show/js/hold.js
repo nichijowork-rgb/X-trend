@@ -28,10 +28,16 @@ export function matchHoldTerm(texts, prepared) {
   return null;
 }
 
-/** 投稿が一致する言葉（本文・@アカウント） */
+/** 投稿が一致する言葉（本文・@アカウント）。同じ投稿・同じ言葉の一覧なら覚えておく */
+const postCache = new WeakMap();
 export function postHoldTerm(post, prepared) {
   if (!post) return null;
-  return matchHoldTerm([post.text, post.user ? `@${post.user}` : ''], prepared);
+  const key = prepared.map((x) => x.norm).join('\u0001');
+  const c = postCache.get(post);
+  if (c && c.key === key) return c.term;
+  const term = matchHoldTerm([post.text, post.user ? `@${post.user}` : ''], prepared);
+  if (typeof post === 'object') postCache.set(post, { key, term });
+  return term;
 }
 
 /**

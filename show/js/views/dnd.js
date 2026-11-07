@@ -129,7 +129,12 @@ function suppressClick() {
 function autoScroll(x, y) {
   const el = document.elementFromPoint(x, y);
   const box = el ? el.closest('.vlist, .tree') : null;
-  if (!box) return;
+  if (!box) {
+    // 一覧の箱が無い画面（進行など）は画面ごと
+    if (y < 70) window.scrollBy(0, -14);
+    else if (y > window.innerHeight - 130) window.scrollBy(0, 14);
+    return;
+  }
   const r = box.getBoundingClientRect();
   const edge = 36;
   if (y < r.top + edge) box.scrollTop -= 14;

@@ -10,7 +10,7 @@ let last = null;
 export const eventLog = []; // 直近の発行（デバッグ・E2E 用。最大 50 件）
 
 /** 進行状態のまとめ（OBS 側が必要とする最小限） */
-export function liveSnapshot({ weekKey, live, cues, topicsById }) {
+export function liveSnapshot({ weekKey, live, cues, topicsById, itemsFor = null }) {
   const cue = cues[live.index] || null;
   const topic = cue && cue.kind === 'topic' ? topicsById.get(cue.topicId) : null;
   return {
@@ -22,7 +22,7 @@ export function liveSnapshot({ weekKey, live, cues, topicsById }) {
     cueId: cue ? cue.id : null,
     corner: cue ? { key: cue.cornerKey, name: cornerDef(cue.cornerKey).name } : null,
     topic: topic ? { id: topic.id, name: topic.name, genre: topic.genre, n: cue.n, of: cue.of } : null,
-    postId: topic ? liveShownPost(live, cue, topic) : null, // 「これを映す」で選んだ投稿（無ければ代表投稿）
+    postId: topic ? liveShownPost(live, cue, topic, itemsFor ? itemsFor(topic) : null) : null, // 「今の投稿」（無ければ並びの先頭）
     cardVisible: live.cardVisible !== false,
   };
 }

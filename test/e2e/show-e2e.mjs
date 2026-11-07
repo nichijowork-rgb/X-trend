@@ -12,6 +12,7 @@
 
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { deflateSync } from 'node:zlib';
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import net from 'node:net';
@@ -67,6 +68,19 @@ async function check(name, fn) {
   console.log(results[results.length - 1]);
 }
 function assert(cond, msg) { if (!cond) throw new Error(msg || 'assertion failed'); }
+
+/** 単色の PNG（w×h）を作る（テスト用。依存なし） */
+function makePng(w, h, [r, g, b]) {
+  const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  const crc = (buf) => { let c = 0xffffffff; for (const x of buf) c = crcTable[(c ^ x) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  const chunk = (type, data) => { const len = Buffer.alloc(4); len.writeUInt32BE(data.length); const td = Buffer.concat([Buffer.from(type), data]); const cr = Buffer.alloc(4); cr.writeUInt32BE(crc(td)); return Buffer.concat([len, td, cr]); };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 2; ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0;
+  const row = Buffer.alloc(1 + w * 3);
+  for (let x = 0; x < w; x++) { row[1 + x * 3] = (r + x) & 255; row[2 + x * 3] = g; row[3 + x * 3] = (b + (x >> 3)) & 255; }
+  const raw = Buffer.concat(Array.from({ length: h }, () => row));
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]);
+}
 
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP4/5/hPwAHAgL/jg2v2QAAAABJRU5ErkJggg==', 'base64');
 // 偽 widgets.js: ID 末尾が奇数なら埋め込み失敗（undefined）→ 自前の表示に戻ることを確かめる
@@ -899,7 +913,7 @@ async function main() {
       assert((await late.textContent('.tb-name')) === evil, 'tb text');
       assert((await cd.textContent('.cd-text')) === evil, 'card text');
       for (const p of [late, cd, tt]) {
-        assert(!(await p.$('#stage img:not(.cd-img)')), 'no injected img');
+        assert(!(await p.$('#stage img:not(.cd-img):not(.cd-photo)')) && !(await p.$('#stage img.cd-photo[src]')), 'no injected img');
         assert(await p.evaluate(() => window.__xss === undefined), 'xss');
       }
       assert(await cd.evaluate(() => document.querySelector('.cd-img').hidden), 'pbs 以外の画像は出さない');
@@ -937,7 +951,18 @@ async function main() {
         const bg = await p.evaluate(() => getComputedStyle(document.body).backgroundColor);
         assert(bg === 'rgba(0, 0, 0, 0)', `透明 ${bg}`);
         assert(await p.evaluate(() => document.documentElement.classList.contains('no-motion')), 'motion=off');
+        if (k === 'topicbar' || k === 'all') {
+          const tb = await p.evaluate(() => ({ corner: Boolean(document.querySelector('.tb-corner')), next: document.querySelector('.tb-next').textContent, line: document.querySelector('.tb-line').className, name: document.querySelector('.tb-name').textContent }));
+          assert(!tb.corner && tb.next.startsWith('NEXT：') && /g-/.test(tb.line) && tb.name, `トピック帯は話題名と NEXT だけ ${JSON.stringify(tb)}`);
+        }
         await p.screenshot({ path: path.join(SHOTS, `overlay-${k}-${w}x${hh}.png`), omitBackground: true });
+        if (k === 'topicbar') {
+          // 長い話題名は 2 行まで（それ以上は省略）
+          await p.evaluate(() => { const d = JSON.parse(JSON.stringify(window.__overlay.last)); d.sid = 'long'; d.seq = 1; d.at = Date.now() + 1000; d.topic.name = '長い話題名のテスト：'.repeat(8); window.dispatchEvent(new CustomEvent('xtrend-show', { detail: d })); });
+          const hgt = await p.evaluate(() => { const e = document.querySelector('.tb-name'); return { ch: e.clientHeight, sh: e.scrollHeight }; });
+          assert(hgt.ch <= 110 && hgt.sh > hgt.ch, `2 行まで ${JSON.stringify(hgt)}`);
+          await p.screenshot({ path: path.join(SHOTS, 'overlay-topicbar-long.png'), omitBackground: true });
+        }
         await p.close();
       }
       // ?scale=2（小さなソース枠でも拡大）
@@ -1417,10 +1442,9 @@ async function main() {
       await c.close();
     });
 
-    // ---- 4h. 進行の関連投稿（全件）と「これを映す」
-    await check('進行: 関連投稿は最初に 5 件→「残り n件を表示」で全部・並び順・「映す」で emit の card.post が変わる・J/K・話題が変わると代表投稿へ', async () => {
-      const obs = { payloads: [] };
-      const c = await newCtx();
+    // ---- 4h. 進行: 話題の投稿の整理（並べ替え・外す・Ctrl+Z）・クリックで今の投稿・常に埋め込み・古い順・画像
+    const liveSetup = async (c) => {
+      const obs = { payloads: [], targets: [] };
       const page = await c.newPage();
       await setupRoutes(page, { data: SAMPLE_404 });
       watchConsole(page, errors);
@@ -1429,12 +1453,17 @@ async function main() {
         ws.onMessage((raw) => {
           const m = JSON.parse(String(raw));
           if (m.op === 1) ws.send(JSON.stringify({ op: 2, d: { negotiatedRpcVersion: 1 } }));
-          if (m.op === 6) { ws.send(JSON.stringify({ op: 7, d: { requestType: m.d.requestType, requestId: m.d.requestId, requestStatus: { result: true, code: 100 } } })); obs.payloads.push(m.d.requestData.requestData.event_data); }
+          if (m.op === 6) {
+            ws.send(JSON.stringify({ op: 7, d: { requestType: m.d.requestType, requestId: m.d.requestId, requestStatus: { result: true, code: 100 } } }));
+            const ev = m.d.requestData.requestData;
+            obs.payloads.push(ev.event_data);
+            for (const t of obs.targets) t.evaluate(([name, d]) => window.dispatchEvent(new CustomEvent(name, { detail: d })), [ev.event_name, ev.event_data]).catch(() => {});
+          }
         });
       });
       await page.goto(show);
       await ready(page);
-      await page.evaluate(() => window.__show.edit('メイン', (w) => { w.rundown.corners[0].items = ['d:d-hostcall', 'd:d-tower']; }));
+      await page.evaluate(() => { window.__show.setView('card'); window.__show.edit('メイン', (w) => { w.rundown.corners[0].items = ['d:d-hostcall', 'd:d-tower']; }); });
       await page.goto(`${show}#live`);
       await ready(page);
       await page.click('#obs-pill');
@@ -1442,62 +1471,218 @@ async function main() {
       await page.waitForFunction(() => document.getElementById('obs-pill').dataset.state === 'connected', null, { timeout: 5000 });
       await page.click('[data-key="obs-close"]');
       await page.click('[data-key="live-start"]');
-      const info = await page.evaluate(() => { const t = window.__show.topicsById.get('d:d-hostcall'); return { n: t.postIds.length, rep: t.stats.topPostId, ids: t.postIds }; });
-      const relCount = () => page.$$eval('.live-related .live-post', (x) => x.length);
-      assert(await relCount() === Math.min(5, info.n - 1), `最初は 5 件（${await relCount()}）`);
-      assert((await page.textContent('[data-key="rel-more"]')).includes(`残り ${info.n - 1 - 5}件を表示`), 'more');
+      return { page, obs };
+    };
+    const items = (page) => page.evaluate(() => window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall')));
+    const visualIds = (page) => page.$$eval('.li-item', (els) => els.map((e) => ({ id: e.dataset.post, o: Number(e.style.order) })).sort((a, b) => a.o - b.o).map((x) => x.id));
+    const lastCard = (obs) => { const x = obs.payloads.filter((p) => p.card && p.card.post).at(-1); return x ? x.card.post.id : null; };
+
+    await check('進行: 投稿は常に埋め込み・最初に 5 件→全件・古い順・クリックで今の投稿（emit の card.post）・J/K・話題が変わると先頭へ', async () => {
+      const c = await newCtx();
+      const { page, obs } = await liveSetup(c);
+      const it = await items(page);
+      assert(await page.$$eval('.li-item', (x) => x.length) === Math.min(5, it.length), '最初は 5 件');
+      assert(await page.$$eval('.li-item .embed-host', (x) => x.length) === Math.min(5, it.length), 'カード表示の設定でも進行は埋め込み');
+      await page.waitForFunction(() => (window.__embedCalls || []).length > 0, null, { timeout: 5000 });
+      assert(!(await page.$('[data-key^="show-"]')), '「映す」ボタンは無い');
+      assert((await page.textContent('[data-key="rel-more"]')).includes(`残り ${it.length - 5}件を表示`), 'more');
       await page.click('[data-key="rel-more"]');
-      await page.waitForFunction((n) => document.querySelectorAll('.live-related .live-post').length === n, info.n - 1);
-      // 新しい順
-      const firstImp = await page.getAttribute('.live-related .live-post', 'data-post');
-      await page.click('[data-key="rel-order-new"]');
-      const firstNew = await page.getAttribute('.live-related .live-post', 'data-post');
-      const expNew = await page.evaluate((rep) => { const a = window.__show; return a.topicsById.get('d:d-hostcall').postIds.filter((x) => x !== rep).sort((x, y) => a.postsById.get(y).ts - a.postsById.get(x).ts)[0]; }, info.rep);
-      assert(firstNew === expNew && firstImp === info.ids.filter((x) => x !== info.rep)[0], `${firstImp} ${firstNew} ${expNew}`);
+      await page.waitForFunction((n) => document.querySelectorAll('.li-item').length === n, it.length);
+      // 古い順
+      await page.click('[data-key="rel-order-old"]');
+      await page.waitForFunction(() => window.__show.weekState().live.order === 'old');
+      const old = await page.evaluate(() => { const a = window.__show; const t = a.topicsById.get('d:d-hostcall'); return [...t.postIds].sort((x, y) => a.postsById.get(x).ts - a.postsById.get(y).ts)[0]; });
+      assert((await visualIds(page))[0] === old, '古い順の先頭は最も古い投稿');
+      await page.waitForFunction((id) => window.__show.lastPayload && window.__show.lastPayload.card.post.id === id, old);
       await page.click('[data-key="rel-order-imp"]');
-      assert(await page.isVisible(`[data-key="shown-${info.rep}"]`), '最初は代表投稿が映し中');
-      // 映す
-      const target = info.ids.filter((x) => x !== info.rep)[2];
-      await page.click(`[data-key="show-${target}"]`);
-      await page.waitForFunction((id) => document.querySelector(`.live-post.is-shown[data-post="${id}"]`), target);
-      await page.waitForFunction((id) => (window.__show.lastPayload || {}).card && window.__show.lastPayload.card.post.id === id, target);
-      const lastObs = () => obs.payloads.filter((x) => x.card && x.card.post).at(-1).card.post.id;
-      await page.waitForTimeout(200);
-      assert(lastObs() === target, `OBS ${lastObs()} / ${target}`);
-      await page.screenshot({ path: path.join(SHOTS, 'live-related-960.png') });
-      // J / K / ↓
+      await page.waitForFunction(() => window.__show.weekState().live.order === 'imp');
+      // カード（余白・帯）をクリック → 今の投稿
+      const target = it[2];
+      await page.click(`.li-item[data-post="${target}"] .li-no`);
+      await page.waitForSelector(`.li-item.is-shown[data-post="${target}"] [data-key="shown-${target}"]`);
+      await page.waitForTimeout(250);
+      assert(lastCard(obs) === target, `OBS ${lastCard(obs)} / ${target}`);
+      const fb = await page.$(`.li-item[data-post="${it[1]}"] .embed-fallback`);
+      if (fb) {
+        await page.click(`.li-item[data-post="${it[1]}"]`, { position: { x: 4, y: 60 } });
+        await page.waitForFunction((id) => window.__show.weekState().live.shown && window.__show.weekState().live.shown.postId === id, it[1]);
+      }
+      // J/K・↓↑
       await page.keyboard.press('j');
-      const after = info.ids.filter((x) => x !== info.rep)[3];
-      await page.waitForFunction((id) => window.__show.weekState().live.shown && window.__show.weekState().live.shown.postId === id, after);
+      await page.waitForFunction((id) => window.__show.weekState().live.shown.postId === id, fb ? it[2] : it[3]);
       await page.keyboard.press('k');
-      await page.keyboard.press('ArrowUp');
-      const two = info.ids.filter((x) => x !== info.rep)[1];
-      await page.waitForFunction((id) => window.__show.weekState().live.shown.postId === id, two);
       await page.keyboard.press('ArrowDown');
-      await page.waitForFunction((id) => window.__show.weekState().live.shown.postId === id, target);
-      // 隠し中でも映す投稿だけ切り替わる
-      await page.click('[data-key="live-card"]');
-      await page.keyboard.press('j');
-      await page.waitForFunction((id) => { const p = window.__show.lastPayload; return p.card.visible === false && p.card.post.id === id; }, after);
-      await page.click('[data-key="live-card"]');
-      // リロードしても映す投稿は残る
+      await page.waitForFunction((id) => window.__show.weekState().live.shown.postId === id, fb ? it[2] : it[3]);
+      await page.screenshot({ path: path.join(SHOTS, 'live-items-960.png') });
+      // 次の話題 → 先頭へ
+      await page.keyboard.press('ArrowRight');
+      const first2 = await page.evaluate(() => window.__show.itemsFor(window.__show.topicsById.get('d:d-tower'))[0]);
+      await page.waitForFunction((id) => window.__show.lastPayload.card.post && window.__show.lastPayload.card.post.id === id, first2);
+      assert(await page.evaluate(() => window.__show.weekState().live.shown) === null, 'reset');
+      await c.close();
+      return `ホストコール ${it.length}件`;
+    });
+
+    await check('進行: ドラッグで並べ替え（埋め込みは作り直さない）→ 先頭が代表・編成にも反映・× で外す → Ctrl+Z・… の先頭へ／末尾へ・手動順の解除', async () => {
+      const c = await newCtx();
+      const { page } = await liveSetup(c);
+      await page.click('[data-key="rel-more"]');
+      const it = await items(page);
+      await page.waitForFunction(() => document.querySelectorAll('.li-item .fake-tweet').length > 0, null, { timeout: 5000 });
+      // 埋め込みに印を付ける（作り直されたら消える）
+      const marked = await page.evaluate(() => { const el = document.querySelector('.li-item .fake-tweet'); el.__mark = 1; return el.closest('.li-item').dataset.post; });
+      // 3 件目の帯 → 1 件目へドラッグ（両方が画面に入るよう、2 件目を真ん中へ）
+      await page.evaluate((id) => document.querySelector(`.li-item[data-post="${id}"]`).scrollIntoView({ block: 'center' }), it[1]);
+      await page.waitForTimeout(100);
+      const from = await page.locator(`.li-item[data-post="${it[2]}"] .li-handle`).boundingBox();
+      const to = await page.locator(`.li-item[data-post="${it[0]}"]`).boundingBox();
+      await page.mouse.move(from.x + 4, from.y + 4);
+      await page.mouse.down();
+      await page.mouse.move(from.x + 10, from.y + 14, { steps: 3 });
+      await page.mouse.move(to.x + 60, to.y + 30, { steps: 12 });
+      await page.mouse.up();
+      await page.waitForFunction((id) => window.__show.weekState().postOrder['d:d-hostcall'] && window.__show.weekState().postOrder['d:d-hostcall'][0] === id, it[2]);
+      const v1 = await visualIds(page);
+      assert(v1[0] === it[2] && v1[1] === it[0], JSON.stringify(v1.slice(0, 3)));
+      assert(await page.evaluate(() => { const el = [...document.querySelectorAll('.li-item .fake-tweet')].find((x) => x.__mark); return Boolean(el && el.isConnected); }), `埋め込みが作り直された（${marked}）`);
+      assert(await page.isVisible('[data-key="rel-order-manual"]'), '手動順');
+      assert(await page.evaluate((id) => window.__show.topicsById.get('d:d-hostcall').stats.topPostId === id && window.__show.lastPayload.card.post.id === id, it[2]), '先頭が代表・OBS も');
+      // × で外す → Ctrl+Z
+      const n0 = (await items(page)).length;
+      await page.click(`[data-key="li-remove-${it[1]}"]`);
+      await page.waitForFunction((n) => window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall')).length === n - 1, n0);
+      assert(await page.evaluate((id) => window.__show.weekState().overrides.moves[id] === `p:${id}`, it[1]), '受信箱へ');
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction((n) => window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall')).length === n, n0);
+      // … → 末尾へ・先頭へ・削除（非表示）
+      const last = it[3];
+      await page.click(`[data-key="li-menu-${last}"]`);
+      await page.click(`[data-key="li-bottom-${last}"]`);
+      await page.waitForFunction((id) => window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall')).at(-1) === id, last);
+      await page.click(`[data-key="li-menu-${last}"]`);
+      await page.click(`[data-key="li-top-${last}"]`);
+      await page.waitForFunction((id) => window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall'))[0] === id, last);
+      await page.click(`[data-key="li-menu-${it[4]}"]`);
+      await page.click(`[data-key="li-hide-${it[4]}"]`);
+      await page.waitForFunction((id) => window.__show.saved.hiddenPosts.some((x) => x.id === id), it[4]);
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction((id) => !window.__show.saved.hiddenPosts.some((x) => x.id === id), it[4]);
+      // 編成にも反映（まとまりの中の並び・プレビューの代表投稿）
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      await folder(page, 'topic:d:d-hostcall');
+      assert((await rowKeys(page))[0] === `p:${last}`, '編成のまとまりの中も手動順');
+      // 手動順の解除
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.click('[data-key="rel-order-imp"]');
+      await page.waitForFunction(() => !window.__show.weekState().postOrder['d:d-hostcall']);
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction(() => Boolean(window.__show.weekState().postOrder['d:d-hostcall']));
+      await c.close();
+    });
+
+    await check('進行: 画像の追加（ファイル・貼り付け）→ 一覧に出る → 今の投稿にすると OBS へ data URL（30 秒おき以外の再送には付けない）→ オーバーレイに表示・リロード後も・編成のプレビュー', async () => {
+      const c = await newCtx();
+      const { page, obs } = await liveSetup(c);
+      const png1 = makePng(1200, 800, [220, 40, 30]);
+      await page.setInputFiles('[data-key="img-file"]', { name: 'a.png', mimeType: 'image/png', buffer: png1 });
+      await page.waitForFunction(() => window.__show.weekState().images.length === 1, null, { timeout: 10000 });
+      // 貼り付け（Ctrl+V）
+      await page.evaluate(async (b64) => {
+        const bin = atob(b64);
+        const u8 = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+        const dt = new DataTransfer();
+        dt.items.add(new File([u8], 'paste.png', { type: 'image/png' }));
+        document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true }));
+      }, makePng(300, 300, [20, 80, 220]).toString('base64'));
+      await page.waitForFunction(() => window.__show.weekState().images.length === 2, null, { timeout: 10000 });
+      const meta = await page.evaluate(() => window.__show.weekState().images.map((x) => ({ id: x.id, w: x.w, h: x.h, type: x.type, bytes: x.bytes, hash: x.hash })));
+      assert(meta[0].w === 1200 && meta[0].bytes <= 1000000 && /^[0-9a-f]{16}$/.test(meta[0].hash), JSON.stringify(meta));
+      await page.click('[data-key="rel-more"]').catch(() => {});
+      const imgItem = `img:${meta[0].id}`;
+      await page.waitForSelector(`.li-item[data-post="${imgItem}"] img.li-img`, { timeout: 5000 });
+      await page.fill(`[data-key="cap-${meta[0].id}"]`, '<b>現地の写真</b>');
+      await page.waitForTimeout(500);
+      // オーバーレイ（別のブラウザ。OBS 経由で受ける）
+      const oc = await newCtx();
+      const ov = await oc.newPage();
+      await ov.setViewportSize({ width: 640, height: 760 });
+      await setupRoutes(ov, { data: SAMPLE_404 });
+      watchConsole(ov, errors);
+      await ov.goto(`${show}overlay.html?part=card&motion=off`);
+      await ov.waitForFunction(() => window.__overlay);
+      obs.targets.push(ov);
+      const before = obs.payloads.length;
+      await page.click(`.li-item[data-post="${imgItem}"] .li-no`);
+      await page.waitForFunction((id) => window.__show.lastPayload.card.post && window.__show.lastPayload.card.post.id === id, imgItem);
+      await page.waitForTimeout(300);
+      const withMedia = obs.payloads.slice(before).filter((x) => x.media);
+      assert(withMedia.length === 1 && withMedia[0].media.dataUrl.startsWith('data:image/') && withMedia[0].media.dataUrl.length < 1500000 && withMedia[0].media.hash === meta[0].hash, `media ${withMedia.length}`);
+      assert(JSON.stringify(obs.payloads.at(-1)).length < 2000000, 'メッセージ 2MB 未満');
+      await ov.waitForFunction(() => { const i = document.querySelector('.cd-photo'); return i && !i.hidden && i.src.startsWith('data:image/'); }, null, { timeout: 5000 });
+      assert((await ov.textContent('.cd-text')) === '<b>現地の写真</b>' && !(await ov.$('.cd-text b')), 'キャプションは文字のまま');
+      await ov.screenshot({ path: path.join(SHOTS, 'overlay-card-image.png'), omitBackground: true });
+      // 再送（5 秒おき）には本体を付けない
+      const n1 = obs.payloads.length;
+      await page.waitForTimeout(5600);
+      const resent = obs.payloads.slice(n1);
+      assert(resent.length >= 1 && resent.every((x) => !x.media), `再送 ${resent.length}件・media ${resent.filter((x) => x.media).length}`);
+      // 後から開いたパーツは本体を待つ（キャッシュが無い）→ 本体が届いたら出る
+      const late = await oc.newPage();
+      await setupRoutes(late, { data: SAMPLE_404 });
+      await late.goto(`${show}overlay.html?part=card&motion=off`);
+      await late.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: d })), resent.at(-1));
+      await late.waitForSelector('.cd-wait:not([hidden])');
+      await late.evaluate((d) => window.dispatchEvent(new CustomEvent('xtrend-show', { detail: d })), withMedia[0]);
+      await late.waitForFunction(() => { const i = document.querySelector('.cd-photo'); return i && !i.hidden; });
+      await oc.close();
+      await page.screenshot({ path: path.join(SHOTS, 'live-image-960.png') });
+      // リロード後も（IndexedDB）
       await page.reload();
       await ready(page);
-      assert(await page.isVisible(`[data-key="shown-${after}"]`), 'reload');
-      // 次の話題 → 代表投稿へ
-      await page.keyboard.press('ArrowRight');
-      const rep2 = await page.evaluate(() => window.__show.topicsById.get('d:d-tower').stats.topPostId);
-      await page.waitForFunction((id) => window.__show.lastPayload && window.__show.lastPayload.card.post && window.__show.lastPayload.card.post.id === id, rep2);
-      assert(await page.evaluate(() => window.__show.weekState().live.shown) === null, 'reset');
-      // 375
+      await page.click('[data-key="rel-more"]').catch(() => {});
+      await page.waitForSelector(`.li-item[data-post="${imgItem}"] img.li-img`, { timeout: 5000 });
+      assert(await page.inputValue(`[data-key="cap-${meta[0].id}"]`) === '<b>現地の写真</b>', 'caption');
+      // 編成のプレビュー
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      await folder(page, 'group:night');
+      await page.click(`${rowSel('t:d:d-hostcall')} .row-main`);
+      await page.waitForSelector('.pv-images .pv-img');
+      assert(await page.$$eval('.pv-img-list li', (x) => x.length) === 2, 'plan preview');
+      // 画像を外す → Ctrl+Z
+      await page.click(`[data-key="pv-img-remove-${meta[1].id}"]`);
+      await page.waitForFunction(() => window.__show.weekState().images.length === 1);
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction(() => window.__show.weekState().images.length === 2);
+      // 書き出しに画像を入れる
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      await page.check('[data-key="export-images"]');
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-key="export"]')]);
+      const f = path.join(tmp, 'img-export.json');
+      await dl.saveAs(f);
+      const ex = JSON.parse(readFileSync(f, 'utf8'));
+      assert(ex.images && ex.images[meta[0].id] && ex.images[meta[0].id].startsWith('data:image/'), 'export images');
+      // 画像でないファイルは日本語のエラー
+      await page.click('[data-key="tools-close"]');
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.setInputFiles('[data-key="img-file"]', { name: 'x.txt', mimeType: 'text/plain', buffer: Buffer.from('x') });
+      await page.waitForFunction(() => (document.getElementById('toast') || {}).textContent?.includes('画像ファイル'));
+      // 1920・375
+      await page.setViewportSize({ width: 1920, height: 1080 });
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: path.join(SHOTS, 'live-items-1920.png') });
       await page.setViewportSize({ width: 375, height: 812 });
-      await page.keyboard.press('ArrowLeft');
-      await page.waitForSelector('.live-related');
+      await page.waitForTimeout(300);
       const w = await sw(page);
       assert(w <= 375, `scrollWidth ${w}`);
-      await page.screenshot({ path: path.join(SHOTS, 'live-related-375.png'), fullPage: true });
+      await page.screenshot({ path: path.join(SHOTS, 'live-items-375.png'), fullPage: true });
       await c.close();
-      return `ホストコール ${info.n}件（関連 ${info.n - 1}件）`;
+      return `画像 ${meta.map((m) => `${m.w}×${m.h} ${Math.round(m.bytes / 1000)}KB`).join('・')}`;
     });
 
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある

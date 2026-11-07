@@ -664,6 +664,7 @@ function emptyOverrides() {
  *   cache       … 任意。{} を渡すと類似まとめの結果を使い回す
  *   hiddenPostIds … 削除（非表示）にした投稿 id（どの話題にも入れない）
  *   botTopics   … 段階3: ボットのまとめ（bot.js の normalizeBotTopics の topics）。番組週の投稿だけ使う
+ *   postOrder   … 話題の中の手動順（話題 id → [id…]）。先頭の投稿が代表投稿になる
  *   outsideIds  … 対象期間の外だが番組構成に入っているので残した投稿 id（話題に outsideCount を付ける。「期間外」の印）
  *   priorityGenre … 優先ジャンル（既定 'host'。'none' で加点なし）。その投稿を含む話題はスコア×GENRE_PRIORITY.boost で並べる
  *   pinnedIds   … 段階3: ユーザーが手を入れた話題 id（番組構成・メイン候補・名前・ジャンル・片付け・削除など）。
@@ -673,6 +674,8 @@ function emptyOverrides() {
  * その後に手作業（投稿の移動・結合・名前・ジャンル）を当てる。
  * 返り値: 話題の配列（スコア順）
  */
+const naturalCache = new WeakMap();
+
 export function buildTopics(input) {
   const {
     posts = [], extraPosts = [], missingIds = [], personalIds = new Set(), bookmarkIds = new Set(),
@@ -709,10 +712,20 @@ export function buildTopics(input) {
   const natural = new Map(); // postId → { tid, base }
   for (const p of byId.values()) {
     if (where.has(p.id)) continue;
-    const info = matchInfo(p);
-    if (info.tags.length) { natural.set(p.id, { tid: 't:' + info.tags[0], base: { kind: 'tag', autoName: info.tags[0] } }); continue; }
-    const e = bestDictEntry(prepared, info);
-    if (e) natural.set(p.id, { tid: 'd:' + e.id, base: { kind: 'dict', autoName: e.name, fixedGenre: GENRE_KEYS.includes(e.genre) ? e.genre : null, dictId: e.id } });
+    // 投稿ごとの照合結果は、同じ辞書（配列が同じ）なら覚えておく（期間を長くしたときの速さ）
+    const c = naturalCache.get(p);
+    let n;
+    if (c && c.dict === dict) n = c.n;
+    else {
+      const info = matchInfo(p);
+      if (info.tags.length) n = { tid: 't:' + info.tags[0], base: { kind: 'tag', autoName: info.tags[0] } };
+      else {
+        const e = bestDictEntry(prepared, info);
+        n = e ? { tid: 'd:' + e.id, base: { kind: 'dict', autoName: e.name, fixedGenre: GENRE_KEYS.includes(e.genre) ? e.genre : null, dictId: e.id } } : null;
+      }
+      naturalCache.set(p, { dict, n });
+    }
+    if (n) natural.set(p.id, { tid: n.tid, base: { ...n.base } });
   }
   // 2a. ユーザーが手を入れた話題（番組構成に入れた辞書の話題・削除した話題など）はボットより先
   const pinned = input.pinnedIds instanceof Set ? input.pinnedIds : new Set(input.pinnedIds || []);
@@ -830,12 +843,20 @@ export function buildTopics(input) {
   const accepted = new Set(ov.accepted);
   const pg = input.priorityGenre === undefined ? GENRE_PRIORITY.default : input.priorityGenre;
   const prio = GENRE_KEYS.includes(pg) ? pg : null;
+  const postOrder = input.postOrder && typeof input.postOrder === 'object' ? input.postOrder : {};
   const out = [];
   for (const t of topics.values()) {
     if (!t.postIds.length && !['link', 'manual', 'carried'].includes(t.kind)) continue;
     const tp = t.postIds.map((id) => byId.get(id)).filter(Boolean);
     const stats = topicStats(tp, refTs);
     t.postIds = [...tp].sort((a, b) => (b.metrics?.impression_count ?? -1) - (a.metrics?.impression_count ?? -1)).map((p) => p.id);
+    // 手動順（進行・編成で並べ替えた順）。先頭の投稿が代表投稿
+    const man = postOrder[t.id];
+    if (man && man.length && t.postIds.length) {
+      const pos = new Map(man.map((id, i) => [id, i]));
+      t.postIds = t.postIds.map((id, i) => ({ id, k: pos.has(id) ? pos.get(id) : man.length + i })).sort((a, b) => a.k - b.k).map((x) => x.id);
+      t.manualOrder = true;
+    }
     let name = t.autoName;
     if (!name) name = autoTopicName(t, tp, stats, byId);
     t.autoName = name;
@@ -850,7 +871,7 @@ export function buildTopics(input) {
     t.personalPaste = t.personal;
     t.bookmarkCount = tp.filter((p) => bookmarkIds.has(p.id)).length + (t.kind === 'link' && bookmarkIds.has(t.linkId) ? 1 : 0);
     t.bookmark = t.bookmarkCount > 0;
-    t.stats = stats;
+    t.stats = t.manualOrder ? { ...stats, topPostId: t.postIds[0] } : stats;
     t.score = topicScore(stats, SCORE_WEIGHTS, t.bookmarkCount);
     // 優先ジャンル（既定ホスト）の投稿を含む話題は並び順で加点（表示の点数は score のまま）
     t.prio = Boolean(prio) && (t.genre === prio || tp.some((p) => postGenre(p) === prio));
@@ -1098,8 +1119,8 @@ export function buildCues(rundown, topicsById) {
 
 export function defaultLive() {
   // cardVisible: 映す用に投稿カードを出しているか（段階2で OBS のパーツ表示と連動する）
-  // shown: 「これを映す」で選んだ投稿（{ cueId, postId }。話題が変わると null＝代表投稿に戻る）
-  return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {}, cardVisible: true, shown: null };
+  // shown: 「今の投稿」（{ cueId, postId }。話題が変わると null＝先頭の投稿に戻る）。order: 進行の並び（imp インプレ順／old 古い順）
+  return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {}, cardVisible: true, shown: null, order: 'imp' };
 }
 
 const LIVE_STATUS = ['done', 'skipped', 'carried'];
@@ -1124,24 +1145,56 @@ export function repPostId(topic) {
   return topic ? (topic.stats && topic.stats.topPostId) || topic.linkId || (topic.linkIds && topic.linkIds[0]) || null : null;
 }
 
+/** 話題の中の 1 件（投稿 id・データに無い投稿 id・画像 'img:<id>'）か */
+export const ITEM_RE = /^(?:\d{1,25}|img:[a-z0-9]{4,40})$/;
+export const isImageItem = (id) => typeof id === 'string' && id.startsWith('img:');
+
 /**
- * 「これを映す」の並び: 代表投稿 → 残り（order: 'imp' インプレ順＝話題の並び／'new' 新しい順）。データに無い投稿も後ろに。
+ * 話題の中の並び（進行の一覧・J/K・OBS の「今の投稿」）。
+ * opts: { postsById, order: 'imp'（インプレ順＝話題の並び）|'old'（古い順＝投稿日時の昇順）, manual: 手動順の id 一覧, images: その話題の画像 [{ id, at }] }
+ * 手動順があればそれを優先（手動順に無いものは後ろに元の並びで）。データに無い投稿と画像は投稿の後ろ。
  */
-export function showablePostIds(topic, postsById = new Map(), order = 'imp') {
+export function topicItemIds(topic, opts = {}) {
   if (!topic) return [];
-  const rep = repPostId(topic);
-  let rest = (topic.postIds || []).filter((id) => id !== rep);
-  if (order === 'new') rest = [...rest].sort((a, b) => ((postsById.get(b) || {}).ts ?? -Infinity) - ((postsById.get(a) || {}).ts ?? -Infinity) || compareIds(b, a));
-  const miss = (topic.missingIds || []).filter((id) => id !== rep && !rest.includes(id));
-  return [...(rep ? [rep] : []), ...rest, ...miss];
+  const { postsById = new Map(), order = 'imp', manual = null, images = [] } = opts;
+  let posts = [...(topic.postIds || [])];
+  if (!manual && order === 'old') posts.sort((a, b) => ((postsById.get(a) || {}).ts ?? Infinity) - ((postsById.get(b) || {}).ts ?? Infinity) || compareIds(a, b));
+  const miss = (topic.missingIds || []).filter((id) => !posts.includes(id));
+  const imgs = [...images].sort((a, b) => (a.at ?? 0) - (b.at ?? 0)).map((x) => `img:${x.id}`);
+  const base = [...posts, ...miss, ...imgs];
+  if (!manual || !manual.length) return base;
+  const pos = new Map(manual.map((id, i) => [id, i]));
+  return base.map((id, i) => ({ id, k: pos.has(id) ? pos.get(id) : manual.length + i })).sort((a, b) => a.k - b.k).map((x) => x.id);
 }
 
-/** 今映している投稿（選んでいて今のキュー・話題に含まれていればそれ、無ければ代表投稿） */
-export function liveShownPost(live, cue, topic) {
+/** 互換: 「これを映す」の並び（order 'new' は新しい順） */
+export function showablePostIds(topic, postsById = new Map(), order = 'imp') {
+  const ids = topicItemIds(topic, { postsById, order: order === 'old' ? 'old' : 'imp' });
+  if (order !== 'new') return ids;
   const rep = repPostId(topic);
-  if (!cue || !topic || !live || !live.shown || live.shown.cueId !== cue.id) return rep;
+  const rest = ids.filter((id) => id !== rep && !(topic.missingIds || []).includes(id));
+  rest.sort((a, b) => ((postsById.get(b) || {}).ts ?? -Infinity) - ((postsById.get(a) || {}).ts ?? -Infinity) || compareIds(b, a));
+  return [...(rep ? [rep] : []), ...rest, ...(topic.missingIds || []).filter((id) => id !== rep)];
+}
+
+/**
+ * 今映している投稿（「今の投稿」）。選んでいて今のキュー・並び（items）に含まれていればそれ、無ければ先頭。
+ * items を省くと話題の既定の並び（インプレ順。代表投稿が先頭）。
+ */
+export function liveShownPost(live, cue, topic, items = null) {
+  const list = items || topicItemIds(topic);
+  const first = list[0] || repPostId(topic);
+  if (!cue || !topic || !live || !live.shown || live.shown.cueId !== cue.id) return first;
   const id = live.shown.postId;
-  return (topic.postIds || []).includes(id) || (topic.missingIds || []).includes(id) || id === rep ? id : rep;
+  return list.includes(id) ? id : first;
+}
+
+/** 手動順: id を index の位置へ（list は今の並び） */
+export function moveItemTo(list, id, index) {
+  const rest = list.filter((x) => x !== id);
+  if (rest.length === list.length) return list;
+  const i = Math.max(0, Math.min(rest.length, index));
+  return [...rest.slice(0, i), id, ...rest.slice(i)];
 }
 
 /** J/K（↓/↑）で次・前の投稿（端で止まる）。list に無ければ先頭 */
@@ -1210,10 +1263,13 @@ function liveReduceRaw(live, action, cues) {
     case 'show': {
       // 「これを映す」: 今のキューの投稿を選ぶ（投稿カード：表示中/隠し中とは別）
       const cue = cues[s.index];
-      if (!cue || cue.kind !== 'topic' || !ID_RE.test(String(action.postId || ''))) return s;
+      if (!cue || cue.kind !== 'topic' || !ITEM_RE.test(String(action.postId || ''))) return s;
       s.shown = { cueId: cue.id, postId: String(action.postId) };
       return s;
     }
+    case 'order':
+      s.order = action.order === 'old' ? 'old' : 'imp';
+      return s;
     case 'toggleCard':
       s.cardVisible = typeof action.visible === 'boolean' ? action.visible : !s.cardVisible;
       return s;
@@ -1362,6 +1418,8 @@ export function defaultWeek() {
     mainCand: [], // メイン候補（メイン1〜3に入れる前の置き場）。話題 id の並び
     range: defaultRange(), // 台本づくりの対象期間（版 5。既定は番組週）
     scriptHold: [], // 台本ファイルの「保留」（[{ name, postIds }]。保留フォルダへ入れる）
+    postOrder: {}, // 話題の中の手動順（話題 id → [投稿 id・'img:<画像id>']。先頭が代表投稿）
+    images: [], // 自分で追加した画像（中身は IndexedDB。[{ id, topicId, caption, w, h, type, bytes, hash, at }]）
   };
 }
 
@@ -1443,7 +1501,8 @@ function sanitizeLive(v, ver = SCHEMA_VERSION) {
   for (const [k, x] of Object.entries(en)) if (isNum(x) && cornerDef(k)) d.enteredAt[k] = x;
   d.cardVisible = o.cardVisible !== false;
   const sh = obj(o.shown);
-  d.shown = sh && typeof sh.cueId === 'string' && ID_RE.test(String(sh.postId)) ? { cueId: sh.cueId.slice(0, 200), postId: String(sh.postId) } : null;
+  d.shown = sh && typeof sh.cueId === 'string' && ITEM_RE.test(String(sh.postId)) ? { cueId: sh.cueId.slice(0, 200), postId: String(sh.postId) } : null;
+  d.order = o.order === 'old' ? 'old' : 'imp';
   return d;
 }
 
@@ -1479,12 +1538,35 @@ function sanitizeScript(v) {
   return out;
 }
 
+/** 画像の情報（中身は IndexedDB） */
+export function sanitizeImages(v) {
+  const seen = new Set();
+  return (Array.isArray(v) ? v : []).map((x) => {
+    const o = obj(x);
+    if (!o || typeof o.id !== 'string' || !/^[a-z0-9]{4,40}$/.test(o.id) || typeof o.topicId !== 'string' || !o.topicId || seen.has(o.id)) return null;
+    seen.add(o.id);
+    const n = (k) => (isNum(o[k]) && o[k] >= 0 ? Math.floor(o[k]) : null);
+    return {
+      id: o.id, topicId: o.topicId.slice(0, 200), caption: (str(o.caption, 200) || '').trim(),
+      w: n('w'), h: n('h'), type: o.type === 'image/png' ? 'image/png' : 'image/jpeg', bytes: n('bytes'),
+      hash: typeof o.hash === 'string' && /^[0-9a-f]{8,64}$/.test(o.hash) ? o.hash : null, at: n('at'),
+    };
+  }).filter(Boolean).slice(0, 300);
+}
+
 function sanitizeWeek(v, ver = SCHEMA_VERSION) {
   const o = obj(v);
   const w = defaultWeek();
   if (!o) return w;
   w.title = typeof o.title === 'string' ? o.title.slice(0, 200) : null;
   w.range = sanitizeRange(o.range); // 版 4 以前は無い → 番組週
+  w.postOrder = {};
+  for (const [k, v] of Object.entries(obj(o.postOrder) || {})) {
+    if (k === '__proto__' || k.length > 200 || !Array.isArray(v)) continue;
+    const list = [...new Set(v.filter((x) => typeof x === 'string' && ITEM_RE.test(x)))].slice(0, 500);
+    if (list.length) w.postOrder[k] = list;
+  }
+  w.images = sanitizeImages(o.images);
   w.scriptHold = (Array.isArray(o.scriptHold) ? o.scriptHold : []).map((x) => (obj(x) ? { name: (str(x.name, 80) || '').trim(), postIds: (Array.isArray(x.postIds) ? x.postIds : []).filter((id) => typeof id === 'string' && ID_RE.test(id)).slice(0, 500) } : null)).filter((x) => x && x.postIds.length).slice(0, 100);
   w.rundown = sanitizeRundown(o.rundown, ver);
   w.script = sanitizeScript(o.script);

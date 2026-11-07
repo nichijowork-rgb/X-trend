@@ -6,6 +6,7 @@ import { formatCompact } from '../assets/js/core.js';
 import { OVERLAY_PARTS, LAYOUT_GUIDE } from './js/overlayinfo.js';
 import { OBS_EVENT_NAME, OVERLAY_CHANNEL, shouldAccept, readDetail, titleVisible, demoPayload } from './js/payload.js';
 import { createEffectGate, effectDef, thanksText, makeEffect } from './js/effects.js';
+import { validImageDataUrl } from './js/imaging.js';
 
 const PARTS = { all: { w: 1920, h: 1080 } };
 for (const p of OVERLAY_PARTS) PARTS[p.key] = { w: p.w, h: p.h };
@@ -28,6 +29,9 @@ const color = (k) => (COLORS.includes(k) ? k : 'white');
 
 const st = { last: null, received: 0, topicId: undefined, cardKey: undefined, titleId: undefined, titleTimer: null, fired: [], audio: false };
 const gate = createEffectGate();
+// 自分で追加した画像（送り手は新しい画像のときと 30 秒おきにだけ本体 media を付ける）。ハッシュ → data URL
+const imageCache = new Map();
+st.images = imageCache;
 window.__overlay = st; // E2E・確認用
 
 function el(tag, cls, text) {
@@ -42,22 +46,19 @@ function el(tag, cls, text) {
 const view = {};
 
 function buildTopicbar(host) {
+  // 話題名（2 行まで）と、その下に小さく「NEXT：次の話題」だけ。ジャンル色は左端の細いライン
   const tb = el('div', 'tb');
   tb.hidden = true;
-  const corner = el('div', 'tb-corner');
-  const cName = el('span', 'tb-corner-name');
-  const cN = el('span', 'tb-corner-n');
-  corner.append(cName, cN);
+  const line = el('span', 'tb-line');
   const main = el('div', 'tb-main');
   const topic = el('div', 'tb-topic');
-  const dot = el('span', 'tb-dot');
   const name = el('span', 'tb-name');
-  topic.append(dot, name);
+  topic.append(name);
   const next = el('div', 'tb-next');
   main.append(topic, next);
-  tb.append(corner, main);
+  tb.append(line, main);
   host.append(tb);
-  view.tb = { tb, corner, cName, cN, dot, name, next };
+  view.tb = { tb, line, name, next };
 }
 
 function buildCard(host) {
@@ -76,10 +77,16 @@ function buildCard(host) {
   img.hidden = true;
   img.addEventListener('error', () => { img.hidden = true; text.classList.remove('has-img'); });
   const metrics = el('div', 'cd-metrics');
-  box.append(band, user, text, img, metrics);
+  const photo = el('img', 'cd-photo');
+  photo.alt = '';
+  photo.decoding = 'async';
+  photo.hidden = true;
+  const wait = el('p', 'cd-wait', '画像を受け取り中…');
+  wait.hidden = true;
+  box.append(band, user, photo, wait, text, img, metrics);
   cd.append(box);
   host.append(cd);
-  view.cd = { cd, band, bandText, user, text, img, metrics };
+  view.cd = { cd, band, bandText, bandX, user, text, img, metrics, photo, wait, box };
 }
 
 function buildTitle(host) {
@@ -144,14 +151,11 @@ function renderTopicbar(p) {
   const show = Boolean(p.corner && p.live && p.live.started && !p.live.finished);
   v.tb.hidden = !show;
   if (!show) { st.topicId = undefined; return; }
-  v.corner.className = `tb-corner g-${color(p.corner.color)}`;
-  v.cName.textContent = p.corner.name || '';
-  v.cN.textContent = p.corner.n && p.corner.of ? `${p.corner.n} / ${p.corner.of}` : '';
-  v.cN.hidden = !v.cN.textContent;
-  v.dot.className = `tb-dot g-${color(t ? t.genre : p.corner.color)}`;
-  v.name.textContent = t ? t.name : (p.corner.sub || p.corner.name || '');
+  v.line.className = `tb-line g-${color(t ? t.genre : p.corner.color)}`;
+  v.name.textContent = t ? t.name : (p.corner.name || '');
   v.next.textContent = '';
-  if (p.next && p.next.name) { v.next.append(el('b', '', 'NEXT'), document.createTextNode(p.next.name)); }
+  if (p.next && p.next.name) { v.next.append(el('b', '', 'NEXT：'), document.createTextNode(p.next.name)); }
+  v.next.hidden = !v.next.textContent;
   const key = `${p.corner.key}:${t ? t.id : ''}`;
   if (st.topicId !== key) {
     v.tb.classList.remove('is-enter');
@@ -165,7 +169,31 @@ function renderCard(p) {
   const v = view.cd;
   const post = p.card && p.card.post;
   const show = Boolean(p.card && p.card.visible && post && p.live && p.live.started && !p.live.finished);
-  if (show) {
+  const isImage = Boolean(show && post.kind === 'image' && post.image);
+  v.box.classList.toggle('is-image', isImage);
+  if (isImage) {
+    v.band.className = `cd-band g-${color(p.topic ? p.topic.genre : 'white')}`;
+    v.bandText.textContent = p.topic ? p.topic.name : '';
+    v.user.textContent = '';
+    v.user.hidden = true;
+    v.metrics.textContent = '';
+    v.img.hidden = true;
+    v.img.removeAttribute('src');
+    v.text.textContent = post.text || '';
+    v.text.hidden = !post.text;
+    v.text.classList.remove('has-img');
+    const data = post.image.hash ? imageCache.get(post.image.hash) : null;
+    if (data) { if (v.photo.getAttribute('src') !== data) v.photo.src = data; v.photo.hidden = false; v.wait.hidden = true; } else { v.photo.removeAttribute('src'); v.photo.hidden = true; v.wait.hidden = false; }
+    v.bandX.textContent = '画像';
+  } else {
+    v.user.hidden = false;
+    v.text.hidden = false;
+    v.photo.hidden = true;
+    v.photo.removeAttribute('src');
+    v.wait.hidden = true;
+    v.bandX.textContent = 'X の投稿';
+  }
+  if (show && !isImage) {
     v.band.className = `cd-band g-${color(p.topic ? p.topic.genre : 'white')}`;
     v.bandText.textContent = p.topic ? p.topic.name : '';
     v.user.textContent = post.user ? `@${post.user}` : '';
@@ -352,6 +380,14 @@ function playSound(kind) {
 
 function receive(raw) {
   const p = readDetail(raw);
+  // 画像の本体（再送の古い seq でも受け取ってキャッシュ。待っていた画像なら描き直す）
+  if (p && p.media && typeof p.media.hash === 'string' && /^[0-9a-f]{8,64}$/.test(p.media.hash) && validImageDataUrl(p.media.dataUrl)) {
+    const fresh = !imageCache.has(p.media.hash);
+    imageCache.set(p.media.hash, p.media.dataUrl);
+    if (imageCache.size > 30) imageCache.delete(imageCache.keys().next().value);
+    const cur = st.last && st.last.card && st.last.card.post;
+    if (fresh && cur && cur.kind === 'image' && cur.image && cur.image.hash === p.media.hash && view.cd) { try { renderCard(st.last); } catch { /* 無視 */ } }
+  }
   if (!shouldAccept(st.last, p)) return;
   st.last = p;
   st.received++;

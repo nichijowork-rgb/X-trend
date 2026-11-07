@@ -15,7 +15,7 @@
 //   effect: { id, kind, at, params } | null                    … 段階4: 1 回限りの演出（effects.js）。受け手は id で二重に出さない
 // }
 
-import { cornerDef, liveShownPost } from './logic.js';
+import { cornerDef, liveShownPost, isImageItem } from './logic.js';
 
 export const PAYLOAD_VERSION = 1;
 export const OBS_EVENT_NAME = 'xtrend-show';
@@ -66,9 +66,17 @@ function postInfo(post) {
   };
 }
 
+/** 自分で追加した画像（中身は送り手が media として別に付ける。ここには id とハッシュだけ） */
+function imageInfo(img) {
+  return {
+    id: `img:${img.id}`, kind: 'image', user: '', text: img.caption || '', created: null, metrics: {}, thumb: null,
+    image: { id: img.id, hash: img.hash || null, w: img.w ?? null, h: img.h ?? null, type: img.type || 'image/jpeg' },
+  };
+}
+
 /**
  * 進行状態からペイロードを作る（seq・sid は送り手が付ける）。
- * input: { live, cues, topicsById, postsById, showName, title, cornerChangedAt }
+ * input: { live, cues, topicsById, postsById, showName, title, cornerChangedAt, itemsFor(topic)（進行の並び）, imagesById（画像の情報） }
  *  cornerChangedAt: 現在のコーナーに入った時刻（ms）。省略時は live.enteredAt（進行の記録）から。null ならタイトルは出さない
  */
 export function buildPayload(input) {
@@ -86,8 +94,11 @@ export function buildPayload(input) {
     if (c.kind === 'topic') { const t = topicsById.get(c.topicId); if (t) { next = { name: t.name, corner: cornerDef(c.cornerKey).name }; break; } }
     else { next = { name: cornerDef(c.cornerKey).name, corner: cornerDef(c.cornerKey).name }; break; }
   }
-  const postId = topic ? liveShownPost(live, cue, topic) : null; // 「これを映す」で選んだ投稿（無ければ代表投稿）
-  const post = postId && postsById ? postsById.get(postId) || null : null;
+  // 「今の投稿」（選んだ投稿。無ければ並びの先頭）。itemsFor(topic) は進行の並び（手動順・古い順・画像を含む）
+  const items = topic && typeof input.itemsFor === 'function' ? input.itemsFor(topic) : null;
+  const postId = topic ? liveShownPost(live, cue, topic, items) : null;
+  const img = isImageItem(postId) && input.imagesById ? input.imagesById.get(postId.slice(4)) || null : null;
+  const post = postId && !img && postsById ? postsById.get(postId) || null : null;
   return {
     v: PAYLOAD_VERSION,
     type: 'state',
@@ -100,10 +111,25 @@ export function buildPayload(input) {
       stats: { count: topic.stats.count, totalImp: topic.stats.totalImp ?? null, maxImp: topic.stats.maxImp ?? null, maxPace: topic.stats.maxPace ?? null },
     } : null,
     next,
-    card: { visible: live.cardVisible !== false && Boolean(post || postId), post: post ? postInfo(post) : (postId ? { id: postId, user: '', text: '', created: null, metrics: {}, thumb: null } : null) },
+    card: img
+      ? { visible: live.cardVisible !== false, post: imageInfo(img) }
+      : { visible: live.cardVisible !== false && Boolean(post || (postId && !isImageItem(postId))), post: post ? postInfo(post) : (postId && !isImageItem(postId) ? { id: postId, user: '', text: '', created: null, metrics: {}, thumb: null } : null) },
     title: cue && cornerChangedAt != null ? { id: `${cue.cornerKey}@${cornerChangedAt}`, text: def.name, sub: def.sub, color: cue.cornerKey === 'main' ? 'main' : def.color, at: cornerChangedAt, duration: TITLE_DURATION_MS } : null,
     effect: input.effect || null,
   };
+}
+
+export const MEDIA_RESEND_MS = 30000;
+/**
+ * 画像の本体（media）を付けるか。state: { hash, at }（前に付けた画像と時刻）。
+ * 今の投稿が画像で、(1) 前と違う画像、(2) force（読み込みが終わった直後など）、(3) 前に付けてから 30 秒たった、のどれかなら付ける。
+ * 返り値: { attach: boolean, state }
+ */
+export function mediaPlan(state, post, now, force = false) {
+  if (!post || post.kind !== 'image' || !post.image) return { attach: false, state };
+  const same = state && state.hash === post.image.hash;
+  if (!force && same && now - state.at < MEDIA_RESEND_MS) return { attach: false, state };
+  return { attach: true, state: { hash: post.image.hash, at: now } };
 }
 
 /** 表示に関わる部分が同じか（再送の判定。seq・at は見ない） */
