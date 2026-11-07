@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-08T01:32:57+09:00",
+  "generated_at": "2026-11-08T01:37:59+09:00",
   "week": "2026-11-07",
   "genre_overrides": [
     {
@@ -654,10 +654,25 @@
       "source": "site",
       "name": "堀大輔　コンカフェ出勤",
       "genre": "夜職その他",
-      "post_ids": [],
+      "post_ids": [
+        "2110344440871346310",
+        "2118970986632773840",
+        "2119081754665599028"
+      ],
       "deleted": false,
       "edits": [
         "posts",
+        "new"
+      ]
+    },
+    {
+      "topic_id": "m:mw6mh44e1h4",
+      "source": "site",
+      "name": "https://x.com/tonma5963/status/2118606491997606229?a=ZyGFIJ3_NMeXTrICmXc&s=20",
+      "genre": "夜職その他",
+      "post_ids": [],
+      "deleted": false,
+      "edits": [
         "new"
       ]
     },
@@ -787,7 +802,8 @@
         "2117786291471610093",
         "2118128365391815101",
         "2118276971109163403",
-        "2118330152220557529"
+        "2118330152220557529",
+        "2118606491997606229"
       ],
       "deleted": false,
       "edits": [
@@ -802,6 +818,7 @@
       "genre": "ホスト",
       "post_ids": [
         "2118314105983655997",
+        "2118326698425139416",
         "2118630661049442505"
       ],
       "deleted": false,
@@ -3560,39 +3577,6 @@
     "高須",
     "あおちゃんぺ"
   ],
-  "requested_posts": [
-    {
-      "id": "2110344440871346310",
-      "url": "https://x.com/i/web/status/2110344440871346310",
-      "topic_id": "m:mw6kubow43g",
-      "added_at": "2026-11-08T01:23:34+09:00",
-      "week": "2026-11-07",
-      "source": "url"
-    },
-    {
-      "id": "2118326698425139416",
-      "url": "https://x.com/i/web/status/2118326698425139416",
-      "topic_id": "m:s-1xndmg16pztzl",
-      "added_at": "2026-11-08T01:25:17+09:00",
-      "week": "2026-11-07",
-      "source": "url"
-    },
-    {
-      "id": "2118970986632773840",
-      "url": "https://x.com/i/web/status/2118970986632773840",
-      "topic_id": "m:mw6kubow43g",
-      "added_at": "2026-11-08T01:04:11+09:00",
-      "week": "2026-11-07",
-      "source": "url"
-    },
-    {
-      "id": "2119081754665599028",
-      "url": "https://x.com/i/web/status/2119081754665599028",
-      "topic_id": "m:mw6kubow43g",
-      "added_at": "2026-11-08T01:04:02+09:00",
-      "week": "2026-11-07",
-      "source": "url"
-    }
-  ],
+  "requested_posts": [],
   "hold_exceptions": []
 }
