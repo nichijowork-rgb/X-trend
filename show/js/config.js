@@ -189,3 +189,8 @@ export const RANGE_PRESETS = Object.freeze([
 ]);
 /** 一般のバズの「おすすめ」件数は期間の日数に比例（7日で generalRecommendN 件）。下限・上限 */
 export const RECOMMEND_SCALE = Object.freeze({ baseDays: 7, min: 10, max: 120 });
+
+/** 機能の表示切替。演出（段階4）は詰めきるまで非表示（オーナー指定 2026-11-07）。true にすると進行の「演出」パレット・Shift+1〜6・OBS ガイドの演出の説明が戻る */
+const featureParam = typeof location !== 'undefined' ? (/[?&]features=([^&#]*)/.exec(location.search) || [])[1] || '' : '';
+/** URL に ?features=effects を付けたときだけ演出を出す（確認・テスト用） */
+export const FEATURES = Object.freeze({ effects: decodeURIComponent(featureParam).split(',').includes('effects') });

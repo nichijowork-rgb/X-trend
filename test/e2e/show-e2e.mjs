@@ -1009,7 +1009,7 @@ async function main() {
           }
         });
       });
-      await page.goto(`${show}#live`);
+      await page.goto(`${show}?features=effects#live`);
       await ready(page);
       await page.click('#obs-pill');
       await page.click('[data-key="obs-connect"]');
@@ -1113,13 +1113,13 @@ async function main() {
 
     await check('演出: 進行画面 375 幅で横スクロールなし・セットアップガイドに演出の説明・合成スクショ（紙吹雪・神回・感謝バナー）', async () => {
       const c = await newCtx({ viewport: { width: 375, height: 812 } });
-      const { page } = await open(c, `${show}#live`);
+      const { page } = await open(c, `${show}?features=effects#live`);
       await page.click('[data-key="fx-toggle"]');
       await page.waitForSelector('[data-key="fx-thanks"]');
       const s2 = await sw(page);
       assert(s2 <= 375, `scrollWidth ${s2}`);
       await page.screenshot({ path: path.join(SHOTS, 'fx-palette-375.png') });
-      await page.goto(`${show}#obs-setup`);
+      await page.goto(`${show}?features=effects#obs-setup`);
       await ready(page);
       assert((await page.textContent('.setup-fx')).includes('OBS で音声を制御') && (await page.textContent('.setup-fx')).includes('Stream Deck'), 'guide');
       assert(await page.$('[data-key="url-fx"]'), 'fx の URL');

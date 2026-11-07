@@ -5,6 +5,7 @@ import { genreIcon } from '../icons.js';
 import { cueColor, leadFor, leadIsBot, topicMarks, statsLine, refYear, bmInfo } from './common.js';
 import { beginPointer } from './dnd.js';
 import { obsDialog } from './obsui.js';
+import { FEATURES } from '../config.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
@@ -48,7 +49,7 @@ export function renderLive(app) {
     h('h2', { class: 'live-headline lh-title', dataset: { key: 'live-title' } }, topic ? topic.name : (cue ? (cue.kind === 'empty' ? `${def.name}（話題が未設定）` : def.name) : 'おつかれさまでした')),
     h('div', { class: 'lh-row' }, h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }), h('div', { class: 'live-start' }, cardToggle, startArea))));
 
-  root.append(fxPalette(app));
+  if (FEATURES.effects) root.append(fxPalette(app));
 
   const mainCard = h('section', { class: 'live-main', dataset: { keep: 'main' }, attrs: { 'aria-label': '今読むニュース' } });
   mainCard.append(cueContent(app, cue, wk));
@@ -346,7 +347,7 @@ export function liveKeydown(app, e) {
   if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || isEditable(e.target)) return;
   if (document.querySelector('dialog[open]')) return;
   // 演出: Shift+1〜6（入力欄にいるときは使わない。Stream Deck などからはこのキーを送る）
-  const m = e.shiftKey ? /^(?:Digit|Numpad)([1-6])$/.exec(e.code || '') : null;
+  const m = FEATURES.effects && e.shiftKey ? /^(?:Digit|Numpad)([1-6])$/.exec(e.code || '') : null;
   if (m) {
     const d = EFFECTS.find((x) => x.digit === Number(m[1]));
     if (d) { e.preventDefault(); fire(app, d.kind); }
