@@ -112,8 +112,8 @@ export function buildPayload(input) {
     } : null,
     next,
     card: img
-      ? { visible: live.cardVisible !== false, post: imageInfo(img) }
-      : { visible: live.cardVisible !== false && Boolean(post || (postId && !isImageItem(postId))), post: post ? postInfo(post) : (postId && !isImageItem(postId) ? { id: postId, user: '', text: '', created: null, metrics: {}, thumb: null } : null) },
+      ? { visible: true, post: imageInfo(img) }
+      : { visible: Boolean(post || (postId && !isImageItem(postId))), post: post ? postInfo(post) : (postId && !isImageItem(postId) ? { id: postId, user: '', text: '', created: null, metrics: {}, thumb: null } : null) },
     title: cue && cornerChangedAt != null ? { id: `${cue.cornerKey}@${cornerChangedAt}`, text: def.name, sub: def.sub, color: cue.cornerKey === 'main' ? 'main' : def.color, at: cornerChangedAt, duration: TITLE_DURATION_MS } : null,
     effect: input.effect || null,
   };

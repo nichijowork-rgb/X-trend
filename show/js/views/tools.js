@@ -3,6 +3,7 @@ import { GENRES, DEFAULT_DICT, SHOW_DEFAULTS } from '../config.js';
 import { extractStatusIds, parseSaved, serializeSaved, statusUrl, genreOverrideList } from '../logic.js';
 import { h, btn, field, downloadText, genreSticker } from '../dom.js';
 import { feedbackCounts } from '../feedback.js';
+import { viewerSettings } from './viewerui.js';
 import { BOT, GENRE_PRIORITY, DEFAULT_HOLD_TERMS } from '../config.js';
 import { parseHoldTerms } from '../hold.js';
 import { parseScriptFile, planScriptImport } from '../scriptimport.js';
@@ -77,6 +78,8 @@ export function toolsDialog(app) {
   }
   body.append(io);
   body.append(scriptSection(app));
+  body.append(h('section', { class: 'tools-sec', dataset: { key: 'viewer-sec' } }, h('h3', {}, '投稿を開くウィンドウ'),
+    h('p', { class: 'muted' }, '「X で開く」は、新しいタブではなく、この位置・大きさの専用ウィンドウで開きます（進行画面も同じ）。'), viewerSettings(app)));
 
   // 自分で集めた投稿（URL）
   const ta = h('textarea', { class: 'input', rows: 3, placeholder: 'https://x.com/…/status/… を1行に1つずつ貼り付け', dataset: { key: 'personal-input' }, value: app.ui.personalDraft || '' });

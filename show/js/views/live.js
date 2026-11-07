@@ -5,6 +5,8 @@ import { genreIcon } from '../icons.js';
 import { cueColor, leadFor, leadIsBot, topicMarks, statsLine, refYear, bmInfo } from './common.js';
 import { beginPointer } from './dnd.js';
 import { obsDialog } from './obsui.js';
+import { viewerDialog } from './viewerui.js';
+import { urlAddDialog } from './urladd.js';
 import { FEATURES } from '../config.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
@@ -39,15 +41,22 @@ export function renderLive(app) {
         btn('やり直す', () => { app.ui.confirmReset = false; app.liveAction('reset'); }, 'btn btn-small btn-dark', { 'data-key': 'live-reset-yes' }),
         btn('やめる', () => { app.ui.confirmReset = false; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset-no' }))
       : btn('リセット', () => { app.ui.confirmReset = true; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'live-reset' }));
-  const cardOn = live.cardVisible !== false;
-  const cardToggle = btn(cardOn ? '投稿カード：表示中' : '投稿カード：隠し中', () => app.liveAction('toggleCard'), `btn btn-small ${cardOn ? 'btn-dark' : 'btn-ghost-dark'}`, { 'data-key': 'live-card', 'aria-pressed': String(cardOn), title: '映す用・OBS の投稿カードを出す／隠す' });
+  // 投稿カードは常に表示（表示中/隠し中の切り替えは廃止。2026-11-08 オーナー確定）
 
-  root.append(progressBar(app, cues, live));
-  root.append(h('section', { class: `live-head g-${color}`, attrs: { 'aria-label': '現在の話題' } },
-    h('p', { class: 'lh-corner' }, h('span', { class: 'live-icon' }, genreIcon(color)),
-      h('span', {}, def ? def.name : '配信終了', def && cue.kind === 'topic' ? h('span', { class: 'live-count' }, `${cue.n} / ${cue.of}`) : null)),
-    h('h2', { class: 'live-headline lh-title', dataset: { key: 'live-title' } }, topic ? topic.name : (cue ? (cue.kind === 'empty' ? `${def.name}（話題が未設定）` : def.name) : 'おつかれさまでした')),
-    h('div', { class: 'lh-row' }, h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }), h('div', { class: 'live-start' }, cardToggle, startArea))));
+  // 上部に固定（スクロールしても見える）: 細い進行バー＋コーナー名・話題名（1 行）・タイマー・押し巻き・OBS・投稿カード・配信開始
+  const title = topic ? topic.name : (cue ? (cue.kind === 'empty' ? `${def.name}（話題が未設定）` : def.name) : 'おつかれさまでした');
+  const obsPill = h('button', { type: 'button', class: 'obs-pill lh-obs', dataset: { key: 'live-obs-pill', obsPill: '' }, on: { click: () => { app.ui.obsDlg = true; app.render(); } } }, 'OBS');
+  root.append(h('div', { class: 'live-sticky', dataset: { keep: 'sticky' } },
+    progressBar(app, cues, live),
+    h('section', { class: `live-head is-compact g-${color}`, attrs: { 'aria-label': '現在の話題' } },
+      h('div', { class: 'lh-top' },
+        h('span', { class: 'live-icon' }, genreIcon(color)),
+        h('span', { class: 'lh-corner-name' }, def ? def.name : '配信終了', def && cue.kind === 'topic' ? h('span', { class: 'live-count' }, `${cue.n} / ${cue.of}`) : null),
+        h('h2', { class: 'live-headline lh-title', dataset: { key: 'live-title' }, attrs: { title } }, title)),
+      h('div', { class: 'lh-row' }, h('div', { class: 'live-timer', id: 'live-timer', attrs: { 'aria-live': 'off' } }),
+        h('div', { class: 'live-start' }, obsPill,
+          btn('開く窓', () => { app.ui.viewerDlg = true; app.render(); }, 'btn btn-small btn-ghost-dark', { 'data-key': 'viewer-open', title: '投稿を開く専用ウィンドウの位置・大きさ' }),
+          startArea)))));
 
   if (FEATURES.effects) root.append(fxPalette(app));
 
@@ -62,6 +71,14 @@ export function renderLive(app) {
 
   root.append(h('div', { class: 'live-grid', dataset: { keep: 'grid' } }, mainCard, progressList(app, cues, live)));
   root.append(controls(app, cue, live));
+  if (app.ui.urlDlg) {
+    root.append(urlAddDialog(app));
+    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
+  }
+  if (app.ui.viewerDlg) {
+    root.append(viewerDialog(app));
+    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
+  }
   if (app.ui.obsDlg) {
     root.append(obsDialog(app));
     app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
@@ -144,7 +161,12 @@ function cueContent(app, cue, wk) {
     const t = app.topicsById.get(cue.topicId);
     if (!t) { box.append(h('p', {}, '話題が見つかりません')); return box; }
     box.append(h('div', { class: 'live-tags' }, genreSticker(t.genre), topicMarks(app, t), h('p', { class: 'stats' }, statsLine(t))));
-    box.append(h('p', { class: 'live-lead' }, leadFor(app, t), leadIsBot(app, t) ? h('span', { class: 'lead-mark', attrs: { title: 'リード文は Grok（ボット）のまとめ。編成のプレビューで書き換えできます' } }, 'Grok のまとめ') : null));
+    // リード文は既定で閉じる（開閉は localStorage に保存）
+    const leadBox = h('details', { class: 'live-lead-box', open: Boolean(app.leadOpen), dataset: { keep: 'lead' } },
+      h('summary', { class: 'live-lead-sum', dataset: { key: 'lead-toggle' } }, 'リード文', leadIsBot(app, t) ? h('span', { class: 'lead-mark', attrs: { title: 'リード文は Grok（ボット）のまとめ。編成のプレビューで書き換えできます' } }, 'Grok のまとめ') : null),
+      h('p', { class: 'live-lead' }, leadFor(app, t)));
+    leadBox.addEventListener('toggle', () => app.setLeadOpen(leadBox.open));
+    box.append(leadBox);
     // 話すポイント・視聴者への質問の欄は表示しない（オーナー指定）。コーナーのメモは書いてあるときだけ
     const notesBox = notes ? h('div', { class: 'live-notes' }, h('h3', {}, 'コーナーのメモ'), h('p', { class: 'pre' }, notes)) : null;
     // 話題の投稿（代表投稿を含む全件・画像も）。クリックで「今の投稿」＝ OBS の投稿カード。つまみ・帯のドラッグで並べ替え
@@ -172,6 +194,8 @@ function itemsList(app, t, cue, wk) {
   const manual = Boolean(wk.postOrder[t.id]);
   const order = wk.live.order === 'old' ? 'old' : 'imp';
   const shownId = liveShownPost(wk.live, cue, t, items);
+  // 「埋め込みを操作」は別の投稿に移ったら戻す
+  if (u.interactId && u.interactId !== shownId) u.interactId = null;
   const open = u.relOpen.has(t.id);
   const visible = open ? items : items.slice(0, ITEMS_FIRST);
   const pos = new Map(items.map((id, i) => [id, i]));
@@ -185,6 +209,7 @@ function itemsList(app, t, cue, wk) {
       ob('imp', 'インプレ順', !manual && order === 'imp', '表示が多い順'),
       ob('old', '古い順', !manual && order === 'old', '投稿日時の古い順（時系列で読む）'),
       manual ? h('span', { class: 'btn btn-small is-on rel-manual', dataset: { key: 'rel-order-manual' }, attrs: { title: '手で並べ替えた順（インプレ順・古い順を押すと解除）' } }, '手動順') : null),
+    btn('＋URL', () => { u.urlDlg = { topicId: t.id, text: '' }; app.render(); }, 'btn btn-small btn-ghost-dark li-add', { 'data-key': 'url-add', title: 'X の投稿の URL を貼って、この話題に追加' }),
     h('label', { class: 'btn btn-small btn-ghost-dark li-add', attrs: { for: `img-file-${t.id}`, title: '画像を追加（ファイルを選ぶ・ここへドラッグ・Ctrl+V で貼り付け）' } }, '＋画像'), file));
   const list = h('div', { class: 'li-list', dataset: { keep: 'li-list' } });
   for (const id of [...visible].sort()) list.append(itemEl(app, t, id, pos.get(id), shownId, items));
@@ -212,6 +237,9 @@ function itemsList(app, t, cue, wk) {
 /** 1 件（投稿・データに無い投稿・画像）。帯（⋮⋮・番号・映し中・×・…）＋ 中身（投稿は常に X 埋め込み） */
 function itemEl(app, t, id, index, shownId, items) {
   const isImg = isImageItem(id);
+  // 埋め込みの上の透明なクリック受け（既定オン）。「埋め込みを操作」中のカードだけ外す
+  const catcherOn = app.viewerPrefs.catcher !== false;
+  const interact = app.ui.interactId === id;
   const el = h('div', { class: `live-post li-item${id === shownId ? ' is-shown' : ''}`, dataset: { keep: `li:${id}`, post: id, drop: `li:${index}` }, attrs: { 'aria-label': `${index + 1}件目` } });
   el.style.order = String(index);
   const handle = h('span', { class: 'li-handle', attrs: { 'aria-hidden': 'true', title: 'ドラッグで並べ替え' } }, '⋮⋮');
@@ -228,6 +256,9 @@ function itemEl(app, t, id, index, shownId, items) {
     isImg ? h('span', { class: 'badge li-kind' }, '画像') : null,
     id === shownId ? h('span', { class: 'badge badge-shown', dataset: { key: `shown-${id}` } }, '映し中') : null,
     h('span', { class: 'li-sp' }),
+    catcherOn && !isImg && app.postsById.has(id)
+      ? btn(interact ? '操作をやめる' : '埋め込みを操作', () => { if (interact) app.ui.interactId = null; else { app.ui.interactId = id; if (id !== shownId) { app.liveAction('show', { postId: id }); return; } } app.render(); }, `btn btn-small btn-ghost-dark li-interact${interact ? ' is-on' : ''}`, { 'data-key': `li-interact-${id}`, 'aria-pressed': String(interact), title: 'このカードだけ、埋め込みの中を直接操作（動画の再生など）' })
+      : null,
     btn('×', () => app.removeItem(t, id), 'btn btn-small btn-ghost-dark li-x', { 'data-key': `li-remove-${id}`, title: '話題から外す（Ctrl+Z で戻せます）', 'aria-label': '話題から外す', disabled: items.length <= 1 && !isImg }),
     menu);
   // 帯をドラッグで並べ替え（マウス・タッチ）。動かさずに離したら「今の投稿」
@@ -258,7 +289,17 @@ function itemEl(app, t, id, index, shownId, items) {
     const p = app.postsById.get(id);
     const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, noActions: true, bm: bmInfo(app, p.id) }) : linkCard(id, statusUrl(id), null);
     // 進行は常に X の埋め込み（画面に近いものから作る。失敗・データに無い投稿は自前のカード）
-    el.append(bar, p ? embedHost(id, own, 'live-embed') : own);
+    const body = h('div', { class: 'li-body', dataset: { keep: 'body' } }, p ? embedHost(id, own, 'live-embed') : own);
+    if (p && catcherOn && !interact) {
+      const catcher = h('div', { class: 'li-catch', dataset: { key: `li-catch-${id}` }, attrs: { title: 'クリックで今の投稿にする（埋め込みの中を操作するときは「埋め込みを操作」）' } });
+      catcher.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (id !== shownId) app.liveAction('show', { postId: id });
+        if (app.viewerPrefs.openOnClick) app.openViewer(statusUrl(id));
+      });
+      body.append(catcher);
+    }
+    el.append(bar, body);
   }
   return el;
 }

@@ -139,6 +139,8 @@ export function folderRows(ctx, key) {
   if (key.startsWith('topic:')) {
     const t = topicsById.get(key.slice(6));
     if (!t) return out([]);
+    // まとまりの中身: 投稿（データに無い投稿）と画像を、進行と同じ並び（手動順 → インプレ順／古い順）で全部
+    if (ctx.itemsFor) return out(ctx.itemsFor(t).map((id) => (id.startsWith('img:') ? { key: id, type: 'image', id: id.slice(4) } : postRow(id))));
     const ids = t.missingIds ? [...t.postIds, ...t.missingIds] : (t.postIds.length ? t.postIds : (t.linkId ? [t.linkId] : []));
     return out(ids.map(postRow));
   }
@@ -472,3 +474,42 @@ export function toggledGenre(current, origNightGenre = null) {
 }
 
 export { compareIds };
+
+// ================================================================ まとまりに X の URL から投稿を足す
+
+/**
+ * まとまりに投稿 id を足す（week をその場で書き換える）。
+ * ctx: { postsById（posts.json の全投稿）, postTopic（投稿 id → 話題 id）, topicsById, inRange（今の対象期間・番組週に入っている投稿 id の Set）, move（別のまとまりにある投稿も移す）, now }
+ * - posts.json にある投稿: 手で移したのと同じ（overrides.moves）。期間の外なら「自分で追加」にも入れて話題に出す
+ * - posts.json に無い投稿: その話題の「データに無い投稿」（topicLinks。埋め込みで表示）
+ * - すでにこの話題にある投稿・同じ入力の重複は無視。別のまとまり（2 件以上・手のまとまり等）にある投稿は move が true のときだけ移す
+ * 返り値: { added: [id], missing: [id], moved: [{ id, from }], dup: [id], conflicts: [{ id, from }] }
+ */
+export function addPostsToTopic(week, topic, ids, ctx) {
+  const { postsById = new Map(), postTopic = new Map(), topicsById = new Map(), inRange = new Set(), move = false, now = Date.now() } = ctx;
+  const out = { added: [], missing: [], moved: [], dup: [], conflicts: [] };
+  const have = new Set([...(topic.postIds || []), ...(topic.missingIds || [])]);
+  const seen = new Set();
+  for (const raw of ids) {
+    const id = String(raw);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    if (have.has(id) || postTopic.get(id) === topic.id) { out.dup.push(id); continue; }
+    if (postsById.has(id)) {
+      const from = postTopic.get(id);
+      const other = from ? topicsById.get(from) : null;
+      if (other && other.id !== topic.id && isFolderTopic(other)) {
+        if (!move) { out.conflicts.push({ id, from }); continue; }
+        out.moved.push({ id, from });
+      }
+      week.overrides.moves = { ...week.overrides.moves, [id]: topic.id };
+      if (!inRange.has(id) && !week.personal.some((p) => p.id === id)) week.personal = [...week.personal, { id, url: `https://x.com/i/web/status/${id}`, addedAt: now }];
+      out.added.push(id);
+    } else {
+      const list = (week.topicLinks && week.topicLinks[topic.id]) || [];
+      week.topicLinks = { ...(week.topicLinks || {}), [topic.id]: [...list, id] };
+      out.missing.push(id);
+    }
+  }
+  return out;
+}

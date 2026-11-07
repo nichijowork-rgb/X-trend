@@ -7,7 +7,7 @@ import { formatDateTime, formatCompact } from '../../../assets/js/core.js';
 import { CHECKPOINTS, GENRES, PLAN_V2 } from '../config.js';
 import {
   recordCheckpoint, autoTitle, weekLabel, genreLabel, statusUrl, postGenre, setPostGenre, canBeMain, cornerDef,
-  leadText, mainSlots, totalMinutes, scorePoints,
+  leadText, mainSlots, totalMinutes, scorePoints, moveItemTo,
 } from '../logic.js';
 import {
   folderRows, buildTree, selectClick, selectAllRows, pruneSelection, isDropTarget, applyDrop, makeGroup, createEmptyGroup,
@@ -18,6 +18,7 @@ import { scriptFor, topicMarks, refYear, mainTopics, currentTitle, bmInfo, stats
 import { beginPointer, isDragging } from './dnd.js';
 import { contextMenu, moveDialog, nameDialog } from './menu.js';
 import { toolsDialog } from './tools.js';
+import { urlAddDialog } from './urladd.js';
 import { startSort, sortDialog, sortKeydown } from './sortmode.js';
 
 const ROW_H = PLAN_V2.rowHeight;
@@ -46,7 +47,7 @@ function folderCtx(app) {
     newPostIds: app.newInfo ? app.newInfo.posts : new Set(), bookmarkPosts: app.bookmarkPosts, pickIds: app.pickIds,
     bookmarkRows: app.ui.bmAll ? app.bookmarkPostsAll : app.bookmarkPosts,
     generalAll: Boolean(app.ui.generalAll), query: app.ui.query, postTopic: app.postTopic, recommended: app.recommended,
-    heldTopics: app.heldTopics || [], heldPosts: app.heldPosts || new Map(),
+    heldTopics: app.heldTopics || [], heldPosts: app.heldPosts || new Map(), itemsFor: app.itemsFor,
   };
 }
 
@@ -94,6 +95,20 @@ function dropCtx(app) {
 
 /** 行をフォルダへ（ドロップ・移動先・メニュー共通。元に戻せる） */
 export function moveRows(app, rows, target) {
+  // まとまりの中での並べ替え（ord:<位置>）。進行と同じ手動順（先頭が代表投稿）
+  if (target.startsWith('ord:')) {
+    const tid = app.ui.folder.startsWith('topic:') ? app.ui.folder.slice(6) : null;
+    const t = tid ? app.topicsById.get(tid) : null;
+    if (!t) return;
+    const items = app.itemsFor(t);
+    const moving = rows.map(itemIdOfRow).filter((x) => items.includes(x));
+    const at = Number(target.slice(4));
+    const before = items.slice(0, at).filter((x) => !moving.includes(x)).length;
+    const rest = items.filter((x) => !moving.includes(x));
+    const next = [...rest.slice(0, before), ...moving, ...rest.slice(before)];
+    if (next.join() !== items.join()) app.setItemOrder(t.id, next);
+    return;
+  }
   const movable = rows.filter((r) => r.type === 'post' || r.type === 'topic');
   if (!movable.length) return;
   let res = null;
@@ -107,6 +122,11 @@ export function moveRows(app, rows, target) {
     app.toast(res.message, () => app.undo());
   }
   app.render();
+}
+
+/** 行 → 話題の中の id（画像は img:<id>） */
+function itemIdOfRow(r) {
+  return r.type === 'image' ? `img:${r.id}` : r.id;
 }
 
 function setGenre(app, rows, genre) {
@@ -139,6 +159,7 @@ export function renderPlan(app) {
   else if (u.move) root.append(moveDlg(app));
   else if (u.nameDlg) root.append(nameDlg(app));
   else if (u.tools) root.append(toolsDialog(app));
+  else if (u.urlDlg) root.append(urlAddDialog(app));
   if (u.menu) root.append(contextMenu(u.menu.items, u.menu.x, u.menu.y, () => { u.menu = null; app.render(); }));
   app.afterRender = () => {
     for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal();
@@ -222,15 +243,33 @@ function treePane(app, wk) {
     h('span', { class: 'tree-name' }, n.label, n.sub ? h('span', { class: 'tree-sub' }, n.sub) : null),
     n.bot ? h('span', { class: `tree-bot${n.bot === 'low' ? ' is-low' : ''}`, attrs: { title: n.bot === 'low' ? 'Grok のまとめ（要確認）' : 'Grok のまとめ' } }, n.bot === 'low' ? 'G?' : 'G') : null,
     n.count != null ? h('span', { class: 'tree-count' }, String(n.count)) : null);
+    let treeMore = null;
     if (n.topicId) {
+      const trow = { key: `t:${n.topicId}`, type: 'topic', id: n.topicId };
       label.addEventListener('dblclick', (e) => { e.preventDefault(); openRename(app, n.topicId); });
-      label.addEventListener('contextmenu', (e) => { e.preventDefault(); openMenu(app, [{ key: `t:${n.topicId}`, type: 'topic', id: n.topicId }], e.clientX, e.clientY, { fromTree: true }); });
+      label.addEventListener('contextmenu', (e) => { e.preventDefault(); openMenu(app, [trow], e.clientX, e.clientY, { fromTree: true }); });
+      // 木のまとまり（メイン1〜3 の中の話題も）をドラッグで番組構成・片付け・ゴミ箱・一覧の並べ替え位置へ（マウス。クリックは開く）
+      label.dataset.draggable = '1';
+      label.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        beginPointer(e, {
+          handle: false,
+          getRows: () => [trow],
+          label: () => (app.topicsById.get(n.topicId) || {}).name || 'まとまり',
+          canDrop: (k, rows) => k !== n.key && canDropOn(app, k, rows),
+          whyNot: (k, rows) => whyNotDrop(app, k, rows),
+          onDenied: (m) => app.toast(m),
+          onDrop: (k, rows) => moveRows(app, rows, k),
+        });
+      });
+      treeMore = h('button', { type: 'button', class: 'tree-more', dataset: { key: `tree-more-${n.key}` }, attrs: { 'aria-label': '操作', title: '番組構成へ・名前・片付けなど' } }, '…');
+      treeMore.addEventListener('click', (e) => { e.stopPropagation(); const r = treeMore.getBoundingClientRect(); openMenu(app, [trow], r.left, r.bottom, { fromTree: true }); });
     }
     const li = h('li', {
       class: `tree-node depth-${n.depth}${isActive ? ' is-active' : ''}`, attrs: { role: 'treeitem', 'aria-level': String(n.depth + 1), 'aria-expanded': n.hasChildren ? String(Boolean(n.open)) : null, 'aria-selected': String(isActive) },
     },
     n.hasChildren ? btn(n.open ? '▾' : '▸', () => { if (u.treeOpen.has(n.key)) u.treeOpen.delete(n.key); else u.treeOpen.add(n.key); app.render(); }, 'tree-toggle', { 'aria-label': n.open ? 'たたむ' : 'ひらく', 'data-key': `toggle-${n.key}` }) : h('span', { class: 'tree-toggle-sp' }),
-    label);
+    label, treeMore);
     if (n.drop) li.dataset.drop = n.key;
     ul.append(li);
   }
@@ -257,6 +296,23 @@ function listPane(app, wk, hidden) {
       btn('＋新しいまとまり', () => { u.nameDlg = { mode: 'new', name: '', genre: 'night' }; app.render(); }, 'btn btn-small', { 'data-key': 'new-group' }),
       info.rows.length ? btn('すべて選択', () => { u.sel = selectAllRows(u.rows); app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'select-all' }) : null));
   pane.append(head);
+  // まとまりの中: 並び順（進行と共通）・URL で追加・画像を追加
+  if (key.startsWith('topic:')) {
+    const t = app.topicsById.get(key.slice(6));
+    if (t) {
+      const manual = Boolean(wk.postOrder[t.id]);
+      const order = wk.live.order === 'old' ? 'old' : 'imp';
+      const ob = (k, label, on) => btn(label, () => app.setLiveOrder(t.id, k), `btn btn-small${on ? ' btn-dark is-on' : ' btn-ghost'}`, { 'data-key': `pl-order-${k}`, 'aria-pressed': String(on) });
+      const file = h('input', { type: 'file', accept: 'image/*', multiple: true, class: 'sr-only', id: `pl-img-file-${t.id}`, dataset: { key: 'pl-img-file' } });
+      file.addEventListener('change', () => { const fs = [...(file.files || [])]; file.value = ''; app.addImages(fs, t.id); });
+      pane.append(h('div', { class: 'lp-topic-tools row' },
+        h('span', { class: 'muted' }, '先頭が代表投稿。行をドラッグで並べ替え'),
+        h('span', { class: 'rel-order', attrs: { role: 'group', 'aria-label': '並び順' } }, ob('imp', 'インプレ順', !manual && order === 'imp'), ob('old', '古い順', !manual && order === 'old'),
+          manual ? h('span', { class: 'btn btn-small is-on rel-manual', dataset: { key: 'pl-order-manual' } }, '手動順') : null),
+        btn('＋URLで追加', () => { u.urlDlg = { topicId: t.id, text: '' }; app.render(); }, 'btn btn-small', { 'data-key': 'url-add', title: 'X の投稿の URL を貼って、このまとまりに追加' }),
+        h('label', { class: 'btn btn-small btn-ghost', attrs: { for: `pl-img-file-${t.id}` } }, '＋画像'), file));
+    }
+  }
   if (key.startsWith('corner:') || key === 'cand' || key.startsWith('slot:')) pane.append(cornerSettings(app, wk, key));
   if (!info.rows.length) {
     const empty = h('p', { class: 'empty lp-empty' }, emptyText(key));
@@ -305,6 +361,7 @@ function rowGenre(app, row) {
   if (row.type === 'post') return postGenre(app.postsById.get(row.id));
   if (row.type === 'topic') { const t = app.topicsById.get(row.id); return t ? t.genre : 'night'; }
   if (row.type === 'trash') { const e = app.saved.trash.find((x) => x.id === row.id); return e ? e.genre : 'night'; }
+  if (row.type === 'image') { const t = app.topicsById.get(app.ui.folder.slice(6)); return t ? t.genre : 'night'; }
   if (row.type === 'heldPost') return postGenre(app.postsById.get(row.id));
   if (row.type === 'heldTopic') { const t = app.topicsById.get(row.id); return t ? t.genre : 'night'; }
   return 'review';
@@ -315,6 +372,7 @@ function rowLabel(app, row) {
   if (row.type === 'topic') { const t = app.topicsById.get(row.id); return t ? t.name : '話題'; }
   if (row.type === 'trash') { const e = app.saved.trash.find((x) => x.id === row.id); return e ? `話題：${e.name}` : '話題'; }
   if (row.type === 'heldTopic') { const t = app.topicsById.get(row.id); return t ? `まとまり：${t.name}` : '話題'; }
+  if (row.type === 'image') { const m = (app.weekState().images || []).find((x) => x.id === row.id); return `画像：${(m && m.caption) || '（キャプションなし）'}`; }
   if (row.type === 'heldPost') { const p = app.postsById.get(row.id); return p ? (p.text || '（本文なし）').replace(/\s+/g, ' ') : `ID ${row.id}`; }
   const p = app.postsById.get(row.id);
   return `投稿：${p ? p.text.replace(/\s+/g, ' ') : `ID ${row.id}`}`;
@@ -338,6 +396,9 @@ function rowEl(app, row, index) {
     else if (key.startsWith('slot:')) el.dataset.drop = key;
     else el.dataset.drop = `topic:${row.id}`;
   }
+  // まとまりの中: 行どうしで並べ替え（進行と同じ手動順。先頭が代表投稿）
+  const inTopic = key.startsWith('topic:') && (row.type === 'post' || row.type === 'image');
+  if (inTopic) el.dataset.drop = `ord:${index}`;
   const check = h('input', { type: 'checkbox', class: 'row-check', checked: selected, tabIndex: -1, attrs: { 'aria-label': '選ぶ' }, dataset: { key: `check-${row.key}` } });
   check.addEventListener('click', (e) => { e.stopPropagation(); u.sel = selectClick(u.sel, u.rows, index, { ctrl: true, shift: e.shiftKey }); app.render(); });
   const handle = h('span', { class: 'drag-handle', attrs: { 'aria-hidden': 'true', title: 'ドラッグで移動' } }, '⋮⋮');
@@ -373,6 +434,8 @@ function rowEl(app, row, index) {
       const nw = app.newInfo && app.newInfo.topics.get(t.id);
       if (nw != null) meta.push(h('span', { class: 'rm-new' }, 'NEW'));
     }
+  } else if (row.type === 'image') {
+    meta.push(h('span', { class: 'rm-kind' }, '画像'));
   } else if (row.type === 'heldPost' || row.type === 'heldTopic') {
     const term = holdTermOfRow(app, row);
     const p = row.type === 'heldPost' ? app.postsById.get(row.id) : null;
@@ -383,10 +446,15 @@ function rowEl(app, row, index) {
   }
   const more = h('button', { type: 'button', class: 'row-more', tabIndex: -1, attrs: { 'aria-label': '操作' }, dataset: { key: `more-${row.key}` } }, '…');
   more.addEventListener('click', (e) => { e.stopPropagation(); const r = more.getBoundingClientRect(); openMenu(app, targetRows(app, row), r.left, r.bottom, { row }); });
+  if (inTopic && index === 0) meta.unshift(h('span', { class: 'rm-rep', dataset: { key: 'rm-rep' } }, '代表'));
+  const tFolder = inTopic ? app.topicsById.get(key.slice(6)) : null;
+  const x = inTopic && tFolder ? h('button', { type: 'button', class: 'row-x', tabIndex: -1, attrs: { 'aria-label': 'まとまりから外す', title: 'まとまりから外す（Ctrl+Z で戻せます）' }, dataset: { key: `row-x-${row.key}` } }, '×') : null;
+  if (x) x.addEventListener('click', (e) => { e.stopPropagation(); app.removeItem(tFolder, itemIdOfRow(row)); });
+  if (x) el.classList.add('has-x');
   el.append(handle, check, h('span', { class: `row-color g-${genre}`, attrs: { title: genreLabel(genre) } }),
     h('div', { class: 'row-main' }, h('div', { class: `row-title${row.type === 'topic' ? ' is-topic' : ''}` }, title), h('div', { class: 'row-meta' }, meta)),
-    more);
-  const draggable = row.type === 'post' || row.type === 'topic';
+    ...(x ? [x] : []), more);
+  const draggable = row.type === 'post' || row.type === 'topic' || row.type === 'image';
   const onDown = (handleMode) => (e) => {
     if (e.target.closest('input, button:not(.drag-handle), a')) return;
     if (!draggable) { if (e.pointerType === 'mouse') { /* クリックは click で */ } return; }
@@ -395,6 +463,8 @@ function rowEl(app, row, index) {
       getRows: () => targetRows(app, row),
       label: (rows) => (rows.length === 1 ? rowLabel(app, rows[0]).slice(0, 30) : `${rowLabel(app, rows[0]).slice(0, 18)} ほか`),
       canDrop: (k, rows) => canDropOn(app, k, rows),
+      whyNot: (k, rows) => whyNotDrop(app, k, rows),
+      onDenied: (m) => app.toast(m),
       onDrop: (k, rows) => moveRows(app, rows, k),
       onClick: (ev) => clickRow(app, row, index, ev),
     });
@@ -414,7 +484,21 @@ function rowEl(app, row, index) {
   return el;
 }
 
+/** 置けない理由（ドラッグ中に灰色＋理由、離したらお知らせ）。理由が無ければ null */
+function whyNotDrop(app, key, rows) {
+  const base = key.split('#')[0];
+  if (rows.some((r) => r.type === 'image')) return key.startsWith('ord:') ? null : '画像はまとまりの中で並べ替えだけできます';
+  if (/^slot:|^cand$/.test(base)) {
+    const ids = topicsOfRows(rows, app.postTopic);
+    if (!ids.some((id) => canBeMain(app.topicsById.get(id)))) return '一般のバズはメイン1〜3・メイン候補に入れられません（雑談へどうぞ）';
+  }
+  if (base.startsWith('topic:') && rows.every((r) => r.type === 'topic' && r.id === base.slice(6))) return null;
+  return null;
+}
+
 function canDropOn(app, key, rows) {
+  if (key.startsWith('ord:')) return app.ui.folder.startsWith('topic:') && rows.every((r) => r.type === 'post' || r.type === 'image');
+  if (rows.some((r) => r.type === 'image')) return false;
   if (!isDropTarget(key)) return false;
   const base = key.split('#')[0];
   if (base.startsWith('topic:')) {
@@ -574,6 +658,19 @@ function openMenu(app, rows, x, y, opts = {}) {
 function menuItems(app, rows, opts) {
   const u = app.ui;
   const one = rows.length === 1 ? rows[0] : null;
+  // まとまりの中（投稿・画像）: 先頭へ（代表にする）／末尾へ／外す
+  const tf = u.folder.startsWith('topic:') && !u.query.trim() ? app.topicsById.get(u.folder.slice(6)) : null;
+  const inside = [];
+  if (tf && one && (one.type === 'post' || one.type === 'image')) {
+    const items = app.itemsFor(tf);
+    const id = itemIdOfRow(one);
+    const i = items.indexOf(id);
+    inside.push({ heading: 'このまとまりの中' },
+      { label: '先頭へ（代表にする）', key: 'ctx-top', disabled: i === 0, run: () => app.setItemOrder(tf.id, moveItemTo(items, id, 0), '先頭へ') },
+      { label: '末尾へ', key: 'ctx-bottom', disabled: i === items.length - 1, run: () => app.setItemOrder(tf.id, moveItemTo(items, id, items.length), '末尾へ') },
+      { label: 'まとまりから外す', key: 'ctx-remove-item', run: () => app.removeItem(tf, id) });
+  }
+  if (rows.some((r) => r.type === 'image')) return inside;
   if (rows.every((r) => r.type === 'heldPost' || r.type === 'heldTopic')) {
     const terms = [...new Set(rows.map((r) => holdTermOfRow(app, r)).filter((t) => t && !t.startsWith('台本：')))];
     return [
@@ -586,7 +683,7 @@ function menuItems(app, rows, opts) {
   }
   const topicIds = topicsOfRows(rows, app.postTopic);
   const mainOk = topicIds.some((id) => canBeMain(app.topicsById.get(id)));
-  const items = [];
+  const items = [...inside];
   if (one && !opts.fromTree) items.push({ label: 'プレビューを見る', key: 'ctx-preview', run: () => { u.focus = one.key; u.pane = 'preview'; app.render(); } });
   if (one && one.type === 'topic') items.push({ label: 'フォルダを開く', key: 'ctx-open', run: () => openFolder(app, one.id) });
   items.push({ heading: '番組に入れる' });
@@ -604,7 +701,7 @@ function menuItems(app, rows, opts) {
   items.push({ label: '受信箱に戻す（まとまり・番組構成から外す）', key: 'ctx-inbox', run: () => moveRows(app, rows, 'inbox') });
   items.push({ label: '片付ける（この週は使わない）', key: 'ctx-shelf', run: () => moveRows(app, rows, 'shelf') });
   items.push({ label: '削除（ゴミ箱へ）', key: 'ctx-trash', danger: true, hint: 'Del', run: () => moveRows(app, rows, 'trash') });
-  if (one && one.type === 'post') items.push({ label: 'X で開く', key: 'ctx-x', run: () => window.open(statusUrl(one.id), '_blank', 'noopener,noreferrer') });
+  if (one && one.type === 'post') items.push({ label: 'X で開く', key: 'ctx-x', run: () => app.openViewer(statusUrl(one.id)) });
   return items;
 }
 
@@ -693,8 +790,14 @@ function previewPane(app, wk) {
   const u = app.ui;
   const row = u.rows.find((r) => r.key === u.focus) || null;
   const pane = h('section', { class: 'preview-pane', attrs: { 'aria-label': 'プレビュー' }, dataset: { keep: 'preview' } });
+  const idx = row ? u.rows.findIndex((r) => r.key === row.key) : -1;
+  const step = (d) => { const r = u.rows[idx + d]; if (r) { u.focus = r.key; u.sel = { sel: new Set([r.key]), anchor: idx + d }; app.render(); } };
   pane.append(h('div', { class: 'pv-top' },
-    btn('← 一覧へ', () => { u.pane = 'list'; app.render(); }, 'btn btn-small btn-ghost pv-back', { 'data-key': 'preview-back' })));
+    btn('← 一覧へ', () => { u.pane = 'list'; app.render(); }, 'btn btn-small btn-ghost pv-back', { 'data-key': 'preview-back' }),
+    row ? h('span', { class: 'pv-nav' },
+      btn('前へ ［', () => step(-1), 'btn btn-small btn-ghost', { 'data-key': 'pv-prev', disabled: idx <= 0, title: '一覧の前の行（キー [ ）' }),
+      h('span', { class: 'muted pv-pos' }, `${idx + 1} / ${u.rows.length}`),
+      btn('次へ ］', () => step(1), 'btn btn-small btn-ghost', { 'data-key': 'pv-next', disabled: idx < 0 || idx >= u.rows.length - 1, title: '一覧の次の行（キー ] ）' })) : null));
   if (!row) {
     pane.append(h('div', { class: 'pv-empty' }, h('p', {}, '行を選ぶと、ここに中身（X の埋め込み）が出ます。'),
       h('ul', { class: 'pv-help' },
@@ -708,8 +811,22 @@ function previewPane(app, wk) {
   if (row.type === 'post') pane.append(postPreview(app, wk, row));
   else if (row.type === 'topic') pane.append(topicPreview(app, wk, row));
   else if (row.type === 'heldPost' || row.type === 'heldTopic') pane.append(heldPreview(app, row));
+  else if (row.type === 'image') pane.append(imagePreview(app, row));
   else pane.append(h('div', { class: 'pv-body' }, h('p', {}, rowLabel(app, row)), btn('戻す', () => restoreRows(app, [row]), 'btn btn-small', { 'data-key': 'pv-restore' })));
   return pane;
+}
+
+/** 画像の行のプレビュー */
+function imagePreview(app, row) {
+  const m = (app.weekState().images || []).find((x) => x.id === row.id) || {};
+  const d = app.imageData(row.id);
+  if (!d) app.loadImage(row.id).catch(() => {});
+  const t = app.topicsById.get(app.ui.folder.slice(6));
+  const cap = h('input', { class: 'input input-sm', type: 'text', value: m.caption || '', maxLength: 200, placeholder: 'キャプション（任意）', dataset: { key: `pv-cap-${row.id}` } });
+  cap.addEventListener('input', () => app.setImageCaption(row.id, cap.value));
+  return h('div', { class: 'pv-body', dataset: { keep: `pv:${row.key}${d ? ':ok' : ''}` } },
+    d ? h('img', { class: 'li-img', src: d.url, alt: m.caption || '追加した画像' }) : h('p', { class: 'muted' }, '画像を読み込み中…'),
+    cap, t ? h('div', { class: 'row' }, btn('まとまりから外す', () => app.removeItem(t, `img:${row.id}`), 'btn btn-small btn-ghost', { 'data-key': 'pv-img-remove' })) : null);
 }
 
 /** 保留の行のプレビュー（理由と、戻す・言葉を外す） */
@@ -830,6 +947,20 @@ function topicPreview(app, wk, row) {
     field('リード文', lead, botLead ? '（Grok のまとめ。書き換えできます）' : '（数字からの自動下書き。書き換えできます）'),
     botLead && !(typeof sc.lead === 'string' && sc.lead.trim()) ? h('p', { class: 'lead-mark-line' }, h('span', { class: 'lead-mark' }, 'Grok のまとめ'), 'リード文はボットの下書きです') : null,
     field('話すポイント', points)));
+  // まとまりの中身（全部）。押すとフォルダを開いてその投稿をプレビュー
+  const all = app.itemsFor(t);
+  if (all.length > 1) {
+    box.append(h('div', { class: 'pv-items', dataset: { keep: `pv-items:${t.id}` } },
+      h('div', { class: 'row' }, h('h4', { class: 'pv-sub' }, `中身（${all.length}件）`),
+        btn('＋URLで追加', () => { u.urlDlg = { topicId: t.id, text: '' }; app.render(); }, 'btn btn-small btn-ghost', { 'data-key': 'pv-url-add' })),
+      h('ol', { class: 'pv-item-list' }, all.slice(0, 50).map((id, i) => {
+        const img = id.startsWith('img:') ? (app.weekState().images || []).find((x) => `img:${x.id}` === id) : null;
+        const p = img ? null : app.postsById.get(id);
+        const label = img ? `画像：${img.caption || '（キャプションなし）'}` : (p ? `@${p.user}：${(p.text || '').replace(/\s+/g, ' ').slice(0, 60)}` : `データに無い投稿（ID ${id}）`);
+        return h('li', {}, h('button', { type: 'button', class: 'pv-item', dataset: { key: `pv-item-${id}` }, on: { click: () => { openFolder(app, t.id); u.focus = img ? id : `p:${id}`; u.pane = 'preview'; app.render(); } } },
+          i === 0 ? h('span', { class: 'rm-rep' }, '代表') : null, label));
+      }))));
+  }
   // 自分で追加した画像（進行でも出せる。Ctrl+V・ドラッグでも追加）
   box.append(imagesSection(app, t));
   // 代表投稿（先頭の投稿。進行で並べ替えたらその先頭）
@@ -860,6 +991,13 @@ export function planKeydown(app, e) {
     const row = (app.ui.rows || []).find((r) => r.key === app.ui.focus);
     const tid = row && row.type === 'topic' ? row.id : (app.ui.folder.startsWith('topic:') ? app.ui.folder.slice(6) : null);
     if (tid) { e.preventDefault(); openRename(app, tid); return true; }
+  }
+  // プレビューの前へ／次へ（[ と ]）
+  if (!mod && (e.key === '[' || e.key === ']') && app.ui.focus) {
+    const rows = app.ui.rows || [];
+    const i = rows.findIndex((r) => r.key === app.ui.focus);
+    const r = rows[i + (e.key === ']' ? 1 : -1)];
+    if (r) { e.preventDefault(); app.ui.focus = r.key; app.ui.sel = { sel: new Set([r.key]), anchor: i + (e.key === ']' ? 1 : -1) }; app.render(); return true; }
   }
   if ((e.key === 'm' || e.key === 'M') && !mod && selectedRows(app).length) { e.preventDefault(); app.ui.move = { rows: selectedRows(app) }; app.render(); return true; }
   if (e.key === 'Escape' && !isDragging()) {

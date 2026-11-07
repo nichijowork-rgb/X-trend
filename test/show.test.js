@@ -1082,12 +1082,12 @@ test('v2 進行状態のイベント: 変わったときだけ 1 か所から発
   pub();
   assert.deepEqual(got[1].changed, ['corner', 'topic', 'card', 'progress']);
   assert.equal(got[1].state.corner.key, 'category');
+  // 投稿カードの表示/非表示は廃止（toggleCard は何もしない＝発行もしない）
   live = liveReduce(live, { type: 'toggleCard' }, cues);
-  pub();
-  assert.deepEqual(got[2].changed, ['card']);
-  assert.equal(got[2].state.cardVisible, false);
+  assert.equal(pub(), null);
+  assert.equal(got[1].state.cardVisible, true);
   off();
-  assert.equal(eventLog.length, 3);
+  assert.equal(eventLog.length, 2);
   assert.deepEqual(diffSnapshot(liveSnapshot({ weekKey: 'w', live, cues, topicsById }), liveSnapshot({ weekKey: 'w', live, cues, topicsById })), []);
 });
 
@@ -1253,9 +1253,10 @@ test('オーバーレイのペイロード: コーナー・話題・次・投稿
   assert.equal(p.topic.color, 'kyaba');
   assert.equal(p.title.id, 'category@9000');
   assert.equal(p.card.post.thumb, null);
-  // 投稿カードを隠す
+  // 投稿カードは常に表示（古い保存データの cardVisible: false も表示）
   live = liveReduce(live, { type: 'toggleCard' }, cues);
-  assert.equal(buildPayload({ ...base, live }).card.visible, false);
+  assert.equal(live.cardVisible, true);
+  assert.equal(buildPayload({ ...base, live: { ...live, cardVisible: false } }).card.visible, true);
   // 最後まで → finished
   live = liveReduce(liveReduce(live, { type: 'done', now: 1 }, cues), { type: 'done', now: 2 }, cues);
   live = liveReduce(live, { type: 'done', now: 3 }, cues);
@@ -1271,7 +1272,7 @@ test('オーバーレイ: 再送の判定（samePayload）と受け手の seq・
   const a = buildPayload({ live, cues, topicsById, postsById, now: 1 });
   const b = buildPayload({ live, cues, topicsById, postsById, now: 2 });
   assert.ok(samePayload({ ...a, seq: 1, sid: 'x' }, { ...b, seq: 2, sid: 'y' }), '時刻・seq だけ違うのは同じ');
-  assert.ok(!samePayload(a, buildPayload({ live: { ...live, cardVisible: false }, cues, topicsById, postsById })));
+  assert.ok(!samePayload(a, buildPayload({ live: { ...live, index: 1 }, cues, topicsById, postsById })));
   assert.ok(!samePayload(a, null));
   const m = (sid, seq, at) => ({ v: 1, type: 'state', sid, seq, at });
   assert.ok(shouldAccept(null, m('s', 1, 10)));
@@ -1944,14 +1945,14 @@ test('これを映す: 並び（代表→インプレ順／新しい順）・選
   assert.deepEqual(live.shown, { cueId: cues[0].id, postId: p2.id });
   assert.equal(liveShownPost(live, cues[0], A), p2.id);
   assert.equal(liveReduce(live, { type: 'show', postId: 'bad' }, cues).shown.postId, p2.id, '不正な id は無視');
-  // 投稿カードの表示/非表示とは別
+  // 投稿カードは常に表示（toggleCard は廃止）
   const hid = liveReduce(live, { type: 'toggleCard' }, cues);
-  assert.equal(hid.cardVisible, false);
+  assert.equal(hid.cardVisible, true);
   assert.equal(hid.shown.postId, p2.id);
   // ペイロード: card.post が映す投稿になる
   const pay = buildPayload({ live, cues, topicsById, postsById });
   assert.equal(pay.card.post.id, p2.id);
-  assert.equal(buildPayload({ live: hid, cues, topicsById, postsById }).card.visible, false);
+  assert.equal(buildPayload({ live: hid, cues, topicsById, postsById }).card.visible, true);
   // 話題が変わると代表投稿へ（戻っても代表投稿）
   live = liveReduce(live, { type: 'done', now: 2 }, cues);
   assert.equal(live.shown, null);
@@ -2100,4 +2101,82 @@ test('画像の縮小: 長辺 1600/1280・1MB/1.5MB に収める（PNG→JPEG・
   assert.match(await shortHash('abc'), /^[0-9a-f]{16}$/);
   assert.equal(await shortHash('abc'), await shortHash('abc'));
   assert.match(newImageId(), /^[a-z0-9]{4,40}$/);
+});
+
+// ================================================================ 追加: 投稿を開く専用ウィンドウ
+import { viewerRect, viewerFeatures, parseViewerPrefs, defaultViewerPrefs, screenSnapshot, isXUrl, openViewer, VIEWER_NAME } from '../show/js/viewer.js';
+
+test('投稿カードは常に表示: 保存データの cardVisible: false も true として読む', () => {
+  const s = defaultSaved();
+  s.weeks['2026-10-17'] = { ...defaultWeek(), live: { ...defaultLive(), cardVisible: false } };
+  assert.equal(parseSaved(serializeSaved(s)).state.weeks['2026-10-17'].live.cardVisible, true);
+});
+
+// URL の取り込み（まとまりに足す）
+import { addPostsToTopic } from '../show/js/folders.js';
+test('まとまりに URL で追加: x/twitter/mobile/fxtwitter/vxtwitter の URL・データあり／無し・重複・別のまとまりから移動・期間の外', () => {
+  const r = extractStatusIds('https://x.com/a/status/2110000000000000001?s=20 https://mobile.twitter.com/b/status/2110000000000000002\nhttps://fxtwitter.com/c/status/2110000000000000003 https://vxtwitter.com/d/status/2110000000000000004 https://example.com/x https://x.com/a/status/2110000000000000001');
+  assert.deepEqual(r.ids.map((x) => x.id), ['2110000000000000001', '2110000000000000002', '2110000000000000003', '2110000000000000004']);
+  assert.deepEqual(r.invalid, ['https://example.com/x']);
+  const a = post({ text: 'a' });
+  const b = post({ text: 'b' });
+  const c = post({ text: 'c' });
+  const postsById = new Map([a, b, c].map((p) => [p.id, p]));
+  const T = { id: 'm:1', kind: 'manual', name: 'T', postIds: [a.id], stats: { count: 1 } };
+  const O = { id: 'd:o', kind: 'dict', name: 'O', postIds: [b.id, 'x'], stats: { count: 2 } };
+  const topicsById = new Map([[T.id, T], [O.id, O], [`p:${c.id}`, { id: `p:${c.id}`, kind: 'single', postIds: [c.id], stats: { count: 1 } }]]);
+  const postTopic = new Map([[a.id, T.id], [b.id, O.id], [c.id, `p:${c.id}`]]);
+  const w = defaultWeek();
+  const ctx = { postsById, postTopic, topicsById, inRange: new Set([a.id, b.id]), now: 1 };
+  let out = addPostsToTopic(w, T, [a.id, b.id, c.id, '1999999999999999977', c.id], ctx);
+  assert.deepEqual(out.dup, [a.id]);
+  assert.deepEqual(out.conflicts, [{ id: b.id, from: O.id }], '別のまとまりにあるものは確認');
+  assert.deepEqual(out.added, [c.id], '1 件の話題（受信箱）からはそのまま');
+  assert.deepEqual(out.missing, ['1999999999999999977']);
+  assert.equal(w.overrides.moves[c.id], T.id);
+  assert.ok(w.personal.some((p) => p.id === c.id), '期間の外の投稿は「自分で追加」にも');
+  assert.deepEqual(w.topicLinks[T.id], ['1999999999999999977']);
+  out = addPostsToTopic(w, T, [b.id], { ...ctx, move: true });
+  assert.deepEqual(out.moved, [{ id: b.id, from: O.id }]);
+  assert.equal(w.overrides.moves[b.id], T.id);
+  // 話題として組み立てる（データに無い投稿も中身に）
+  const d = ds([a, b, c]);
+  const topics = buildTopics({ posts: d.posts, dict: [], refTs: d.refTs, overrides: { manual: [{ id: 'm:1', name: 'T', genre: 'host' }], moves: w.overrides.moves }, topicLinks: w.topicLinks });
+  const t = topics.find((x) => x.id === 'm:1');
+  assert.deepEqual([t.postIds.length, t.missingIds], [2, ['1999999999999999977']], 'b と c（a は元の位置のまま）');
+  assert.ok(t.movedIn);
+  assert.deepEqual(parseSaved(serializeSaved({ ...defaultSaved(), weeks: { '2026-10-17': w } })).state.weeks['2026-10-17'].topicLinks, w.topicLinks);
+});
+
+test('投稿を開くウィンドウ: 位置のプリセット（中央・右半分・左半分・全体・数値）・画面（モニター）・設定の読み書き・開き方', () => {
+  const scr = { availLeft: 1920, availTop: 0, availWidth: 1600, availHeight: 900, label: 'サブ', isPrimary: false };
+  const s = screenSnapshot(scr, 1);
+  assert.deepEqual(s, { label: 'サブ', left: 1920, top: 0, width: 1600, height: 900, primary: false });
+  assert.deepEqual(viewerRect({ preset: 'right', screen: s }), { left: 2720, top: 0, width: 800, height: 900 });
+  assert.deepEqual(viewerRect({ preset: 'left', screen: s }), { left: 1920, top: 0, width: 800, height: 900 });
+  assert.deepEqual(viewerRect({ preset: 'full', screen: s }), { left: 1920, top: 0, width: 1600, height: 900 });
+  assert.deepEqual(viewerRect({ preset: 'center', screen: s }), { left: 1920 + 480, top: 45, width: 640, height: 810 });
+  assert.deepEqual(viewerRect({ preset: 'custom', left: 10, top: 20, width: 500, height: 700 }), { left: 10, top: 20, width: 500, height: 700 });
+  assert.deepEqual(viewerRect({ preset: 'right' }, { availLeft: 0, availTop: 0, availWidth: 1280, availHeight: 800 }), { left: 640, top: 0, width: 640, height: 800 }, '画面を選んでいなければこのウィンドウの画面');
+  assert.equal(viewerFeatures({ left: 1, top: 2, width: 3, height: 4 }), 'popup,left=1,top=2,width=3,height=4');
+  assert.deepEqual(parseViewerPrefs(null), defaultViewerPrefs());
+  assert.deepEqual(parseViewerPrefs('{壊れ'), defaultViewerPrefs());
+  const p = parseViewerPrefs(JSON.stringify({ preset: 'left', width: 10, height: 99999999, screen: s, catcher: false, openOnClick: true }));
+  assert.equal(p.preset, 'left');
+  assert.equal(p.width, 250, '最小 250');
+  assert.equal(p.height, 20000);
+  assert.deepEqual(p.screen, s, '画面の情報も保存できる');
+  assert.equal(p.catcher, false);
+  assert.equal(p.openOnClick, true);
+  assert.equal(parseViewerPrefs({ preset: 'x' }).preset, 'right');
+  assert.ok(defaultViewerPrefs().catcher && !defaultViewerPrefs().openOnClick, 'クリック受けは既定オン・クリックで開くは既定オフ');
+  assert.ok(isXUrl('https://x.com/a/status/1') && isXUrl('https://twitter.com/a') && !isXUrl('https://example.com/') && !isXUrl('javascript:alert(1)'));
+  // 開き方: 名前付き・指定サイズ・使い回すウィンドウも位置を合わせ直す／ブロックされたら false
+  const calls = [];
+  const fakeWin = { moveTo: (x, y) => calls.push(['move', x, y]), resizeTo: (w, h) => calls.push(['resize', w, h]), focus: () => calls.push(['focus']) };
+  const win = { screen: scr, open: (...a) => { calls.push(['open', ...a]); return fakeWin; } };
+  assert.equal(openViewer('https://x.com/a/status/1', { preset: 'custom', left: 5, top: 6, width: 600, height: 700 }, win), true);
+  assert.deepEqual(calls[0], ['open', 'https://x.com/a/status/1', VIEWER_NAME, 'popup,left=5,top=6,width=600,height=700']);
+  assert.deepEqual(calls.slice(1), [['move', 5, 6], ['resize', 600, 700], ['focus']]);
+  assert.equal(openViewer('https://x.com/', {}, { screen: scr, open: () => null }), false);
 });

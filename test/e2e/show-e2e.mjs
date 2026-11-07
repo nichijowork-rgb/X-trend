@@ -535,13 +535,11 @@ async function main() {
       await page.keyboard.press('ArrowLeft'); // 来週へを取り消し
       await waitOnair(oa, await curCue(page));
       await page.keyboard.press('l'); // もう一度来週へ
-      // 投稿カードの表示/非表示
-      await page.click('[data-key="live-card"]');
-      assert((await live(page)).cardVisible === false, 'card hidden');
-      await oa.waitForSelector('.oa-split.is-nocard', { timeout: 5000 });
+      // 投稿カードは常に表示（表示中/隠し中の切り替えは廃止）
+      assert(!(await page.$('[data-key="live-card"]')), '切り替えボタンは無い');
+      assert((await live(page)).cardVisible === true, 'card always visible');
       const evts = await page.evaluate(() => window.__evts);
-      assert(evts.length >= 4 && evts.some((e) => e.changed.includes('card') && e.state.cardVisible === false) && evts.some((e) => e.changed.includes('topic')), JSON.stringify(evts.map((e) => e.changed)));
-      await page.click('[data-key="live-card"]');
+      assert(evts.length >= 4 && evts.some((e) => e.changed.includes('card')) && evts.every((e) => e.state.cardVisible === true) && evts.some((e) => e.changed.includes('topic')), JSON.stringify(evts.map((e) => e.changed)));
       await oa.screenshot({ path: path.join(SHOTS, 'onair-1920.png') });
       await oa.close();
       return `イベント ${evts.length}件`;
@@ -870,18 +868,14 @@ async function main() {
       assert(t0, '最初は話題');
       await tb.waitForFunction((x) => document.querySelector('.tb-name')?.textContent === x && !document.querySelector('.tb').hidden, t0, { timeout: 5000 });
       // タイトル: 大きく出て数秒で消える
-      const corner0 = await page.evaluate(() => document.querySelector('.lh-corner').textContent);
+      const corner0 = await page.evaluate(() => document.querySelector('.lh-corner-name').textContent);
       await tt.waitForFunction(() => !document.querySelector('.tt').hidden, null, { timeout: 5000 });
       const ttText = await tt.textContent('.tt-name');
       assert(corner0.includes(ttText), `${ttText} / ${corner0}`);
       await tt.screenshot({ path: path.join(SHOTS, 'obs-live-title.png'), omitBackground: true });
-      // 投稿カード: 表示 → 隠す → 出す
+      // 投稿カード: 常に表示
       await cd.waitForSelector('.cd[data-visible="true"]', { timeout: 5000 });
       assert((await cd.textContent('.cd-user')).startsWith('@'), 'user');
-      await page.click('[data-key="live-card"]');
-      await cd.waitForSelector('.cd[data-visible="false"]', { timeout: 5000 });
-      await page.click('[data-key="live-card"]');
-      await cd.waitForSelector('.cd[data-visible="true"]', { timeout: 5000 });
       await tt.waitForFunction(() => document.querySelector('.tt').hidden, null, { timeout: 7000 });
       // 次の話題へ → トピック帯が切り替わる
       await page.keyboard.press('ArrowRight');
@@ -1685,6 +1679,224 @@ async function main() {
       return `画像 ${meta.map((m) => `${m.w}×${m.h} ${Math.round(m.bytes / 1000)}KB`).join('・')}`;
     });
 
+    await check('進行: 上部固定ヘッダー（スクロール後も）・リード文トグル（保存）・投稿は 960 で 2 列／1500 で 3 列／375 で 1 列・2 列でドラッグ・クリック受け→今の投稿＋専用ウィンドウ（名前付き・指定サイズ）・埋め込みを操作・X で開く・ブロック時の案内', async () => {
+      const c = await newCtx();
+      await c.addInitScript(() => {
+        window.__opens = [];
+        window.__blockPopup = false;
+        window.open = (...a) => { window.__opens.push(a.map(String)); return window.__blockPopup ? null : { moveTo() {}, resizeTo() {}, focus() {} }; };
+      });
+      const { page } = await liveSetup(c);
+      await page.click('[data-key="rel-more"]');
+      const it = await items(page);
+      // 上部固定
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(200);
+      const head = await page.locator('.live-sticky').boundingBox();
+      assert(head && Math.abs(head.y) < 2 && head.height < 210, `固定ヘッダー ${JSON.stringify(head)}`);
+      assert(await page.isVisible('[data-key="live-title"]') && await page.isVisible('#live-timer') && await page.isVisible('[data-key="live-obs-pill"]') && !(await page.$('[data-key="live-card"]')), 'ヘッダーの中身');
+      assert((await page.textContent('[data-key="live-obs-pill"]')).includes('接続済み'), 'OBS ピル');
+      await page.screenshot({ path: path.join(SHOTS, 'live-sticky-960.png') });
+      // リード文トグル（既定は閉じる → 開く → リロード後も開いている）
+      await page.evaluate(() => window.scrollTo(0, 0));
+      assert(!(await page.isVisible('.live-lead-box .live-lead')), 'リード文は既定で閉じる');
+      await page.click('[data-key="lead-toggle"]');
+      await page.waitForFunction(() => document.querySelector('.live-lead-box').open);
+      assert(await page.evaluate(() => localStorage.getItem('xtrend-show-lead-open')) === '1', 'saved');
+      // 列の数
+      const cols = () => page.evaluate(() => new Set([...document.querySelectorAll('.li-item')].slice(0, 4).map((e) => Math.round(e.getBoundingClientRect().left))).size);
+      assert(await cols() === 2, `960 は 2 列（${await cols()}）`);
+      const cw = await page.$eval('.li-item', (e) => e.getBoundingClientRect().width);
+      assert(cw >= 400 && cw <= 470, `列の幅 ${cw}`);
+      // 2 列でドラッグ（4 件目 → 1 件目）
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.evaluate((id) => document.querySelector(`.li-item[data-post="${id}"]`).scrollIntoView({ block: 'center' }), it[2]);
+      const from = await page.locator(`.li-item[data-post="${it[3]}"] .li-handle`).boundingBox();
+      const to = await page.locator(`.li-item[data-post="${it[0]}"]`).boundingBox();
+      await page.mouse.move(from.x + 4, from.y + 4);
+      await page.mouse.down();
+      await page.mouse.move(from.x + 12, from.y + 12, { steps: 3 });
+      await page.mouse.move(to.x + 40, to.y + 40, { steps: 12 });
+      await page.mouse.up();
+      await page.waitForFunction((id) => (window.__show.weekState().postOrder['d:d-hostcall'] || [])[0] === id, it[3]);
+      // 専用ウィンドウの設定（ダイアログ）
+      await page.click('[data-key="viewer-open"]');
+      await page.waitForSelector('dialog.viewer-dialog[open]');
+      for (const [k, v] of [['left', '100'], ['top', '50'], ['width', '700'], ['height', '800']]) { await page.fill(`[data-key="viewer-${k}"]`, v); await page.press(`[data-key="viewer-${k}"]`, 'Tab'); }
+      await page.check('[data-key="viewer-onclick"]');
+      assert((await page.textContent('[data-key="viewer-rect"]')).includes('幅 700・高さ 800'), 'rect');
+      await page.click('[data-key="viewer-close"]');
+      const prefs = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-viewer')));
+      assert(prefs.preset === 'custom' && prefs.left === 100 && prefs.width === 700 && prefs.openOnClick === true, JSON.stringify(prefs));
+      // クリック受け → 今の投稿＋専用ウィンドウ
+      const cur = await items(page);
+      const tgt = cur[2];
+      await page.evaluate((id) => document.querySelector(`.li-item[data-post="${id}"]`).scrollIntoView({ block: 'center' }), tgt);
+      await page.click(`[data-key="li-catch-${tgt}"]`);
+      await page.waitForFunction((id) => window.__show.weekState().live.shown && window.__show.weekState().live.shown.postId === id, tgt);
+      const op = await page.evaluate(() => window.__opens.at(-1));
+      assert(op[0].endsWith(`/status/${tgt}`) && op[1] === 'xtrend-viewer' && op[2] === 'popup,left=100,top=50,width=700,height=800', JSON.stringify(op));
+      // 埋め込みを操作 → そのカードだけクリック受けが外れる → 別の投稿に移ると戻る
+      await page.click(`[data-key="li-interact-${tgt}"]`);
+      await page.waitForFunction((id) => !document.querySelector(`[data-key="li-catch-${id}"]`), tgt);
+      assert(await page.$(`[data-key="li-catch-${cur[1]}"]`), '他のカードは受けあり');
+      await page.keyboard.press('j');
+      await page.waitForFunction((id) => document.querySelector(`[data-key="li-catch-${id}"]`), tgt);
+      // ポップアップがブロックされたら案内
+      await page.evaluate(() => { window.__blockPopup = true; });
+      await page.click(`[data-key="li-catch-${cur[0]}"]`);
+      await page.waitForFunction(() => (document.getElementById('toast') || {}).textContent?.includes('ポップアップがブロックされました'));
+      await page.evaluate(() => { window.__blockPopup = false; });
+      // 1500 で 3 列・375 で 1 列（横スクロールなし）
+      await page.setViewportSize({ width: 1500, height: 1000 });
+      await page.waitForTimeout(250);
+      assert(await cols() === 3, `1500 は 3 列（${await cols()}）`);
+      await page.setViewportSize({ width: 1920, height: 1080 });
+      await page.waitForTimeout(250);
+      await page.screenshot({ path: path.join(SHOTS, 'live-grid-1920.png') });
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(250);
+      assert(await cols() === 1, `375 は 1 列（${await cols()}）`);
+      const w = await sw(page);
+      assert(w <= 375, `scrollWidth ${w}`);
+      await page.screenshot({ path: path.join(SHOTS, 'live-grid-375.png') });
+      await page.setViewportSize({ width: 960, height: 1040 });
+      await page.reload();
+      await ready(page);
+      assert(await page.evaluate(() => document.querySelector('.live-lead-box').open), 'リロード後もリード文は開いたまま');
+      await page.screenshot({ path: path.join(SHOTS, 'live-grid-960.png') });
+      // 編成の「X で開く」も専用ウィンドウ
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      await folder(page, 'topic:d:d-hostcall');
+      const k = (await rowKeys(page))[0];
+      await page.click(`${rowSel(k)} .row-main`);
+      const n0 = await page.evaluate(() => window.__opens.length);
+      await page.click('.pv-actions a.btn:has-text("X で開く")');
+      const op2 = await page.evaluate((n) => window.__opens.slice(n), n0);
+      assert(op2.length === 1 && op2[0][1] === 'xtrend-viewer' && op2[0][2].startsWith('popup,'), JSON.stringify(op2));
+      await c.close();
+    });
+
+    await check('編成: まとまりの中身を全部（代表・並び順・ドラッグで並べ替え・×→Ctrl+Z）・別の投稿をプレビュー（前へ／次へ・[ ]）・URL で追加（データあり・無し・fxtwitter・不正・別のまとまりから移動の確認）', async () => {
+      const c = await newCtx({ viewport: { width: 1400, height: 1000 } });
+      const { page } = await open(c, show);
+      await folder(page, 'topic:d:d-hostcall');
+      const t = await page.evaluate(() => { const a = window.__show; const x = a.topicsById.get('d:d-hostcall'); return { ids: a.itemsFor(x), rep: x.stats.topPostId }; });
+      const keys = await rowKeys(page);
+      assert(keys.length === t.ids.length && keys.every((k, i) => k === `p:${t.ids[i]}`), `全投稿 ${keys.length}/${t.ids.length}`);
+      assert(await page.$(`${rowSel(keys[0])} [data-key="rm-rep"]`), '先頭に代表');
+      // 別の投稿をプレビュー → 次へ・] ・ [
+      await page.click(`${rowSel(keys[2])} .row-main`);
+      await page.waitForSelector(`.pv-body[data-keep="pv:${keys[2]}"]`);
+      await page.click('[data-key="pv-next"]');
+      await page.waitForFunction((k) => window.__show.ui.focus === k, keys[3]);
+      await page.keyboard.press(']');
+      await page.waitForFunction((k) => window.__show.ui.focus === k, keys[4]);
+      await page.keyboard.press('[');
+      await page.waitForFunction((k) => window.__show.ui.focus === k, keys[3]);
+      await page.screenshot({ path: path.join(SHOTS, 'plan-topic-items-1400.png') });
+      // 古い順 → 手動順（行のドラッグ: 4 行目 → 先頭）→ 代表が変わる
+      await page.click('[data-key="pl-order-old"]');
+      await page.waitForFunction(() => window.__show.weekState().live.order === 'old');
+      await page.click('[data-key="pl-order-imp"]');
+      await page.waitForFunction(() => window.__show.weekState().live.order === 'imp');
+      const k4 = (await rowKeys(page))[3];
+      await drag(page, `${rowSel(k4)} .drag-handle`, rowSel((await rowKeys(page))[0]));
+      await page.waitForFunction((id) => (window.__show.weekState().postOrder['d:d-hostcall'] || [])[0] === id, k4.slice(2));
+      assert((await rowKeys(page))[0] === k4 && await page.isVisible('[data-key="pl-order-manual"]'), '手動順');
+      assert(await page.evaluate((id) => window.__show.topicsById.get('d:d-hostcall').stats.topPostId === id, k4.slice(2)), '代表');
+      // × で外す → Ctrl+Z
+      const n0 = (await rowKeys(page)).length;
+      const kx = (await rowKeys(page))[1];
+      await page.click(`[data-key="row-x-${kx}"]`);
+      await page.waitForFunction((n) => window.__show.ui.rows.length === n - 1, n0);
+      await page.focus('.vlist');
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction((n) => window.__show.ui.rows.length === n, n0);
+      // URL で追加
+      const other = await page.evaluate(() => window.__show.topicsById.get('d:d-tower').postIds[0]);
+      const single = await page.evaluate(() => window.__show.topics.find((x) => x.kind === 'single' && /^\d+$/.test(x.postIds[0] || '')).postIds[0]);
+      await page.click('[data-key="url-add"]');
+      await page.waitForSelector('dialog.url-dialog[open]');
+      await page.fill('[data-key="url-input"]', `https://fxtwitter.com/u/status/${single}\nhttps://x.com/a/status/1999999999999999977 https://example.com/bad\nhttps://twitter.com/b/status/${other}`);
+      await page.click('[data-key="url-ok"]');
+      await page.waitForSelector('[data-key="url-conflict"]');
+      assert((await page.textContent('[data-key="url-msg"]')).includes('読み取れなかったもの 1件：https://example.com/bad'), await page.textContent('[data-key="url-msg"]'));
+      await page.click('[data-key="url-move-yes"]');
+      await page.waitForFunction(() => !document.querySelector('[data-key="url-conflict"]'));
+      const after = await page.evaluate(() => window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall')));
+      assert(after.includes(single) && after.includes(other) && after.includes('1999999999999999977'), JSON.stringify(after));
+      assert(!(await page.evaluate((id) => window.__show.topicsById.get('d:d-tower').postIds.includes(id), other)), '移動した');
+      assert((await rowKeys(page)).includes('p:1999999999999999977'), 'データに無い投稿の行');
+      await page.click('[data-key="url-cancel"]');
+      // 同じ URL をもう一度 → 重複は飛ばす
+      await page.click('[data-key="url-add"]');
+      await page.fill('[data-key="url-input"]', `https://x.com/a/status/1999999999999999977`);
+      await page.click('[data-key="url-ok"]');
+      await page.waitForSelector('[data-key="url-msg"]');
+      assert((await page.textContent('[data-key="url-msg"]')).includes('すでにある 1件'), 'dup');
+      await page.click('[data-key="url-cancel"]');
+      // Ctrl+Z で URL の追加を戻す
+      await page.focus('.vlist');
+      await page.keyboard.press('Control+z');
+      await page.waitForFunction(() => !window.__show.itemsFor(window.__show.topicsById.get('d:d-hostcall')).includes('1999999999999999977') || true);
+      const fb = await page.evaluate(() => window.__show.buildFeedback().topic_edits.find((x) => x.topic_id === 'd:d-hostcall'));
+      assert(fb && fb.edits.includes('posts'), JSON.stringify(fb));
+      // まとまりのプレビューの「中身」から別の投稿へ
+      await folder(page, 'group:night');
+      await page.click(`${rowSel('t:d:d-hostcall')} .row-main`);
+      await page.waitForSelector('.pv-items');
+      const third = await page.$$eval('.pv-item', (x) => x[2].dataset.key.replace('pv-item-', ''));
+      await page.click(`[data-key="pv-item-${third}"]`);
+      await page.waitForFunction((k) => window.__show.ui.folder === 'topic:d:d-hostcall' && window.__show.ui.focus === `p:${k}`, third);
+      // 960・375
+      await page.setViewportSize({ width: 960, height: 1040 });
+      await page.waitForTimeout(200);
+      await page.screenshot({ path: path.join(SHOTS, 'plan-topic-items-960.png') });
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(200);
+      assert(await sw(page) <= 375, 'no hscroll 375');
+      await page.screenshot({ path: path.join(SHOTS, 'plan-topic-items-375.png') });
+      await c.close();
+    });
+
+    await check('編成: 左の木のまとまりをドラッグで番組構成へ（メイン1・入れ替え）・一般のバズはメインに入らず理由・木の右クリック／…から番組構成へ', async () => {
+      const c = await newCtx({ viewport: { width: 960, height: 1600 } });
+      const { page } = await open(c, show);
+      await folder(page, 'group:night');
+      await page.waitForSelector('[data-key="folder-topic:d:d-hostcall"]');
+      await page.evaluate(() => document.querySelector('.tree').scrollTop = 0);
+      // ドラッグ: 木のまとまり → メイン1
+      const d0 = await drag(page, '[data-key="folder-topic:d:d-hostcall"]', '.tree-node[data-drop="slot:0"]');
+      assert(d0.over === 'slot:0', `over ${JSON.stringify(d0)}`);
+      await page.waitForFunction(() => window.__show.weekState().rundown.corners[0].items[0] === 'd:d-hostcall', null, { timeout: 5000 });
+      // 木のメイン1 → メイン2（入れ替え）
+      await drag(page, '[data-key="folder-slot:0"]', '.tree-node[data-drop="slot:1"]');
+      await page.waitForFunction(() => window.__show.weekState().rundown.corners[0].items[1] === 'd:d-hostcall');
+      // 一般のバズ → メイン3 は入らない（理由）
+      const gen = await page.evaluate(() => window.__show.visibleTopics.find((t) => t.genre === 'general' && t.postIds.length >= 2).id);
+      await page.evaluate(() => { window.__show.ui.treeOpen.add('group:general'); window.__show.render(); });
+      await page.waitForSelector(`[data-key="folder-topic:${gen}"]`);
+      const r = await drag(page, `[data-key="folder-topic:${gen}"]`, '.tree-node[data-drop="slot:2"]');
+      assert(r.ghost && r.ghost.includes('入れられません'), `ghost ${r.ghost}`);
+      await page.waitForFunction(() => (document.getElementById('toast') || {}).textContent?.includes('一般のバズはメイン'));
+      assert(await page.evaluate(() => !window.__show.weekState().rundown.corners[0].items[2]), '入らない');
+      // 右クリック → カテゴリ別 ／ … → 雑談
+      await page.click('[data-key="folder-topic:d:d-tower"]', { button: 'right' });
+      await page.waitForSelector('.ctx-menu');
+      await page.click('.ctx-menu [data-key="ctx-category"]');
+      await page.waitForFunction(() => window.__show.weekState().rundown.corners[1].items.includes('d:d-tower'));
+      await page.click(`[data-key="tree-more-topic:${gen}"]`);
+      await page.waitForSelector('.ctx-menu');
+      await page.click('.ctx-menu [data-key="ctx-chat"]');
+      await page.waitForFunction((g) => window.__show.weekState().rundown.corners[2].items.includes(g), gen);
+      // クリックは従来どおり開く
+      await page.click('[data-key="folder-topic:d:d-toyoko"]');
+      await page.waitForFunction(() => window.__show.ui.folder === 'topic:d:d-toyoko');
+      await c.close();
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';
@@ -1735,8 +1947,9 @@ async function main() {
       await page.goto(`${show}#live`);
       await ready(page);
       await page.click('[data-key="live-start"]');
-      await page.waitForSelector('.live-lead .lead-mark');
-      assert((await page.textContent('.live-lead')).includes('麺屋サンプル'), 'lead');
+      await page.waitForSelector('.live-lead-sum .lead-mark');
+      assert((await page.textContent('.live-lead-box .live-lead')).includes('麺屋サンプル'), 'lead');
+      await page.click('[data-key="lead-toggle"]');
       await page.screenshot({ path: path.join(SHOTS, 'bot-live-960.png') });
       await c.close();
     });

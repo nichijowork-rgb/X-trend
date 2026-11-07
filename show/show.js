@@ -7,11 +7,12 @@ import {
   defaultWeek, newSince, liveReduce, carriedTopicIds, syncCarriedOut, weekLabel, compareIds, bookmarkList, usedPostIdsOf,
   partitionTopics, serializeSaved, parseSaved, shelveTopic, unshelveTopic, trashTopic, restoreTrash, hidePost, unhidePost,
   applyGenreOverrides, majorityGenre, pastUsedIds, usedTopicIds, normalizePriorityGenre,
-  resolveRange, sanitizeRange, recommendCount, placedPostIds, toJstInput, fromJstInput, topicItemIds, isImageItem,
+  resolveRange, sanitizeRange, recommendCount, placedPostIds, toJstInput, fromJstInput, topicItemIds, isImageItem, extractStatusIds,
 } from './js/logic.js';
-import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory } from './js/folders.js';
+import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory, addPostsToTopic } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { parseViewerPrefs, openViewer, isXUrl, screenSnapshot, VIEWER_PREF_KEY } from './js/viewer.js';
 import { IMAGE_LIMITS, checkImageFile, decodeImage, shrinkImage, canvasEncoder, shortHash, newImageId, validImageDataUrl } from './js/imaging.js';
 import { putImage, getImage, deleteImage, imageKeys } from './js/imagestore.js';
 import { applyScriptImport } from './js/scriptimport.js';
@@ -190,7 +191,7 @@ function recompute() {
     posts: weekPosts, extraPosts, missingIds: missingIds.sort(compareIds), personalIds, bookmarkIds, carried,
     postsById: app.postsById, dict: app.saved.dict, overrides: wk.overrides, refTs: app.ds.refTs, cache: app.clusterCache,
     hiddenPostIds, botTopics: app.bot ? app.bot.topics : [], pinnedIds: pinnedTopicIds(wk), priorityGenre: app.saved.priorityGenre,
-    postOrder: wk.postOrder,
+    postOrder: wk.postOrder, topicLinks: wk.topicLinks,
   });
   app.topics = build(hidden);
   // 類似まとめ（c:）などで話題 id から投稿が分からず構成の話題が消えたときは、期間外の候補も入れて作り直し、その話題の投稿を戻す
@@ -316,7 +317,10 @@ app.setLiveOrder = (topicId, order) => {
 app.removeItem = (topic, id) => {
   app.edit('話題から外す', (w) => {
     if (isImageItem(id)) w.images = w.images.filter((x) => `img:${x.id}` !== id);
-    else if ((topic.missingIds || []).includes(id)) w.overrides.manual = w.overrides.manual.map((m) => (m.id === topic.id ? { ...m, missing: (m.missing || []).filter((x) => x !== id) } : m));
+    else if ((topic.missingIds || []).includes(id)) {
+      w.overrides.manual = w.overrides.manual.map((m) => (m.id === topic.id ? { ...m, missing: (m.missing || []).filter((x) => x !== id) } : m));
+      if (w.topicLinks && w.topicLinks[topic.id]) w.topicLinks = { ...w.topicLinks, [topic.id]: w.topicLinks[topic.id].filter((x) => x !== id) };
+    }
     else w.overrides.moves = { ...w.overrides.moves, [id]: `p:${id}` };
     if (w.postOrder[topic.id]) w.postOrder = { ...w.postOrder, [topic.id]: w.postOrder[topic.id].filter((x) => x !== id) };
   }, { toastText: isImageItem(id) ? '画像を外しました' : '話題から外しました（受信箱に戻りました）' });
@@ -328,6 +332,25 @@ app.hideItem = (topic, id) => {
     s.hiddenPosts = hidePost(s, id, app.weekKey, Date.now(), topic.name).hiddenPosts;
     if (w.postOrder[topic.id]) w.postOrder = { ...w.postOrder, [topic.id]: w.postOrder[topic.id].filter((x) => x !== id) };
   }, { toastText: '投稿を削除しました（どの話題にも出しません。ゴミ箱から戻せます）' });
+};
+
+/**
+ * まとまりに X の URL から投稿を足す（1 回の編集。Ctrl+Z で戻せる）。
+ * 返り値: { result（addPostsToTopic の結果）, invalid（読み取れなかった文字列）} 。別のまとまりにある投稿は move が true のときだけ移す
+ */
+app.addUrlsToTopic = (topicId, text, move = false) => {
+  const t = app.topicsById.get(topicId);
+  const ex = extractStatusIds(text);
+  if (!t) return { result: null, invalid: ex.invalid };
+  let result = null;
+  const ids = ex.ids.map((x) => x.id);
+  // 移すものがあるかを先に確かめる（ここでは書き換えない）
+  const probe = addPostsToTopic(JSON.parse(JSON.stringify(app.weekState())), t, ids, { postsById: app.basePostsById, postTopic: app.postTopic, topicsById: app.topicsById, inRange: new Set(app.weekPosts.map((p) => p.id)), move });
+  if (!probe.added.length && !probe.missing.length) return { result: probe, invalid: ex.invalid };
+  app.edit(`URL で追加「${t.name}」`, (w) => {
+    result = addPostsToTopic(w, t, ids, { postsById: app.basePostsById, postTopic: app.postTopic, topicsById: app.topicsById, inRange: new Set(app.weekPosts.map((p) => p.id)), move });
+  }, { toastText: `「${t.name}」に ${probe.added.length + probe.missing.length}件追加しました${probe.missing.length ? `（うちデータに無い投稿 ${probe.missing.length}件は埋め込みで表示）` : ''}` });
+  return { result, invalid: ex.invalid };
 };
 
 // 画像の中身（IndexedDB）のキャッシュ: id → { url（表示用 object URL）, obs（OBS 用 data URL） }
@@ -428,6 +451,35 @@ async function cleanupImages() {
     for (const k of await imageKeys()) if (!used.has(k)) await deleteImage(k);
   } catch { /* 使えないブラウザは何もしない */ }
 }
+
+// ---------------------------------------------------------------- 投稿を開く専用ウィンドウ（名前付きポップアップ）
+
+app.viewerPrefs = (() => { try { return parseViewerPrefs(localStorage.getItem(VIEWER_PREF_KEY)); } catch { return parseViewerPrefs(null); } })();
+app.saveViewerPrefs = (v) => {
+  app.viewerPrefs = parseViewerPrefs({ ...app.viewerPrefs, ...v });
+  try { localStorage.setItem(VIEWER_PREF_KEY, JSON.stringify(app.viewerPrefs)); } catch { /* 保存できなくても今回は使う */ }
+};
+/** 進行のリード文の開閉（localStorage） */
+app.leadOpen = (() => { try { return localStorage.getItem('xtrend-show-lead-open') === '1'; } catch { return false; } })();
+app.setLeadOpen = (open) => {
+  app.leadOpen = Boolean(open);
+  try { localStorage.setItem('xtrend-show-lead-open', open ? '1' : '0'); } catch { /* 保存できなくても今回は開閉する */ }
+};
+/** 専用ウィンドウで開く。ブロックされたら日本語で案内 */
+app.openViewer = (url) => {
+  const ok = openViewer(url, app.viewerPrefs);
+  if (!ok) toast('ポップアップがブロックされました。アドレスバー右のアイコン（ポップアップのブロック）から、このサイトのポップアップを「常に許可」にしてください');
+  return ok;
+};
+/** 画面（モニター）の一覧（Chrome の Window Management API。権限の確認が出る）。使えなければ null */
+app.loadScreens = async () => {
+  if (typeof window.getScreenDetails !== 'function') return null;
+  try {
+    const d = await window.getScreenDetails();
+    app.screens = d.screens.map((x, i) => screenSnapshot(x, i)).filter(Boolean);
+    return app.screens;
+  } catch { app.screens = null; return null; }
+};
 
 /** 貼り付けた画像を入れる話題（進行は今の話題、編成はプレビュー中・開いているまとまり） */
 app.pasteTopicId = () => {
@@ -593,6 +645,8 @@ function updateObsPill() {
   const pill = $('obs-pill');
   if (!pill) return;
   const st = app.obs ? app.obs.status() : { state: 'idle' };
+  // 進行の固定ヘッダー内のピルも
+  for (const x of document.querySelectorAll('[data-obs-pill]')) { x.textContent = obsStatusLabel(st); x.dataset.state = st.state; x.title = st.reason || 'OBS との連動の設定'; }
   pill.hidden = !(app.route === 'live' || app.route === 'obs-setup');
   pill.textContent = obsStatusLabel(st);
   pill.dataset.state = st.state;
@@ -991,6 +1045,14 @@ async function main() {
     renderRoute();
   });
   window.addEventListener('hashchange', renderRoute);
+  // 「X で開く」などの X のリンクは、新しいタブではなく専用ウィンドウ（位置・大きさは設定）で開く
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || !isXUrl(a.href) || !(app.route === 'live' || app.route === 'plan' || app.route === 'review')) return;
+    e.preventDefault();
+    app.openViewer(a.href);
+  });
   // 画像の貼り付け（Ctrl+V）: 進行は今の話題、編成はプレビュー中の話題へ
   document.addEventListener('paste', (e) => {
     const files = [...((e.clipboardData && e.clipboardData.files) || [])].filter((f) => /^image\//.test(f.type));

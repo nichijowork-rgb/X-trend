@@ -14,6 +14,8 @@ let active = null;
  *   canDrop(key, rows): そこに置けるか
  *   onDrop(key, rows): 置いたとき
  *   onClick(e): 動かさずに離したとき（クリック扱い）
+ *   whyNot(key, rows): 置けないときの理由（あれば、その上で灰色＋理由を出し、離したら onDenied）
+ *   onDenied(message): 置けない所で離したとき
  *   handle: つまみから始めたか（タッチはつまみのみ）
  * }
  */
@@ -42,8 +44,10 @@ export function beginPointer(e, opts) {
     cleanup();
     if (st.dragging) {
       const key = st.over ? st.over.dataset.drop : null;
+      const denied = st.denied;
       finish(st);
       if (key && st.opts.canDrop(key, st.rows)) st.opts.onDrop(key, st.rows);
+      else if (denied && st.opts.onDenied) st.opts.onDenied(denied);
       // ドラッグ後のクリックは無視
       suppressClick();
     } else if (opts.onClick && ev.type === 'pointerup') {
@@ -102,7 +106,18 @@ function updateOver(st, x, y) {
   const el = document.elementFromPoint(x, y);
   if (st.ghost) st.ghost.style.visibility = '';
   let target = el ? el.closest('[data-drop]') : null;
+  // 置けない所: 灰色にして理由を出す（離したら onDenied）
+  const raw = target;
   if (target && !st.opts.canDrop(target.dataset.drop, st.rows)) target = null;
+  const why = !target && raw && st.opts.whyNot ? st.opts.whyNot(raw.dataset.drop, st.rows) : null;
+  if (st.noEl && st.noEl !== raw) { st.noEl.classList.remove('is-drop-no'); st.noEl = null; }
+  st.denied = why || null;
+  if (why && raw) { raw.classList.add('is-drop-no'); st.noEl = raw; }
+  if (st.ghost) {
+    const lab = st.ghost.querySelector('.drag-label');
+    if (lab) lab.textContent = why ? `入れられません：${why}` : st.opts.label(st.rows);
+    st.ghost.classList.toggle('is-no', Boolean(why));
+  }
   if (target === st.over) return;
   if (st.over) st.over.classList.remove('is-drop-over');
   st.over = target;
@@ -112,6 +127,7 @@ function updateOver(st, x, y) {
 
 function finish(st) {
   if (st.over) st.over.classList.remove('is-drop-over');
+  if (st.noEl) st.noEl.classList.remove('is-drop-no');
   for (const el of document.querySelectorAll('.is-drop-ok')) el.classList.remove('is-drop-ok');
   if (st.ghost) st.ghost.remove();
   document.body.classList.remove('is-dragging');

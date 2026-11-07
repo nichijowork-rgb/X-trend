@@ -111,7 +111,7 @@ export function renderObsSetup(app) {
     Object.assign(b.style, { left: `${(g.x / 1920) * 100}%`, top: `${(g.y / 1080) * 100}%`, width: `${(g.w / 1920) * 100}%`, height: `${(g.h / 1080) * 100}%` });
     canvas.append(b);
   }
-  fig.append(canvas, h('figcaption', { class: 'muted' }, '参考配置（1920×1080）。灰色＝ほかのツール（重ねない）、色つき＝この番組サイトのパーツ。コーナータイトルは全面に数秒だけ出ます。CastCraft のコメント吹き出しは投稿カードと重なることがあるので、吹き出しを出す間はカードを「隠し中」にするか、吹き出しを左寄せにしてください。'));
+  fig.append(canvas, h('figcaption', { class: 'muted' }, '参考配置（1920×1080）。灰色＝ほかのツール（重ねない）、色つき＝この番組サイトのパーツ。コーナータイトルは全面に数秒だけ出ます。CastCraft のコメント吹き出しは投稿カードと重なることがあるので、吹き出しは左寄せにしてください。'));
   root.append(h('h3', { class: 'sub-title' }, '参考配置'), fig);
   root.append(h('p', { class: 'muted' }, '※ 進行画面（またはこの画面）を開いている間だけ、オーバーレイへ進行状態を送ります（変化したとき＋5 秒おき）。OBS を後から開いても数秒で追いつきます。'));
   if (app.ui.obsDlg) {

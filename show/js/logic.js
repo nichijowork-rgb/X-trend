@@ -176,11 +176,11 @@ export function weekLabel(week) {
 
 // ================================================================ URL → 投稿 id
 
-const STATUS_RE = /^https?:\/\/(?:www\.|mobile\.|m\.)?(?:x|twitter)\.com\/(?:[A-Za-z0-9_]{1,30}|i(?:\/web)?)\/status(?:es)?\/(\d{5,25})(?:[/?#].*)?$/i;
+const STATUS_RE = /^https?:\/\/(?:www\.|mobile\.|m\.)?(?:x|twitter|fxtwitter|vxtwitter|fixupx|fixvx)\.com\/(?:[A-Za-z0-9_]{1,30}|i(?:\/web)?)\/status(?:es)?\/(\d{5,25})(?:[/?#].*)?$/i;
 
 /**
  * 貼り付けたテキスト（複数行・スペース区切り可）から投稿 id を取り出す。
- * x.com / twitter.com の status URL と、数字だけの id を受け付ける。
+ * x.com / twitter.com（www・mobile）・fxtwitter.com・vxtwitter.com の status URL と、数字だけの id を受け付ける。
  * 返り値: { ids: [{ id, url }], invalid: [読み取れなかった文字列] }（重複は除く・順番は保つ）
  */
 export function extractStatusIds(text) {
@@ -844,12 +844,20 @@ export function buildTopics(input) {
   const pg = input.priorityGenre === undefined ? GENRE_PRIORITY.default : input.priorityGenre;
   const prio = GENRE_KEYS.includes(pg) ? pg : null;
   const postOrder = input.postOrder && typeof input.postOrder === 'object' ? input.postOrder : {};
+  const topicLinks = input.topicLinks && typeof input.topicLinks === 'object' ? input.topicLinks : {};
   const out = [];
   for (const t of topics.values()) {
-    if (!t.postIds.length && !['link', 'manual', 'carried'].includes(t.kind)) continue;
+    if (!t.postIds.length && !['link', 'manual', 'carried'].includes(t.kind) && !(topicLinks[t.id] || []).length) continue;
     const tp = t.postIds.map((id) => byId.get(id)).filter(Boolean);
     const stats = topicStats(tp, refTs);
     t.postIds = [...tp].sort((a, b) => (b.metrics?.impression_count ?? -1) - (a.metrics?.impression_count ?? -1)).map((p) => p.id);
+    // URL で追加した「データに無い投稿」
+    const links = (topicLinks[t.id] || []).filter((id) => !byId.has(id) && !(t.missingIds || []).includes(id));
+    if (links.length) {
+      t.missingIds = [...(t.missingIds || []), ...links];
+      if (!t.linkId && !t.postIds.length) t.linkId = links[0];
+      t.movedIn = true;
+    }
     // 手動順（進行・編成で並べ替えた順）。先頭の投稿が代表投稿
     const man = postOrder[t.id];
     if (man && man.length && t.postIds.length) {
@@ -1118,7 +1126,7 @@ export function buildCues(rundown, topicsById) {
 }
 
 export function defaultLive() {
-  // cardVisible: 映す用に投稿カードを出しているか（段階2で OBS のパーツ表示と連動する）
+  // cardVisible: 投稿カードは常に表示（表示中/隠し中の切り替えは廃止。古い保存データの false も true として扱う）
   // shown: 「今の投稿」（{ cueId, postId }。話題が変わると null＝先頭の投稿に戻る）。order: 進行の並び（imp インプレ順／old 古い順）
   return { startedAt: null, index: 0, status: {}, history: [], enteredAt: {}, cardVisible: true, shown: null, order: 'imp' };
 }
@@ -1261,7 +1269,7 @@ function liveReduceRaw(live, action, cues) {
       return enter(s);
     }
     case 'show': {
-      // 「これを映す」: 今のキューの投稿を選ぶ（投稿カード：表示中/隠し中とは別）
+      // 「今の投稿」: 今のキューの投稿を選ぶ
       const cue = cues[s.index];
       if (!cue || cue.kind !== 'topic' || !ITEM_RE.test(String(action.postId || ''))) return s;
       s.shown = { cueId: cue.id, postId: String(action.postId) };
@@ -1271,7 +1279,8 @@ function liveReduceRaw(live, action, cues) {
       s.order = action.order === 'old' ? 'old' : 'imp';
       return s;
     case 'toggleCard':
-      s.cardVisible = typeof action.visible === 'boolean' ? action.visible : !s.cardVisible;
+      // 廃止（投稿カードは常に表示）
+      s.cardVisible = true;
       return s;
     default:
       return s;
@@ -1418,6 +1427,7 @@ export function defaultWeek() {
     mainCand: [], // メイン候補（メイン1〜3に入れる前の置き場）。話題 id の並び
     range: defaultRange(), // 台本づくりの対象期間（版 5。既定は番組週）
     scriptHold: [], // 台本ファイルの「保留」（[{ name, postIds }]。保留フォルダへ入れる）
+    topicLinks: {}, // URL で話題に追加した「データに無い投稿」（話題 id → [投稿 id]。埋め込みで表示）
     postOrder: {}, // 話題の中の手動順（話題 id → [投稿 id・'img:<画像id>']。先頭が代表投稿）
     images: [], // 自分で追加した画像（中身は IndexedDB。[{ id, topicId, caption, w, h, type, bytes, hash, at }]）
   };
@@ -1499,7 +1509,7 @@ function sanitizeLive(v, ver = SCHEMA_VERSION) {
   d.history = strList(o.history, 500).filter((id) => d.status[id]);
   const en = obj(o.enteredAt) || {};
   for (const [k, x] of Object.entries(en)) if (isNum(x) && cornerDef(k)) d.enteredAt[k] = x;
-  d.cardVisible = o.cardVisible !== false;
+  d.cardVisible = true; // 投稿カードは常に表示（保存データに false が残っていても true）
   const sh = obj(o.shown);
   d.shown = sh && typeof sh.cueId === 'string' && ITEM_RE.test(String(sh.postId)) ? { cueId: sh.cueId.slice(0, 200), postId: String(sh.postId) } : null;
   d.order = o.order === 'old' ? 'old' : 'imp';
@@ -1567,6 +1577,12 @@ function sanitizeWeek(v, ver = SCHEMA_VERSION) {
     if (list.length) w.postOrder[k] = list;
   }
   w.images = sanitizeImages(o.images);
+  w.topicLinks = {};
+  for (const [k, v] of Object.entries(obj(o.topicLinks) || {})) {
+    if (k === '__proto__' || k.length > 200 || !Array.isArray(v)) continue;
+    const list = [...new Set(v.filter((x) => typeof x === 'string' && ID_RE.test(x)))].slice(0, 300);
+    if (list.length) w.topicLinks[k] = list;
+  }
   w.scriptHold = (Array.isArray(o.scriptHold) ? o.scriptHold : []).map((x) => (obj(x) ? { name: (str(x.name, 80) || '').trim(), postIds: (Array.isArray(x.postIds) ? x.postIds : []).filter((id) => typeof id === 'string' && ID_RE.test(id)).slice(0, 500) } : null)).filter((x) => x && x.postIds.length).slice(0, 100);
   w.rundown = sanitizeRundown(o.rundown, ver);
   w.script = sanitizeScript(o.script);

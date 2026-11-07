@@ -23,7 +23,7 @@ export function liveSnapshot({ weekKey, live, cues, topicsById, itemsFor = null 
     corner: cue ? { key: cue.cornerKey, name: cornerDef(cue.cornerKey).name } : null,
     topic: topic ? { id: topic.id, name: topic.name, genre: topic.genre, n: cue.n, of: cue.of } : null,
     postId: topic ? liveShownPost(live, cue, topic, itemsFor ? itemsFor(topic) : null) : null, // 「今の投稿」（無ければ並びの先頭）
-    cardVisible: live.cardVisible !== false,
+    cardVisible: true, // 投稿カードは常に表示
   };
 }
 
