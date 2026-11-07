@@ -508,6 +508,7 @@ export function addPostsToTopic(week, topic, ids, ctx) {
     } else {
       const list = (week.topicLinks && week.topicLinks[topic.id]) || [];
       week.topicLinks = { ...(week.topicLinks || {}), [topic.id]: [...list, id] };
+      week.linkAddedAt = { ...(week.linkAddedAt || {}), [id]: now };
       out.missing.push(id);
     }
   }

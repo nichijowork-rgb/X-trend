@@ -6,7 +6,8 @@
 //   genre_overrides: [{ id, genre（カテゴリ名）, was: [元のカテゴリ] }],
 //   topic_edits: [{ topic_id, source: 'bot'|'site', name, genre, post_ids, deleted, edits: ['rename'|'genre'|'posts'|'merge'|'new'|'shelve'|'delete'], merged_from? }],
 //   removed_posts: [{ id, reason: 'trash'|'hidden', topic_id? }],
-//   hold_terms: ['ヒカル', …], hold_exceptions: ['<投稿id か 話題id>', …] }
+//   hold_terms: ['ヒカル', …], hold_exceptions: ['<投稿id か 話題id>', …],
+//   requested_posts: [{ id, url, topic_id, added_at, week, source: 'url'|'script' }] }   … まだ posts.json に無い投稿の取得依頼（現れたら自動で外れる）
 //  - topic_id はボットの話題ならボットの id（サイトの 'g:' を外したもの）、サイトの話題はサイトの id（d:辞書 / t:話題名 / c:類似 / m:手動 …）
 //  - 書き込み先は BOT.feedbackPath（feedback/）に固定。data/ には書かない
 
@@ -77,8 +78,33 @@ export function buildFeedback(input) {
     removed_posts: [...removed.values()].sort((a, b) => compareIds(a.id, b.id)),
     // 保留する言葉（YouTuber 関連など。ボットが分類・まとめから外す参考）と、ユーザーが保留から戻した投稿・話題
     hold_terms: [...(saved.holdTerms || [])],
+    requested_posts: requestedPosts(saved, basePostsById),
     hold_exceptions: [...new Set(saved.holdExceptions || [])].map((x) => (feedbackTopicId(x).source === 'bot' ? feedbackTopicId(x).topic_id : x)).sort(),
   };
+}
+
+/**
+ * ボットへの取得依頼: URL で追加した（と台本で入れた）まだ posts.json に無い投稿。posts.json に現れたら自動で外れる。
+ * 全部の番組週から（同じ id は最初の 1 件）
+ */
+export function requestedPosts(saved, basePostsById = new Map()) {
+  const out = new Map();
+  for (const [week, w] of Object.entries(saved.weeks || {}).sort(([a], [b]) => (a < b ? -1 : 1))) {
+    const at = (w && w.linkAddedAt) || {};
+    for (const [tid, ids] of Object.entries((w && w.topicLinks) || {})) {
+      for (const id of ids || []) {
+        if (basePostsById.has(id) || out.has(id)) continue;
+        out.set(id, { id, url: `https://x.com/i/web/status/${id}`, topic_id: feedbackTopicId(tid).topic_id, added_at: Number.isFinite(at[id]) ? jstIso(at[id]) : null, week, source: 'url' });
+      }
+    }
+    for (const m of ((w && w.overrides && w.overrides.manual) || [])) {
+      for (const id of m.missing || []) {
+        if (basePostsById.has(id) || out.has(id)) continue;
+        out.set(id, { id, url: `https://x.com/i/web/status/${id}`, topic_id: m.id, added_at: null, week, source: 'script' });
+      }
+    }
+  }
+  return [...out.values()].sort((a, b) => compareIds(a.id, b.id));
 }
 
 /** 中身が同じか（generated_at は見ない） */
@@ -89,7 +115,7 @@ export function sameFeedback(a, b) {
 
 /** 件数のまとめ（画面表示用） */
 export function feedbackCounts(fb) {
-  return { genres: fb.genre_overrides.length, topics: fb.topic_edits.filter((x) => !x.deleted).length, deleted: fb.topic_edits.filter((x) => x.deleted).length, posts: fb.removed_posts.length };
+  return { genres: fb.genre_overrides.length, topics: fb.topic_edits.filter((x) => !x.deleted).length, deleted: fb.topic_edits.filter((x) => x.deleted).length, posts: fb.removed_posts.length, requested: (fb.requested_posts || []).length };
 }
 
 // ================================================================ GitHub に直接保存（任意）

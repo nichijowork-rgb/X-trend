@@ -1456,7 +1456,7 @@ test('ボットへの修正（feedback）: 今の全修正・冪等・ボット�
   assert.deepEqual(byId.pets.edits, ['posts', 'shelve'], 'g2 を新しいまとまりへ移した＋片付け');
   assert.equal(byId['old-topic'].deleted, true);
   assert.deepEqual(a.removed_posts, [{ id: '2110000000000008888', reason: 'hidden' }, { id: '2110000000000009999', reason: 'trash', topic_id: 'old-topic' }]);
-  assert.deepEqual(feedbackCounts(a), { genres: 1, topics: 4, deleted: 1, posts: 2 });
+  assert.deepEqual(feedbackCounts(a), { genres: 1, topics: 4, deleted: 1, posts: 2, requested: 0 });
   assert.deepEqual(feedbackTopicId('k:g:x'), { topic_id: 'x', source: 'bot' });
   assert.match(BOT.feedbackPath, /^feedback\//);
   // 修正が無ければ空
@@ -2179,4 +2179,39 @@ test('投稿を開くウィンドウ: 位置のプリセット（中央・右半
   assert.deepEqual(calls[0], ['open', 'https://x.com/a/status/1', VIEWER_NAME, 'popup,left=5,top=6,width=600,height=700']);
   assert.deepEqual(calls.slice(1), [['move', 5, 6], ['resize', 600, 700], ['focus']]);
   assert.equal(openViewer('https://x.com/', {}, { screen: scr, open: () => null }), false);
+});
+
+test('URL で追加した「データに無い投稿」: あとで posts.json に現れたら同じ話題・同じ位置の普通の投稿に・取得依頼（requested_posts）から自動で外れる', () => {
+  const a = post({ text: 'シャンパンコールの話A', categories: ['ホスト'], metrics: { impression_count: 9000 } });
+  const b = post({ text: 'シャンパンコールの話B', categories: ['ホスト'], metrics: { impression_count: 5000 } });
+  const late = post({ text: '全然関係ない単発の話題', categories: ['キャバクラ'], metrics: { impression_count: 1 } });
+  const w = defaultWeek();
+  const T = { id: 'd:d-hostcall', kind: 'dict', name: 'ホストコール', postIds: [a.id, b.id], stats: { count: 2 } };
+  // 1 回目: late はまだ posts.json に無い → データに無い投稿として追加
+  addPostsToTopic(w, T, [late.id], { postsById: new Map([[a.id, a], [b.id, b]]), postTopic: new Map([[a.id, T.id], [b.id, T.id]]), topicsById: new Map([[T.id, T]]), now: Date.parse('2026-11-08T03:00:00Z') });
+  assert.deepEqual(w.topicLinks[T.id], [late.id]);
+  w.postOrder = { [T.id]: [b.id, late.id, a.id] }; // 真ん中に並べた
+  const d1 = ds([a, b]);
+  let t = buildTopics({ posts: d1.posts, dict: DEFAULT_DICT, refTs: d1.refTs, overrides: w.overrides, topicLinks: w.topicLinks, postOrder: w.postOrder }).find((x) => x.id === T.id);
+  assert.deepEqual(t.missingIds, [late.id]);
+  assert.deepEqual(topicItemIds(t, { manual: w.postOrder[T.id] }), [b.id, late.id, a.id]);
+  const saved = { ...defaultSaved(), weeks: { '2026-10-17': w } };
+  let fb = buildFeedback({ saved, weekKey: '2026-10-17', topics: [t], basePostsById: new Map(d1.posts.map((p) => [p.id, p])), nowMs: 0 });
+  assert.deepEqual(fb.requested_posts, [{ id: late.id, url: `https://x.com/i/web/status/${late.id}`, topic_id: 'd:d-hostcall', added_at: '2026-11-08T12:00:00+09:00', week: '2026-10-17', source: 'url' }]);
+  // 2 回目: 次の posts.json に late が現れた（別の話題に入りそうな本文でも）→ 同じ話題・同じ位置の普通の投稿
+  const d2 = ds([a, b, late]);
+  t = buildTopics({ posts: d2.posts, dict: DEFAULT_DICT, refTs: d2.refTs, overrides: w.overrides, topicLinks: w.topicLinks, postOrder: w.postOrder }).find((x) => x.id === T.id);
+  assert.ok(t.postIds.includes(late.id), '普通の投稿として話題に入る');
+  assert.ok(!(t.missingIds || []).includes(late.id), 'データに無い投稿ではなくなる');
+  assert.deepEqual(t.postIds, [b.id, late.id, a.id], '手動順の位置もそのまま');
+  fb = buildFeedback({ saved, weekKey: '2026-10-17', topics: [t], basePostsById: new Map(d2.posts.map((p) => [p.id, p])), nowMs: 0 });
+  assert.deepEqual(fb.requested_posts, [], '取得依頼から自動で外れる');
+  // 手で別の話題へ移したらそちらが優先
+  const t2 = buildTopics({ posts: d2.posts, dict: DEFAULT_DICT, refTs: d2.refTs, overrides: { ...w.overrides, moves: { [late.id]: `p:${late.id}` } }, topicLinks: w.topicLinks }).find((x) => x.id === T.id);
+  assert.ok(!t2.postIds.includes(late.id));
+  // 台本で入れたデータに無い投稿も依頼に入る
+  const s2 = { ...defaultSaved(), weeks: { '2026-10-24': { ...defaultWeek(), overrides: { ...defaultWeek().overrides, manual: [{ id: 'm:s-x', name: 'x', genre: 'host', missing: ['1999999999999999955'] }] } } } };
+  assert.deepEqual(buildFeedback({ saved: s2, weekKey: '2026-10-24', topics: [], nowMs: 0 }).requested_posts.map((x) => [x.id, x.source, x.topic_id]), [['1999999999999999955', 'script', 'm:s-x']]);
+  // 保存
+  assert.deepEqual(parseSaved(serializeSaved(saved)).state.weeks['2026-10-17'].linkAddedAt, w.linkAddedAt);
 });

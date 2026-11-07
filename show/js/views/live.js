@@ -7,7 +7,7 @@ import { beginPointer } from './dnd.js';
 import { obsDialog } from './obsui.js';
 import { viewerDialog } from './viewerui.js';
 import { urlAddDialog } from './urladd.js';
-import { FEATURES } from '../config.js';
+import { FEATURES, TEXT } from '../config.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
 const STATUS_LABEL = { done: '済', skipped: '飛ばした', carried: '来週へ', current: '進行中', todo: '' };
@@ -287,6 +287,7 @@ function itemEl(app, t, id, index, shownId, items) {
   if (isImg) el.append(bar, imageBody(app, id));
   else {
     const p = app.postsById.get(id);
+    if (!p) { el.title = TEXT.missingPost; bar.insertBefore(h('span', { class: 'badge li-kind', attrs: { title: TEXT.missingPost } }, 'データに無い'), bar.querySelector('.li-sp')); }
     const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, noActions: true, bm: bmInfo(app, p.id) }) : linkCard(id, statusUrl(id), null);
     // 進行は常に X の埋め込み（画面に近いものから作る。失敗・データに無い投稿は自前のカード）
     const body = h('div', { class: 'li-body', dataset: { keep: 'body' } }, p ? embedHost(id, own, 'live-embed') : own);

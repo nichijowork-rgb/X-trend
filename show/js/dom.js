@@ -3,6 +3,7 @@ import { formatCompact, formatDateTime, formatPace, isSafeHttpUrl, UNKNOWN } fro
 import { sizedImageUrl } from '../../assets/js/media.js';
 import { statusUrl, genreLabel } from './logic.js';
 import { genreIcon } from './icons.js';
+import { TEXT } from './config.js';
 
 /**
  * 要素を作る。props: { class, text, attrs, dataset, on, hidden, ...プロパティ }
@@ -107,8 +108,8 @@ export function postCard(post, opts = {}) {
 }
 
 /** posts.json に無い投稿（リンクだけ） */
-export function linkCard(id, url, embedder, note = 'この投稿の中身と数値は posts.json にありません') {
-  return h('article', { class: 'post is-link', dataset: { id } },
+export function linkCard(id, url, embedder, note = 'この投稿の中身と数値は収集データ（posts.json）にありません') {
+  return h('article', { class: 'post is-link', dataset: { id }, attrs: { title: TEXT.missingPost } },
     h('p', { class: 'post-text muted' }, note),
     h('p', { class: 'post-id' }, `投稿 ID ${id}`),
     postActions(id, url || statusUrl(id), embedder));

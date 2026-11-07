@@ -792,8 +792,13 @@ export function buildTopics(input) {
     add(m.id, { kind: 'manual', autoName: m.name || '新しい話題', fixedGenre: GENRE_KEYS.includes(m.genre) ? m.genre : null, ...(miss.length ? { missingIds: miss, linkId: miss[0] } : {}), ...(m.source ? { source: m.source } : {}) });
   }
 
-  // 7. 投稿の移動
-  for (const [pid, target] of Object.entries(ov.moves)) {
+  // 7. 投稿の移動（URL で追加した「データに無い投稿」があとから posts.json に現れたら、その話題への移動として扱う＝普通の投稿に昇格。
+  //    手で移した先（overrides.moves）があればそちらが優先）
+  const linkMoves = {};
+  for (const [tid, ids] of Object.entries(input.topicLinks && typeof input.topicLinks === 'object' ? input.topicLinks : {})) {
+    for (const id of Array.isArray(ids) ? ids : []) if (byId.has(id) && !(id in ov.moves)) linkMoves[id] = tid;
+  }
+  for (const [pid, target] of Object.entries({ ...linkMoves, ...ov.moves })) {
     const from = where.get(pid);
     if (!from || from === target) continue;
     if (!topics.has(target)) {
@@ -1427,7 +1432,8 @@ export function defaultWeek() {
     mainCand: [], // メイン候補（メイン1〜3に入れる前の置き場）。話題 id の並び
     range: defaultRange(), // 台本づくりの対象期間（版 5。既定は番組週）
     scriptHold: [], // 台本ファイルの「保留」（[{ name, postIds }]。保留フォルダへ入れる）
-    topicLinks: {}, // URL で話題に追加した「データに無い投稿」（話題 id → [投稿 id]。埋め込みで表示）
+    topicLinks: {}, // URL で話題に追加した「データに無い投稿」（話題 id → [投稿 id]。埋め込みで表示。あとで posts.json に現れたら普通の投稿として扱う）
+    linkAddedAt: {}, // その追加日時（投稿 id → ms。ボットへの取得依頼 requested_posts の added_at）
     postOrder: {}, // 話題の中の手動順（話題 id → [投稿 id・'img:<画像id>']。先頭が代表投稿）
     images: [], // 自分で追加した画像（中身は IndexedDB。[{ id, topicId, caption, w, h, type, bytes, hash, at }]）
   };
@@ -1577,6 +1583,8 @@ function sanitizeWeek(v, ver = SCHEMA_VERSION) {
     if (list.length) w.postOrder[k] = list;
   }
   w.images = sanitizeImages(o.images);
+  w.linkAddedAt = {};
+  for (const [k, v] of Object.entries(obj(o.linkAddedAt) || {})) if (ID_RE.test(k) && isNum(v)) w.linkAddedAt[k] = v;
   w.topicLinks = {};
   for (const [k, v] of Object.entries(obj(o.topicLinks) || {})) {
     if (k === '__proto__' || k.length > 200 || !Array.isArray(v)) continue;

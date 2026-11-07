@@ -170,7 +170,7 @@ function botSection(app) {
     : 'ボットの話題まとめ（data/show/topics.json）はまだ届いていません（届けば自動で使います）。'));
   sec.append(h('p', {}, '編成で直したこと（ジャンルの変更・まとまりの名前や中身・削除）をボットに渡すと、次の収集から分類・まとめ方に反映されます。毎回「今の修正すべて」を送ります（何度送っても同じ内容）。'));
   sec.append(h('p', { class: 'fb-counts', dataset: { key: 'fb-counts' } },
-    `ジャンルの変更 ${n.genres}件・話題の修正 ${n.topics}件・削除した話題 ${n.deleted}件・削除した投稿 ${n.posts}件`));
+    `ジャンルの変更 ${n.genres}件・話題の修正 ${n.topics}件・削除した話題 ${n.deleted}件・削除した投稿 ${n.posts}件・取得の依頼（データに無い投稿）${n.requested}件`));
   sec.append(h('p', { class: 'muted', dataset: { key: 'fb-last' } }, sent ? `最後に送った日時：${fmtTime(sent.at)}（${sent.via === 'github' ? 'GitHub に保存' : 'ファイルで保存'}）` : 'まだ送っていません'));
   sec.append(h('div', { class: 'row' },
     btn('ファイルで保存（show-feedback.json）', () => {

@@ -185,6 +185,9 @@ function recompute() {
       if (!extraPosts.includes(p)) extraPosts.push(p);
     }
   };
+  // URL で追加した投稿があとから posts.json に現れたとき、期間の外でもその話題に残す（「期間外」の印）
+  const linkIds = Object.values(wk.topicLinks || {}).flat();
+  addOutside(linkIds.filter((id) => app.postsById.has(id)));
   if (placedList.length) addOutside(placedPostIds({ placedIds: placedList, candidates, dict: app.saved.dict, botTopics: app.bot ? app.bot.topics : [], overrides: wk.overrides }));
   const build = (hiddenPostIds) => buildTopics({
     outsideIds,
@@ -209,7 +212,7 @@ function recompute() {
   const placed = new Set([...usedTopicIds(wk.rundown), ...(wk.mainCand || [])]);
   app.heldPosts = heldPostsOf({
     posts: [...weekPosts, ...extraPosts], topics: app.topics, prepared, exceptions, protectedTopicIds: placed,
-    protectedPostIds: new Set([...Object.keys(wk.overrides.moves), ...personalIds, ...outsideIds]),
+    protectedPostIds: new Set([...Object.keys(wk.overrides.moves), ...personalIds, ...outsideIds, ...linkIds]),
     // 台本ファイルの「保留」（投稿 id で指定）
     forced: new Map((wk.scriptHold || []).flatMap((x) => x.postIds.map((id) => [id, `台本：${x.name}`]))),
   });

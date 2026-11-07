@@ -1829,6 +1829,8 @@ async function main() {
       assert(after.includes(single) && after.includes(other) && after.includes('1999999999999999977'), JSON.stringify(after));
       assert(!(await page.evaluate((id) => window.__show.topicsById.get('d:d-tower').postIds.includes(id), other)), '移動した');
       assert((await rowKeys(page)).includes('p:1999999999999999977'), 'データに無い投稿の行');
+      assert((await page.getAttribute(rowSel('p:1999999999999999977'), 'title')).includes('収集データに無い投稿です'), 'データに無い投稿の説明');
+      assert(await page.evaluate(() => window.__show.buildFeedback().requested_posts.some((x) => x.id === '1999999999999999977' && x.source === 'url')), 'requested_posts');
       await page.click('[data-key="url-cancel"]');
       // 同じ URL をもう一度 → 重複は飛ばす
       await page.click('[data-key="url-add"]');

@@ -129,6 +129,7 @@ export const CHANNEL_NAME = 'xtrend-show';
 
 /** 画面の文言 */
 export const TEXT = Object.freeze({
+  missingPost: '収集データに無い投稿です（数値・カテゴリは不明）。X でブックマークするか、［ボットに修正を送る］で取得を依頼すると、次回の更新で数値付きになります',
   sampleBanner: 'サンプル表示中（data/ が見つからないため、架空のデータを表示しています）',
   empty: '該当なし',
   unknown: '不明',

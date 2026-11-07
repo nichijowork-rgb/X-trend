@@ -4,7 +4,7 @@
 // 上: 常設の検索・元に戻す/やり直す・仕分けモード・チェックポイント・ツール
 // 操作: ドラッグ＆ドロップ（pointer events）・複数選択（Ctrl/⌘・Shift・チェック・Ctrl+A）・一括操作バー・右クリックメニュー・「移動先…」
 import { formatDateTime, formatCompact } from '../../../assets/js/core.js';
-import { CHECKPOINTS, GENRES, PLAN_V2 } from '../config.js';
+import { CHECKPOINTS, GENRES, PLAN_V2, TEXT } from '../config.js';
 import {
   recordCheckpoint, autoTitle, weekLabel, genreLabel, statusUrl, postGenre, setPostGenre, canBeMain, cornerDef,
   leadText, mainSlots, totalMinutes, scorePoints, moveItemTo,
@@ -408,6 +408,7 @@ function rowEl(app, row, index) {
     const p = app.postsById.get(row.id);
     const t = app.topicsById.get(app.postTopic.get(row.id));
     if (p) meta.push(h('span', { class: 'rm-user' }, `@${p.user}`), h('span', { class: 'rm-imp' }, formatCompact(p.metrics.impression_count)));
+    else { meta.push(h('span', { class: 'rm-tag rm-missing', attrs: { title: TEXT.missingPost } }, 'データに無い投稿（数値は不明）')); el.title = TEXT.missingPost; }
     if (bmInfo(app, row.id)) meta.push(h('span', { class: 'rm-star', attrs: { title: 'ブックマーク（数値はブックマーク時点）' } }, '★'));
     if (app.usedBefore && app.usedBefore.has(row.id)) meta.push(h('span', { class: 'rm-tag', attrs: { title: '前の配信で読んだ投稿' } }, '使用済み'));
     if (p && p._genreOverride) meta.push(h('span', { class: 'rm-tag', attrs: { title: 'ジャンルを上書きしています' } }, `${genreLabel(p._genreOverride)}に変更`));
