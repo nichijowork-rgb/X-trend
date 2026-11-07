@@ -1897,6 +1897,58 @@ async function main() {
       await c.close();
     });
 
+    await check('編成: 960・1200 でプレビュー中に一覧の列が細く残らない（一覧⇄プレビュー切替）・1400→960→1200→1400 の幅変更でも崩れない', async () => {
+      const layout = (page) => page.evaluate(() => {
+        const vis = (el) => el && el.offsetParent !== null && el.getBoundingClientRect().width > 0;
+        const list = document.querySelector('.list-pane');
+        const pv = document.querySelector('.preview-pane');
+        const tree = document.querySelector('.tree-pane');
+        return { list: vis(list) ? Math.round(list.getBoundingClientRect().width) : 0, pv: vis(pv) ? Math.round(pv.getBoundingClientRect().width) : 0, tree: vis(tree) ? Math.round(tree.getBoundingClientRect().width) : 0, back: vis(document.querySelector('[data-key="preview-back"]')), sw: document.documentElement.scrollWidth };
+      });
+      const ok = (l, w, label) => {
+        assert(l.sw <= w, `${label} 横スクロール ${l.sw}`);
+        assert(l.list === 0 || l.list >= 280, `${label} 一覧の列が細い ${JSON.stringify(l)}`);
+        assert(l.pv === 0 || l.pv >= 400, `${label} プレビューが狭い ${JSON.stringify(l)}`);
+        assert(l.list > 0 || l.pv > 0, `${label} 何も出ていない ${JSON.stringify(l)}`);
+      };
+      for (const w of [960, 1200]) {
+        const c = await newCtx({ viewport: { width: w, height: 1040 } });
+        const { page } = await open(c, show);
+        await folder(page, 'topic:d:d-hostcall');
+        const k = (await rowKeys(page))[1];
+        await page.click(`${rowSel(k)} .row-main`);
+        await page.waitForSelector('.preview-pane .pv-body');
+        const l = await layout(page);
+        ok(l, w, `${w}`);
+        assert(l.pv >= 400 && l.list === 0 && l.back, `${w} はプレビュー中は一覧を隠して「← 一覧へ」 ${JSON.stringify(l)}`);
+        await page.screenshot({ path: path.join(SHOTS, `plan-preview-${w}.png`) });
+        await page.click('[data-key="preview-back"]');
+        const l2 = await layout(page);
+        assert(l2.list >= 280 && l2.pv === 0, `${w} 一覧へ戻る ${JSON.stringify(l2)}`);
+        await c.close();
+      }
+      // 幅を変えても（1400 の 3 列 → 960 → 1200 → 1400）
+      const c = await newCtx({ viewport: { width: 1400, height: 1000 } });
+      const { page } = await open(c, show);
+      await folder(page, 'topic:d:d-hostcall');
+      await page.click(`${rowSel((await rowKeys(page))[2])} .row-main`);
+      await page.waitForSelector('.preview-pane .pv-body');
+      let l = await layout(page);
+      assert(l.list >= 280 && l.pv >= 400, `1400 は 3 列 ${JSON.stringify(l)}`);
+      for (const w of [960, 1200, 1400]) {
+        await page.setViewportSize({ width: w, height: 1000 });
+        await page.waitForTimeout(250);
+        l = await layout(page);
+        ok(l, w, `→${w}`);
+        if (w < 1400) assert(l.list === 0 || l.pv === 0, `→${w} は切り替え表示 ${JSON.stringify(l)}`);
+        else assert(l.list >= 280 && l.pv >= 400, `→1400 は 3 列 ${JSON.stringify(l)}`);
+      }
+      await page.setViewportSize({ width: 960, height: 1040 });
+      await page.waitForTimeout(250);
+      await page.screenshot({ path: path.join(SHOTS, 'plan-preview-resized-960.png') });
+      await c.close();
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';

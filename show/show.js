@@ -1093,6 +1093,14 @@ async function main() {
   $('range-apply').addEventListener('click', applyCustom);
   for (const id of ['range-from', 'range-to']) $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCustom(); } });
   window.addEventListener('resize', () => { if (app.route === 'onair') tickOnair(app, true); });
+  // 編成の並び方（3 列／一覧⇄プレビューの切替／木の引き出し）は画面幅で決めるので、境目をまたいだら描き直す
+  if (typeof matchMedia === 'function') {
+    for (const q of ['(min-width: 1400px)', '(max-width: 760px)']) {
+      const mq = matchMedia(q);
+      const onChange = () => { if (app.route === 'plan' && app.ready) renderRoute(); };
+      if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange); else if (typeof mq.addListener === 'function') mq.addListener(onChange);
+    }
+  }
 
   $('loading').hidden = true;
   $('app').hidden = false;

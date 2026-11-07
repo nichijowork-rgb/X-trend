@@ -705,7 +705,8 @@ body[data-route="plan"] .sh-header { padding-bottom: 6px; }
 .menu-cp .menu-list { left: auto; right: 0; min-width: 260px; }
 
 .plan2-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 10px; }
-.plan2.is-wide .plan2-body { grid-template-columns: 300px minmax(0, 1fr) minmax(460px, 600px); }
+/* 3 列（木・一覧・プレビュー）は 1400px 以上だけ。幅が変わったときは描き直して切り替える（show.js） */
+@media (min-width: 1400px) { .plan2.is-wide .plan2-body { grid-template-columns: 300px minmax(0, 1fr) minmax(460px, 600px); } }
 .plan2:not(.is-wide) .preview-pane { grid-column: 2; grid-row: 1; }
 .list-pane.is-hidden { display: none; }
 
