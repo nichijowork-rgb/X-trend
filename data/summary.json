@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-11-07T23:36:39+09:00",
+ "generated_at": "2026-11-08T01:27:45+09:00",
  "min_impressions": 300000,
- "total_posts": 4709,
- "total_accounts": 2242,
- "below_threshold_posts": 64,
+ "total_posts": 4713,
+ "total_accounts": 2244,
+ "below_threshold_posts": 67,
  "report_missing_ids": [],
  "unknown_user_posts": 0,
  "period": {
   "oldest_jst": "2023-03-21T17:12:23+09:00",
-  "newest_jst": "2026-11-07T21:03:50+09:00"
+  "newest_jst": "2026-11-07T23:57:15+09:00"
  },
  "categories": [
   "ホスト",
@@ -133,9 +133,9 @@
  ],
  "by_category": {
   "ホスト": {
-   "posts": 301,
-   "impressions": 572477439,
-   "likes": 1616527
+   "posts": 302,
+   "impressions": 572615163,
+   "likes": 1616970
   },
   "キャバクラ": {
    "posts": 858,
@@ -148,19 +148,19 @@
    "likes": 525080
   },
   "夜職その他": {
-   "posts": 330,
-   "impressions": 728170863,
-   "likes": 2344566
+   "posts": 332,
+   "impressions": 728373950,
+   "likes": 2345405
   },
   "監視アカウント": {
-   "posts": 602,
-   "impressions": 1714844299,
-   "likes": 4570825
+   "posts": 603,
+   "impressions": 1714981529,
+   "likes": 4571270
   },
   "その他": {
-   "posts": 3340,
-   "impressions": 9542932439,
-   "likes": 65539333
+   "posts": 3341,
+   "impressions": 9545477395,
+   "likes": 65551348
   }
  },
  "by_account": [
@@ -746,6 +746,13 @@
    "likes": 29224
   },
   {
+   "user": "HarukiKai0628",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 7598430,
+   "likes": 20811
+  },
+  {
    "user": "tw0mlj",
    "is_watched": false,
    "posts": 7,
@@ -837,13 +844,6 @@
    "likes": 15166
   },
   {
-   "user": "HarukiKai0628",
-   "is_watched": false,
-   "posts": 6,
-   "impressions": 7395667,
-   "likes": 19974
-  },
-  {
    "user": "DEATHDOL_NOTE",
    "is_watched": false,
    "posts": 5,
@@ -868,7 +868,7 @@
    "user": "daitai_shitteru",
    "is_watched": false,
    "posts": 5,
-   "impressions": 30035760,
+   "impressions": 30035788,
    "likes": 41808
   },
   {
@@ -1260,7 +1260,7 @@
    "user": "fuakawa_",
    "is_watched": false,
    "posts": 4,
-   "impressions": 3172557,
+   "impressions": 3172586,
    "likes": 6865
   },
   {
@@ -1290,6 +1290,13 @@
    "posts": 4,
    "impressions": 2297049,
    "likes": 141637
+  },
+  {
+   "user": "HajimeRikuto",
+   "is_watched": true,
+   "posts": 4,
+   "impressions": 1690389,
+   "likes": 6918
   },
   {
    "user": "cherry68051641",
@@ -1689,13 +1696,6 @@
    "posts": 3,
    "impressions": 1592023,
    "likes": 149529
-  },
-  {
-   "user": "HajimeRikuto",
-   "is_watched": true,
-   "posts": 3,
-   "impressions": 1553159,
-   "likes": 6473
   },
   {
    "user": "fs_inumi2",
@@ -2919,7 +2919,7 @@
    "user": "shitsuji_juto",
    "is_watched": false,
    "posts": 2,
-   "impressions": 1722706,
+   "impressions": 1722914,
    "likes": 3951
   },
   {
@@ -4687,6 +4687,13 @@
    "likes": 5440
   },
   {
+   "user": "aiuchuhaku",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 5613639,
+   "likes": 10153
+  },
+  {
    "user": "yabuinu_dojin",
    "is_watched": false,
    "posts": 1,
@@ -4720,13 +4727,6 @@
    "posts": 1,
    "impressions": 5536063,
    "likes": 37030
-  },
-  {
-   "user": "aiuchuhaku",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 5527510,
-   "likes": 10057
   },
   {
    "user": "papiyonkun2",
@@ -6829,6 +6829,13 @@
    "likes": 7290
   },
   {
+   "user": "Kurumirage",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2457470,
+   "likes": 11914
+  },
+  {
    "user": "shinu___444",
    "is_watched": false,
    "posts": 1,
@@ -8827,8 +8834,8 @@
    "user": "toji_std",
    "is_watched": false,
    "posts": 1,
-   "impressions": 1348683,
-   "likes": 77988
+   "impressions": 1348787,
+   "likes": 77986
   },
   {
    "user": "HHDCZEIRISHI",
@@ -10493,7 +10500,7 @@
    "user": "getuei_",
    "is_watched": false,
    "posts": 1,
-   "impressions": 930324,
+   "impressions": 930393,
    "likes": 6028
   },
   {
@@ -12642,7 +12649,7 @@
    "user": "ztmxyf2",
    "is_watched": false,
    "posts": 1,
-   "impressions": 567194,
+   "impressions": 567231,
    "likes": 1602
   },
   {
@@ -14130,6 +14137,13 @@
    "likes": 3145
   },
   {
+   "user": "gomimelo48",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 405778,
+   "likes": 1616
+  },
+  {
    "user": "hakushi_tsutan",
    "is_watched": false,
    "posts": 1,
@@ -14149,13 +14163,6 @@
    "posts": 1,
    "impressions": 404627,
    "likes": 31
-  },
-  {
-   "user": "gomimelo48",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 404421,
-   "likes": 1611
   },
   {
    "user": "roland_0fficial",
@@ -15750,7 +15757,7 @@
    "user": "tsuma_yohji",
    "is_watched": false,
    "posts": 1,
-   "impressions": 196406,
+   "impressions": 196425,
    "likes": 3004
   },
   {
@@ -15857,6 +15864,13 @@
    "posts": 1,
    "impressions": 56608,
    "likes": 78
+  },
+  {
+   "user": "xoxnyaqq",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 255,
+   "likes": 2
   }
  ],
  "by_day": [
@@ -18046,16 +18060,16 @@
   },
   {
    "date": "2026-10-14",
-   "posts": 300,
-   "impressions": 866633167,
-   "likes": 7721483,
+   "posts": 301,
+   "impressions": 869090637,
+   "likes": 7733397,
    "categories": {
     "ホスト": 12,
     "キャバクラ": 32,
     "歌舞伎町": 3,
     "夜職その他": 29,
     "監視アカウント": 31,
-    "その他": 237
+    "その他": 238
    }
   },
   {
@@ -18299,8 +18313,8 @@
   {
    "date": "2026-11-01",
    "posts": 123,
-   "impressions": 275693694,
-   "likes": 1379260,
+   "impressions": 275693817,
+   "likes": 1379258,
    "categories": {
     "ホスト": 14,
     "キャバクラ": 24,
@@ -18313,7 +18327,7 @@
   {
    "date": "2026-11-02",
    "posts": 114,
-   "impressions": 239190615,
+   "impressions": 239190823,
    "likes": 607048,
    "categories": {
     "ホスト": 13,
@@ -18327,7 +18341,7 @@
   {
    "date": "2026-11-03",
    "posts": 73,
-   "impressions": 163724465,
+   "impressions": 163724559,
    "likes": 407979,
    "categories": {
     "ホスト": 8,
@@ -18354,23 +18368,23 @@
   },
   {
    "date": "2026-11-05",
-   "posts": 119,
-   "impressions": 289701488,
-   "likes": 905216,
+   "posts": 120,
+   "impressions": 289838718,
+   "likes": 905661,
    "categories": {
-    "ホスト": 6,
+    "ホスト": 7,
     "キャバクラ": 19,
     "歌舞伎町": 1,
     "夜職その他": 12,
-    "監視アカウント": 6,
+    "監視アカウント": 7,
     "その他": 86
    }
   },
   {
    "date": "2026-11-06",
    "posts": 96,
-   "impressions": 253355076,
-   "likes": 1710641,
+   "impressions": 253441274,
+   "likes": 1710737,
    "categories": {
     "ホスト": 7,
     "キャバクラ": 20,
@@ -18382,14 +18396,14 @@
   },
   {
    "date": "2026-11-07",
-   "posts": 42,
-   "impressions": 107635581,
-   "likes": 356883,
+   "posts": 44,
+   "impressions": 107839956,
+   "likes": 357727,
    "categories": {
     "ホスト": 2,
     "キャバクラ": 10,
     "歌舞伎町": 0,
-    "夜職その他": 4,
+    "夜職その他": 6,
     "監視アカウント": 4,
     "その他": 29
    }

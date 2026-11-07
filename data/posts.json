@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T00:00:50+09:00",
+ "generated_at": "2026-11-08T01:27:45+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -10,6 +10,47 @@
   "その他"
  ],
  "posts": [
+  {
+   "id": "2119081754665599028",
+   "url": "https://x.com/xoxnyaqq/status/2119081754665599028",
+   "user": "xoxnyaqq",
+   "created_utc": "2026-11-07T14:57:15Z",
+   "created_jst": "2026-11-07T23:57:15+09:00",
+   "ts": 1794063435,
+   "metrics": {
+    "impression_count": 255,
+    "like_count": 2,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 0,
+    "bookmark_count": 1
+   },
+   "text": "堀さんにやっと会えた♡\n動画と変わんないずっとニコニコで幸せ空間でした🥹💕\nこれからも頑張ってほしい(т_т)\n\n#堀大輔 #コンカフェ https://t.co/3cJYs2AqQk",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "コンカフェ"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWh9n3UagAA0Nul.jpg",
+     "width": 1206,
+     "height": 1608
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWh9n3gbwAAJt_F.jpg",
+     "width": 1276,
+     "height": 2048
+    }
+   ],
+   "in_bookmarks": true,
+   "in_requested": true,
+   "below_threshold": true
+  },
   {
    "id": "2119038111191839217",
    "url": "https://x.com/tkzwgrs/status/2119038111191839217",
@@ -662,6 +703,67 @@
    "is_watched": false
   },
   {
+   "id": "2118970986632773840",
+   "url": "https://x.com/HarukiKai0628/status/2118970986632773840",
+   "user": "HarukiKai0628",
+   "created_utc": "2026-11-07T07:37:06Z",
+   "created_jst": "2026-11-07T16:37:06+09:00",
+   "ts": 1794037026,
+   "metrics": {
+    "impression_count": 202763,
+    "like_count": 837,
+    "retweet_count": null,
+    "reply_count": 15,
+    "quote_count": 52,
+    "bookmark_count": 104
+   },
+   "text": "堀さんのコンカフェ出勤応援行ったら\nシャンパンのチェイサーにEAA飲んでた🤣寝ないように頑張って〜〜〜〜💤 https://t.co/GpKh9hpsnc",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "コンカフェ"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2118970880852459520/img/meCFmgqFqEOU38N5.jpg",
+     "variants": [
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118970880852459520/vid/avc1/480x852/oUEFhFyZwtDo9_Sq.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118970880852459520/vid/avc1/1080x1920/iKpPYnpIZC6eE_gL.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118970880852459520/vid/avc1/720x1280/8G1Mke4gVtfn6AJ2.mp4"
+      },
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118970880852459520/vid/avc1/320x568/4rMpxBfHK5ZWrgL0.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2118970880852459520/pl/852NeIgHudLpaYKc.m3u8?v=cfc"
+      }
+     ],
+     "width": 1080,
+     "height": 1920
+    }
+   ],
+   "in_bookmarks": true,
+   "in_requested": true,
+   "below_threshold": true
+  },
+  {
    "id": "2118960115156123836",
    "url": "https://x.com/Meowth_BTC/status/2118960115156123836",
    "user": "Meowth_BTC",
@@ -1057,8 +1159,8 @@
    "created_jst": "2026-11-07T12:46:03+09:00",
    "ts": 1794023163,
    "metrics": {
-    "impression_count": 404421,
-    "like_count": 1611,
+    "impression_count": 405778,
+    "like_count": 1616,
     "retweet_count": null,
     "reply_count": 2,
     "quote_count": 8,
@@ -1677,12 +1779,12 @@
    "created_jst": "2026-11-06T23:08:39+09:00",
    "ts": 1793974119,
    "metrics": {
-    "impression_count": 5527510,
-    "like_count": 10057,
+    "impression_count": 5613639,
+    "like_count": 10153,
     "retweet_count": null,
-    "reply_count": 98,
-    "quote_count": 373,
-    "bookmark_count": 2258
+    "reply_count": 99,
+    "quote_count": 376,
+    "bookmark_count": 2277
    },
    "text": "PayPayはもうサ終したほうがいいよ。\n総額187万円の被害でてます。 https://t.co/xQBa365vTY https://t.co/RCVa66W2vh",
    "categories": [
@@ -4675,7 +4777,7 @@
    "created_jst": "2026-11-06T06:49:22+09:00",
    "ts": 1793915362,
    "metrics": {
-    "impression_count": 930324,
+    "impression_count": 930393,
     "like_count": 6028,
     "retweet_count": null,
     "reply_count": 1,
@@ -5351,6 +5453,75 @@
    "matched_terms": [],
    "is_watched": false,
    "in_bookmarks": true
+  },
+  {
+   "id": "2118326698425139416",
+   "url": "https://x.com/HajimeRikuto/status/2118326698425139416",
+   "user": "HajimeRikuto",
+   "created_utc": "2026-11-05T12:56:56Z",
+   "created_jst": "2026-11-05T21:56:56+09:00",
+   "ts": 1793883416,
+   "metrics": {
+    "impression_count": 137230,
+    "like_count": 445,
+    "retweet_count": 19,
+    "reply_count": 12,
+    "quote_count": 10,
+    "bookmark_count": 19
+   },
+   "text": "あおい会長の怒り方が胡散臭いのはおいといて、、、\n\nアレスくんの他グループの引き抜き行為はあんまりいい行為だとは思わないねえ\n\n#ホストコール https://t.co/2OpFOTESo2",
+   "categories": [
+    "ホスト",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "ホスト",
+    "ホストコール"
+   ],
+   "is_watched": true,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2118326635598651392/img/WHlNhYNg65BJ47bs.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118326635598651392/vid/avc1/474x270/Jc6SWAphKolACf1y.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2118326635598651392/pl/7bwhTntQQB3Vm01J.m3u8?v=77e"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118326635598651392/vid/avc1/2118x1206/kOEdJPE3lAUxY5ZT.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118326635598651392/vid/avc1/632x360/SW0LyUQ2JHlzAhN_.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2118326635598651392/vid/avc1/1264x720/R6j0JtVZFZ-N03aN.mp4"
+      }
+     ],
+     "width": 2118,
+     "height": 1206
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWXO2ggaAAAVnGZ.jpg",
+     "width": 850,
+     "height": 1206
+    }
+   ],
+   "in_bookmarks": true,
+   "in_requested": true,
+   "below_threshold": true
   },
   {
    "id": "2118325745265324272",
@@ -12786,7 +12957,7 @@
    "created_jst": "2026-11-03T19:16:07+09:00",
    "ts": 1793700967,
    "metrics": {
-    "impression_count": 567194,
+    "impression_count": 567231,
     "like_count": 1602,
     "retweet_count": null,
     "reply_count": 60,
@@ -12811,7 +12982,7 @@
    "created_jst": "2026-11-03T19:14:44+09:00",
    "ts": 1793700884,
    "metrics": {
-    "impression_count": 137731,
+    "impression_count": 137759,
     "like_count": 199,
     "retweet_count": null,
     "reply_count": 4,
@@ -13213,7 +13384,7 @@
    "created_jst": "2026-11-03T17:54:21+09:00",
    "ts": 1793696061,
    "metrics": {
-    "impression_count": 128286,
+    "impression_count": 128315,
     "like_count": 558,
     "retweet_count": null,
     "reply_count": 0,
@@ -15411,7 +15582,7 @@
    "created_jst": "2026-11-02T20:45:49+09:00",
    "ts": 1793619949,
    "metrics": {
-    "impression_count": 975666,
+    "impression_count": 975874,
     "like_count": 2254,
     "retweet_count": null,
     "reply_count": 12,
@@ -22288,12 +22459,12 @@
    "created_jst": "2026-11-01T13:00:27+09:00",
    "ts": 1793505627,
    "metrics": {
-    "impression_count": 196406,
+    "impression_count": 196425,
     "like_count": 3004,
     "retweet_count": null,
     "reply_count": 1,
     "quote_count": 41,
-    "bookmark_count": 112
+    "bookmark_count": 111
    },
    "text": "本日ロフト！よろしくお願いします！\n俺たちの機材に寄りかかってホストとホス狂がエロがってて搬入出来なくて神 https://t.co/8cIP8Dzdhj",
    "categories": [
@@ -24033,8 +24204,8 @@
    "created_jst": "2026-11-01T01:48:20+09:00",
    "ts": 1793465300,
    "metrics": {
-    "impression_count": 1348683,
-    "like_count": 77988,
+    "impression_count": 1348787,
+    "like_count": 77986,
     "retweet_count": null,
     "reply_count": 21,
     "quote_count": 202,
@@ -115541,6 +115712,38 @@
    ],
    "matched_terms": [],
    "is_watched": false
+  },
+  {
+   "id": "2110344440871346310",
+   "url": "https://x.com/Kurumirage/status/2110344440871346310",
+   "user": "Kurumirage",
+   "created_utc": "2026-10-14T12:18:17Z",
+   "created_jst": "2026-10-14T21:18:17+09:00",
+   "ts": 1791980297,
+   "metrics": {
+    "impression_count": 2457470,
+    "like_count": 11914,
+    "retweet_count": null,
+    "reply_count": 110,
+    "quote_count": 1645,
+    "bookmark_count": 1244
+   },
+   "text": "🏛2026/11/07 Sat.🏛\nゲストイベント開催決定💗\n　\n🫖堀大輔さん🎀\n＠d_holi \nが1日限定ゲスト女神に…🫧💍\n\n🕓17:00~23:00\n\n堀大輔さんのゲストイベントでは\n特別なグッズや特典を手に入れることができます🎉🤍\n\n詳細は後日ポストさせていただきますので楽しみにお待ちください🧸 https://t.co/GT6owJ8TT8",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HUlzFUrasAApbhE.jpg",
+     "width": 2250,
+     "height": 2250
+    }
+   ],
+   "in_bookmarks": true,
+   "in_requested": true
   },
   {
    "id": "2110344330850292082",
