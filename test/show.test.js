@@ -1534,8 +1534,9 @@ test('GitHub に保存: エラーは日本語（401・403・404・通信不可�
     assert.equal(g.calls.length, 0, '送らない');
   }
   assert.match(githubErrorText(500), /コード 500/);
-  assert.deepEqual(parseGhPrefs(null), { repo: BOT.defaultRepo, branch: BOT.defaultBranch, token: '' });
-  assert.deepEqual(parseGhPrefs('{"repo":"a/b","branch":"main","token":" t "}'), { repo: 'a/b', branch: 'main', token: 't' });
+  assert.deepEqual(parseGhPrefs(null), { repo: BOT.defaultRepo, branch: BOT.defaultBranch, token: '', auto: true });
+  assert.deepEqual(parseGhPrefs('{"repo":"a/b","branch":"main","token":" t "}'), { repo: 'a/b', branch: 'main', token: 't', auto: true });
+  assert.equal(parseGhPrefs('{"auto":false}').auto, false, '自動送信は既定オン・切れる');
   assert.equal(parseGhPrefs('{"repo":"bad"}').repo, BOT.defaultRepo);
 });
 
@@ -2214,4 +2215,166 @@ test('URL で追加した「データに無い投稿」: あとで posts.json �
   assert.deepEqual(buildFeedback({ saved: s2, weekKey: '2026-10-24', topics: [], nowMs: 0 }).requested_posts.map((x) => [x.id, x.source, x.topic_id]), [['1999999999999999955', 'script', 'm:s-x']]);
   // 保存
   assert.deepEqual(parseSaved(serializeSaved(saved)).state.weeks['2026-10-17'].linkAddedAt, w.linkAddedAt);
+});
+
+// ================================================================ 追加: ボットへの修正の自動送信・oEmbed
+import { createAutoSender, feedbackHash, AUTOSEND, mergeDelays } from '../show/js/autosend.js';
+import { parseOembed, htmlText, estimateGenre, oembedUrl, sanitizeLinkMeta, fetchOembed } from '../show/js/oembed.js';
+
+/** 偽の時計とタイマー */
+function fakeClock(start = 1_000_000) {
+  let t = start;
+  const timers = [];
+  return {
+    now: () => t,
+    setTimer: (fn, ms) => { const x = { at: t + ms, fn, done: false }; timers.push(x); return x; },
+    clearTimer: (x) => { if (x) x.done = true; },
+    async advance(ms) {
+      const end = t + ms;
+      for (;;) {
+        const next = timers.filter((x) => !x.done && x.at <= end).sort((a, b) => a.at - b.at)[0];
+        if (!next) break;
+        t = next.at;
+        next.done = true;
+        await next.fn();
+        await Promise.resolve();
+      }
+      t = end;
+    },
+  };
+}
+
+test('自動送信: 最後の編集から 60 秒（URL 追加は 15 秒）・まとめて 1 回・最短 5 分・同じ中身は送らない', async () => {
+  const c = fakeClock();
+  let content = JSON.stringify({ generated_at: 'a', topic_edits: [1] });
+  const sent = [];
+  const states = [];
+  const s = createAutoSender({ ...c, getContent: () => content, send: async (x) => { sent.push([c.now(), x]); return { ok: true }; }, onState: (st) => states.push(st.status) });
+  s.notify('edit');
+  await c.advance(30 * 1000);
+  s.notify('edit'); // まとめる（最後の編集から 60 秒）
+  await c.advance(59 * 1000);
+  assert.equal(sent.length, 0);
+  await c.advance(1000);
+  assert.equal(sent.length, 1);
+  assert.equal(s.state().status, 'done');
+  // 1 分後に URL 追加 → 15 秒ではなく、最短 5 分（前回から）を待つ
+  await c.advance(60 * 1000);
+  content = JSON.stringify({ generated_at: 'b', topic_edits: [1, 2] });
+  s.notify('url');
+  await c.advance(15 * 1000);
+  assert.equal(sent.length, 1, '最短間隔の中');
+  assert.equal(s.state().status, 'pending');
+  await c.advance(AUTOSEND.minInterval);
+  assert.equal(sent.length, 2);
+  // 中身が同じ（generated_at だけ違う）なら送らない
+  content = JSON.stringify({ generated_at: 'zzz', topic_edits: [1, 2] });
+  s.notify('url');
+  await c.advance(AUTOSEND.minInterval + 1000);
+  assert.equal(sent.length, 2, '同じ中身');
+  assert.equal(s.state().status, 'done');
+  assert.ok(states.includes('pending') && states.includes('sending'));
+  assert.equal(feedbackHash('{"generated_at":"1","a":1}'), feedbackHash({ generated_at: '2', a: 1 }));
+  // URL 追加だけなら 15 秒
+  const c2 = fakeClock();
+  const sent2 = [];
+  const s2 = createAutoSender({ ...c2, getContent: () => '{"a":1}', send: async () => { sent2.push(c2.now()); return { ok: true }; } });
+  s2.notify('url');
+  await c2.advance(14 * 1000);
+  assert.equal(sent2.length, 0);
+  await c2.advance(1000);
+  assert.equal(sent2.length, 1);
+});
+
+test('自動送信: 失敗は 1 分・5 分・15 分で間をあけてやり直す・401/403 は止める・手で送ったら同じ中身は送らない・前回の残りを引き継ぐ', async () => {
+  const c = fakeClock();
+  let fail = { ok: false, status: 500, message: 'サーバー' };
+  const calls = [];
+  const s = createAutoSender({ ...c, getContent: () => '{"x":1}', send: async () => { calls.push(c.now()); return fail; } });
+  s.notify('url');
+  await c.advance(15 * 1000);
+  assert.equal(calls.length, 1);
+  assert.equal(s.state().status, 'error');
+  assert.equal(s.state().reason, 'サーバー');
+  await c.advance(59 * 1000);
+  assert.equal(calls.length, 1);
+  await c.advance(1000 + 15 * 1000);
+  assert.equal(calls.length, 2, '1 分あけて');
+  await c.advance(5 * 60 * 1000);
+  assert.equal(calls.length, 3, '5 分あけて');
+  await c.advance(14 * 60 * 1000);
+  assert.equal(calls.length, 3);
+  await c.advance(60 * 1000);
+  assert.equal(calls.length, 4, '15 分あけて');
+  fail = { ok: false, status: 401, message: 'トークンが正しくない' };
+  await c.advance(15 * 60 * 1000);
+  assert.equal(s.state().status, 'stopped', '401 は止める');
+  const n = calls.length;
+  s.notify('edit');
+  await c.advance(60 * 60 * 1000);
+  assert.equal(calls.length, n, '止めたら送らない');
+  // ボタンでやり直す
+  fail = { ok: true };
+  s.flush(true);
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(s.state().status, 'done');
+  // 手で送った中身と同じなら送らない
+  const c3 = fakeClock();
+  const calls3 = [];
+  const s3 = createAutoSender({ ...c3, getContent: () => '{"y":1}', send: async () => { calls3.push(1); return { ok: true }; } });
+  s3.markSent('{"generated_at":"q","y":1}');
+  s3.notify('edit');
+  await c3.advance(10 * 60 * 1000);
+  assert.equal(calls3.length, 0);
+  // 前回の残り（タブを閉じる前の未送信）を引き継ぐ
+  const c4 = fakeClock();
+  const s4 = createAutoSender({ ...c4, restore: { pendingSince: c4.now() - 1000, lastSentAt: null, lastHash: null }, getContent: () => '{"z":1}', send: async () => ({ ok: true }) });
+  assert.equal(s4.state().status, 'pending');
+  s4.flush();
+  await c4.advance(1000);
+  assert.equal(s4.state().status, 'done');
+  // トークンが無い（オフ）なら何もしない
+  const s5 = createAutoSender({ ...fakeClock(), enabled: false, getContent: () => '{}', send: async () => { throw new Error('x'); } });
+  s5.notify('edit');
+  assert.equal(s5.state().status, 'off');
+});
+
+test('oEmbed: 本文・投稿者・日付を文字だけで取り出す（タグ・スクリプトは文字にしない）・ジャンル推定', async () => {
+  const json = {
+    author_name: 'さくら &amp; ホスト',
+    author_url: 'https://twitter.com/sakura_host',
+    html: '<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">シャンパンコール<br>最高でした &lt;img src=x onerror=alert(1)&gt; <a href="https://t.co/x">#ホスト</a> <script>alert(2)</script>pic.twitter.com/abc</p>&mdash; さくら (@sakura_host) <a href="https://twitter.com/sakura_host/status/1">2026年11月7日</a></blockquote>',
+  };
+  const m = parseOembed(json);
+  assert.equal(m.author, 'さくら & ホスト');
+  assert.equal(m.handle, 'sakura_host');
+  assert.equal(m.text, 'シャンパンコール\n最高でした <img src=x onerror=alert(1)> #ホスト', '文字参照は戻すが HTML としては扱わない（表示は textContent）');
+  assert.ok(!m.text.includes('alert(2)'), 'script の中身は捨てる');
+  assert.equal(m.date, '2026年11月7日');
+  assert.equal(parseOembed(null), null);
+  assert.equal(parseOembed({ html: 3 }), null);
+  assert.equal(htmlText('a&#x41;&#66;&nbsp;b'), 'aAB b');
+  assert.match(oembedUrl('2110000000000000001'), /^https:\/\/publish\.twitter\.com\/oembed\?url=https%3A%2F%2Ftwitter\.com%2Fi%2Fstatus%2F2110000000000000001&omit_script=true&dnt=true&lang=ja$/);
+  // ジャンル推定: 話題辞書 → 夜職の言葉 → 保留する言葉（一般のバズ）
+  assert.deepEqual(estimateGenre('昨日のシャンパンコールがすごかった', { dict: DEFAULT_DICT }), { genre: 'host', via: 'dict' });
+  assert.deepEqual(estimateGenre('キャバ嬢の同伴の話', { dict: DEFAULT_DICT }), { genre: 'kyaba', via: 'keyword' });
+  assert.deepEqual(estimateGenre('歌舞伎町の夜', { dict: [] }), { genre: 'kabuki', via: 'keyword' });
+  assert.deepEqual(estimateGenre('人気YouTuberのコラボ', { dict: DEFAULT_DICT, holdTerms: ['YouTuber'] }), { genre: 'general', via: 'hold' });
+  assert.equal(estimateGenre('今日の天気', { dict: DEFAULT_DICT }), null);
+  assert.equal(estimateGenre('', {}), null);
+  assert.deepEqual(sanitizeLinkMeta({ author: 'a'.repeat(200), handle: 'bad handle!', text: 't', date: 'd', fetchedAt: 1, error: null }).handle, '');
+  // 取得: 404 は「削除・非公開」
+  await assert.rejects(fetchOembed('1', { fetchImpl: async () => ({ status: 404, ok: false }) }), /削除されたか、非公開/);
+  const ok = await fetchOembed('1', { fetchImpl: async () => ({ status: 200, ok: true, json: async () => json }) });
+  assert.equal(ok.handle, 'sakura_host');
+});
+
+test('autosend: 待ち時間の上書きは正の数だけ（壊れた値は既定値）', () => {
+  assert.deepEqual(mergeDelays(null), { ...AUTOSEND });
+  const d = mergeDelays({ editDelay: 700, urlDelay: -1, minInterval: 'x', backoff: [400, NaN] });
+  assert.equal(d.editDelay, 700);
+  assert.equal(d.urlDelay, AUTOSEND.urlDelay);
+  assert.equal(d.minInterval, AUTOSEND.minInterval);
+  assert.deepEqual(d.backoff, AUTOSEND.backoff);
+  assert.deepEqual(mergeDelays({ backoff: [1, 2] }).backoff, [1, 2]);
 });

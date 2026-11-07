@@ -139,6 +139,13 @@
 - **まとまりの中身を全部**: まとまり（フォルダ）を開くと、中の投稿・データに無い投稿・画像を全部並べる（先頭＝代表に「代表」の印）。並びは進行と共通（手動順、無ければ インプレ順／古い順。一覧の上で切り替え）。行をドラッグで並べ替え（進行と同じ `postOrder`）、行の × でまとまりから外す、…／右クリックに「先頭へ（代表にする）／末尾へ／まとまりから外す」。Ctrl+Z で戻せる。
 - **別の投稿をプレビュー**: 行を選ぶとプレビューにその投稿（埋め込み）。プレビューの上の［前へ ［］［次へ ］］か、キーの `[` `]` で一覧の前後へ。まとまりのプレビューにも「中身（n件）」の一覧があり、押すとそのまとまりを開いてその投稿をプレビュー（メイン1 など番組構成のフォルダから開いたときも）。
 - **＋URLで追加**（まとまりの一覧の上・プレビューの「中身」・進行の投稿一覧の上）: x.com／twitter.com（www・mobile）／fxtwitter／vxtwitter の status URL を、複数行・スペース区切りで貼る。posts.json にあればその投稿として（期間の外なら「自分で追加」にも入れて出す）、無ければ「データに無い投稿」（番組週の `topicLinks[話題id]`。埋め込みで表示。数値・カテゴリは不明で、行・カードにその説明のツールチップ）として追加。**あとでボットが posts.json に入れたら、自動で同じ話題・同じ並び位置の普通の投稿になる**（期間の外なら「期間外」の印。手で別の話題へ移していればそちらが優先）。まだ無い投稿はボットへの修正の `requested_posts` で取得を依頼できる。すでにあるものは飛ばす。別のまとまりにある投稿は「移動しますか？」と確かめる。読み取れなかった URL は一覧で表示。Ctrl+Z で戻せ、保存・書き出し・ボットへの修正（topic_edits の posts）に入る。`folders.js` の `addPostsToTopic`。
+- **データに無い投稿の本文（X oEmbed。2026-11-08 追加）**: URL で追加した・台本で入れた「データに無い投稿」は、X の公開 oEmbed（`https://publish.twitter.com/oembed?url=https://twitter.com/i/status/<id>&omit_script=true&dnt=true&lang=ja`）で本文・投稿者を取りに行く（`show/js/oembed.js`）。
+  - 取り方: まず fetch、通信や CORS で読めなければ JSONP（`&callback=`、8 秒で打ち切り）。404/403 は「削除されたか、非公開の投稿です」で JSONP はしない。**1 件ずつ・500ms 以上あけて**（`OEMBED_GAP_MS`）。URL で追加した直後と、起動の 1.5 秒後（まだ本文が無い topicLinks・自分で追加の分＝台本で入れた分も）。1 回の起動で同じ id は 1 回だけ。
+  - 読み方: 返ってきた `html` の最初の `<p>` を文字にする（タグは捨て、`<br>` は改行、実体参照は戻す、末尾の pic.twitter.com は外す、600 字まで）。`author_name`、`author_url` の末尾を @ハンドル（英数字と _ の 30 字まで）、最後の `<a>` の文字が日付らしければ日付。**HTML は画面に入れず、すべて textContent**。
+  - 保存: 番組週の `linkMeta[投稿id] = { author, handle, text, date, fetchedAt }`（取れなかったときは `{ error, fetchedAt }`）。保存・書き出しに入る。**posts.json に入った投稿の linkMeta は使わない**（データが優先）。
+  - 表示: 編成の行（本文 1 行・@ハンドル・「数値は次回の更新で」の印）、プレビュー・進行のカード（@ハンドル・名前・日付・本文・「表示 不明・いいね 不明（数値は次回の更新で）」・［X で開く］）。取れなかったら行に「本文を取得できませんでした」、カードは従来のリンクカード。
+  - ジャンルの推定（`estimateGenre`）: 本文が話題辞書（夜職のみの言葉）に当たればそのジャンル、無ければ夜職の言葉（`config.js` の `NIGHT_KEYWORDS`。ホスト・キャバクラ・歌舞伎町・夜職その他でいちばん多く当たったもの）、保留する言葉に当たれば一般のバズ。行に「推定：◯◯」、プレビューに「推定」バッジ。**手でジャンルを変えればそちらが優先**（推定の印は消える）。
+  - CSP: `script-src`（JSONP 用）と `connect-src`（fetch 用）に `https://publish.twitter.com` だけを追加。
 - **左の木からドラッグ**: 木のまとまり（夜職・一般のバズの下、メイン1〜3 の中の話題も）をマウスでドラッグして、番組構成（メイン1〜3・メイン候補・カテゴリ別・雑談）・片付け・ゴミ箱・ほかのまとまりへ。メイン1〜3 どうしは入れ替え。クリックは従来どおり開く。置けない所（一般のバズ→メインなど）は灰色になり、影に「入れられません：理由」、離すとお知らせで理由を出す。木の項目の右クリックと「…」から「番組に入れる（メイン1〜3・メイン候補・カテゴリ別・雑談）」も選べる。
 
 ### ⑥ Grok ボット連携（段階3・サイト側）
@@ -188,8 +195,16 @@
 - (a) **GitHub に直接保存（任意）**: リポジトリ（既定 `nichijowork-rgb/X-trend`）・ブランチ（既定 `claude/x-scraper-nightlife-tool-sb26pq`）・fine-grained トークン。設定は localStorage `xtrend-show-github`（このブラウザだけ・平文。注意書きあり。トークンは入力欄にも画面にも出さず「保存済み」とだけ表示、［トークンを消す］あり）。
   - 送信: `GET /repos/{owner}/{repo}/contents/feedback/show-feedback.json?ref=<branch>` で sha（404 なら新規）→ `PUT`（`message: "feedback: show edits <日時>"`、base64 の中身、branch、sha）。409/422 は sha を取り直して 1 回だけやり直す。トークンはヘッダー（`Authorization: Bearer`）だけで、URL には入れない。
   - エラー（日本語）: 401 トークン違い・期限切れ／403 権限不足（回数制限は別の文）／404 リポジトリ・ブランチ違いか権限なし／409・422 ぶつかった／通信不可。
-  - 書き込み先は `BOT.feedbackPath`（`feedback/show-feedback.json`）に固定。data/ には書かない。CSP の connect-src に `https://api.github.com`（show/index.html のみ）。
+  - 書き込み先は `BOT.feedbackPath`（`feedback/show-feedback.json`）に固定。data/ には書かない。CSP の connect-src に `https://api.github.com`（show/index.html のみ）。本文の取得用に `https://publish.twitter.com`（script-src・connect-src）。
   - トークンの作り方（画面に案内あり）: Fine-grained tokens → Repository access は「Only select repositories」でこのリポジトリ 1 つ → Repository permissions の Contents を Read and write（ほかは触らない）→ 有効期限を設定。
+- (c) **自動で送る（2026-11-08 追加。トークンを入れたときだけ）**: ［ツール…］の「自動で送る」（既定オン。トークンが無いときは押せない灰色）。`show/js/autosend.js` の `createAutoSender`。
+  - タイミング: 最後の編集から **60 秒**（URL で追加したときは **15 秒**）たったら GitHub に保存（(a) と同じ送り方・同じ中身）。前に送ってから **最短 5 分** はあける。
+  - 同じなら送らない: `generated_at` を除いた中身のハッシュ（`feedbackHash`）が前回送ったものと同じなら送らない（「変更なし」）。手で［GitHub に保存］して成功したときもハッシュを覚える。
+  - 失敗: 次の編集かピルを押したときにやり直す。待ちは 1 分 → 5 分 → 15 分（以後 15 分）。**401・403 は自動送信を止めて**「止めました（要確認）」とツールに案内（トークンを確かめて［GitHub に保存］が成功すると再開。トークンは画面・ピルに出さない）。
+  - ヘッダーのピル（編成・進行の両方。押すと理由を出してすぐ送る）: 「ボット送信：済 23:41」「送信待ち（HH:MMごろ）」「送信中…」「失敗（やり直します）」「止めました（要確認）」「変更なし」「自動オフ」。
+  - タブを閉じても: 送れていない変更の時刻は localStorage `xtrend-show-autosend`（`{ lastSentAt, lastHash, pendingSince }`）に残し、次に開いたとき「前回送れなかったボットへの修正があります。自動で送ります」と出して送る。
+  - オン・オフは `xtrend-show-github` の `auto`（false のときだけオフ）。確認用に待ち時間を短くするキー `xtrend-show-autosend-delays`（E2E 用。ふだんは使わない。正の数だけ有効）。
+  - 手動の［GitHub に保存］［ファイルで保存］は従来どおり。
 
 ### ⑦ 演出（段階4・手動発火）
 - **パレット**（［進行］の話題の下。「演出 ▸」で開閉、開閉は localStorage `xtrend-show-fx-open`。画面半分で 1〜2 行）: 👏拍手（Shift+1）／🎉紙吹雪（Shift+2）／✨神回！（Shift+3）／❗えぇっ！？（Shift+4）／🔥炎上（Shift+5）／🙏感謝バナー（Shift+6。名前 20 字・金額 12 字までの入力欄、欄の中で Enter でも出る）。［プレビュー］でこのブラウザの小窓に全部入り（`overlay.html?part=all`）を開いて確認できる。
@@ -284,6 +299,8 @@
 | `show/js/hold.js` | **追加**: 保留する言葉の照合・保留する投稿/話題の決定（手作業・例外を除く）・言葉の入力と削除（DOM 非依存。単体テスト対象） |
 | `show/js/effects.js` | **段階4**: 演出の種類・effect の作成（一意な id）・感謝バナーの入力の制限・発火の門番（発火済み id・古い at・連打・同時 3 つ）（DOM 非依存。単体テスト対象） |
 | `show/js/feedback.js` | **段階3**: 修正の書き戻し（feedback/show-feedback.json の生成・GitHub Contents API での保存）（DOM 非依存。単体テスト対象） |
+| `show/js/autosend.js` | **追加**: ボットへの自動送信（待ち時間・最短間隔・中身のハッシュ・やり直しの待ち・401/403 で停止）（DOM 非依存。単体テスト対象） |
+| `show/js/oembed.js` | **追加**: データに無い投稿の本文（X oEmbed の取得・本文の取り出し・ジャンルの推定・linkMeta の検証）（単体テスト対象） |
 | `show/overlay.html` / `overlay.css` / `overlay.js` | **段階2・4**: OBS のブラウザソース用オーバーレイ（`?part=topicbar|card|title|fx|all`、背景透明。fx は演出と WebAudio の効果音） |
 | `show/js/views/plan.js` | 編成画面（上の帯・フォルダの木・行リスト（仮想スクロール）・プレビュー・一括操作バー・右クリック/移動先/名前のダイアログ・キー操作） |
 | `show/js/views/dnd.js` | ドラッグ＆ドロップ（pointer events。マウス・タッチ・Esc・自動スクロール） |
@@ -339,6 +356,10 @@
       "checkpoints": [{ "kind": "preview|final", "dataAt": "generated_at", "recordedAt": 0, "count": 0, "postIds": ["…"], "topicIds": ["…"] }],
       "range": { "mode": "week", "from": null, "to": null },   // 対象期間（版 5。week/since/d3/d7/d14/d30/custom）
       "scriptHold": [{ "name": "YouTuber 関連", "postIds": ["…"] }],   // 台本ファイルの保留（⑩）
+      "postOrder": { "<話題id>": ["<投稿id>", "img:<画像id>"] },   // 進行・編成での手動の並び（先頭＝代表）
+      "topicLinks": { "<話題id>": ["<投稿id>"] },   // URL で追加した、まだ posts.json に無い投稿（入ったら普通の投稿として同じ話題へ）
+      "linkAddedAt": { "<投稿id>": 0 },              // URL で追加した時刻（requested_posts の added_at）
+      "linkMeta": { "<投稿id>": { "author": "みお", "handle": "mio_cabajo", "text": "本文…", "date": "2026年11月7日", "fetchedAt": 0 } },   // oEmbed で取った本文（取れなければ { "error": "…", "fetchedAt": 0 }）。posts.json に入ったら使わない
       "live": { "startedAt": 0, "index": 0, "status": { "<キューid>": "done|skipped|carried" }, "history": [], "enteredAt": { "main": 0 }, "cardVisible": true, "shown": { "cueId": "main:…", "postId": "…" } },
       "carriedOut": [{ "topicId": "…", "name": "…", "genre": "host", "postIds": [], "linkIds": [], "fromWeek": "2026-10-17", "points": "", "via": "live|plan" }],
       "usedPostIds": ["…"],                 // 読んだ話題の投稿（翌週以降のブックマーク枠で「使用済み」）
@@ -361,7 +382,7 @@
 5. **土 1:00 配信**: （初回だけ）［OBS］タブのガイドどおり OBS の WebSocket を有効にし、パーツ（トピック帯・投稿カード・コーナータイトル）をブラウザソースで貼る。［進行］の右上「OBS：未接続」→ パスワード →［接続］→［テスト表示］で確認（2 回目からは自動で接続）。［映す用↗］は全部入りの確認・ウィンドウキャプチャ用に残してある。［進行］（画面半分で縦 1 列）で「配信開始」→ →/Enter 読んだ、← 戻す、S 飛ばす、L 来週へ。OBS の投稿カードには常に「今の投稿」が出る。
 6. 配信後: ［振り返り］で「告知・概要欄用」をコピー。来週に回した話題は翌週の「まとまり」に「持ち越し」で出る。
 7. （段階4）配信中の盛り上がりに合わせて［進行］の「演出 ▸」から拍手・紙吹雪など（Shift+1〜6）。投げ銭のお礼は名前・金額を入れて Enter。
-8. （段階3）週に 1 回くらい、［ツール…］→「ボット（Grok）に修正を送る」で［GitHub に保存］（初回だけトークンを入れる）か［ファイルで保存］。
+8. （段階3）［ツール…］→「ボット（Grok）に修正を送る」で初回だけトークンを入れて［GitHub に保存］。あとは「自動で送る」（既定オン）で編集のたびに自動で届く（ヘッダーの「ボット送信：済 ◯◯:◯◯」で確認）。トークンを使わないときは［ファイルで保存］。
 9. バックアップ・別PCへ: ［ツール…］→［書き出し（JSON）］→ 別PCで［読み込み］（ジャンルの上書きも含む）。
 
 ### 注意・残課題

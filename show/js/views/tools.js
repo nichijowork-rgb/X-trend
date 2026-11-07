@@ -171,6 +171,15 @@ function botSection(app) {
   sec.append(h('p', {}, '編成で直したこと（ジャンルの変更・まとまりの名前や中身・削除）をボットに渡すと、次の収集から分類・まとめ方に反映されます。毎回「今の修正すべて」を送ります（何度送っても同じ内容）。'));
   sec.append(h('p', { class: 'fb-counts', dataset: { key: 'fb-counts' } },
     `ジャンルの変更 ${n.genres}件・話題の修正 ${n.topics}件・削除した話題 ${n.deleted}件・削除した投稿 ${n.posts}件・取得の依頼（データに無い投稿）${n.requested}件`));
+  // 自動で送る（GitHub のトークンを設定したときだけ）
+  const hasToken = Boolean(app.ghPrefs.token);
+  const auto = h('input', { type: 'checkbox', checked: hasToken && app.ghPrefs.auto !== false, disabled: !hasToken, dataset: { key: 'fb-auto' } });
+  auto.addEventListener('change', () => { app.setAutoSend(auto.checked); app.render(); });
+  const ast = app.autoSendState;
+  sec.append(h('label', { class: 'check-line' }, auto,
+    h('span', {}, '自動で送る（編集のあと 60 秒・URL で追加したら 15 秒で GitHub に保存。最短 5 分おき・中身が同じなら送らない）'),
+    !hasToken ? h('span', { class: 'muted' }, '— 下の「GitHub に直接保存」でトークンを入れると使えます') : null));
+  if (hasToken && ast && ast.reason && (ast.status === 'error' || ast.status === 'stopped')) sec.append(h('p', { class: 'import-msg is-error', dataset: { key: 'fb-auto-msg' } }, `自動送信：${ast.reason}${ast.status === 'stopped' ? '（自動送信を止めています。トークンを確かめて「GitHub に保存」を押すと再開します）' : '（間をあけてやり直します）'}`));
   sec.append(h('p', { class: 'muted', dataset: { key: 'fb-last' } }, sent ? `最後に送った日時：${fmtTime(sent.at)}（${sent.via === 'github' ? 'GitHub に保存' : 'ファイルで保存'}）` : 'まだ送っていません'));
   sec.append(h('div', { class: 'row' },
     btn('ファイルで保存（show-feedback.json）', () => {

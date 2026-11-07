@@ -1153,3 +1153,9 @@ body.is-dragging .li-end { border-color: var(--line); }
 .tree-more { all: unset; box-sizing: border-box; width: 26px; height: 26px; border-radius: 8px; text-align: center; line-height: 24px; color: var(--muted); cursor: pointer; flex: none; font-size: 14px; }
 .tree-more:hover, .tree-more:focus-visible { background: var(--surface-2); color: var(--text); }
 .tree-node .tree-label[data-draggable] { touch-action: pan-y; }
+.bot-pill[data-state="done"] { background: var(--surface-2); color: var(--text-2); }
+.bot-pill[data-state="pending"], .bot-pill[data-state="sending"] { background: var(--warn); border-color: var(--warn); color: var(--ink); }
+.bot-pill[data-state="error"], .bot-pill[data-state="stopped"] { background: #5a1410; border-color: var(--over); color: #fff; }
+.bot-pill[hidden] { display: none; }
+.rm-est { color: #9fd3ff; }
+.badge-est { background: #10304a; color: #cfe8ff; border-color: #5ea0ff; }

@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <!-- 通信先は自サイトのみ。例外は X 埋め込み（platform.twitter.com ほか。プレビュー・進行・映す用で表示するものだけ）、
        X の画像・動画（pbs/video.twimg.com）、この PC の OBS WebSocket（ws://127.0.0.1 / ws://localhost。進行画面で「接続」したときだけ）、
-       GitHub API（api.github.com。ツールの「ボットに修正を送る」で GitHub に保存を押したときだけ。feedback/ にだけ書く）。
+       GitHub API（api.github.com。ツールの「ボットに修正を送る」で GitHub に保存したとき・自動送信をオンにしたときだけ。feedback/ にだけ書く）、
+       X の oEmbed（publish.twitter.com。URL で追加した「データに無い投稿」の本文・投稿者を取るときだけ。文字だけ使う）。
        フォントは端末の標準ゴシック（外部フォントは読まない）。
        widgets.js が iframe に style 属性を付けるため style-src に 'unsafe-inline' を許可（本文は常に textContent で挿入） -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com https://api.github.com ws:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com https://publish.twitter.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com https://api.github.com https://publish.twitter.com ws:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark">
@@ -59,7 +60,7 @@
           <span id="range-msg" class="range-msg" role="status"></span>
         </span>
       </div>
-      <p class="sh-meta"><button type="button" id="obs-pill" class="obs-pill" data-key="obs-pill" data-state="idle" hidden>OBS：未接続</button> <span id="data-time"></span> <span id="save-status" class="save-status" role="status"></span></p>
+      <p class="sh-meta"><button type="button" id="bot-pill" class="obs-pill bot-pill" data-key="bot-pill" data-state="idle" hidden>ボット送信</button> <button type="button" id="obs-pill" class="obs-pill" data-key="obs-pill" data-state="idle" hidden>OBS：未接続</button> <span id="data-time"></span> <span id="save-status" class="save-status" role="status"></span></p>
     </div>
   </header>
 

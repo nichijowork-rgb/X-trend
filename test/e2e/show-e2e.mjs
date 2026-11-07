@@ -1951,6 +1951,93 @@ async function main() {
       await c.close();
     });
 
+    await check('ボットへの自動送信（GitHub はモック・待ち時間は短縮）: URL で追加→自動で PUT・同じ中身は送らない・401 で止めて案内／oEmbed で本文・@ハンドル・推定ジャンル・失敗の案内', async () => {
+      const SECRET = 'github_pat_AUTO_SECRET_1';
+      const A = '2110000000000088801';
+      const B = '2110000000000088802';
+      const c = await newCtx();
+      await c.addInitScript((tok) => {
+        if (!localStorage.getItem('xtrend-show-github')) localStorage.setItem('xtrend-show-github', JSON.stringify({ repo: 'nichijowork-rgb/X-trend', branch: 'claude/x-scraper-nightlife-tool-sb26pq', token: tok, auto: true }));
+        localStorage.setItem('xtrend-show-autosend-delays', JSON.stringify({ urlDelay: 400, editDelay: 700, minInterval: 1200, backoff: [400, 800, 1600] }));
+      }, SECRET);
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      watchConsole(page, errors);
+      const puts = [];
+      let gh = 'ok';
+      await page.route('https://api.github.com/**', async (route) => {
+        const r = route.request();
+        const cors = { 'access-control-allow-origin': '*' };
+        if (r.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { ...cors, 'access-control-allow-headers': '*', 'access-control-allow-methods': 'GET, PUT' } });
+        if (gh === 'unauth') return route.fulfill({ status: 401, headers: cors, contentType: 'application/json', body: '{}' });
+        if (r.method() === 'GET') return route.fulfill({ status: 404, headers: cors, contentType: 'application/json', body: '{}' });
+        puts.push(JSON.parse(Buffer.from(JSON.parse(r.postData()).content, 'base64').toString('utf8')));
+        return route.fulfill({ status: 201, headers: cors, contentType: 'application/json', body: JSON.stringify({ commit: { html_url: 'https://github.com/x/y/commit/1' } }) });
+      });
+      const oembedCalls = [];
+      await page.route('https://publish.twitter.com/**', async (route) => {
+        const u = new URL(route.request().url());
+        const target = u.searchParams.get('url') || '';
+        oembedCalls.push(target);
+        const cors = { 'access-control-allow-origin': '*' };
+        if (target.endsWith(B)) return route.fulfill({ status: 404, headers: cors, body: '' });
+        return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({
+          author_name: 'みお', author_url: 'https://twitter.com/mio_cabajo',
+          html: `<blockquote class="twitter-tweet"><p lang="ja">キャバの同伴でラウンジへ &lt;b&gt;太字&lt;/b&gt;</p>&mdash; みお (@mio_cabajo) <a href="https://twitter.com/mio_cabajo/status/${A}">2026年11月7日</a></blockquote>`,
+        }) });
+      });
+      await page.goto(show);
+      await ready(page);
+      assert(await page.isVisible('#bot-pill'), 'ボット送信のピル');
+      await folder(page, 'topic:d:d-hostcall');
+      await page.click('[data-key="url-add"]');
+      await page.fill('[data-key="url-input"]', `https://x.com/a/status/${A}\nhttps://x.com/b/status/${B}`);
+      await page.click('[data-key="url-ok"]');
+      // oEmbed（1 件ずつ）→ 行に本文・@ハンドル・推定ジャンル
+      await page.waitForFunction((id) => (document.querySelector(`.row-item[data-row-key="p:${id}"] .row-title`) || {}).textContent?.includes('キャバの同伴でラウンジへ'), A, { timeout: 8000 });
+      const metaA = await page.textContent(`${rowSel(`p:${A}`)} .row-meta`);
+      assert(metaA.includes('@mio_cabajo') && metaA.includes('数値は次回の更新で') && metaA.includes('推定：キャバクラ'), metaA);
+      assert(!(await page.$(`${rowSel(`p:${A}`)} b`)), 'タグは文字のまま');
+      await page.waitForFunction((id) => (document.querySelector(`.row-item[data-row-key="p:${id}"] .row-meta`) || {}).textContent?.includes('本文を取得できませんでした'), B, { timeout: 8000 });
+      assert(oembedCalls.length === 2, `oEmbed ${oembedCalls.length}`);
+      await page.$eval(rowSel(`p:${A}`), (el) => el.scrollIntoView({ block: 'start' }));
+      await page.evaluate(() => { const t = document.getElementById('toast'); if (t) t.hidden = true; });
+      await page.screenshot({ path: path.join(SHOTS, 'link-meta-rows-960.png') });
+      await page.click(`${rowSel(`p:${A}`)} .row-main`);
+      await page.waitForSelector('[data-key="pv-est"]');
+      assert((await page.textContent('.pv-body .post.is-meta')).includes('キャバの同伴でラウンジへ'), 'preview');
+      const saved = await page.evaluate((id) => window.__show.weekState().linkMeta[id], A);
+      assert(saved && saved.handle === 'mio_cabajo' && saved.date === '2026年11月7日', JSON.stringify(saved));
+      // 自動送信（URL 追加は短い待ち）
+      await page.waitForFunction(() => document.getElementById('bot-pill').dataset.state === 'done', null, { timeout: 8000 });
+      assert(puts.length === 1 && puts[0].requested_posts.some((x) => x.id === A), `PUT ${puts.length}`);
+      assert((await page.textContent('#bot-pill')).startsWith('ボット送信：済'), await page.textContent('#bot-pill'));
+      await page.screenshot({ path: path.join(SHOTS, 'bot-autosend-plan-960.png') });
+      // 中身が同じ編集 → 送らない
+      await page.evaluate(() => window.__show.edit('何も変えない', () => {}));
+      await page.waitForTimeout(2500);
+      assert(puts.length === 1, `同じ中身は送らない ${puts.length}`);
+      // 401 → 止めて案内（トークンは出さない）
+      gh = 'unauth';
+      await page.evaluate(() => window.__show.edit('名前', (w) => { w.overrides.renames['d:d-hostcall'] = '自動送信テスト'; }));
+      await page.waitForFunction(() => document.getElementById('bot-pill').dataset.state === 'stopped', null, { timeout: 8000 });
+      assert((await page.textContent('#bot-pill')).includes('止めました') && !(await page.getAttribute('#bot-pill', 'title')).includes(SECRET), 'stopped');
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('[data-key="fb-auto-msg"]');
+      assert((await page.textContent('[data-key="fb-auto-msg"]')).includes('トークン'), 'tools msg');
+      await page.$eval('[data-key="fb-auto-msg"]', (el) => el.scrollIntoView({ block: 'center' }));
+      await page.screenshot({ path: path.join(SHOTS, 'bot-autosend-stopped-960.png') });
+      // 自動で送るを切る
+      await page.uncheck('[data-key="fb-auto"]');
+      await page.waitForFunction(() => document.getElementById('bot-pill').dataset.state === 'off');
+      await page.click('[data-key="tools-close"]');
+      // 進行画面にもピル
+      await page.goto(`${show}#live`);
+      await ready(page);
+      assert(await page.isVisible('#bot-pill'), 'live pill');
+      await c.close();
+    });
+
     // ---- 4c. Grok ボット連携（段階3）。サンプルには sample/show/topics.json（ボットの話題まとめ）と show_pick がある
     const RAMEN = 'g:sample-ramen-2026w42';
     const SAKURA = 'g:sample-sakura-2026w42';

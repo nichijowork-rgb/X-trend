@@ -195,3 +195,11 @@ export const RECOMMEND_SCALE = Object.freeze({ baseDays: 7, min: 10, max: 120 })
 const featureParam = typeof location !== 'undefined' ? (/[?&]features=([^&#]*)/.exec(location.search) || [])[1] || '' : '';
 /** URL に ?features=effects を付けたときだけ演出を出す（確認・テスト用） */
 export const FEATURES = Object.freeze({ effects: decodeURIComponent(featureParam).split(',').includes('effects') });
+
+/** データに無い投稿（URL で追加・台本）のジャンル推定に使う夜職の言葉（話題辞書の次に見る。「推定」の印つき） */
+export const NIGHT_KEYWORDS = Object.freeze({
+  host: Object.freeze(['ホスト', 'ホストクラブ', '担当', 'シャンパン', 'ラスソン', '売掛', '本指名']),
+  kyaba: Object.freeze(['キャバ', 'キャバクラ', 'キャバ嬢', 'ラウンジ', '同伴', 'アフター']),
+  kabuki: Object.freeze(['歌舞伎町', 'トー横', 'ゴジラロード']),
+  night: Object.freeze(['夜職', '風俗', 'ガールズバー', 'ガルバ', 'コンカフェ', 'パパ活', 'メンエス', 'ソープ', 'デリヘル', '水商売']),
+});

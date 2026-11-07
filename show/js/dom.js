@@ -108,6 +108,18 @@ export function postCard(post, opts = {}) {
 }
 
 /** posts.json に無い投稿（リンクだけ） */
+/** データに無い投稿（X の oEmbed で補った本文・投稿者があればそれ）。文字はすべて textContent */
+export function metaCard(id, meta, url, embedder) {
+  if (!meta || (!meta.text && !meta.author)) {
+    return linkCard(id, url, embedder, meta && meta.error ? `本文を取得できませんでした（${meta.error}）。数値・カテゴリは不明` : undefined);
+  }
+  return h('article', { class: 'post is-link is-meta', dataset: { id }, attrs: { title: TEXT.missingPost } },
+    h('header', { class: 'post-head' }, h('span', { class: 'post-user' }, meta.handle ? `@${meta.handle}` : meta.author), meta.author && meta.handle ? h('span', { class: 'muted' }, meta.author) : null, meta.date ? h('time', { class: 'post-time' }, meta.date) : null),
+    h('p', { class: 'post-text' }, meta.text || '（本文なし）'),
+    h('p', { class: 'post-metrics muted' }, '表示 不明・いいね 不明（数値は次回の更新で）'),
+    postActions(id, url || statusUrl(id), embedder));
+}
+
 export function linkCard(id, url, embedder, note = 'この投稿の中身と数値は収集データ（posts.json）にありません') {
   return h('article', { class: 'post is-link', dataset: { id }, attrs: { title: TEXT.missingPost } },
     h('p', { class: 'post-text muted' }, note),

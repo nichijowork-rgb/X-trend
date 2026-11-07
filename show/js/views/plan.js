@@ -13,7 +13,7 @@ import {
   folderRows, buildTree, selectClick, selectAllRows, pruneSelection, isDropTarget, applyDrop, makeGroup, createEmptyGroup,
   renameTopic, isFolderTopic, placeOf, isNightGenre, topicsOfRows,
 } from '../folders.js';
-import { h, btn, badge, field, postCard, linkCard, genreSticker, embedHost, isEditable } from '../dom.js';
+import { h, btn, badge, field, postCard, linkCard, metaCard, genreSticker, embedHost, isEditable } from '../dom.js';
 import { scriptFor, topicMarks, refYear, mainTopics, currentTitle, bmInfo, statsLine, botMarks, pickReason, outsideLabel } from './common.js';
 import { beginPointer, isDragging } from './dnd.js';
 import { contextMenu, moveDialog, nameDialog } from './menu.js';
@@ -358,7 +358,7 @@ function cornerSettings(app, wk, key) {
 }
 
 function rowGenre(app, row) {
-  if (row.type === 'post') return postGenre(app.postsById.get(row.id));
+  if (row.type === 'post') { const p = app.postsById.get(row.id); if (p) return postGenre(p); const g = app.missingGenre(row.id); return g ? g.genre : 'general'; }
   if (row.type === 'topic') { const t = app.topicsById.get(row.id); return t ? t.genre : 'night'; }
   if (row.type === 'trash') { const e = app.saved.trash.find((x) => x.id === row.id); return e ? e.genre : 'night'; }
   if (row.type === 'image') { const t = app.topicsById.get(app.ui.folder.slice(6)); return t ? t.genre : 'night'; }
@@ -368,7 +368,12 @@ function rowGenre(app, row) {
 }
 
 function rowLabel(app, row) {
-  if (row.type === 'post') { const p = app.postsById.get(row.id); return p ? (p.text || '（本文なし）').replace(/\s+/g, ' ') : `データに無い投稿（ID ${row.id}）`; }
+  if (row.type === 'post') {
+    const p = app.postsById.get(row.id);
+    if (p) return (p.text || '（本文なし）').replace(/\s+/g, ' ');
+    const m = app.linkMetaOf(row.id);
+    return m && m.text ? m.text.replace(/\s+/g, ' ') : `データに無い投稿（ID ${row.id}）`;
+  }
   if (row.type === 'topic') { const t = app.topicsById.get(row.id); return t ? t.name : '話題'; }
   if (row.type === 'trash') { const e = app.saved.trash.find((x) => x.id === row.id); return e ? `話題：${e.name}` : '話題'; }
   if (row.type === 'heldTopic') { const t = app.topicsById.get(row.id); return t ? `まとまり：${t.name}` : '話題'; }
@@ -408,7 +413,15 @@ function rowEl(app, row, index) {
     const p = app.postsById.get(row.id);
     const t = app.topicsById.get(app.postTopic.get(row.id));
     if (p) meta.push(h('span', { class: 'rm-user' }, `@${p.user}`), h('span', { class: 'rm-imp' }, formatCompact(p.metrics.impression_count)));
-    else { meta.push(h('span', { class: 'rm-tag rm-missing', attrs: { title: TEXT.missingPost } }, 'データに無い投稿（数値は不明）')); el.title = TEXT.missingPost; }
+    else {
+      // データに無い投稿: X の oEmbed で補った本文・@ハンドル。数値は次回の更新で
+      const m = app.linkMetaOf(row.id);
+      if (m && m.handle) meta.push(h('span', { class: 'rm-user' }, `@${m.handle}`));
+      meta.push(h('span', { class: 'rm-tag rm-missing', attrs: { title: TEXT.missingPost } }, m && m.text ? '数値は次回の更新で' : (m && m.error ? '本文を取得できませんでした' : 'データに無い投稿（数値は不明）')));
+      const g = app.missingGenre(row.id);
+      if (g && g.estimated) meta.push(h('span', { class: 'rm-est', attrs: { title: '本文から推定したジャンル（ジャンルを変えるとそちらになります）' } }, `推定：${genreLabel(g.genre)}`));
+      el.title = TEXT.missingPost;
+    }
     if (bmInfo(app, row.id)) meta.push(h('span', { class: 'rm-star', attrs: { title: 'ブックマーク（数値はブックマーク時点）' } }, '★'));
     if (app.usedBefore && app.usedBefore.has(row.id)) meta.push(h('span', { class: 'rm-tag', attrs: { title: '前の配信で読んだ投稿' } }, '使用済み'));
     if (p && p._genreOverride) meta.push(h('span', { class: 'rm-tag', attrs: { title: 'ジャンルを上書きしています' } }, `${genreLabel(p._genreOverride)}に変更`));
@@ -883,15 +896,17 @@ function postPreview(app, wk, row) {
   const u = app.ui;
   const p = app.postsById.get(row.id);
   const t = app.topicsById.get(app.postTopic.get(row.id));
-  const genre = postGenre(p);
+  const mg = p ? null : app.missingGenre(row.id);
+  const genre = p ? postGenre(p) : (mg ? mg.genre : 'general');
   const box = h('div', { class: 'pv-body', dataset: { keep: `pv:${row.key}` } });
   box.append(h('div', { class: `pv-head g-${genre}` }, genreSticker(genre, { small: true }),
-    h('b', { class: 'pv-title' }, p ? `@${p.user}` : `ID ${row.id}`),
+    h('b', { class: 'pv-title' }, p ? `@${p.user}` : (app.linkMetaOf(row.id) && app.linkMetaOf(row.id).handle ? `@${app.linkMetaOf(row.id).handle}` : `ID ${row.id}`)),
+    mg && mg.estimated ? h('span', { class: 'badge badge-est', dataset: { key: 'pv-est' }, attrs: { title: '本文から推定したジャンル（下で変えるとそちらになります）' } }, '推定') : null,
     t && isFolderTopic(t) ? h('button', { type: 'button', class: 'pv-link', dataset: { key: 'pv-open-topic' }, on: { click: () => openFolder(app, t.id) } }, `▸ まとまり「${t.name}」`) : null,
     p && p._genreOverride ? h('span', { class: 'badge badge-me' }, `ジャンル上書き（元：${genreLabel(app.origGenreOf(row.id))}）`) : null));
   const pr = pickReason(app, row.id);
   if (pr != null) box.append(pickNote(pr));
-  const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: null, noActions: true, bm: bmInfo(app, p.id) }) : linkCard(row.id, statusUrl(row.id), null);
+  const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), embedder: null, noActions: true, bm: bmInfo(app, p.id) }) : metaCard(row.id, app.linkMetaOf(row.id), statusUrl(row.id), null);
   box.append(h('div', { class: 'pv-post', dataset: { keep: `pp:${row.id}` } }, app.ui.view !== 'card' ? embedHost(row.id, own, 'pv-embed') : own));
   box.append(h('div', { class: 'pv-actions' },
     field('ジャンル', genreSelect(app, [row], genre, 'pv-genre')),
@@ -957,7 +972,8 @@ function topicPreview(app, wk, row) {
       h('ol', { class: 'pv-item-list' }, all.slice(0, 50).map((id, i) => {
         const img = id.startsWith('img:') ? (app.weekState().images || []).find((x) => `img:${x.id}` === id) : null;
         const p = img ? null : app.postsById.get(id);
-        const label = img ? `画像：${img.caption || '（キャプションなし）'}` : (p ? `@${p.user}：${(p.text || '').replace(/\s+/g, ' ').slice(0, 60)}` : `データに無い投稿（ID ${id}）`);
+        const lm = !img && !p ? app.linkMetaOf(id) : null;
+        const label = img ? `画像：${img.caption || '（キャプションなし）'}` : (p ? `@${p.user}：${(p.text || '').replace(/\s+/g, ' ').slice(0, 60)}` : (lm && lm.text ? `@${lm.handle || '?'}：${lm.text.replace(/\s+/g, ' ').slice(0, 60)}（数値は次回の更新で）` : `データに無い投稿（ID ${id}）`));
         return h('li', {}, h('button', { type: 'button', class: 'pv-item', dataset: { key: `pv-item-${id}` }, on: { click: () => { openFolder(app, t.id); u.focus = img ? id : `p:${id}`; u.pane = 'preview'; app.render(); } } },
           i === 0 ? h('span', { class: 'rm-rep' }, '代表') : null, label));
       }))));

@@ -1433,6 +1433,7 @@ export function defaultWeek() {
     range: defaultRange(), // 台本づくりの対象期間（版 5。既定は番組週）
     scriptHold: [], // 台本ファイルの「保留」（[{ name, postIds }]。保留フォルダへ入れる）
     topicLinks: {}, // URL で話題に追加した「データに無い投稿」（話題 id → [投稿 id]。埋め込みで表示。あとで posts.json に現れたら普通の投稿として扱う）
+    linkMeta: {}, // データに無い投稿の本文・投稿者（X の oEmbed から。投稿 id → { author, handle, text, date, fetchedAt, error }。posts.json に入ったら使わない）
     linkAddedAt: {}, // その追加日時（投稿 id → ms。ボットへの取得依頼 requested_posts の added_at）
     postOrder: {}, // 話題の中の手動順（話題 id → [投稿 id・'img:<画像id>']。先頭が代表投稿）
     images: [], // 自分で追加した画像（中身は IndexedDB。[{ id, topicId, caption, w, h, type, bytes, hash, at }]）
@@ -1583,6 +1584,13 @@ function sanitizeWeek(v, ver = SCHEMA_VERSION) {
     if (list.length) w.postOrder[k] = list;
   }
   w.images = sanitizeImages(o.images);
+  w.linkMeta = {};
+  for (const [k, v] of Object.entries(obj(o.linkMeta) || {})) {
+    const m = obj(v);
+    if (!ID_RE.test(k) || !m) continue;
+    const s2 = (x, n) => (typeof x === 'string' ? x.slice(0, n) : '');
+    w.linkMeta[k] = { author: s2(m.author, 80), handle: /^[A-Za-z0-9_]{0,30}$/.test(m.handle || '') ? (m.handle || '') : '', text: s2(m.text, 600), date: s2(m.date, 40), fetchedAt: isNum(m.fetchedAt) ? m.fetchedAt : null, error: m.error ? s2(String(m.error), 120) : null };
+  }
   w.linkAddedAt = {};
   for (const [k, v] of Object.entries(obj(o.linkAddedAt) || {})) if (ID_RE.test(k) && isNum(v)) w.linkAddedAt[k] = v;
   w.topicLinks = {};

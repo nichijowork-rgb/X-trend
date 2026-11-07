@@ -12,6 +12,8 @@ import {
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory, addPostsToTopic } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { createAutoSender } from './js/autosend.js';
+import { fetchOembed, estimateGenre, sanitizeLinkMeta, OEMBED_GAP_MS } from './js/oembed.js';
 import { parseViewerPrefs, openViewer, isXUrl, screenSnapshot, VIEWER_PREF_KEY } from './js/viewer.js';
 import { IMAGE_LIMITS, checkImageFile, decodeImage, shrinkImage, canvasEncoder, shortHash, newImageId, validImageDataUrl } from './js/imaging.js';
 import { putImage, getImage, deleteImage, imageKeys } from './js/imagestore.js';
@@ -273,7 +275,69 @@ app.ghPrefs = loadGhPrefs();
 app.saveGhPrefs = (v) => {
   app.ghPrefs = parseGhPrefs({ ...app.ghPrefs, ...v });
   try { localStorage.setItem(GH_PREF_KEY, JSON.stringify(app.ghPrefs)); } catch { /* このブラウザでは保存できない（今回だけ使う） */ }
+  if (app.autoSend) app.autoSend.setEnabled(autoEnabled());
+  updateBotPill();
 };
+// ---------------------------------------------------------------- ボットへの修正の自動送信（最後の編集から 60 秒・URL 追加は 15 秒・最短 5 分おき）
+
+const AUTOSEND_KEY = 'xtrend-show-autosend';
+function loadAutoState() {
+  try { const o = JSON.parse(localStorage.getItem(AUTOSEND_KEY) || 'null'); return o && typeof o === 'object' ? o : {}; } catch { return {}; }
+}
+function saveAutoState(st) {
+  try { localStorage.setItem(AUTOSEND_KEY, JSON.stringify({ lastSentAt: st.lastSentAt, lastHash: st.lastHash, pendingSince: st.pendingSince })); } catch { /* 保存できなくても動く */ }
+}
+const autoEnabled = () => Boolean(app.ghPrefs && app.ghPrefs.token && app.ghPrefs.auto !== false);
+app.autoSendState = null;
+function initAutoSend() {
+  const restore = loadAutoState();
+  // 確認用（E2E）: 待ち時間を短くする（localStorage xtrend-show-autosend-delays。ふだんは使わない）
+  let delays;
+  try { const d = JSON.parse(localStorage.getItem('xtrend-show-autosend-delays') || 'null'); if (d && typeof d === 'object') delays = d; } catch { delays = undefined; }
+  app.autoSend = createAutoSender({
+    enabled: autoEnabled(),
+    restore,
+    delays,
+    getContent: () => (app.saved ? `${JSON.stringify(app.buildFeedback(), null, 2)}\n` : null),
+    send: async (content) => {
+      const p = app.ghPrefs;
+      const r = await saveFeedbackToGitHub({ repo: p.repo, branch: p.branch, token: p.token, content });
+      if (r.ok) { try { localStorage.setItem(FEEDBACK_SENT_KEY, JSON.stringify({ at: Date.now(), via: 'github' })); } catch { /* 無視 */ } }
+      return r;
+    },
+    onState: (st) => { app.autoSendState = st; saveAutoState(st); updateBotPill(); },
+  });
+  app.autoSendState = app.autoSend.state();
+  // 前回、送る前にタブを閉じた分があれば知らせて送る
+  if (restore.pendingSince && autoEnabled()) { toast('前回送れなかったボットへの修正があります。自動で送ります'); app.autoSend.flush(); }
+  updateBotPill();
+}
+const clock = (ms) => { const d = new Date(ms + 9 * 3600 * 1000); return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`; };
+/** ヘッダーの小さなピル（編成・進行）: ボット送信の状態 */
+function updateBotPill() {
+  const pill = $('bot-pill');
+  if (!pill) return;
+  const st = app.autoSendState;
+  const show = (app.route === 'plan' || app.route === 'live') && Boolean(app.ghPrefs && app.ghPrefs.token) && st;
+  pill.hidden = !show;
+  if (!show) return;
+  const label = !st.enabled ? 'ボット送信：自動オフ'
+    : st.status === 'sending' ? 'ボット送信：送信中…'
+      : st.status === 'pending' ? `ボット送信：送信待ち${st.nextAt ? `（${clock(st.nextAt)}ごろ）` : ''}`
+        : st.status === 'error' ? 'ボット送信：失敗（やり直します）'
+          : st.status === 'stopped' ? 'ボット送信：止めました（要確認）'
+            : st.lastSentAt ? `ボット送信：済 ${clock(st.lastSentAt)}` : 'ボット送信：変更なし';
+  pill.textContent = label;
+  pill.dataset.state = st.enabled ? st.status : 'off';
+  pill.title = st.reason ? `理由：${st.reason}（押すと今すぐ送り直します）` : '押すと今すぐ送ります（自動送信は［ツール…］で切り替え）';
+}
+app.updateBotPill = updateBotPill;
+app.setAutoSend = (on) => {
+  app.saveGhPrefs({ auto: Boolean(on) });
+  if (app.autoSend) app.autoSend.setEnabled(autoEnabled());
+  updateBotPill();
+};
+
 /** GitHub の feedback/show-feedback.json に保存（GET で sha → PUT。ぶつかったら 1 回だけやり直す） */
 app.sendFeedbackGitHub = async (v) => {
   if (app.ui.fbBusy) return;
@@ -288,6 +352,7 @@ app.sendFeedbackGitHub = async (v) => {
   if (r.ok) {
     const url = r.commitUrl && /^https:\/\/github\.com\//.test(r.commitUrl) ? r.commitUrl : null;
     app.ui.fbMsg = { kind: 'ok', text: `GitHub に保存しました（${p.repo} の ${p.branch}・feedback/show-feedback.json）。`, url };
+    if (app.autoSend) app.autoSend.markSent(content);
     app.markFeedbackSent('github');
   } else {
     app.ui.fbMsg = { kind: 'error', text: `保存できませんでした：${r.message}` };
@@ -352,8 +417,68 @@ app.addUrlsToTopic = (topicId, text, move = false) => {
   if (!probe.added.length && !probe.missing.length) return { result: probe, invalid: ex.invalid };
   app.edit(`URL で追加「${t.name}」`, (w) => {
     result = addPostsToTopic(w, t, ids, { postsById: app.basePostsById, postTopic: app.postTopic, topicsById: app.topicsById, inRange: new Set(app.weekPosts.map((p) => p.id)), move });
-  }, { toastText: `「${t.name}」に ${probe.added.length + probe.missing.length}件追加しました${probe.missing.length ? `（うちデータに無い投稿 ${probe.missing.length}件は埋め込みで表示）` : ''}` });
+  }, { autoKind: 'url', toastText: `「${t.name}」に ${probe.added.length + probe.missing.length}件追加しました${probe.missing.length ? `（うちデータに無い投稿 ${probe.missing.length}件は本文を取りに行きます）` : ''}` });
+  if (result && result.missing.length) enqueueMeta(result.missing.map((id) => ({ id, week: app.weekKey })));
   return { result, invalid: ex.invalid };
+};
+
+// ---------------------------------------------------------------- データに無い投稿の本文・投稿者（X の oEmbed。1 件ずつ 500ms 以上あけて）
+
+const metaQueue = [];
+let metaBusy = false;
+const metaTried = new Set();
+function enqueueMeta(list) {
+  for (const x of list) {
+    const k = `${x.week}|${x.id}`;
+    if (metaTried.has(k) || app.basePostsById.has(x.id)) continue;
+    metaTried.add(k);
+    metaQueue.push(x);
+  }
+  runMeta();
+}
+async function runMeta() {
+  if (metaBusy) return;
+  metaBusy = true;
+  try {
+    while (metaQueue.length) {
+      const { id, week } = metaQueue.shift();
+      let meta;
+      try { meta = { ...(await fetchOembed(id)), fetchedAt: Date.now(), error: null }; } catch (err) { meta = { author: '', handle: '', text: '', date: '', fetchedAt: Date.now(), error: (err && err.message) || '取得できませんでした' }; }
+      const w = app.saved.weeks[week];
+      if (w) {
+        w.linkMeta = { ...(w.linkMeta || {}), [id]: sanitizeLinkMeta(meta) };
+        persist();
+        if (week === app.weekKey) { app.metaVersion = (app.metaVersion || 0) + 1; if (!isEditable(document.activeElement)) renderRoute(); }
+      }
+      await new Promise((r) => setTimeout(r, OEMBED_GAP_MS));
+    }
+  } finally { metaBusy = false; }
+}
+/** 起動時: 本文をまだ取っていないデータに無い投稿（URL で追加・台本）を順に */
+function enqueueMissingMeta() {
+  const list = [];
+  for (const [week, w] of Object.entries(app.saved.weeks || {})) {
+    const meta = w.linkMeta || {};
+    const ids = [...Object.values(w.topicLinks || {}).flat(), ...((w.overrides && w.overrides.manual) || []).flatMap((m) => m.missing || [])];
+    for (const id of ids) if (!meta[id] && !app.basePostsById.has(id)) list.push({ id, week });
+  }
+  enqueueMeta(list);
+}
+app.enqueueMissingMeta = enqueueMissingMeta;
+/** データに無い投稿の本文・投稿者（今の番組週）。posts.json にあれば null（本物のデータ優先） */
+app.linkMetaOf = (id) => {
+  if (app.basePostsById.has(id)) return null;
+  const w = app.weekState();
+  return (w.linkMeta && w.linkMeta[id]) || null;
+};
+/** データに無い投稿のジャンル（手で変えたらそれ、無ければ本文からの推定）。{ genre, estimated } か null */
+app.missingGenre = (id) => {
+  const o = app.saved.genreOverrides && app.saved.genreOverrides[id];
+  if (o && o.genre) return { genre: o.genre, estimated: false };
+  const m = app.linkMetaOf(id);
+  if (!m || !m.text) return null;
+  const e = estimateGenre(m.text, { dict: app.saved.dict, holdTerms: app.saved.holdTerms });
+  return e ? { genre: e.genre, estimated: true, via: e.via } : null;
 };
 
 // 画像の中身（IndexedDB）のキャッシュ: id → { url（表示用 object URL）, obs（OBS 用 data URL） }
@@ -704,6 +829,8 @@ app.edit = (label, mut, opts = {}) => {
   app.update(mut, { topics: true, ...opts });
   if (opts.toastText) toast(opts.toastText, () => app.undo());
   updateHistoryButtons();
+  // ボットへの修正の自動送信（トークンを設定しているときだけ。中身が同じなら送らない）
+  if (app.autoSend) app.autoSend.notify(opts.autoKind || 'edit');
 };
 
 function restoreSnap(snap) {
@@ -975,6 +1102,7 @@ function renderRoute() {
   // 進行画面に来たら（前に接続していれば）OBS へつなぐ。状態ピル
   if ((app.route === 'live' || app.route === 'obs-setup') && app.obsPrefs.enabled && app.obsPrefs.auto && !app.obs) ensureObs().connect(app.obsPrefs);
   updateObsPill();
+  updateBotPill();
   sendOverlay();
 }
 app.render = renderRoute;
@@ -1080,6 +1208,13 @@ async function main() {
   }, 1000);
   setInterval(resendOverlay, RESEND_MS);
   $('obs-pill').addEventListener('click', () => { app.ui.obsDlg = true; renderRoute(); });
+  $('bot-pill').addEventListener('click', () => {
+    const st = app.autoSendState;
+    if (!app.autoSend) return;
+    if (st && (st.status === 'error' || st.status === 'stopped') && st.reason) toast(`ボットへの送信：${st.reason}${st.status === 'stopped' ? '（［ツール…］の「GitHub に直接保存」でトークンを確かめてください）' : ''}`);
+    if (!autoEnabled()) { toast('自動送信はオフです（［ツール…］→「ボット（Grok）に修正を送る」）'); return; }
+    app.autoSend.flush(true);
+  });
   $('range-select').addEventListener('change', (e) => {
     const mode = e.target.value;
     if (mode === 'custom') { app.ui.rangeDraft = true; renderRangePicker(); $('range-from').focus(); return; }
@@ -1110,6 +1245,8 @@ async function main() {
   main.setAttribute('aria-busy', 'false');
   app.ready = true;
   setTimeout(cleanupImages, 3000);
+  initAutoSend();
+  setTimeout(enqueueMissingMeta, 1500);
   renderRoute();
 }
 

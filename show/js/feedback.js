@@ -132,6 +132,7 @@ export function parseGhPrefs(raw) {
     repo: ok && validRepo(o.repo) ? o.repo : BOT.defaultRepo,
     branch: ok && validBranch(o.branch) ? o.branch : BOT.defaultBranch,
     token: ok && typeof o.token === 'string' ? o.token.trim().slice(0, 300) : '',
+    auto: !(ok && o.auto === false), // 自動で送る（既定オン。トークンがあるときだけ動く）
   };
 }
 

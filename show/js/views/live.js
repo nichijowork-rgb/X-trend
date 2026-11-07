@@ -1,6 +1,6 @@
 // ② 進行（配信中）画面。キーボード: →/Enter 読んだ、← 戻す、S 飛ばす、L 来週へ、J/↓・K/↑ 映す投稿を次・前へ、Shift+1〜6 演出。
 import { computeTimer, formatClock, cornerDef, cueStates, liveShownPost, stepShownPost, statusUrl, isImageItem, moveItemTo } from '../logic.js';
-import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, linkCard, embedHost } from '../dom.js';
+import { h, btn, genreSticker, isEditable, prefersReducedMotion, postCard, metaCard, embedHost } from '../dom.js';
 import { genreIcon } from '../icons.js';
 import { cueColor, leadFor, leadIsBot, topicMarks, statsLine, refYear, bmInfo } from './common.js';
 import { beginPointer } from './dnd.js';
@@ -288,7 +288,7 @@ function itemEl(app, t, id, index, shownId, items) {
   else {
     const p = app.postsById.get(id);
     if (!p) { el.title = TEXT.missingPost; bar.insertBefore(h('span', { class: 'badge li-kind', attrs: { title: TEXT.missingPost } }, 'データに無い'), bar.querySelector('.li-sp')); }
-    const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, noActions: true, bm: bmInfo(app, p.id) }) : linkCard(id, statusUrl(id), null);
+    const own = p ? postCard(p, { refTs: app.ds.refTs, refYear: refYear(app), compact: true, noActions: true, bm: bmInfo(app, p.id) }) : metaCard(id, app.linkMetaOf(id), statusUrl(id), null);
     // 進行は常に X の埋め込み（画面に近いものから作る。失敗・データに無い投稿は自前のカード）
     const body = h('div', { class: 'li-body', dataset: { keep: 'body' } }, p ? embedHost(id, own, 'live-embed') : own);
     if (p && catcherOn && !interact) {
