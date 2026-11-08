@@ -1,6 +1,104 @@
 {
- "generated_at": "2026-11-07T23:36:39+09:00",
+ "generated_at": "2026-11-09T00:06:02+09:00",
  "daily": [
+  {
+   "date": "2026-11-08",
+   "rising": [
+    {
+     "id": "2119403984712851927",
+     "views": 472799,
+     "hours_since_post": 2.2,
+     "views_per_hour": 216000,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2119400476504715486",
+     "views": 430220,
+     "hours_since_post": 2.4,
+     "views_per_hour": 177675,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2119406908390154722",
+     "views": 284350,
+     "hours_since_post": 2.0,
+     "views_per_hour": 142511,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2119408864760401930",
+     "views": 250532,
+     "hours_since_post": 1.9,
+     "views_per_hour": 134274,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2119416042934182048",
+     "views": 163926,
+     "hours_since_post": 1.4,
+     "views_per_hour": 117909,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2119403177133117914",
+     "views": 174293,
+     "hours_since_post": 2.2,
+     "views_per_hour": 77723,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "LAST CALL新回の、きゃにょんさんが愛沢えみりさんに一発ギャグを伝授する場面の切り抜きが、約2時間で17万表示を超えています"
+    },
+    {
+     "id": "2119406670879355042",
+     "views": 145206,
+     "hours_since_post": 2.0,
+     "views_per_hour": 72202,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "LAST CALL新回で南柚子さんと桃瀬ともさんの意見が割れた場面の切り抜きが、約2時間で14万表示を超えています"
+    }
+   ],
+   "review": [
+    {
+     "id": "2118985454632731088",
+     "before_views": 351462,
+     "after_views": 759232,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2118941423513080273",
+     "before_views": 418499,
+     "after_views": 1270257,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119000517519233189",
+     "before_views": 265182,
+     "after_views": 427250,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-07",
    "rising": [
