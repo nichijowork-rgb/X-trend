@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T00:06:02+09:00",
+ "generated_at": "2026-11-09T00:24:28+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -685,7 +685,8 @@
     "ガールズバー",
     "quote:北新地"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "in_bookmarks": true
   },
   {
    "id": "2119353229410533420",
@@ -1075,6 +1076,110 @@
      "height": 1987
     }
    ]
+  },
+  {
+   "id": "2119293672168862121",
+   "url": "https://x.com/recta_erabi/status/2119293672168862121",
+   "user": "recta_erabi",
+   "created_utc": "2026-11-08T04:59:20Z",
+   "created_jst": "2026-11-08T13:59:20+09:00",
+   "ts": 1794113960,
+   "metrics": {
+    "impression_count": 249485,
+    "like_count": 533,
+    "retweet_count": null,
+    "reply_count": 21,
+    "quote_count": 25,
+    "bookmark_count": 215
+   },
+   "text": "天音恋愛さんのお店で桜井野の花さんがブチギレ⁉️プリンスこうやさん優しいしかっこいい😳 https://t.co/4IYZHYstcY",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119293511736733696/img/l_lj_U1U1hDzb7lR.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119293511736733696/vid/avc1/490x270/VuPFqtPLH3OkH0CE.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119293511736733696/vid/avc1/652x360/n_MrC5ybaeCoRAf1.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119293511736733696/vid/avc1/1206x664/QYtPxNiDJ4ZR4vpK.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119293511736733696/pl/lte2GyutiwZx5ZyD.m3u8"
+      }
+     ],
+     "width": 1206,
+     "height": 664
+    }
+   ],
+   "in_bookmarks": true,
+   "below_threshold": true
+  },
+  {
+   "id": "2119290457452933624",
+   "url": "https://x.com/nm4xh5/status/2119290457452933624",
+   "user": "nm4xh5",
+   "created_utc": "2026-11-08T04:46:34Z",
+   "created_jst": "2026-11-08T13:46:34+09:00",
+   "ts": 1794113194,
+   "metrics": {
+    "impression_count": 4463248,
+    "like_count": 10642,
+    "retweet_count": null,
+    "reply_count": 229,
+    "quote_count": 696,
+    "bookmark_count": 3998
+   },
+   "text": "ゴリゴリ整形してる歌舞伎町界隈がみんなこの肌に収束してるから起こり得る全可能性列挙してみた👇\n\n👃小鼻縮小や人中短縮などの傷跡\n👁️目頭切開や全切開などの傷跡\n👁️クマ取りでのハムラ顔\n💉リジュラン → 炎症・肌テカテカ\n💉ジュベルック → 結節・硬いしこり\n💉ヒアルロン酸 → https://t.co/ldzVja9c4n",
+   "categories": [
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "歌舞伎町"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWk7b8DawAA-ETK.jpg",
+     "width": 1120,
+     "height": 1776
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWk7b79b0AAYm8f.jpg",
+     "width": 1120,
+     "height": 1742
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWk7b71aAAA5KX8.jpg",
+     "width": 1127,
+     "height": 1744
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWk7b77aEAEM_uK.jpg",
+     "width": 1136,
+     "height": 1727
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2119284676586287406",
@@ -2451,7 +2556,8 @@
      "width": 1206,
      "height": 1369
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2119061122670317720",
@@ -4505,8 +4611,8 @@
    "created_jst": "2026-11-07T12:46:03+09:00",
    "ts": 1794023163,
    "metrics": {
-    "impression_count": 405778,
-    "like_count": 1616,
+    "impression_count": 407334,
+    "like_count": 1622,
     "retweet_count": null,
     "reply_count": 2,
     "quote_count": 8,
@@ -5235,12 +5341,12 @@
    "created_jst": "2026-11-06T23:08:39+09:00",
    "ts": 1793974119,
    "metrics": {
-    "impression_count": 5613639,
-    "like_count": 10153,
+    "impression_count": 5854314,
+    "like_count": 10270,
     "retweet_count": null,
-    "reply_count": 99,
-    "quote_count": 376,
-    "bookmark_count": 2277
+    "reply_count": 102,
+    "quote_count": 383,
+    "bookmark_count": 2279
    },
    "text": "PayPayはもうサ終したほうがいいよ。\n総額187万円の被害でてます。 https://t.co/xQBa365vTY https://t.co/RCVa66W2vh",
    "categories": [
@@ -17156,8 +17262,8 @@
    "created_jst": "2026-11-03T17:54:21+09:00",
    "ts": 1793696061,
    "metrics": {
-    "impression_count": 128315,
-    "like_count": 558,
+    "impression_count": 128650,
+    "like_count": 561,
     "retweet_count": null,
     "reply_count": 0,
     "quote_count": 9,
@@ -119754,12 +119860,12 @@
    "created_jst": "2026-10-14T21:18:17+09:00",
    "ts": 1791980297,
    "metrics": {
-    "impression_count": 2457470,
-    "like_count": 11914,
+    "impression_count": 2459538,
+    "like_count": 11910,
     "retweet_count": null,
     "reply_count": 110,
     "quote_count": 1645,
-    "bookmark_count": 1244
+    "bookmark_count": 1243
    },
    "text": "🏛2026/11/07 Sat.🏛\nゲストイベント開催決定💗\n　\n🫖堀大輔さん🎀\n＠d_holi \nが1日限定ゲスト女神に…🫧💍\n\n🕓17:00~23:00\n\n堀大輔さんのゲストイベントでは\n特別なグッズや特典を手に入れることができます🎉🤍\n\n詳細は後日ポストさせていただきますので楽しみにお待ちください🧸 https://t.co/GT6owJ8TT8",
    "categories": [
