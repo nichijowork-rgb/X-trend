@@ -1,6 +1,134 @@
 {
- "generated_at": "2026-11-09T00:06:02+09:00",
+ "generated_at": "2026-11-10T00:11:06+09:00",
  "daily": [
+  {
+   "date": "2026-11-09",
+   "rising": [
+    {
+     "id": "2119773587485954458",
+     "views": 334291,
+     "hours_since_post": 1.7,
+     "views_per_hour": 198033,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2119753359909658991",
+     "views": 310531,
+     "hours_since_post": 3.0,
+     "views_per_hour": 102561,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2119706544824815901",
+     "views": 404184,
+     "hours_since_post": 6.1,
+     "views_per_hour": 65956,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2119780300452466842",
+     "views": 112417,
+     "hours_since_post": 1.2,
+     "views_per_hour": 90396,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "暴露系アカウント（見張るアカウント）の新しい暴露投稿。1時間あまりで11万表示を超えています"
+    },
+    {
+     "id": "2119777641058218154",
+     "views": 125660,
+     "hours_since_post": 1.4,
+     "views_per_hour": 88510,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウント ori_newsroom2 の暴露投稿。1時間半ほどで12万表示を超え、orihara_bakuro にも引用されています"
+    },
+    {
+     "id": "2119761309067788773",
+     "views": 189939,
+     "hours_since_post": 2.5,
+     "views_per_hour": 75933,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "銀座のななえママのクラファン炎上の続報。2時間半で19万表示"
+    },
+    {
+     "id": "2119745283538170186",
+     "views": 167662,
+     "hours_since_post": 3.6,
+     "views_per_hour": 47063,
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "reason": "見出しのバロンかりんさんの暴露を引用した投稿"
+    }
+   ],
+   "review": [
+    {
+     "id": "2119403984712851927",
+     "before_views": 472799,
+     "after_views": 1629494,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119400476504715486",
+     "before_views": 430220,
+     "after_views": 1355188,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119406908390154722",
+     "before_views": 284350,
+     "after_views": 2460182,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119408864760401930",
+     "before_views": 250532,
+     "after_views": 1138985,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119416042934182048",
+     "before_views": 163926,
+     "after_views": 784899,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119403177133117914",
+     "before_views": 174293,
+     "after_views": 541701,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2119406670879355042",
+     "before_views": 145206,
+     "after_views": 374295,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-08",
    "rising": [
