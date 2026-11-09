@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-10T00:11:06+09:00",
+ "generated_at": "2026-11-10T06:39:03+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -18,19 +18,27 @@
    "created_jst": "2026-11-09T22:52:44+09:00",
    "ts": 1794232364,
    "metrics": {
-    "impression_count": 1922879,
-    "like_count": 178513,
+    "impression_count": 6123347,
+    "like_count": 378948,
     "retweet_count": null,
-    "reply_count": 931,
-    "quote_count": 6368,
-    "bookmark_count": 5982
+    "reply_count": 1389,
+    "quote_count": 10305,
+    "bookmark_count": 13303
    },
    "text": "🙌 https://t.co/YCy9lFLDah",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWsCCWpbQAAWjUx.jpg",
+     "width": 2000,
+     "height": 2846
+    }
+   ]
   },
   {
    "id": "2119786585294324061",
@@ -55,6 +63,85 @@
    "is_watched": false
   },
   {
+   "id": "2119784962379632856",
+   "url": "https://x.com/super_sachico/status/2119784962379632856",
+   "user": "super_sachico",
+   "created_utc": "2026-11-09T13:31:33Z",
+   "created_jst": "2026-11-09T22:31:33+09:00",
+   "ts": 1794231093,
+   "metrics": {
+    "impression_count": 1096473,
+    "like_count": 1814,
+    "retweet_count": null,
+    "reply_count": 32,
+    "quote_count": 56,
+    "bookmark_count": 702
+   },
+   "text": "【🚨驚愕🚨】ラストコール・星乃リア、《整形》＆衝撃の《すっぴん》披露⚡️‼️\n\n「もう何も怖くない」「いくらでも映してください」\n\n整形カウンセリングのために、《素顔》で撮影🔥\nたしかにいつもとだいぶ印象ちがうけど可愛い🙂‍↕️\n\n⭐️↓《施術内容》は\n・二重埋没\n・顎下脂肪吸引\n・糸リフト https://t.co/o1pRijOLa1 https://t.co/u4nmGwLG0Q",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "星乃リア",
+    "ラストコール",
+    "report:キャバクラ"
+   ],
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr9JWfbUAAHVpm.jpg",
+     "width": 1152,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr9JWkaMAAxkVS.jpg",
+     "width": 1125,
+     "height": 1187
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119784911733501953/img/oZeksOHY3nJqlPBy.jpg",
+     "variants": [
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119784911733501953/vid/avc1/636x360/P3n10DN0P0phNWAG.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119784911733501953/vid/avc1/1272x720/B_DGe1bFqP8eGqBN.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119784911733501953/vid/avc1/1988x1124/_j7iQ3H1Fw2ZFK9c.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119784911733501953/pl/-0caXe-EyVRvL4FV.m3u8?v=3fd"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119784911733501953/vid/avc1/476x270/AWlekFd7xI9RtYtw.mp4"
+      }
+     ],
+     "width": 1988,
+     "height": 1124
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr9JWSbAAApXx1.jpg",
+     "width": 1825,
+     "height": 929
+    }
+   ]
+  },
+  {
    "id": "2119780300452466842",
    "url": "https://x.com/orihara_bakuro/status/2119780300452466842",
    "user": "orihara_bakuro",
@@ -62,25 +149,52 @@
    "created_jst": "2026-11-09T22:13:01+09:00",
    "ts": 1794229981,
    "metrics": {
-    "impression_count": 112417,
-    "like_count": 284,
+    "impression_count": 366303,
+    "like_count": 918,
     "retweet_count": null,
-    "reply_count": 1,
-    "quote_count": 22,
-    "bookmark_count": 51
+    "reply_count": 3,
+    "quote_count": 53,
+    "bookmark_count": 168
    },
    "text": "【風営法違反】\n\nTOPDANDY vivid、現在No.3の司\n\n-質問-\n最初は営業ではなくて普通に会いたいって言っていたので私も会ってみようと思って会ってみました。\n会った後に連絡がきて、「今度お店に飲みに来て欲しい。」と言われました。 https://t.co/VsqnKgQA0m https://t.co/pJtEI7KcrW",
    "categories": [
-    "その他",
+    "ホスト",
     "監視アカウント"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:ホスト"
+   ],
    "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr44WSWsAAFOaO.jpg",
+     "width": 1536,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr44WXXwAA5zOh.jpg",
+     "width": 945,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr44WSWoAADNrx.jpg",
+     "width": 945,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr44WaXkAA663u.jpg",
+     "width": 945,
+     "height": 2048
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising_watch"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2119777641058218154",
@@ -90,27 +204,70 @@
    "created_jst": "2026-11-09T22:02:27+09:00",
    "ts": 1794229347,
    "metrics": {
-    "impression_count": 125660,
-    "like_count": 139,
+    "impression_count": 392688,
+    "like_count": 338,
     "retweet_count": null,
     "reply_count": 1,
-    "quote_count": 2,
-    "bookmark_count": 27
+    "quote_count": 4,
+    "bookmark_count": 66
    },
    "text": "【不同意性行】\n\nHAABクリニック　梶千尋\nユグドラシル　黒崎琥珀\nリスタート　本田嵐\nMatt\n\n説明\nMattと本田嵐の件で知り合いから頼まれたから黙っててやったのにお前らカマシ入れてくるなんて随分行儀が良いな。 https://t.co/3AcSzNoi7Q https://t.co/jP6ti2PfjV",
    "categories": [
-    "夜職その他",
+    "ホスト",
     "監視アカウント"
    ],
    "matched_terms": [
-    "inherit:ref"
+    "report:ホスト"
    ],
    "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr2gPFWIAEMcs7.jpg",
+     "width": 1026,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr2gPMXMAAD47H.jpg",
+     "width": 2048,
+     "height": 1152
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising_watch"
+   ]
+  },
+  {
+   "id": "2119777179781447834",
+   "url": "https://x.com/Stray_Kids_JP/status/2119777179781447834",
+   "user": "Stray_Kids_JP",
+   "created_utc": "2026-11-09T13:00:37Z",
+   "created_jst": "2026-11-09T22:00:37+09:00",
+   "ts": 1794229237,
+   "metrics": {
+    "impression_count": 877377,
+    "like_count": 32063,
+    "retweet_count": null,
+    "reply_count": 210,
+    "quote_count": 4732,
+    "bookmark_count": 2092
+   },
+   "text": "Stray Kids\nWorld Tour <RUN IT JAPAN>\n\n2027.4.24 SAT\n2027.4.25 SUN\n@ NISSAN STADIUM\n\n2027.5.04 TUE\n2027.5.05 WED\n@ YANMAR STADIUM NAGAI\n\n#StrayKids\n#スキズ\n#RUN_IT\n#RUN_IT_JAPAN https://t.co/KrGrIFBnTP",
+   "categories": [
+    "その他"
    ],
-   "below_threshold": true
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWr2EkEasAEcpTJ.jpg",
+     "width": 2887,
+     "height": 4096
+    }
+   ]
   },
   {
    "id": "2119773587485954458",
@@ -120,24 +277,183 @@
    "created_jst": "2026-11-09T21:46:21+09:00",
    "ts": 1794228381,
    "metrics": {
-    "impression_count": 334291,
-    "like_count": 813,
+    "impression_count": 1027819,
+    "like_count": 2534,
     "retweet_count": null,
-    "reply_count": 3,
-    "quote_count": 13,
-    "bookmark_count": 121
+    "reply_count": 19,
+    "quote_count": 37,
+    "bookmark_count": 390
    },
    "text": "かりんちゃんレベルの美女になるとイケメン達がSNSで匂わせ合戦をしてきますww\nせっかく億女になれたのに仕事の邪魔をしてくるのが男っていうね😇笑\nそりゃ今日も急遽仕事休むわ、お疲れ様 https://t.co/ZLmPiUpIN0 https://t.co/XsHm2M9xla",
    "categories": [
     "キャバクラ"
    ],
    "matched_terms": [
-    "quote:バロン かりん"
+    "quote:バロン かりん",
+    "report:キャバクラ"
    ],
    "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWry0oOaoAAe1z-.jpg",
+     "width": 961,
+     "height": 1703
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWry1AybUAENUZs.jpg",
+     "width": 1280,
+     "height": 1280
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWry1ZzbgAAe4iL.jpg",
+     "width": 1280,
+     "height": 1280
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWry1yJbcAA6PTb.jpg",
+     "width": 1108,
+     "height": 1478
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising"
+   ]
+  },
+  {
+   "id": "2119770461353721872",
+   "url": "https://x.com/matchingmomonga/status/2119770461353721872",
+   "user": "matchingmomonga",
+   "created_utc": "2026-11-09T12:33:56Z",
+   "created_jst": "2026-11-09T21:33:56+09:00",
+   "ts": 1794227636,
+   "metrics": {
+    "impression_count": 583594,
+    "like_count": 296,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 8,
+    "bookmark_count": 144
+   },
+   "text": "抱ける女の職業ランキング\n\n🥉やれない\n・ラウンジ嬢\n・外資系\n・不動産系\n→絶対やれない\n\n🥈普通にやれる\n・保育士\n・キャバ嬢\n・美容師\n→比較的抱きやすい\n\n🥇まじやれる↓↓",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "キャバ嬢",
+    "キャバ",
+    "ラウンジ嬢",
+    "report:キャバクラ"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2119762174445019204",
+   "url": "https://x.com/genjibu_sdr/status/2119762174445019204",
+   "user": "genjibu_sdr",
+   "created_utc": "2026-11-09T12:01:00Z",
+   "created_jst": "2026-11-09T21:01:00+09:00",
+   "ts": 1794225660,
+   "metrics": {
+    "impression_count": 349812,
+    "like_count": 22096,
+    "retweet_count": null,
+    "reply_count": 5,
+    "quote_count": 2474,
+    "bookmark_count": 841
+   },
+   "text": "#原因は自分にある。「#ラブリーズン」\nPerformance Video 公開\n───•⋅⊰༻♥༺⊱⋅•────\n\nhttps://t.co/dylZ5t6j1F https://t.co/dArX3YUaKl",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119339319966171136/img/vJkwJm3uvJEoKchc.jpg",
+     "variants": [
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119339319966171136/vid/avc1/640x360/J31TIiqkjaX-gdkl.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119339319966171136/vid/avc1/480x270/1uutFPmuIG63kKZJ.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119339319966171136/vid/avc1/1280x720/BwsTKZxEgR-0-QQK.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119339319966171136/vid/avc1/1920x1080/5GTvo_2JQv_kS7Wl.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119339319966171136/pl/YoOshWlKlPF3dbCz.m3u8?v=cfc"
+      }
+     ],
+     "width": 1920,
+     "height": 1080
+    }
+   ]
+  },
+  {
+   "id": "2119761934937416084",
+   "url": "https://x.com/fuyuyasumiminai/status/2119761934937416084",
+   "user": "fuyuyasumiminai",
+   "created_utc": "2026-11-09T12:00:03Z",
+   "created_jst": "2026-11-09T21:00:03+09:00",
+   "ts": 1794225603,
+   "metrics": {
+    "impression_count": 365430,
+    "like_count": 904,
+    "retweet_count": null,
+    "reply_count": 20,
+    "quote_count": 10,
+    "bookmark_count": 107
+   },
+   "text": "200万を赤字で強調してるのが\nまじで痛いw https://t.co/lGCSf4qaih",
+   "categories": [
+    "その他",
+    "監視アカウント"
+   ],
+   "matched_terms": [],
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnoupDaoAATCwQ.jpg",
+     "width": 421,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnou1zbkAATJfi.jpg",
+     "width": 381,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnovVUaQAA104i.jpg",
+     "width": 384,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnovq9bkAAW9-9.jpg",
+     "width": 404,
+     "height": 680
+    }
    ]
   },
   {
@@ -148,19 +464,33 @@
    "created_jst": "2026-11-09T21:00:02+09:00",
    "ts": 1794225602,
    "metrics": {
-    "impression_count": 444822,
-    "like_count": 1238,
-    "retweet_count": 17,
-    "reply_count": 6,
-    "quote_count": 4,
-    "bookmark_count": 57
+    "impression_count": 1446517,
+    "like_count": 4404,
+    "retweet_count": null,
+    "reply_count": 20,
+    "quote_count": 18,
+    "bookmark_count": 195
    },
    "text": "それ筋肉じゃなくてただジジイだから血管浮き出てるだけで草 https://t.co/BCnSgVC9V0",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnh2W9a4AAjVyO.jpg",
+     "width": 386,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnh2mEa8AANc3N.jpg",
+     "width": 389,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119761309067788773",
@@ -170,24 +500,51 @@
    "created_jst": "2026-11-09T20:57:33+09:00",
    "ts": 1794225453,
    "metrics": {
-    "impression_count": 189939,
-    "like_count": 555,
+    "impression_count": 363009,
+    "like_count": 1027,
     "retweet_count": null,
-    "reply_count": 5,
-    "quote_count": 4,
-    "bookmark_count": 80
+    "reply_count": 15,
+    "quote_count": 11,
+    "bookmark_count": 149
    },
    "text": "ななえママ、ヒカルがオープンマリッジで炎上した時に再生数稼ぎでボロクソ叩いてた癖に、今現在2ヶ月の営業停止なってクラファン開いても支援額3000円しか来ないから林社長経由でヒカルに宣伝頼み込んだけど、速攻断られて人間性諸々ボロクソ言われてておもろいwww https://t.co/ONO4g0sT4G",
    "categories": [
-    "その他"
+    "夜職その他"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:夜職その他"
+   ],
    "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrnrKjagAEgxwy.jpg",
+     "width": 2048,
+     "height": 1174
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrnrKbaIAALDuK.jpg",
+     "width": 2048,
+     "height": 1164
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrnrKfboAA04gK.jpg",
+     "width": 2048,
+     "height": 1140
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrnrKdbAAA7DNg.jpg",
+     "width": 1179,
+     "height": 1303
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising_watch"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2119757668177027250",
@@ -209,7 +566,41 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119757567534727168/img/9Mr0_1ufsFiwrHWA.jpg",
+     "variants": [
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119757567534727168/vid/avc1/1080x1920/xF59naMofqLvxmNo.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119757567534727168/vid/avc1/480x852/ZoBa1TITaxd4_8Kq.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119757567534727168/vid/avc1/720x1280/KGuPYUDxIih4C1tJ.mp4"
+      },
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119757567534727168/vid/avc1/320x568/lGpgiRft1dhacPGf.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119757567534727168/pl/qX3ZkasBX_AyKhg-.m3u8?v=cfc"
+      }
+     ],
+     "width": 1080,
+     "height": 1920
+    }
+   ]
   },
   {
    "id": "2119757508571226561",
@@ -219,18 +610,20 @@
    "created_jst": "2026-11-09T20:42:27+09:00",
    "ts": 1794224547,
    "metrics": {
-    "impression_count": 596480,
-    "like_count": 1426,
+    "impression_count": 940202,
+    "like_count": 2359,
     "retweet_count": null,
-    "reply_count": 23,
-    "quote_count": 51,
-    "bookmark_count": 49
+    "reply_count": 27,
+    "quote_count": 88,
+    "bookmark_count": 71
    },
    "text": "てへぺろ",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:キャバクラ"
+   ],
    "is_watched": false
   },
   {
@@ -241,12 +634,12 @@
    "created_jst": "2026-11-09T20:25:58+09:00",
    "ts": 1794223558,
    "metrics": {
-    "impression_count": 310531,
-    "like_count": 1043,
+    "impression_count": 454614,
+    "like_count": 1492,
     "retweet_count": null,
-    "reply_count": 17,
-    "quote_count": 9,
-    "bookmark_count": 56
+    "reply_count": 27,
+    "quote_count": 10,
+    "bookmark_count": 91
    },
    "text": "バロンのかりんちゃんと緋咲一馬さんの交際噂されてるけど本当だったら美男美女すぎないか？！？！？！？！？！\nむしろツーショット見たいまであるんだけど？！？！？！？！？！ https://t.co/DLXmnwD9Bw",
    "categories": [
@@ -256,6 +649,20 @@
     "バロン かりん"
    ],
    "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrgciQa0AAxJpl.jpg",
+     "width": 688,
+     "height": 1032
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrgciXbAAAzZLE.jpg",
+     "width": 741,
+     "height": 1111
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising"
@@ -281,7 +688,71 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119752833784520704/img/rErbHG5H9sRk7aug.jpg",
+     "variants": [
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119752833784520704/vid/avc1/1312x720/yCa6Ah_xM5CqYq4S.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119752833784520704/vid/avc1/656x360/rZ9quqT2HBmf-hio.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119752833784520704/vid/avc1/2200x1206/AJhv_j8wcOuAF1W5.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119752833784520704/vid/avc1/492x270/JWRAKbmqcx3wyv9_.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119752833784520704/pl/YvCxP3q5wgfUIpUA.m3u8?v=e28"
+      }
+     ],
+     "width": 2200,
+     "height": 1206
+    }
+   ]
+  },
+  {
+   "id": "2119750378983993733",
+   "url": "https://x.com/AhmedMoor/status/2119750378983993733",
+   "user": "AhmedMoor",
+   "created_utc": "2026-11-09T11:14:08Z",
+   "created_jst": "2026-11-09T20:14:08+09:00",
+   "ts": 1794222848,
+   "metrics": {
+    "impression_count": 964487,
+    "like_count": 32108,
+    "retweet_count": null,
+    "reply_count": 2672,
+    "quote_count": 532,
+    "bookmark_count": 1502
+   },
+   "text": "My name is Ahmed Moor and I’m running for US Senate here in PA (election 2028). I’m running to end the war in Iran and to promote the dignity agenda: free healthcare, free childcare, and affordable housing. \n\nI’m calling for accountability for genocide, for ICE and for https://t.co/TTRUprl6T7",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrdlbNW0AAC7O8.jpg",
+     "width": 1170,
+     "height": 1104
+    }
+   ]
   },
   {
    "id": "2119747075093221563",
@@ -291,19 +762,33 @@
    "created_jst": "2026-11-09T20:01:00+09:00",
    "ts": 1794222060,
    "metrics": {
-    "impression_count": 620954,
-    "like_count": 813,
-    "retweet_count": 9,
-    "reply_count": 2,
-    "quote_count": 10,
-    "bookmark_count": 55
+    "impression_count": 1454628,
+    "like_count": 2610,
+    "retweet_count": null,
+    "reply_count": 19,
+    "quote_count": 28,
+    "bookmark_count": 196
    },
    "text": "写真のために色々準備してそうなの滑稽で草 https://t.co/ImzZYleJWT",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnkgtqaQAAhdvN.jpg",
+     "width": 314,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnkg8La8AAy5ck.jpg",
+     "width": 314,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119746905290985499",
@@ -325,7 +810,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119735980555112448/img/Hi_39OMUSg9Y7qIy.jpg",
+     "variants": [
+      {
+       "bit_rate": 288000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119735980555112448/vid/avc1/480x270/mZ6iPZv4SE88UvQQ.mp4?tag=14"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119735980555112448/vid/avc1/640x360/noJh5zVbo9sU-7Ai.mp4?tag=14"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119735980555112448/vid/avc1/1280x720/4qo6om5MrEa69C86.mp4?tag=14"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119735980555112448/pl/RSCzIHyPQgxI7lKP.m3u8?tag=14&v=d4b"
+      }
+     ],
+     "width": 1920,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2119746836617388415",
@@ -335,12 +849,12 @@
    "created_jst": "2026-11-09T20:00:03+09:00",
    "ts": 1794222003,
    "metrics": {
-    "impression_count": 1271716,
-    "like_count": 1405,
-    "retweet_count": 24,
-    "reply_count": 25,
-    "quote_count": 29,
-    "bookmark_count": 224
+    "impression_count": 3331156,
+    "like_count": 4738,
+    "retweet_count": null,
+    "reply_count": 96,
+    "quote_count": 110,
+    "bookmark_count": 640
    },
    "text": "31歳女さんブチギレ https://t.co/B70ufka9Ah",
    "categories": [
@@ -348,7 +862,33 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnon1Ka8AASSh7.jpg",
+     "width": 945,
+     "height": 1551
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnoohrbwAAVese.jpg",
+     "width": 945,
+     "height": 1501
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnopFVagAAHDGy.jpg",
+     "width": 945,
+     "height": 1616
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnorL_bwAAzomI.jpg",
+     "width": 945,
+     "height": 1534
+    }
+   ]
   },
   {
    "id": "2119746380508106887",
@@ -370,7 +910,27 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWraFcOaIAAy1qp.jpg",
+     "width": 801,
+     "height": 455
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWraFcUaoAAmBe5.jpg",
+     "width": 813,
+     "height": 456
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWraFcdasAAbD01.jpg",
+     "width": 833,
+     "height": 461
+    }
+   ]
   },
   {
    "id": "2119745283538170186",
@@ -380,12 +940,12 @@
    "created_jst": "2026-11-09T19:53:53+09:00",
    "ts": 1794221633,
    "metrics": {
-    "impression_count": 167662,
-    "like_count": 160,
+    "impression_count": 288513,
+    "like_count": 284,
     "retweet_count": null,
-    "reply_count": 0,
-    "quote_count": 0,
-    "bookmark_count": 15
+    "reply_count": 1,
+    "quote_count": 2,
+    "bookmark_count": 28
    },
    "text": "あれ、るると付き合ってんじゃなかったの？\n\nラヴ上等ってやっぱやらせ？\n\nそれともイケメン一馬がちんちんでってだけ？\n\nさすがに、昔歌舞伎中級店キャバ嬢るると、\n六本木現役売れっ子キャバ嬢かりんじゃ浮気するか、、、。 https://t.co/2j5aoEYrah https://t.co/bEyyzh0BhW",
    "categories": [
@@ -399,6 +959,14 @@
     "quote:バロン かりん"
    ],
    "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrZGdIakAAXT2U.jpg",
+     "width": 598,
+     "height": 1053
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising_watch"
@@ -413,12 +981,12 @@
    "created_jst": "2026-11-09T19:49:28+09:00",
    "ts": 1794221368,
    "metrics": {
-    "impression_count": 2544041,
-    "like_count": 6647,
+    "impression_count": 4453820,
+    "like_count": 9083,
     "retweet_count": null,
-    "reply_count": 34,
-    "quote_count": 159,
-    "bookmark_count": 939
+    "reply_count": 40,
+    "quote_count": 247,
+    "bookmark_count": 1288
    },
    "text": "【全部溝口が悪い】\n\nバロン　かりん@k0__10_ \nラブ上等2 緋咲一馬@CRAZYbee0224 \n\n説明\n・ラブ上海お泊まりデート❤️\n・かりん、カイザーに在籍したせいで爆撃される。 https://t.co/4GFr4KHosY https://t.co/4tACufjELW",
    "categories": [
@@ -426,9 +994,36 @@
     "監視アカウント"
    ],
    "matched_terms": [
-    "バロン かりん"
+    "バロン かりん",
+    "report:キャバクラ"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrYFCTWIAAdxRJ.jpg",
+     "width": 1242,
+     "height": 1628
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrYFCWX0AAn_kn.jpg",
+     "width": 1064,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrYFCWXcAASMoS.jpg",
+     "width": 720,
+     "height": 973
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrYFCPWEAE821X.jpg",
+     "width": 666,
+     "height": 743
+    }
+   ]
   },
   {
    "id": "2119742945046024392",
@@ -450,7 +1045,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119742892034134017/img/uV35ZwVmQ3dDZ4mY.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119742892034134017/vid/avc1/488x270/EERfzLJ84pAQ4-jy.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119742892034134017/vid/avc1/650x360/j5c9ZApLZVkuqiUs.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119742892034134017/vid/avc1/1206x666/u6gnkEP7fsGjmGiw.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119742892034134017/pl/cxY_jlvkq5SRBdIL.m3u8?v=43e"
+      }
+     ],
+     "width": 1206,
+     "height": 666
+    }
+   ]
   },
   {
    "id": "2119741207438107037",
@@ -472,7 +1096,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrVY5DbEAA-FSo.jpg",
+     "width": 1198,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrVY6ZaQAAaIgR.jpg",
+     "width": 1198,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2119739871548076463",
@@ -494,7 +1132,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119739798558785536/img/oTT7_JdqHZs4uXEx.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119739798558785536/vid/avc1/492x270/2icQ3b4Acshh77-F.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119739798558785536/vid/avc1/656x360/5DbFehDjiwBiPreB.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119739798558785536/vid/avc1/1206x660/k6LI4-PxUqee-9Zk.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119739798558785536/pl/jIAJ4KaQdkwjATe5.m3u8"
+      }
+     ],
+     "width": 1206,
+     "height": 660
+    }
+   ]
   },
   {
    "id": "2119739274518003915",
@@ -516,7 +1183,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWn4V_DacAAyey3.jpg",
+     "width": 600,
+     "height": 1142
+    }
+   ]
   },
   {
    "id": "2119738948553699821",
@@ -526,19 +1201,33 @@
    "created_jst": "2026-11-09T19:28:42+09:00",
    "ts": 1794220122,
    "metrics": {
-    "impression_count": 2672589,
-    "like_count": 13486,
+    "impression_count": 5697789,
+    "like_count": 28756,
     "retweet_count": null,
-    "reply_count": 21,
-    "quote_count": 2437,
-    "bookmark_count": 4231
+    "reply_count": 44,
+    "quote_count": 3768,
+    "bookmark_count": 8777
    },
    "text": "遠征用に小さい財布（？）にしてたんやけど\n入れてる全部のキャッシュカードの磁気飛んだ(T_T)\n\nちゃんと財布買います…😭 https://t.co/CQINj0dzwg",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrTVcha4AEPcME.jpg",
+     "width": 2048,
+     "height": 1536
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrTVcQbcAAA_K1.jpg",
+     "width": 786,
+     "height": 1436
+    }
+   ]
   },
   {
    "id": "2119731737236541610",
@@ -560,7 +1249,27 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhyyHbYAAgQPr.png",
+     "width": 525,
+     "height": 466
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhzLBaYAADjPQ.png",
+     "width": 524,
+     "height": 524
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhzgUaQAE4RSK.png",
+     "width": 411,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119731735130677454",
@@ -578,6 +1287,57 @@
     "bookmark_count": 500
    },
    "text": "令和みなちゃんの金銭事情20歳とは思えない…\nいくらになるか分かってないのやばい笑 https://t.co/Lt91e0Nva0",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119644109631823872/img/kZv34j73mG3vv7kw.jpg",
+     "variants": [
+      {
+       "bit_rate": 288000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119644109631823872/vid/avc1/480x270/Y16U9xOxbH2Eb24A.mp4?tag=14"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119644109631823872/vid/avc1/640x360/ZBmrPKHZILtG7zd1.mp4?tag=14"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119644109631823872/vid/avc1/1280x720/xA_Czo-myehsau3V.mp4?tag=14"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119644109631823872/pl/pwgh2pe7lGuDr_Co.m3u8?tag=14&v=890"
+      }
+     ],
+     "width": 2144,
+     "height": 1206
+    }
+   ]
+  },
+  {
+   "id": "2119727509558513834",
+   "url": "https://x.com/himuroReborn398/status/2119727509558513834",
+   "user": "himuroReborn398",
+   "created_utc": "2026-11-09T09:43:15Z",
+   "created_jst": "2026-11-09T18:43:15+09:00",
+   "ts": 1794217395,
+   "metrics": {
+    "impression_count": 5560962,
+    "like_count": 44979,
+    "retweet_count": null,
+    "reply_count": 636,
+    "quote_count": 1911,
+    "bookmark_count": 5489
+   },
+   "text": "なんか凄え事になって来てんぞ\n\n【速報】労働基準法の女性保護規定、全廃へhttps://t.co/odWtvkRiY4",
    "categories": [
     "その他"
    ],
@@ -604,7 +1364,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrIWKDbAAALbwf.jpg",
+     "width": 1152,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2119720367707074784",
@@ -627,7 +1395,15 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrCb99bwAAU2o5.jpg",
+     "width": 1200,
+     "height": 1558
+    }
+   ]
   },
   {
    "id": "2119718917971333593",
@@ -672,7 +1448,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWrAOc1aQAAHfb4.jpg",
+     "width": 1536,
+     "height": 1024
+    }
+   ]
   },
   {
    "id": "2119716626413089276",
@@ -694,7 +1478,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnkc91agAExk4a.jpg",
+     "width": 1169,
+     "height": 2043
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnkdXra4AALdwC.jpg",
+     "width": 945,
+     "height": 1599
+    }
+   ]
   },
   {
    "id": "2119707648316805569",
@@ -716,7 +1514,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWq23wna0AAYs30.jpg",
+     "width": 1672,
+     "height": 941
+    }
+   ]
   },
   {
    "id": "2119706544824815901",
@@ -726,12 +1532,12 @@
    "created_jst": "2026-11-09T17:19:57+09:00",
    "ts": 1794212397,
    "metrics": {
-    "impression_count": 404184,
-    "like_count": 440,
+    "impression_count": 481934,
+    "like_count": 553,
     "retweet_count": null,
-    "reply_count": 4,
-    "quote_count": 3,
-    "bookmark_count": 71
+    "reply_count": 6,
+    "quote_count": 5,
+    "bookmark_count": 89
    },
    "text": "南柚子「ストレスで吐いて、輪郭ぼやけてる」\n\n今回のラストコールでは、桃瀬ともさんと《バトる》シーンが印象的⚡️\nゆずず体調が悪い中、熱量高く臨む姿勢はさすがだと思う🥺 https://t.co/hKl1YQ45SZ",
    "categories": [
@@ -743,10 +1549,100 @@
     "report:キャバクラ"
    ],
    "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWq1y_2bkAAYj-s.jpg",
+     "width": 1125,
+     "height": 1883
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWq1zAGbsAAW_UM.jpg",
+     "width": 1125,
+     "height": 630
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119706462465531904/img/PuZqEyUvQgp88mzM.jpg",
+     "variants": [
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119706462465531904/pl/bzs4azMqhayilLiN.m3u8"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119706462465531904/vid/avc1/1980x1124/o8l5ZbmralZVQdbi.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119706462465531904/vid/avc1/634x360/q9xe9G4Hxg_W9jp_.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119706462465531904/vid/avc1/1268x720/f3VrN4V7s0BpeyXu.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119706462465531904/vid/avc1/474x270/nJbvUM0KHKm8_jVv.mp4"
+      }
+     ],
+     "width": 1980,
+     "height": 1124
+    }
+   ],
    "in_reports": true,
    "report_refs": [
     "rising"
    ]
+  },
+  {
+   "id": "2119706314872119681",
+   "url": "https://x.com/47news_official/status/2119706314872119681",
+   "user": "47news_official",
+   "created_utc": "2026-11-09T08:19:02Z",
+   "created_jst": "2026-11-09T17:19:02+09:00",
+   "ts": 1794212342,
+   "metrics": {
+    "impression_count": 6428270,
+    "like_count": 17685,
+    "retweet_count": null,
+    "reply_count": 490,
+    "quote_count": 2459,
+    "bookmark_count": 3433
+   },
+   "text": "【速報】労働基準法の女性保護規定、全廃へ\nhttps://t.co/Ufo8EZVUlv",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2119705313238712388",
+   "url": "https://x.com/YahooNewsTopics/status/2119705313238712388",
+   "user": "YahooNewsTopics",
+   "created_utc": "2026-11-09T08:15:03Z",
+   "created_jst": "2026-11-09T17:15:03+09:00",
+   "ts": 1794212103,
+   "metrics": {
+    "impression_count": 1894042,
+    "like_count": 3412,
+    "retweet_count": null,
+    "reply_count": 156,
+    "quote_count": 421,
+    "bookmark_count": 744
+   },
+   "text": "【労基法 女子保護規定の全廃検討へ】\nhttps://t.co/qXHLm6pJAl",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2119702324813656252",
@@ -790,7 +1686,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjy8fbgAAwTtv.jpg",
+     "width": 436,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnj0rCb0AAUo7a.jpg",
+     "width": 430,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnj1BHbEAAieAW.jpg",
+     "width": 430,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnj1lXbcAAiVbp.jpg",
+     "width": 401,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119701776408404439",
@@ -812,7 +1734,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2109444568337059840/img/Zi3a1xa4zS1FdRsO.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109444568337059840/vid/avc1/480x270/R0kOIg_EAEzYHMV4.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109444568337059840/vid/avc1/640x360/dOyo5LHo8LW3y3Fb.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2109444568337059840/vid/avc1/1280x720/3byiXKDM2EPHPPHu.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2109444568337059840/pl/nNsOLThvmXcRopi_.m3u8"
+      }
+     ],
+     "width": 1280,
+     "height": 720
+    }
+   ]
   },
   {
    "id": "2119701631554170970",
@@ -834,7 +1785,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqxZcHboAA5Spn.jpg",
+     "width": 655,
+     "height": 811
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqxZcFaYAAH2Fg.jpg",
+     "width": 643,
+     "height": 815
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqxZcKasAA8OB8.jpg",
+     "width": 655,
+     "height": 802
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqxZcGbYAA3xmf.jpg",
+     "width": 654,
+     "height": 815
+    }
+   ]
   },
   {
    "id": "2119692273374150881",
@@ -844,12 +1821,12 @@
    "created_jst": "2026-11-09T16:23:14+09:00",
    "ts": 1794208994,
    "metrics": {
-    "impression_count": 1806305,
-    "like_count": 4425,
+    "impression_count": 2321777,
+    "like_count": 6852,
     "retweet_count": null,
-    "reply_count": 14,
-    "quote_count": 16,
-    "bookmark_count": 487
+    "reply_count": 15,
+    "quote_count": 19,
+    "bookmark_count": 658
    },
    "text": "キャバ嬢は髪の毛整えすぎるぐらいがいいしまつ毛なんもやらずの人見たことない https://t.co/M0HCAwwlSv",
    "categories": [
@@ -858,7 +1835,36 @@
    "matched_terms": [
     "quote:キャバクラ",
     "キャバ嬢",
-    "キャバ"
+    "キャバ",
+    "report:キャバクラ"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2119690480212725911",
+   "url": "https://x.com/master_sama_/status/2119690480212725911",
+   "user": "master_sama_",
+   "created_utc": "2026-11-09T07:16:07Z",
+   "created_jst": "2026-11-09T16:16:07+09:00",
+   "ts": 1794208567,
+   "metrics": {
+    "impression_count": 650209,
+    "like_count": 1280,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 6,
+    "bookmark_count": 760
+   },
+   "text": "これがプレイヤー時代の\n社美緒らしいが\n\n確かに本人が言う通り \nホストの中ではイケメン枠ではないし\n\n自慢の知性や品格も \n今ほど洗練されていない。\n\n社美緒よりイケメンでも\n女を風俗に落としたり\nDVまでしてる奴もいる中\n\n一体どうやって \nカリスマホストになったんだ？\n\nもしかしてセックスが https://t.co/8xFt5lfNKT",
+   "categories": [
+    "ホスト",
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "ホストの",
+    "ホスト",
+    "風俗",
+    "report:ホスト"
    ],
    "is_watched": false
   },
@@ -905,7 +1911,33 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnntTTaYAAzj3w.jpg",
+     "width": 1148,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnntqFbwAAkGn7.jpg",
+     "width": 1164,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnnuC3aAAA5teA.jpg",
+     "width": 1162,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnnugRbwAArA2y.jpg",
+     "width": 1168,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2119686429693657311",
@@ -927,7 +1959,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2113871233700057088/img/t_5yDgt4SCnh3BJA.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2113871233700057088/vid/avc1/320x568/M2wAUhMqtTf3Pu8N.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2113871233700057088/vid/avc1/480x852/iJOQXBFevLJHd2rt.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2113871233700057088/vid/avc1/720x1280/UNqnB-JGWULAlFdh.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2113871233700057088/pl/e31Q6hu1f0dsPkSs.m3u8?v=682"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2119685418186576090",
@@ -949,7 +2010,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2092233221337698304/img/0fDhO2VBeDvqsE6b.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2092233221337698304/vid/avc1/320x348/_r0yBW99-ZhK8fYR.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2092233221337698304/vid/avc1/480x524/A9aG-uTlUk7TKCtY.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2092233221337698304/vid/avc1/720x786/IlNwfK_BFqwpLj5q.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2092233221337698304/pl/HmfeFNYUexIF8j18.m3u8?v=742"
+      }
+     ],
+     "width": 720,
+     "height": 786
+    }
+   ]
   },
   {
    "id": "2119682626525249889",
@@ -972,7 +2062,41 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119682404684374016/img/DhYgsKl8Mpcl0OBR.jpg",
+     "variants": [
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119682404684374016/vid/avc1/1262x720/XvTZUIV-0HIaGz0d.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119682404684374016/vid/avc1/472x270/fvOy7PUmuCMBoUWp.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119682404684374016/vid/avc1/1972x1124/es035HnLAP3s002M.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119682404684374016/pl/7gGYcl8k0KPLvQYj.m3u8"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119682404684374016/vid/avc1/630x360/Ef8daeVlI2hKzBi5.mp4"
+      }
+     ],
+     "width": 1972,
+     "height": 1124
+    }
+   ]
   },
   {
    "id": "2119675674969751635",
@@ -982,19 +2106,45 @@
    "created_jst": "2026-11-09T15:17:17+09:00",
    "ts": 1794205037,
    "metrics": {
-    "impression_count": 2468296,
-    "like_count": 18371,
+    "impression_count": 2963307,
+    "like_count": 22138,
     "retweet_count": null,
-    "reply_count": 36,
-    "quote_count": 120,
-    "bookmark_count": 1035
+    "reply_count": 43,
+    "quote_count": 148,
+    "bookmark_count": 1239
    },
    "text": "お金貸してる友達が急に記憶喪失になってアツい😂 https://t.co/XJm6UsUUPe",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqZyp5aUAE1qOc.jpg",
+     "width": 1169,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqZypqbMAAUSuX.jpg",
+     "width": 1179,
+     "height": 2047
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqZyp0aQAA7FJS.jpg",
+     "width": 1081,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqZypqaQAAiqRP.jpg",
+     "width": 1116,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2119671325920743762",
@@ -1016,7 +2166,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjhdkbEAA4D-v.jpg",
+     "width": 969,
+     "height": 1024
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjh5jbEAAKwEk.jpg",
+     "width": 799,
+     "height": 468
+    }
+   ]
   },
   {
    "id": "2119660808980619475",
@@ -1038,7 +2202,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqL5mnasAAh5C5.jpg",
+     "width": 1200,
+     "height": 955
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqL6Dca4AATpc8.jpg",
+     "width": 1200,
+     "height": 784
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqMDwab0AAJ9j5.jpg",
+     "width": 1200,
+     "height": 888
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqMENma4AAjQXo.jpg",
+     "width": 1200,
+     "height": 937
+    }
+   ]
   },
   {
    "id": "2119660503975014741",
@@ -1060,7 +2250,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/1997167919529340928/img/qrM9F6QilvBknzZn.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/1997167919529340928/vid/avc1/320x450/mxDeZWhyIBx-Ynlk.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/1997167919529340928/vid/avc1/480x676/7BxHCTDrq8KlxRI2.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/1997167919529340928/vid/avc1/720x1014/Z8DgJn3lFack_GyQ.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/1997167919529340928/pl/rI5eMsDIySAP4lSi.m3u8?v=9c2"
+      }
+     ],
+     "width": 720,
+     "height": 1014
+    }
+   ]
   },
   {
    "id": "2119656234752028770",
@@ -1070,12 +2289,12 @@
    "created_jst": "2026-11-09T14:00:02+09:00",
    "ts": 1794200402,
    "metrics": {
-    "impression_count": 301159,
+    "impression_count": 302814,
     "like_count": 40,
     "retweet_count": null,
     "reply_count": 0,
     "quote_count": 4,
-    "bookmark_count": 28
+    "bookmark_count": 29
    },
    "text": "ラストコールシンデレラりょうかさんのお母さんが天才すぎる瞬間\n\nうちの娘はビジュアル悪いってフレーズを実の親が言う意外性がすごい\n\nそこが話題になることを計算して応援してるんだとしたらすごすぎる😆 https://t.co/DbQc9gpwHO",
    "categories": [
@@ -1085,7 +2304,36 @@
     "ラストコール",
     "report:キャバクラ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2022505819565367296/img/ZM1KkELTnB9gnsGN.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2022505819565367296/vid/avc1/480x270/ai9YrQsyGnya3ehE.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2022505819565367296/vid/avc1/640x360/TBdGu2BrgZyOcNNX.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2022505819565367296/vid/avc1/1206x678/cyLK09N7qk3YWRY1.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2022505819565367296/pl/GAJ9-ymUDLzP-gu2.m3u8?v=067"
+      }
+     ],
+     "width": 1206,
+     "height": 678
+    }
+   ]
   },
   {
    "id": "2119656228808991045",
@@ -1095,19 +2343,39 @@
    "created_jst": "2026-11-09T14:00:00+09:00",
    "ts": 1794200400,
    "metrics": {
-    "impression_count": 11011814,
-    "like_count": 157919,
+    "impression_count": 11902352,
+    "like_count": 162228,
     "retweet_count": null,
-    "reply_count": 355,
-    "quote_count": 12917,
-    "bookmark_count": 30751
+    "reply_count": 371,
+    "quote_count": 13215,
+    "bookmark_count": 31664
    },
    "text": "🏝️.˚⊹\n年内の入場者特典\n第8弾から12弾を一挙解禁！\n\n『#映画ちいかわ 人魚の島のひみつ』\n入場者特典第8弾は\n11月14日(土)より配布開始✨\n「エアーびんよよ」\n\n第9弾～第11弾は\n「チャームミニフィギュア」\n「ごきげんセイレーン♪」の\nリバイバル配布！\n\nそして第12弾は https://t.co/3HCJSb9enx",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqFPXYacAIF4kU.jpg",
+     "width": 4096,
+     "height": 4096
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqFS44bgAAFGGv.jpg",
+     "width": 4096,
+     "height": 2304
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqFWuabIAAoe3g.jpg",
+     "width": 4096,
+     "height": 4096
+    }
+   ]
   },
   {
    "id": "2119655722363314608",
@@ -1129,7 +2397,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2019038645924302848/img/uLB3ZiTY7_9XKKOH.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2019038645924302848/vid/avc1/320x568/NiTrEzW8oGsMhNwz.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2019038645924302848/vid/avc1/480x852/fAgs5L1xBsFblXfQ.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2019038645924302848/vid/avc1/720x1278/Qrtiz2AbIYM7jRpY.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2019038645924302848/pl/gZ7OLR1VfdHyV6BT.m3u8?v=cfc"
+      }
+     ],
+     "width": 720,
+     "height": 1278
+    }
+   ]
   },
   {
    "id": "2119652722060460531",
@@ -1139,12 +2436,12 @@
    "created_jst": "2026-11-09T13:46:04+09:00",
    "ts": 1794199564,
    "metrics": {
-    "impression_count": 2294478,
-    "like_count": 8642,
+    "impression_count": 3192973,
+    "like_count": 12914,
     "retweet_count": null,
-    "reply_count": 52,
-    "quote_count": 57,
-    "bookmark_count": 1936
+    "reply_count": 73,
+    "quote_count": 82,
+    "bookmark_count": 2853
    },
    "text": "ホス狂いだった高岡由佳の過去と現在\n人ってこんなに変わるんやなぁ… https://t.co/08hzmDTk3d",
    "categories": [
@@ -1154,7 +2451,21 @@
     "ホス狂い",
     "report:ホスト"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqE6ZBa8AApeby.jpg",
+     "width": 739,
+     "height": 415
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWqE6ZEagAA8DbM.jpg",
+     "width": 1366,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2119650416405491869",
@@ -1176,7 +2487,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119650385984188416/img/N-RuzdqwX9m6XRQO.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119650385984188416/vid/avc1/320x690/UlX9yhuWGqMM3ZaL.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119650385984188416/vid/avc1/480x1036/Blty_gL_nU47teje.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119650385984188416/vid/avc1/592x1280/z8jQRdn6YsHanpil.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119650385984188416/pl/8JhVWaTgu3VNOHTD.m3u8?v=93c"
+      }
+     ],
+     "width": 592,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2119649333465448544",
@@ -1208,19 +2548,33 @@
    "created_jst": "2026-11-09T13:30:00+09:00",
    "ts": 1794198600,
    "metrics": {
-    "impression_count": 3126676,
-    "like_count": 29597,
+    "impression_count": 3495964,
+    "like_count": 31070,
     "retweet_count": null,
-    "reply_count": 516,
-    "quote_count": 12928,
-    "bookmark_count": 4804
+    "reply_count": 545,
+    "quote_count": 13431,
+    "bookmark_count": 5003
    },
    "text": "[DAY 별 최종 라인업]\n오직 <2026 SBS 가요대전>에서만 볼 수 있는\n가요대전 30주년 기념 역대급 최종 라인업✨\n\n<2026 SBS 가요대전>\n☞ 12월 24일 [목] ~ 12월 25일 [금] 일산 킨텍스\n\n#SBS #2026SBS가요대전 #SBS가요대전 https://t.co/xb9G4U4zxy",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpdLWPa0AACOCX.jpg",
+     "width": 2893,
+     "height": 4096
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpdLWTbsAAs6wP.jpg",
+     "width": 2893,
+     "height": 4096
+    }
+   ]
   },
   {
    "id": "2119641130359013490",
@@ -1242,7 +2596,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWldGkZa4AAiL3Z.jpg",
+     "width": 573,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWldGwpacAEsNrd.jpg",
+     "width": 900,
+     "height": 584
+    }
+   ]
   },
   {
    "id": "2119641131017445657",
@@ -1264,7 +2632,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp6DElbUAAfeNi.png",
+     "width": 566,
+     "height": 800
+    }
+   ]
   },
   {
    "id": "2119641129608249480",
@@ -1286,7 +2662,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2100858108545523712/img/98_L7A5g0g0qJibE.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2100858108545523712/vid/avc1/320x568/6a7EyMB-izMnzx6D.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2100858108545523712/vid/avc1/480x852/utLV4VfOKZ9vCuNA.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2100858108545523712/vid/avc1/720x1280/Z52it6wuqBSWBb0_.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2100858108545523712/pl/aZlGqiEudj3mOHdm.m3u8?v=cfc"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2119639741712961653",
@@ -1296,12 +2701,12 @@
    "created_jst": "2026-11-09T12:54:30+09:00",
    "ts": 1794196470,
    "metrics": {
-    "impression_count": 1567651,
-    "like_count": 3769,
+    "impression_count": 1809779,
+    "like_count": 4363,
     "retweet_count": null,
-    "reply_count": 47,
-    "quote_count": 74,
-    "bookmark_count": 959
+    "reply_count": 54,
+    "quote_count": 89,
+    "bookmark_count": 1088
    },
    "text": "ラストコールも鼻整形、二重切開、脂肪吸引＋糸リフトとフル顔課金している人が多いが、ホストコールの様に肌質がボロボロという訳ではない。\n\nこの中だとパネルマジックを感じるのは、ゆずずは目の下にハムラ顔を感じ、きゃにょん は鼻翼基部陥没さん由来の法令線を感じる位。大崩れでは無い。 https://t.co/gqIzhcpshC",
    "categories": [
@@ -1315,7 +2720,33 @@
     "ラストコール",
     "report:キャバクラ"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp5HEPaMAAG6Wg.jpg",
+     "width": 1152,
+     "height": 1699
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp5HEJbsAAahnm.jpg",
+     "width": 817,
+     "height": 1280
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp5HEZacAE71Pa.jpg",
+     "width": 874,
+     "height": 1280
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp5HEdbcAAZA19.jpg",
+     "width": 1184,
+     "height": 1680
+    }
+   ]
   },
   {
    "id": "2119638714041397734",
@@ -1325,19 +2756,45 @@
    "created_jst": "2026-11-09T12:50:25+09:00",
    "ts": 1794196225,
    "metrics": {
-    "impression_count": 1464262,
-    "like_count": 4043,
+    "impression_count": 1642129,
+    "like_count": 4379,
     "retweet_count": null,
-    "reply_count": 46,
-    "quote_count": 161,
-    "bookmark_count": 1609
+    "reply_count": 50,
+    "quote_count": 172,
+    "bookmark_count": 1739
    },
    "text": "森咲智美、夫・平沼翔太選手とは\n自著『詐欺バスト術』きっかけで交際\nhttps://t.co/KqYEPDiM2l\n⠀\nオリックス・バファローズ平沼翔太(29)の妻で、現在は2児の母の森咲智美(34)。夫との出会いは自身の著書『詐欺バスト術』がきっかけだったといい「この本がきっかけで結婚して、子どもが2人も生まれる https://t.co/wDNEvWlj3y",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp4HopaQAAsSo5.jpg",
+     "width": 1045,
+     "height": 1567
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp4Jg2bUAAS-Dz.jpg",
+     "width": 1800,
+     "height": 1200
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp4J-Ya0AAo2jy.jpg",
+     "width": 1567,
+     "height": 1045
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp4KwkaAAATCJK.jpg",
+     "width": 1045,
+     "height": 1567
+    }
+   ]
   },
   {
    "id": "2119636029078704364",
@@ -1347,12 +2804,12 @@
    "created_jst": "2026-11-09T12:39:44+09:00",
    "ts": 1794195584,
    "metrics": {
-    "impression_count": 532255,
-    "like_count": 836,
+    "impression_count": 555065,
+    "like_count": 894,
     "retweet_count": null,
     "reply_count": 1,
     "quote_count": 13,
-    "bookmark_count": 90
+    "bookmark_count": 96
    },
    "text": "黒崎みさちゃんまたまた匂わせ疑惑⁉️🤣\n\nお相手のVMの服のロゴ、\n以前の匂わせのときと同じ服じゃない？？\nアクセサリーも天使ニアさんっぽい気がする...\n\nこれは偶然なのかそれとも伏線回収なのか… https://t.co/wApfdBXCYZ https://t.co/7chlFxiAJf",
    "categories": [
@@ -1365,7 +2822,27 @@
     "黒崎みさ",
     "report:ホスト"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp1u-qaMAA3kHQ.jpg",
+     "width": 1179,
+     "height": 1951
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp1u-va8AAg05w.jpg",
+     "width": 1038,
+     "height": 1623
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWp1u-qbsAIES1m.jpg",
+     "width": 930,
+     "height": 1388
+    }
+   ]
   },
   {
    "id": "2119631312105755050",
@@ -1390,6 +2867,57 @@
    "is_watched": false
   },
   {
+   "id": "2119626048853741740",
+   "url": "https://x.com/reclaim_00/status/2119626048853741740",
+   "user": "reclaim_00",
+   "created_utc": "2026-11-09T03:00:05Z",
+   "created_jst": "2026-11-09T12:00:05+09:00",
+   "ts": 1794193205,
+   "metrics": {
+    "impression_count": 1559212,
+    "like_count": 8164,
+    "retweet_count": null,
+    "reply_count": 68,
+    "quote_count": 818,
+    "bookmark_count": 1999
+   },
+   "text": "▔▔▔▔▔▔▔▔▔▔▔▔▔\n\n 　　　最強の二人が\n　       再び、動き出す。\n\n▁▁▁▁▁▁▁▁▁▁▁▁▁ https://t.co/Xq4fcSbAud",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119593920414023680/img/pnMwTXfToxZgFor8.jpg",
+     "variants": [
+      {
+       "bit_rate": 288000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119593920414023680/vid/avc1/480x270/qkmw71N65tnQ3gtz.mp4?tag=14"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119593920414023680/vid/avc1/640x360/mzmu3PUNBIo3GBR5.mp4?tag=14"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119593920414023680/vid/avc1/1280x720/HghBqYZEGVlhKtM_.mp4?tag=14"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119593920414023680/pl/wUIn0RjYxdxMw1Fd.m3u8?tag=14&v=cfc"
+      }
+     ],
+     "width": 1280,
+     "height": 720
+    }
+   ]
+  },
+  {
    "id": "2119626043598193079",
    "url": "https://x.com/Animo_official_/status/2119626043598193079",
    "user": "Animo_official_",
@@ -1409,7 +2937,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWSRL2PaIAAFpv-.jpg",
+     "width": 2953,
+     "height": 1654
+    }
+   ]
   },
   {
    "id": "2119626028112879963",
@@ -1431,7 +2967,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhUH4aUAAoYQs.png",
+     "width": 325,
+     "height": 360
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhUWbbwAAWBJi.png",
+     "width": 360,
+     "height": 354
+    }
+   ]
   },
   {
    "id": "2119620225222230514",
@@ -1441,12 +2991,12 @@
    "created_jst": "2026-11-09T11:36:56+09:00",
    "ts": 1794191816,
    "metrics": {
-    "impression_count": 968357,
-    "like_count": 834,
+    "impression_count": 1131505,
+    "like_count": 1774,
     "retweet_count": null,
-    "reply_count": 68,
-    "quote_count": 16,
-    "bookmark_count": 102
+    "reply_count": 87,
+    "quote_count": 18,
+    "bookmark_count": 153
    },
    "text": "なんでピンサロはあって\n女性のクンニ用風俗ないんだろうね\nもしかしてある？",
    "categories": [
@@ -1457,6 +3007,36 @@
     "report:夜職その他"
    ],
    "is_watched": false
+  },
+  {
+   "id": "2119615385456767254",
+   "url": "https://x.com/livedoornews/status/2119615385456767254",
+   "user": "livedoornews",
+   "created_utc": "2026-11-09T02:17:43Z",
+   "created_jst": "2026-11-09T11:17:43+09:00",
+   "ts": 1794190663,
+   "metrics": {
+    "impression_count": 470668,
+    "like_count": 3371,
+    "retweet_count": null,
+    "reply_count": 150,
+    "quote_count": 337,
+    "bookmark_count": 355
+   },
+   "text": "【調査へ】エヌビディアCEO \"中国スパイ女性と親密関係\"報道を認めて謝罪\nhttps://t.co/7lXMPrOPfQ\n\nエヌビディアの取締役会は独立委員会による調査を開始すると発表。取締役会は「国家安全保障やエヌビディアの機密情報が漏洩したとは考えていない」としつつも、全情報を精査する方針を示している。 https://t.co/0cMP3L4p3Z",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpi41kbQAA7cUD.png",
+     "width": 620,
+     "height": 349
+    }
+   ]
   },
   {
    "id": "2119611179299701230",
@@ -1478,7 +3058,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjB2ua0AAGL-c.jpg",
+     "width": 375,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjCAKbgAAxT_b.jpg",
+     "width": 680,
+     "height": 564
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjCiVbAAAR9NQ.jpg",
+     "width": 680,
+     "height": 590
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnjC1ObkAAToPS.jpg",
+     "width": 561,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119610935195361413",
@@ -1500,7 +3106,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhHcHawAA1Tu1.jpg",
+     "width": 348,
+     "height": 360
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnhHxNa8AAi1Wg.jpg",
+     "width": 410,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119605922653995199",
@@ -1510,12 +3130,12 @@
    "created_jst": "2026-11-09T10:40:06+09:00",
    "ts": 1794188406,
    "metrics": {
-    "impression_count": 901169,
-    "like_count": 5849,
+    "impression_count": 1062885,
+    "like_count": 7732,
     "retweet_count": null,
-    "reply_count": 56,
-    "quote_count": 175,
-    "bookmark_count": 593
+    "reply_count": 73,
+    "quote_count": 217,
+    "bookmark_count": 715
    },
    "text": "やっぱ風俗やらメンエスやら行く男気持ちわりー過去利用履歴あるって聞いた瞬間速攻恋愛対象から外してきたけど正解だった。本当に気持ち悪い",
    "categories": [
@@ -1536,19 +3156,27 @@
    "created_jst": "2026-11-09T10:36:43+09:00",
    "ts": 1794188203,
    "metrics": {
-    "impression_count": 6060517,
-    "like_count": 15748,
+    "impression_count": 6449716,
+    "like_count": 16423,
     "retweet_count": null,
-    "reply_count": 237,
-    "quote_count": 3559,
-    "bookmark_count": 3513
+    "reply_count": 238,
+    "quote_count": 3743,
+    "bookmark_count": 3639
    },
    "text": "「赤ちゃんの名前ランキング2026」発表✨\n\n👦男の子「朔」が初の1位\n👧女の子「陽葵」が3年ぶりに1位に返り咲き\nhttps://t.co/I3VBouPgij https://t.co/coRzwKVAAy",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpZbtVaAAATGRG.jpg",
+     "width": 1507,
+     "height": 1563
+    }
+   ]
   },
   {
    "id": "2119595836589879383",
@@ -1572,7 +3200,21 @@
    "matched_terms": [
     "ラヴ上等"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWleL0-aQAA7AeJ.jpg",
+     "width": 503,
+     "height": 680
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWleMuoaIAAAvhu.jpg",
+     "width": 457,
+     "height": 680
+    }
+   ]
   },
   {
    "id": "2119580728220389684",
@@ -1594,7 +3236,21 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWlc4t3bkAE5RYT.jpg",
+     "width": 900,
+     "height": 501
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWlc48XaAAAL0Ra.jpg",
+     "width": 900,
+     "height": 501
+    }
+   ]
   },
   {
    "id": "2119578831694799085",
@@ -1616,7 +3272,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpBtb-bQAA-LNI.jpg",
+     "width": 1290,
+     "height": 1916
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpBtb3bsAACSEq.jpg",
+     "width": 1290,
+     "height": 1923
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpBtb1bsAA4cHS.jpg",
+     "width": 1290,
+     "height": 2168
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWpBtb3bUAAUC8W.jpg",
+     "width": 1080,
+     "height": 512
+    }
+   ]
   },
   {
    "id": "2119569867347308687",
@@ -1626,12 +3308,12 @@
    "created_jst": "2026-11-09T08:16:50+09:00",
    "ts": 1794179810,
    "metrics": {
-    "impression_count": 1497175,
-    "like_count": 30803,
+    "impression_count": 1746914,
+    "like_count": 35673,
     "retweet_count": null,
-    "reply_count": 221,
-    "quote_count": 325,
-    "bookmark_count": 4046
+    "reply_count": 261,
+    "quote_count": 363,
+    "bookmark_count": 4633
    },
    "text": "80キロデカ女が\nキャバ嬢ガリガリ体型が蔓延る世界をぶっ壊しにきた https://t.co/QHmfcCDBT7",
    "categories": [
@@ -1641,7 +3323,74 @@
     "キャバ嬢",
     "キャバ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWo5jgkaAAASwP2.jpg",
+     "width": 1536,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWo5jguaYAA4jpA.jpg",
+     "width": 1536,
+     "height": 2048
+    }
+   ]
+  },
+  {
+   "id": "2119568397235323287",
+   "url": "https://x.com/Wafm60z/status/2119568397235323287",
+   "user": "Wafm60z",
+   "created_utc": "2026-11-08T23:11:00Z",
+   "created_jst": "2026-11-09T08:11:00+09:00",
+   "ts": 1794179460,
+   "metrics": {
+    "impression_count": 1503149,
+    "like_count": 5894,
+    "retweet_count": null,
+    "reply_count": 3,
+    "quote_count": 33,
+    "bookmark_count": 2608
+   },
+   "text": "社美緒様のプレイヤー時代の映像が発見される。\n\nこの頃から話し方がすごく賢いし、言葉の選び方も素敵。\n今と見比べても、根本的な部分は全然変わってないんだなって思う。\n\nホストとしても、一人の人間としても本当に尊敬する…！ https://t.co/eXlyQErFIb",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "report:ホスト"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119438118592147456/img/4tzKXC3oiopbXX85.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119438118592147456/vid/avc1/496x270/VZeOELHsm-qjHQYW.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119438118592147456/vid/avc1/660x360/IjSRbnsZqg9NXS5v.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119438118592147456/vid/avc1/1026x558/Z06_nbBUI9ifLiib.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119438118592147456/pl/HQgg36EKp5g0GIyJ.m3u8?v=a9f"
+      }
+     ],
+     "width": 1026,
+     "height": 558
+    }
+   ]
   },
   {
    "id": "2119553275427279208",
@@ -1651,19 +3400,33 @@
    "created_jst": "2026-11-09T07:10:54+09:00",
    "ts": 1794175854,
    "metrics": {
-    "impression_count": 7724826,
-    "like_count": 10509,
+    "impression_count": 8789364,
+    "like_count": 12313,
     "retweet_count": null,
-    "reply_count": 543,
-    "quote_count": 393,
-    "bookmark_count": 2270
+    "reply_count": 610,
+    "quote_count": 451,
+    "bookmark_count": 2574
    },
    "text": "ワンピ今回で完全に吹っ切れたわ\n子供の頃からずっとリアタイで追っかけて現在まで毎週欠かさず見るのがルーティンだったけどもうあかんわこの漫画\n後付けに失敗して作品をぶち壊し、それを誤魔化すかの如く現実逃避し芸能人と遊んで幸せでーすアピールし休載するクソ漫画\n今までありがとうワンピース https://t.co/cwkzl7R7fL",
    "categories": [
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWoqeAvbcAA4gAv.jpg",
+     "width": 1184,
+     "height": 723
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWoqeAvaQAA9nFD.jpg",
+     "width": 1155,
+     "height": 490
+    }
+   ]
   },
   {
    "id": "2119550537217507715",
@@ -1686,7 +3449,15 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWnmkGfawAEGfoC.jpg",
+     "width": 945,
+     "height": 1403
+    }
+   ]
   },
   {
    "id": "2119543571523223962",
@@ -1696,12 +3467,12 @@
    "created_jst": "2026-11-09T06:32:21+09:00",
    "ts": 1794173541,
    "metrics": {
-    "impression_count": 902991,
-    "like_count": 616,
+    "impression_count": 1053110,
+    "like_count": 721,
     "retweet_count": null,
-    "reply_count": 16,
-    "quote_count": 14,
-    "bookmark_count": 205
+    "reply_count": 23,
+    "quote_count": 19,
+    "bookmark_count": 240
    },
    "text": "又闇深い歌舞伎町を知ってしまった\n\n---深夜1時30----\n\n歌舞伎町をブ～ラブラしてたら1人\n可愛い子がいたので\n声かけたらネカフェ難民の子で\n\n俺が元々住みかにしてた場所に\n今寝泊まりしながら\n歌舞伎にハマってる19才の子だった。\n\nノリのイイ子で\n今日使わなかった部屋にそのままin https://t.co/rul5Mv4KIa",
    "categories": [
@@ -1711,7 +3482,21 @@
     "歌舞伎町",
     "report:歌舞伎町"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWohomEboAAZ-hA.jpg",
+     "width": 1080,
+     "height": 810
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWohpB5a0AAphqr.jpg",
+     "width": 1477,
+     "height": 1108
+    }
+   ]
   },
   {
    "id": "2119436798342672589",
@@ -1769,12 +3554,12 @@
    "created_jst": "2026-11-08T23:13:16+09:00",
    "ts": 1794147196,
    "metrics": {
-    "impression_count": 2993163,
-    "like_count": 807,
+    "impression_count": 3896381,
+    "like_count": 1014,
     "retweet_count": null,
-    "reply_count": 69,
-    "quote_count": 244,
-    "bookmark_count": 307
+    "reply_count": 80,
+    "quote_count": 313,
+    "bookmark_count": 418
    },
    "text": "キャバ嬢ワイ、\nキャバ嬢の中ではムチムチどころかデブらしく\n顔も可愛くないと\n今日は既にフリーで4卓着きましたが\n3卓でブス！と言われました！\n\nキャバクラ界厳しいですね！ https://t.co/Y77SpK9hSh",
    "categories": [
@@ -1783,9 +3568,18 @@
    "matched_terms": [
     "キャバクラ",
     "キャバ嬢",
-    "キャバ"
+    "キャバ",
+    "report:キャバクラ"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWm9JLUaEAEVknl.jpg",
+     "width": 1536,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2119430653481795702",
@@ -1840,7 +3634,36 @@
     "ラストコール",
     "あっすん"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119423411671986176/img/ZxvbPYMJ3vWUtffp.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119423411671986176/vid/avc1/544x270/gTLlkL1-S4-ouRHt.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119423411671986176/vid/avc1/724x360/CXwxFrCCX8RSqFb8.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119423411671986176/vid/avc1/1080x536/KRWVcCRQnf9y6FcN.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119423411671986176/pl/ubGpdhitmFCN5o7G.m3u8"
+      }
+     ],
+     "width": 1080,
+     "height": 536
+    }
+   ]
   },
   {
    "id": "2119419846337425612",
@@ -1940,7 +3763,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWl-yNLbAAAesEt.jpg",
+     "width": 1200,
+     "height": 800
+    }
+   ]
   },
   {
    "id": "2119416425005957580",
@@ -2161,7 +3992,41 @@
     "quote:キャバ",
     "quote:あっすん"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119408965650206720/img/AgHw_RS1eNsPECzR.jpg",
+     "variants": [
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119408965650206720/pl/ih47jSspbCvqxrFS.m3u8?v=4a4"
+      },
+      {
+       "bit_rate": 432000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119408965650206720/vid/avc1/320x320/lctxAnFSCM7k7i5n.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119408965650206720/vid/avc1/540x540/T9n5s98LVZox6YPu.mp4"
+      },
+      {
+       "bit_rate": 8768000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119408965650206720/vid/avc1/1080x1080/ysYhWUmh-xBgfDly.mp4"
+      },
+      {
+       "bit_rate": 1280000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119408965650206720/vid/avc1/720x720/AlZfmeqiz5qM4j2x.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2119408864760401930",
@@ -2171,12 +4036,12 @@
    "created_jst": "2026-11-08T21:37:04+09:00",
    "ts": 1794141424,
    "metrics": {
-    "impression_count": 1138985,
-    "like_count": 2832,
-    "retweet_count": null,
-    "reply_count": 44,
-    "quote_count": 60,
-    "bookmark_count": 837
+    "impression_count": 1224697,
+    "like_count": 3077,
+    "retweet_count": 58,
+    "reply_count": 47,
+    "quote_count": 65,
+    "bookmark_count": 919
    },
    "text": "【中卒のレジェンド】キャバ嬢に学歴いる！？→「学歴があればいいんだよ」あっすんの言葉の重みが凄すぎる\n\n令和みな\n「お客様は仕事で疲れて、癒やされに来てるから。そんな話はしたことない」\n↓\n令和みな\n「頭が良くても、必要なのは愛嬌と賢さ」\n↓\nあっすん https://t.co/FCisl9XnQC https://t.co/4rfImYDxzQ",
    "categories": [
@@ -2621,7 +4486,33 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWmg3DdaUAEoSZZ.jpg",
+     "width": 1536,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWmg3DcaAAANv0W.jpg",
+     "width": 1536,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWmg3DiaQAAEfNh.jpg",
+     "width": 2048,
+     "height": 1536
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWmg3DdaQAAYKT7.jpg",
+     "width": 2048,
+     "height": 1536
+    }
+   ]
   },
   {
    "id": "2119401805876691017",
@@ -2861,7 +4752,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119397981216522240/img/U-4n5pMLfBIsGR8X.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119397981216522240/vid/avc1/320x568/Mgb176YeqH46blPb.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119397981216522240/vid/avc1/480x852/jM54uyFYX88jA6x2.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119397981216522240/vid/avc1/720x1280/BzIWMGoLc4iy4fWU.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119397981216522240/pl/oibYc4CB3pyyOvHV.m3u8?v=cfc"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    }
+   ]
   },
   {
    "id": "2119382412023210000",
@@ -2871,12 +4791,12 @@
    "created_jst": "2026-11-08T19:51:57+09:00",
    "ts": 1794135117,
    "metrics": {
-    "impression_count": 395126,
-    "like_count": 792,
-    "retweet_count": 6,
+    "impression_count": 1297370,
+    "like_count": 888,
+    "retweet_count": null,
     "reply_count": 1,
-    "quote_count": 8,
-    "bookmark_count": 63
+    "quote_count": 12,
+    "bookmark_count": 85
    },
    "text": "【仲良し】星乃リア＆如月れい、《初サシ飯🍜》\n\nリオでは優しい先輩に恵まれてよかったね🫶🏻🩵\n\nこの2人は仲違いしないでほしい、、！\n#ラストコール https://t.co/7hjJojoBS2 https://t.co/uinMqMV2J4",
    "categories": [
@@ -2887,7 +4807,15 @@
     "星乃リア",
     "ラストコール"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWmPEgfbMAAJmXk.jpg",
+     "width": 1125,
+     "height": 1664
+    }
+   ]
   },
   {
    "id": "2119379122921279916",
@@ -2945,7 +4873,36 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2119377577987153921/img/TPsKUyfBhRr6U3WR.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119377577987153921/vid/avc1/494x270/2hHCiBMSMu4nUY9D.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119377577987153921/vid/avc1/658x360/0i0m3MwJxSKNinKa.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2119377577987153921/vid/avc1/1206x658/nABBi4BGFp6Sc1xa.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2119377577987153921/pl/K2QM9zh0Q8n9dN8b.m3u8"
+      }
+     ],
+     "width": 1206,
+     "height": 658
+    }
+   ]
   },
   {
    "id": "2119371545055223876",
@@ -3362,12 +5319,12 @@
    "created_jst": "2026-11-08T17:23:00+09:00",
    "ts": 1794126180,
    "metrics": {
-    "impression_count": 1110963,
-    "like_count": 10686,
-    "retweet_count": 96,
-    "reply_count": 16,
-    "quote_count": 6,
-    "bookmark_count": 455
+    "impression_count": 2999034,
+    "like_count": 32939,
+    "retweet_count": 343,
+    "reply_count": 25,
+    "quote_count": 26,
+    "bookmark_count": 1249
    },
    "text": "整形してる人で整形顔の感覚麻痺ってない人初めて見た https://t.co/INdG5kpQvS",
    "categories": [
@@ -3884,7 +5841,15 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWgsRpdawAAoLi5.jpg",
+     "width": 1920,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2119324038942401015",
@@ -4353,12 +6318,12 @@
    "created_jst": "2026-11-08T13:46:34+09:00",
    "ts": 1794113194,
    "metrics": {
-    "impression_count": 4463248,
-    "like_count": 10642,
+    "impression_count": 9923182,
+    "like_count": 18995,
     "retweet_count": null,
-    "reply_count": 229,
-    "quote_count": 696,
-    "bookmark_count": 3998
+    "reply_count": 344,
+    "quote_count": 1301,
+    "bookmark_count": 7157
    },
    "text": "ゴリゴリ整形してる歌舞伎町界隈がみんなこの肌に収束してるから起こり得る全可能性列挙してみた👇\n\n👃小鼻縮小や人中短縮などの傷跡\n👁️目頭切開や全切開などの傷跡\n👁️クマ取りでのハムラ顔\n💉リジュラン → 炎症・肌テカテカ\n💉ジュベルック → 結節・硬いしこり\n💉ヒアルロン酸 → https://t.co/ldzVja9c4n",
    "categories": [
@@ -6650,12 +8615,12 @@
    "created_jst": "2026-11-08T00:50:40+09:00",
    "ts": 1794066640,
    "metrics": {
-    "impression_count": 1746858,
-    "like_count": 602,
+    "impression_count": 2412741,
+    "like_count": 647,
     "retweet_count": null,
-    "reply_count": 6,
+    "reply_count": 8,
     "quote_count": 1,
-    "bookmark_count": 46
+    "bookmark_count": 51
    },
    "text": "久しぶりに回答したけど\n明日から朝昼晩で行くからよろしく。\n緋咲一馬とバロンのかりん行くか。",
    "categories": [
@@ -6675,12 +8640,12 @@
    "created_jst": "2026-11-08T00:46:59+09:00",
    "ts": 1794066419,
    "metrics": {
-    "impression_count": 744671,
-    "like_count": 1401,
+    "impression_count": 806934,
+    "like_count": 1418,
     "retweet_count": null,
     "reply_count": 15,
     "quote_count": 6,
-    "bookmark_count": 152
+    "bookmark_count": 154
    },
    "text": "明日から暴露祭。\n片っ端から行くからよろしく。\nあと、MATTの件触れるかも。\nジャングルの子は数人撃つからよろしく。",
    "categories": [
@@ -8685,12 +10650,12 @@
    "created_jst": "2026-11-07T18:24:43+09:00",
    "ts": 1794043483,
    "metrics": {
-    "impression_count": 3614679,
-    "like_count": 23243,
-    "retweet_count": 2562,
-    "reply_count": 488,
+    "impression_count": 3621287,
+    "like_count": 23244,
+    "retweet_count": 2568,
+    "reply_count": 487,
     "quote_count": 377,
-    "bookmark_count": 3461
+    "bookmark_count": 3445
    },
    "text": "名古屋からハワイに来たキャバクラ嬢が強制送還される映像。\n入管で質問に答えないで暴れて入国出来るわけないし、ナレーションがストレートで面白い。\n「日本ではホステスクラブはしばしば売春と紐付いており犯罪者集団に経営されていて、海外に売春婦を送り込んでいる」 https://t.co/0aDQp8Hs6A",
    "categories": [
@@ -9680,11 +11645,11 @@
    "created_jst": "2026-11-07T13:26:01+09:00",
    "ts": 1794025561,
    "metrics": {
-    "impression_count": 1933098,
-    "like_count": 2,
+    "impression_count": 2257931,
+    "like_count": 39,
     "retweet_count": 0,
     "reply_count": 0,
-    "quote_count": 13,
+    "quote_count": 10,
     "bookmark_count": 3
    },
    "text": "https://t.co/y2zuhftMdQ",
@@ -9996,12 +11961,12 @@
    "created_jst": "2026-11-07T12:46:03+09:00",
    "ts": 1794023163,
    "metrics": {
-    "impression_count": 407334,
+    "impression_count": 408299,
     "like_count": 1622,
     "retweet_count": null,
     "reply_count": 2,
     "quote_count": 8,
-    "bookmark_count": 92
+    "bookmark_count": 89
    },
    "text": "嘘の名前教えて本名だよって言えばいいだけのことをなにをうだうだ言ってんのかわからん。客に成功体験与えてる女も同罪だからな普通に https://t.co/hkuozuVfRK",
    "categories": [
@@ -10750,12 +12715,12 @@
    "created_jst": "2026-11-06T23:08:39+09:00",
    "ts": 1793974119,
    "metrics": {
-    "impression_count": 5854314,
-    "like_count": 10270,
+    "impression_count": 5930632,
+    "like_count": 10278,
     "retweet_count": null,
     "reply_count": 102,
-    "quote_count": 383,
-    "bookmark_count": 2279
+    "quote_count": 385,
+    "bookmark_count": 2274
    },
    "text": "PayPayはもうサ終したほうがいいよ。\n総額187万円の被害でてます。 https://t.co/xQBa365vTY https://t.co/RCVa66W2vh",
    "categories": [
@@ -18885,8 +20850,8 @@
    "created_jst": "2026-11-04T21:09:04+09:00",
    "ts": 1793794144,
    "metrics": {
-    "impression_count": 540736,
-    "like_count": 4985,
+    "impression_count": 542527,
+    "like_count": 4989,
     "retweet_count": 77,
     "reply_count": 69,
     "quote_count": 25,
@@ -19251,7 +21216,41 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117933425537802240/img/xV-QqNK7zkz9aGyE.jpg",
+     "variants": [
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117933425537802240/vid/avc1/502x360/j4kY721NW2NdSvaW.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117933425537802240/vid/avc1/376x270/1yhR8mi7xd3icZ9a.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117933425537802240/vid/avc1/1006x720/8ZoT0eGd0cn-mLuo.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117933425537802240/pl/olOZRE0Zg8Q26uPx.m3u8?v=e7d"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117933425537802240/vid/avc1/1080x772/F8-DLG0B2zF7D4ox.mp4"
+      }
+     ],
+     "width": 1080,
+     "height": 772
+    }
+   ]
   },
   {
    "id": "2117930707519758729",
@@ -21649,7 +23648,41 @@
     "その他"
    ],
    "matched_terms": [],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2097620280361570304/img/qzf2OtgFxZd2MWzq.jpg",
+     "variants": [
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2097620280361570304/vid/avc1/636x360/MuZvDAP9DaEvI52O.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2097620280361570304/vid/avc1/476x270/4NfG4QlkyfgW4Tax.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2097620280361570304/pl/ExZNr2uwxAO5mf-5.m3u8"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2097620280361570304/vid/avc1/1272x720/DW-hIfLlKawruKSA.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2097620280361570304/vid/avc1/2068x1170/6kIMZHlZTqPjvzRd.mp4"
+      }
+     ],
+     "width": 2068,
+     "height": 1170
+    }
+   ]
   },
   {
    "id": "2117738602574622889",
@@ -22827,8 +24860,8 @@
    "created_jst": "2026-11-03T17:54:21+09:00",
    "ts": 1793696061,
    "metrics": {
-    "impression_count": 128650,
-    "like_count": 561,
+    "impression_count": 129131,
+    "like_count": 562,
     "retweet_count": null,
     "reply_count": 0,
     "quote_count": 9,
@@ -27843,7 +29876,41 @@
     "あっすん",
     "quote:ゆいぴす"
    ],
-   "is_watched": false
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117091443907125248/img/_yZcLtNtXf51nzpK.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117091443907125248/vid/avc1/480x270/mwbtrU5clGbwI6Ly.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117091443907125248/vid/avc1/640x360/6lEA2PQeUUOj83eI.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117091443907125248/vid/avc1/1920x1080/XXUGAzCgqmE6Imbl.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117091443907125248/pl/ChHwTWI7nQSJ9JQn.m3u8"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117091443907125248/vid/avc1/1280x720/GeKHDr6SjoGlpPD9.mp4"
+      }
+     ],
+     "width": 1920,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2117089316531012076",
@@ -28229,12 +30296,12 @@
    "created_jst": "2026-11-02T09:13:02+09:00",
    "ts": 1793578382,
    "metrics": {
-    "impression_count": 692292,
-    "like_count": 66,
+    "impression_count": 715317,
+    "like_count": 69,
     "retweet_count": null,
     "reply_count": 1,
     "quote_count": 1,
-    "bookmark_count": 4
+    "bookmark_count": 5
    },
    "text": "黒崎みさちゃん\n誰と匂わせてるんだろう…🤔\n\nこの画像だけじゃ断定できないw https://t.co/kaDD4DUkiF https://t.co/y7y8IynPA9",
    "categories": [
@@ -28245,7 +30312,15 @@
     "quote:天使ニア",
     "黒崎みさ"
    ],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWFDS0IaQAASBJ-.jpg",
+     "width": 1179,
+     "height": 1978
+    }
+   ]
   },
   {
    "id": "2117044475637936286",
@@ -118633,12 +120708,12 @@
    "created_jst": "2026-10-15T22:17:22+09:00",
    "ts": 1792070242,
    "metrics": {
-    "impression_count": 27360351,
-    "like_count": 74,
+    "impression_count": 27778308,
+    "like_count": 76,
     "retweet_count": 4,
     "reply_count": 0,
-    "quote_count": 17,
-    "bookmark_count": 178
+    "quote_count": 14,
+    "bookmark_count": 185
    },
    "text": "https://t.co/ex7sPaiJMj",
    "categories": [
@@ -125554,12 +127629,12 @@
    "created_jst": "2026-10-14T21:18:17+09:00",
    "ts": 1791980297,
    "metrics": {
-    "impression_count": 2459538,
-    "like_count": 11910,
+    "impression_count": 2460847,
+    "like_count": 11908,
     "retweet_count": null,
     "reply_count": 110,
     "quote_count": 1645,
-    "bookmark_count": 1243
+    "bookmark_count": 1240
    },
    "text": "🏛2026/11/07 Sat.🏛\nゲストイベント開催決定💗\n　\n🫖堀大輔さん🎀\n＠d_holi \nが1日限定ゲスト女神に…🫧💍\n\n🕓17:00~23:00\n\n堀大輔さんのゲストイベントでは\n特別なグッズや特典を手に入れることができます🎉🤍\n\n詳細は後日ポストさせていただきますので楽しみにお待ちください🧸 https://t.co/GT6owJ8TT8",
    "categories": [
@@ -145931,8 +148006,8 @@
    "created_jst": "2026-10-12T21:55:41+09:00",
    "ts": 1791809741,
    "metrics": {
-    "impression_count": 2698017,
-    "like_count": 8486,
+    "impression_count": 2698058,
+    "like_count": 8485,
     "retweet_count": null,
     "reply_count": 61,
     "quote_count": 43,
@@ -150216,12 +152291,12 @@
    "created_jst": "2026-10-12T00:17:31+09:00",
    "ts": 1791731851,
    "metrics": {
-    "impression_count": 10349610,
+    "impression_count": 10709377,
     "like_count": 10,
     "retweet_count": 1,
     "reply_count": 0,
-    "quote_count": 15,
-    "bookmark_count": 25
+    "quote_count": 14,
+    "bookmark_count": 28
    },
    "text": "https://t.co/c5LtF2ggme",
    "categories": [
@@ -152587,7 +154662,7 @@
    "created_jst": "2026-10-11T16:03:16+09:00",
    "ts": 1791702196,
    "metrics": {
-    "impression_count": 132910,
+    "impression_count": 132911,
     "like_count": 269,
     "retweet_count": null,
     "reply_count": 23,
@@ -153126,8 +155201,8 @@
    "created_jst": "2026-10-11T15:02:12+09:00",
    "ts": 1791698532,
    "metrics": {
-    "impression_count": 689387,
-    "like_count": 1918,
+    "impression_count": 689401,
+    "like_count": 1917,
     "retweet_count": null,
     "reply_count": 44,
     "quote_count": 61,
@@ -153523,7 +155598,7 @@
    "created_jst": "2026-10-11T13:33:56+09:00",
    "ts": 1791693236,
    "metrics": {
-    "impression_count": 1057652,
+    "impression_count": 1057678,
     "like_count": 913,
     "retweet_count": null,
     "reply_count": 0,
@@ -162254,6 +164329,28 @@
      "height": 4077
     }
    ]
+  },
+  {
+   "id": "2107974231594267068",
+   "url": "https://x.com/shiraishi_x_/status/2107974231594267068",
+   "user": "shiraishi_x_",
+   "created_utc": "2026-10-07T23:19:55Z",
+   "created_jst": "2026-10-08T08:19:55+09:00",
+   "ts": 1791415195,
+   "metrics": {
+    "impression_count": 671673,
+    "like_count": 246,
+    "retweet_count": 12,
+    "reply_count": 0,
+    "quote_count": 14,
+    "bookmark_count": 255
+   },
+   "text": "https://t.co/Nvosw3RMrC",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2107962151927500860",
@@ -174824,6 +176921,62 @@
    ]
   },
   {
+   "id": "2047171895293079856",
+   "url": "https://x.com/bakusai_hodo/status/2047171895293079856",
+   "user": "bakusai_hodo",
+   "created_utc": "2026-04-23T04:33:09Z",
+   "created_jst": "2026-04-23T13:33:09+09:00",
+   "ts": 1776918789,
+   "metrics": {
+    "impression_count": 1333566,
+    "like_count": 2113,
+    "retweet_count": 106,
+    "reply_count": 24,
+    "quote_count": 18,
+    "bookmark_count": 452
+   },
+   "text": "【衝撃】NHK長野支局の女子アナさん、緊急地震速報のためすっぴんメガネでTV出演し話題に\n\n4月18日長野県北部で震度5強の地震が発生。稲井アナは発生から約10分でスタジオに到着し、ノーメイクで震源や被害状況を報告。\n\nこれぞプロ。\n#稲井清香\nhttps://t.co/VmSVHR1Fs8 https://t.co/uFrzK5hfew",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2045365004694945792/img/7OEZFApDNfeV-Gsr.jpg",
+     "variants": [
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2045365004694945792/vid/avc1/2560x1440/vv-PzO0Kam-2GTsG.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2045365004694945792/pl/fs7e_yhXL7hhYQ9e.m3u8?v=960"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2045365004694945792/vid/avc1/1280x720/GXK8o5rdkDlPE4HU.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2045365004694945792/vid/avc1/640x360/XCiC1SsMWAGxmGSA.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2045365004694945792/vid/avc1/480x270/XMA9PNck5NLsoi5m.mp4"
+      }
+     ],
+     "width": 2560,
+     "height": 1440
+    }
+   ]
+  },
+  {
    "id": "2046220135586034144",
    "url": "https://x.com/orihara_bakuro/status/2046220135586034144",
    "user": "orihara_bakuro",
@@ -175437,7 +177590,15 @@
     "監視アカウント"
    ],
    "matched_terms": [],
-   "is_watched": true
+   "is_watched": true,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HBmTlGPbsAAuZhJ.jpg",
+     "width": 533,
+     "height": 400
+    }
+   ]
   },
   {
    "id": "2021168154882298182",
