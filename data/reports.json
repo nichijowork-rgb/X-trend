@@ -1,6 +1,97 @@
 {
- "generated_at": "2026-11-10T00:11:06+09:00",
+ "generated_at": "2026-11-11T00:01:55+09:00",
  "daily": [
+  {
+   "date": "2026-11-10",
+   "rising": [
+    {
+     "id": "2120029616438231471",
+     "views": 458909,
+     "hours_since_post": 8.7,
+     "views_per_hour": 52943,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [],
+   "review": [
+    {
+     "id": "2119773587485954458",
+     "before_views": 334291,
+     "after_views": 2998751,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119753359909658991",
+     "before_views": 310531,
+     "after_views": 602927,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119706544824815901",
+     "before_views": 404184,
+     "after_views": 511264,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2119780300452466842",
+     "before_views": 112417,
+     "after_views": 785250,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2119777641058218154",
+     "before_views": 125660,
+     "after_views": 856313,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2119761309067788773",
+     "before_views": 189939,
+     "after_views": 556577,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2119745283538170186",
+     "before_views": 167662,
+     "after_views": 550876,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上かつ1時間あたり3万以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-09",
    "rising": [
