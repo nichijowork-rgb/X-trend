@@ -1,6 +1,51 @@
 {
- "generated_at": "2026-11-11T00:01:55+09:00",
+ "generated_at": "2026-11-12T00:09:16+09:00",
  "daily": [
+  {
+   "date": "2026-11-11",
+   "rising": [
+    {
+     "id": "2120443666062053652",
+     "views": 314077,
+     "hours_since_post": 5.24,
+     "views_per_hour": 59929,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2120360986620420488",
+     "views": 479822,
+     "hours_since_post": 10.72,
+     "views_per_hour": 44775,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2120462277967306799",
+     "views": 260685,
+     "hours_since_post": 4.01,
+     "views_per_hour": 65040,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "進撃のノアさんの発言の話題"
+    }
+   ],
+   "review": [
+    {
+     "id": "2120029616438231471",
+     "before_views": 458909,
+     "after_views": 630837,
+     "crossed_500k": true,
+     "source": "rising"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-10",
    "rising": [
