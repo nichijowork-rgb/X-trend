@@ -1,6 +1,132 @@
 {
- "generated_at": "2026-11-12T00:09:16+09:00",
+ "generated_at": "2026-11-13T00:07:51+09:00",
  "daily": [
+  {
+   "date": "2026-11-12",
+   "rising": [
+    {
+     "id": "2120837576953319483",
+     "views": 351160,
+     "hours_since_post": 3.3,
+     "views_per_hour": 106376,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2120715287733629384",
+     "views": 498046,
+     "hours_since_post": 11.4,
+     "views_per_hour": 43688,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2120724568184909922",
+     "views": 408146,
+     "hours_since_post": 10.79,
+     "views_per_hour": 37842,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2120853432001261752",
+     "views": 234875,
+     "hours_since_post": 2.25,
+     "views_per_hour": 104337,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコールの切り抜き（6時間以内15万・1時間あたり3万以上も満たす）"
+    },
+    {
+     "id": "2120852683825590394",
+     "views": 133942,
+     "hours_since_post": 2.3,
+     "views_per_hour": 58222,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコールの切り抜き"
+    },
+    {
+     "id": "2120853294298095856",
+     "views": 121101,
+     "hours_since_post": 2.26,
+     "views_per_hour": 53578,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "南柚子さんの「炎上している件について」動画告知"
+    },
+    {
+     "id": "2120851140644573558",
+     "views": 118184,
+     "hours_since_post": 2.4,
+     "views_per_hour": 49186,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコールの切り抜き"
+    },
+    {
+     "id": "2120851360522641491",
+     "views": 112943,
+     "hours_since_post": 2.39,
+     "views_per_hour": 47289,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコールの切り抜き"
+    },
+    {
+     "id": "2120799873641640389",
+     "views": 215164,
+     "hours_since_post": 5.8,
+     "views_per_hour": 37110,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "ぼったくりバー逮捕ニュースへの引用"
+    }
+   ],
+   "review": [
+    {
+     "id": "2120443666062053652",
+     "before_views": 314077,
+     "after_views": 698910,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2120360986620420488",
+     "before_views": 479822,
+     "after_views": 652888,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2120462277967306799",
+     "before_views": 260685,
+     "after_views": 1526058,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-11",
    "rising": [
