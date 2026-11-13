@@ -1,6 +1,128 @@
 {
- "generated_at": "2026-11-13T00:07:51+09:00",
+ "generated_at": "2026-11-14T00:05:46+09:00",
  "daily": [
+  {
+   "date": "2026-11-13",
+   "rising": [
+    {
+     "id": "2121217335566672122",
+     "views": 353624,
+     "hours_since_post": 2.18,
+     "views_per_hour": 162420,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2121191804016197720",
+     "views": 206712,
+     "hours_since_post": 3.87,
+     "views_per_hour": 53441,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "ゆいぴすさんの体調の話（見張るアカウントの投稿）"
+    },
+    {
+     "id": "2121170339208335546",
+     "views": 238254,
+     "hours_since_post": 5.29,
+     "views_per_hour": 45041,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "香港でAV女優が入国拒否された件"
+    }
+   ],
+   "review": [
+    {
+     "id": "2120837576953319483",
+     "before_views": 351160,
+     "after_views": 691112,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2120715287733629384",
+     "before_views": 498046,
+     "after_views": 638552,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2120724568184909922",
+     "before_views": 408146,
+     "after_views": 745097,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2120853432001261752",
+     "before_views": 234875,
+     "after_views": 742024,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2120852683825590394",
+     "before_views": 133942,
+     "after_views": 380160,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2120853294298095856",
+     "before_views": 121101,
+     "after_views": 231951,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2120851140644573558",
+     "before_views": 118184,
+     "after_views": 874259,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2120851360522641491",
+     "before_views": 112943,
+     "after_views": 195102,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2120799873641640389",
+     "before_views": 215164,
+     "after_views": 480577,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 0,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 5,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-12",
    "rising": [
