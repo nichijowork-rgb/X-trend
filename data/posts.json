@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-14T00:27:16+09:00",
+ "generated_at": "2026-11-14T06:39:18+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -11,6 +11,314 @@
  ],
  "posts": [
   {
+   "id": "2121254698422600130",
+   "url": "https://x.com/nhk_kouhaku/status/2121254698422600130",
+   "user": "nhk_kouhaku",
+   "created_utc": "2026-11-13T14:51:45Z",
+   "created_jst": "2026-11-13T23:51:45+09:00",
+   "ts": 1794581505,
+   "metrics": {
+    "impression_count": 2433956,
+    "like_count": 36084,
+    "retweet_count": null,
+    "reply_count": 83,
+    "quote_count": 3641,
+    "bookmark_count": 3926
+   },
+   "text": "🔴第77回 #NHK紅白 ⚪️\n\n初出場歌手のみなさんの\n会見当日の朝ごはんをまとめました📝 https://t.co/Wz7c1rWEBD",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXA16DxbkAApoF1.jpg",
+     "width": 1080,
+     "height": 1350
+    }
+   ]
+  },
+  {
+   "id": "2121254004655288375",
+   "url": "https://x.com/YahooNewsTopics/status/2121254004655288375",
+   "user": "YahooNewsTopics",
+   "created_utc": "2026-11-13T14:49:00Z",
+   "created_jst": "2026-11-13T23:49:00+09:00",
+   "ts": 1794581340,
+   "metrics": {
+    "impression_count": 316612,
+    "like_count": 1958,
+    "retweet_count": null,
+    "reply_count": 70,
+    "quote_count": 47,
+    "bookmark_count": 76
+   },
+   "text": "【自衛官の給与引き上げ法が成立】\nhttps://t.co/tvIsEMfx0M",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2121253303690641704",
+   "url": "https://x.com/nhk_kouhaku/status/2121253303690641704",
+   "user": "nhk_kouhaku",
+   "created_utc": "2026-11-13T14:46:13Z",
+   "created_jst": "2026-11-13T23:46:13+09:00",
+   "ts": 1794581173,
+   "metrics": {
+    "impression_count": 370657,
+    "like_count": 20917,
+    "retweet_count": null,
+    "reply_count": 21,
+    "quote_count": 300,
+    "bookmark_count": 3733
+   },
+   "text": "🔴第77回 #NHK紅白 ⚪️\n\n紅白出場者発表会見を終えた #EBiDAN の皆さんからコメントが到着1️⃣！\n\n「みんなが抱く大きな夢！」\n\n配信には入りきらなかった初出場歌手の皆さんの意気込みを、\n特別番組「いよいよ紅白 ！第77回NHK紅白歌合戦 出場歌手会見」でたっぷりお届けします！\nNHK総合でこんや https://t.co/ILN4fjfOKP",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/media/HXA0o1WbQAASGGh.jpg",
+     "variants": [
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121253113743200256/vid/avc1/1080x1920/7k5TJLXLQHW1QYYy.mp4?tag=16"
+      },
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121253113743200256/vid/avc1/320x568/NFuAxKwENTJXMcor.mp4?tag=16"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121253113743200256/vid/avc1/480x852/ijgZHUqDygjLrrO5.mp4?tag=16"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2121253113743200256/pl/QjS8fPElxfR5KYhs.m3u8?tag=16&v=084"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121253113743200256/vid/avc1/720x1280/5LVcbMV89EQpQZre.mp4?tag=16"
+      }
+     ],
+     "width": 1080,
+     "height": 1920
+    }
+   ]
+  },
+  {
+   "id": "2121251376504402431",
+   "url": "https://x.com/nhk_kouhaku/status/2121251376504402431",
+   "user": "nhk_kouhaku",
+   "created_utc": "2026-11-13T14:38:33Z",
+   "created_jst": "2026-11-13T23:38:33+09:00",
+   "ts": 1794580713,
+   "metrics": {
+    "impression_count": 724870,
+    "like_count": 42197,
+    "retweet_count": null,
+    "reply_count": 50,
+    "quote_count": 1929,
+    "bookmark_count": 7910
+   },
+   "text": "🔴第77回 #NHK紅白 ⚪️\n\n紅白出場者発表会見を終えた #EBiDAN の皆さんからコメントが到着2️⃣！\n\nメンバー37人に聞きました！\n「きょうの朝ごはんは？」\n\n配信には入りきらなかった初出場歌手の皆さんの意気込みを、\n特別番組「いよいよ紅白 ！第77回NHK紅白歌合戦 https://t.co/TyhzzBq43N",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/media/HXAy4pPaMAEuzQl.jpg",
+     "variants": [
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2121251238570586112/pl/d427HwiErGYnpfio.m3u8?tag=16&v=a19"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121251238570586112/vid/avc1/720x1280/PidYAdIp4xjfzZbB.mp4?tag=16"
+      },
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121251238570586112/vid/avc1/320x568/YA5uKbEQVjGgQrMO.mp4?tag=16"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121251238570586112/vid/avc1/1080x1920/_mPvz1tLXWmdBmk2.mp4?tag=16"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121251238570586112/vid/avc1/480x852/R4nxesuYfxDB5cNa.mp4?tag=16"
+      }
+     ],
+     "width": 1080,
+     "height": 1920
+    }
+   ]
+  },
+  {
+   "id": "2121242708589309992",
+   "url": "https://x.com/3559dai/status/2121242708589309992",
+   "user": "3559dai",
+   "created_utc": "2026-11-13T14:04:07Z",
+   "created_jst": "2026-11-13T23:04:07+09:00",
+   "ts": 1794578647,
+   "metrics": {
+    "impression_count": 831627,
+    "like_count": 47668,
+    "retweet_count": null,
+    "reply_count": 74,
+    "quote_count": 468,
+    "bookmark_count": 5841
+   },
+   "text": "強風に耐えるくりまんじゅう\n1〜20 https://t.co/QcUA6GlZL3",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5mbIAER-mH.jpg",
+     "width": 1831,
+     "height": 1831
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5laEAMNAym.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5ua0AEtyIY.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5mb0AAs9YQ.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5eaQAA_N31.jpg",
+     "width": 1125,
+     "height": 1127
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5maMAAD00s.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-51awAEidGb.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5vbUAAZonk.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5yaMAAmb9Z.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-53aMAAtF3d.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5sboAAJSiB.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5ta0AA1D2x.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5ybUAAzA_P.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-5racAELwgM.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-6WboAAvvjm.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-6YbwAA42i3.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-6ba0AA4210.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-6PasAEZmg9.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-8BbAAArRAs.jpg",
+     "width": 1125,
+     "height": 1125
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAq-6Ma4AAuZxm.jpg",
+     "width": 1125,
+     "height": 1125
+    }
+   ]
+  },
+  {
    "id": "2121217335566672122",
    "url": "https://x.com/m_b_d_f_00/status/2121217335566672122",
    "user": "m_b_d_f_00",
@@ -18,18 +326,20 @@
    "created_jst": "2026-11-13T21:23:17+09:00",
    "ts": 1794572597,
    "metrics": {
-    "impression_count": 353624,
-    "like_count": 1346,
+    "impression_count": 786140,
+    "like_count": 2984,
     "retweet_count": null,
     "reply_count": 0,
-    "quote_count": 27,
-    "bookmark_count": 79
+    "quote_count": 48,
+    "bookmark_count": 180
    },
    "text": "コノノバさん、新橋リオで現在ナンバー3らしい。\nグラフのネックレスもお客様からいただいたそう🫪 https://t.co/5IvPUJKy1E",
    "categories": [
-    "その他"
+    "キャバクラ"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:キャバクラ"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -87,21 +397,21 @@
    ]
   },
   {
-   "id": "2121199836703678885",
-   "url": "https://x.com/PIYOyes/status/2121199836703678885",
-   "user": "PIYOyes",
-   "created_utc": "2026-11-13T11:13:45Z",
-   "created_jst": "2026-11-13T20:13:45+09:00",
-   "ts": 1794568425,
+   "id": "2121211477084520952",
+   "url": "https://x.com/milk_info/status/2121211477084520952",
+   "user": "milk_info",
+   "created_utc": "2026-11-13T12:00:00Z",
+   "created_jst": "2026-11-13T21:00:00+09:00",
+   "ts": 1794571200,
    "metrics": {
-    "impression_count": 922094,
-    "like_count": 964,
+    "impression_count": 1506921,
+    "like_count": 26947,
     "retweet_count": null,
-    "reply_count": 23,
-    "quote_count": 20,
-    "bookmark_count": 223
+    "reply_count": 50,
+    "quote_count": 2689,
+    "bookmark_count": 2014
    },
-   "text": "進撃のノア本人から3股発言にした事に対して弁明\n\n飲みの場のノリの発言であり、都合よく切り取られただけで、三股はしていないとの事\n\nヒカルに対して、「俺は7股してた」と私を守る発言をあえてしてくれた事に本当に申し訳ないと https://t.co/LlN4x9xKEb https://t.co/6kCh851Rlx",
+   "text": "＋＋＋\n　+KIRARI スクラッチ開催\n　　　　　　　　　　＋＋＋\n\nM!LK 11月スクラッチ開催決定🎉\nM!LK結成記念月をお祝いする、12周年記念スペシャルスクラッチです！\n\n🗓️開催期間\n#佐野勇斗 #塩﨑太智 #曽野舜太\n11月14日(土)19:00〜11月16日(月)23:59\n\n#山中柔太朗 #吉田仁人 https://t.co/2ZXfcluYPB",
    "categories": [
     "その他"
    ],
@@ -110,9 +420,115 @@
    "media": [
     {
      "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_zraWbcAA3-eh.jpg",
+     "width": 2048,
+     "height": 1448
+    }
+   ]
+  },
+  {
+   "id": "2121208397022577077",
+   "url": "https://x.com/mizuagesaretai/status/2121208397022577077",
+   "user": "mizuagesaretai",
+   "created_utc": "2026-11-13T11:47:46Z",
+   "created_jst": "2026-11-13T20:47:46+09:00",
+   "ts": 1794570466,
+   "metrics": {
+    "impression_count": 3633055,
+    "like_count": 7043,
+    "retweet_count": null,
+    "reply_count": 74,
+    "quote_count": 43,
+    "bookmark_count": 949
+   },
+   "text": "進撃のノアがヒカルとの結婚生活中の浮気について言及してる！！\nすべてエンタメだったんだね🥹 https://t.co/VV9ZG3OEqF",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "report:ホスト"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXALyt2aIAAXyVS.jpg",
+     "width": 926,
+     "height": 1767
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXALytsa0AAjHCW.jpg",
+     "width": 1206,
+     "height": 1199
+    }
+   ]
+  },
+  {
+   "id": "2121199836703678885",
+   "url": "https://x.com/PIYOyes/status/2121199836703678885",
+   "user": "PIYOyes",
+   "created_utc": "2026-11-13T11:13:45Z",
+   "created_jst": "2026-11-13T20:13:45+09:00",
+   "ts": 1794568425,
+   "metrics": {
+    "impression_count": 1242322,
+    "like_count": 1167,
+    "retweet_count": null,
+    "reply_count": 27,
+    "quote_count": 24,
+    "bookmark_count": 273
+   },
+   "text": "進撃のノア本人から3股発言にした事に対して弁明\n\n飲みの場のノリの発言であり、都合よく切り取られただけで、三股はしていないとの事\n\nヒカルに対して、「俺は7股してた」と私を守る発言をあえてしてくれた事に本当に申し訳ないと https://t.co/LlN4x9xKEb https://t.co/6kCh851Rlx",
+   "categories": [
+    "ホスト"
+   ],
+   "matched_terms": [
+    "report:ホスト"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
      "url": "https://pbs.twimg.com/media/HXAEAM6bIAA7K6K.jpg",
      "width": 1102,
      "height": 2048
+    }
+   ]
+  },
+  {
+   "id": "2121199709222248798",
+   "url": "https://x.com/twf003/status/2121199709222248798",
+   "user": "twf003",
+   "created_utc": "2026-11-13T11:13:15Z",
+   "created_jst": "2026-11-13T20:13:15+09:00",
+   "ts": 1794568395,
+   "metrics": {
+    "impression_count": 2953369,
+    "like_count": 29344,
+    "retweet_count": null,
+    "reply_count": 55,
+    "quote_count": 129,
+    "bookmark_count": 1472
+   },
+   "text": "これはすごい。46年も継続したことが誰にも真似できない偉業すぎるし退職ではなく卒業っていうのが素敵すぎる🥹 https://t.co/RytWBzXXH6",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAD5HPboAABWse.jpg",
+     "width": 1206,
+     "height": 1648
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXAD5HRbwAA8UJ2.jpg",
+     "width": 1206,
+     "height": 1608
     }
    ]
   },
@@ -139,6 +555,28 @@
    "is_watched": false
   },
   {
+   "id": "2121193050810860007",
+   "url": "https://x.com/h3_mr/status/2121193050810860007",
+   "user": "h3_mr",
+   "created_utc": "2026-11-13T10:46:47Z",
+   "created_jst": "2026-11-13T19:46:47+09:00",
+   "ts": 1794566807,
+   "metrics": {
+    "impression_count": 587543,
+    "like_count": 2423,
+    "retweet_count": null,
+    "reply_count": 26,
+    "quote_count": 35,
+    "bookmark_count": 257
+   },
+   "text": "ちょっと攻めたことを言うけど、正直 NHK はもう演歌歌手出したくないんだろうな\nおそらく 紅白の基準として10回前後の出演回数が一番落としやすいボーダーラインなんだと思う\nだから 去年の山内惠介さん、そして今年の三山さんと立て続けに落として、白組の演歌歌手がゼロになったと考えてる",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2121191804016197720",
    "url": "https://x.com/super_sachico/status/2121191804016197720",
    "user": "super_sachico",
@@ -146,12 +584,12 @@
    "created_jst": "2026-11-13T19:41:50+09:00",
    "ts": 1794566510,
    "metrics": {
-    "impression_count": 206712,
-    "like_count": 122,
+    "impression_count": 390185,
+    "like_count": 234,
     "retweet_count": null,
-    "reply_count": 2,
-    "quote_count": 4,
-    "bookmark_count": 49
+    "reply_count": 4,
+    "quote_count": 6,
+    "bookmark_count": 99
    },
    "text": "【⚡️赤裸々⚡️】ゆいぴす「できちゃったかな」「笑い事じゃない」体調を語る🫪💦\n→多嚢胞生卵巣症候群\n\n生理不順などの状態で、よく🈵ジャ口やってたなぁ(T . T)🌀\n\n妊娠しづらくなるという説もアリ⚠️\n改めてめちゃくちゃ危ないし、あとから《後悔》する人も多そう。 https://t.co/pSFahuhy65 https://t.co/HddAPKvaRo",
    "categories": [
@@ -212,8 +650,77 @@
    "in_reports": true,
    "report_refs": [
     "rising_watch"
+   ]
+  },
+  {
+   "id": "2121186406202786129",
+   "url": "https://x.com/mofufuwa_cocoa/status/2121186406202786129",
+   "user": "mofufuwa_cocoa",
+   "created_utc": "2026-11-13T10:20:23Z",
+   "created_jst": "2026-11-13T19:20:23+09:00",
+   "ts": 1794565223,
+   "metrics": {
+    "impression_count": 774391,
+    "like_count": 14646,
+    "retweet_count": null,
+    "reply_count": 182,
+    "quote_count": 293,
+    "bookmark_count": 600
+   },
+   "text": "TM NETWORK紅白へ\n\nワイ「Get Wildだよな…」\n世間「Get Wildだよな…」\n紅白スタッフ「Get Wildだよな…」\n宇都宮、木根「Get Wildだよな…」\n\n小室「BEYOND THE TIMEで」",
+   "categories": [
+    "その他"
    ],
-   "below_threshold": true
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2121182738560762050",
+   "url": "https://x.com/harikiri_tairi/status/2121182738560762050",
+   "user": "harikiri_tairi",
+   "created_utc": "2026-11-13T10:05:49Z",
+   "created_jst": "2026-11-13T19:05:49+09:00",
+   "ts": 1794564349,
+   "metrics": {
+    "impression_count": 1241811,
+    "like_count": 14301,
+    "retweet_count": null,
+    "reply_count": 87,
+    "quote_count": 83,
+    "bookmark_count": 503
+   },
+   "text": "11月12日❤️\n生まれてきてくれてありがとう!\n妹でいてくれてありがとう!\n祐ちゃんを産んでくれてありがとう母さん✨父さんも🤝✨\n@harikiri_tiger https://t.co/n7ZIC9uGA4",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_0cUWa4AACf-Z.jpg",
+     "width": 1280,
+     "height": 1901
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_0cUWbkAEQ38e.jpg",
+     "width": 946,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_0cUNb0AAvFrR.jpg",
+     "width": 1163,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_0cURbEAEUWhX.jpg",
+     "width": 1159,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2121179584297418990",
@@ -238,6 +745,28 @@
    "is_watched": false
   },
   {
+   "id": "2121172762056331359",
+   "url": "https://x.com/KeiobbcOfficial/status/2121172762056331359",
+   "user": "KeiobbcOfficial",
+   "created_utc": "2026-11-13T09:26:10Z",
+   "created_jst": "2026-11-13T18:26:10+09:00",
+   "ts": 1794561970,
+   "metrics": {
+    "impression_count": 1851632,
+    "like_count": 2285,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 286,
+    "bookmark_count": 762
+   },
+   "text": "【令和8年度卒業生 進路先】\n\n令和8年度卒業生48名の進路先を公開しました！\n\n進路先一覧はこちら👇\nhttps://t.co/7a1tg68tq7\n\n#keiobaseball #tokyobig6",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2121170339208335546",
    "url": "https://x.com/chuzaiina/status/2121170339208335546",
    "user": "chuzaiina",
@@ -245,18 +774,20 @@
    "created_jst": "2026-11-13T18:16:32+09:00",
    "ts": 1794561392,
    "metrics": {
-    "impression_count": 238254,
-    "like_count": 216,
+    "impression_count": 449200,
+    "like_count": 432,
     "retweet_count": null,
-    "reply_count": 6,
-    "quote_count": 6,
-    "bookmark_count": 169
+    "reply_count": 9,
+    "quote_count": 11,
+    "bookmark_count": 330
    },
    "text": "【悲報】香港国際空港に到着したAV女優さんたち、入国拒否されてしまう😭🇭🇰\n.\n香港で11月13日から開催予定だった大型アダルトイベント「MEGA FANS EXPO 2026」、開幕直前に中止‼️\n.\n参加予定だったAV女優28名＆特別ゲストは画像の通り https://t.co/HeLPpoFjSF",
    "categories": [
-    "その他"
+    "夜職その他"
    ],
-   "matched_terms": [],
+   "matched_terms": [
+    "report:夜職その他"
+   ],
    "is_watched": false,
    "media": [
     {
@@ -323,8 +854,7 @@
    "in_reports": true,
    "report_refs": [
     "rising_watch"
-   ],
-   "below_threshold": true
+   ]
   },
   {
    "id": "2121166190492221615",
@@ -353,6 +883,45 @@
      "url": "https://pbs.twimg.com/media/HW_jobdbEAEl8QQ.jpg",
      "width": 1448,
      "height": 1086
+    }
+   ]
+  },
+  {
+   "id": "2121165913500393722",
+   "url": "https://x.com/melody_merod_t/status/2121165913500393722",
+   "user": "melody_merod_t",
+   "created_utc": "2026-11-13T08:58:57Z",
+   "created_jst": "2026-11-13T17:58:57+09:00",
+   "ts": 1794560337,
+   "metrics": {
+    "impression_count": 2030522,
+    "like_count": 2808,
+    "retweet_count": null,
+    "reply_count": 90,
+    "quote_count": 580,
+    "bookmark_count": 1177
+   },
+   "text": "この写真でめいどりーみん落ちた\n無加工で適当に撮ったからかな\nそこまでブサイク？？？？？？\n\n書類選考で落ちるとかやばい\n\n#めいどりーみん #自撮り界隈 #面接 #コンカフェ https://t.co/kmtIwXZHSk",
+   "categories": [
+    "夜職その他"
+   ],
+   "matched_terms": [
+    "コンカフェ",
+    "report:夜職その他"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_lJ9ma0AAm8E1.jpg",
+     "width": 1170,
+     "height": 1395
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_lJ9abYAEhlZg.jpg",
+     "width": 1536,
+     "height": 2048
     }
    ]
   },
@@ -424,12 +993,12 @@
    "created_jst": "2026-11-13T17:06:12+09:00",
    "ts": 1794557172,
    "metrics": {
-    "impression_count": 4373686,
-    "like_count": 8079,
+    "impression_count": 5879463,
+    "like_count": 9785,
     "retweet_count": null,
-    "reply_count": 286,
-    "quote_count": 423,
-    "bookmark_count": 1653
+    "reply_count": 345,
+    "quote_count": 509,
+    "bookmark_count": 1973
    },
    "text": "「なんで死刑じゃないんだよ」閉廷直後叫ぶ　娘殺害の車いすユーチューバーに拘禁8年判決\nhttps://t.co/EbyHtGpxxc\n\n裁判長は拘禁刑8年（求刑拘禁刑10年）を言い渡した。裁判長が閉廷を告げた直後、被告は証言台の前で「なんで死刑じゃないんだよ」「おかしいよ」などと叫び、廷内は一時騒然とした。",
    "categories": [
@@ -437,6 +1006,36 @@
    ],
    "matched_terms": [],
    "is_watched": false
+  },
+  {
+   "id": "2121151473753166027",
+   "url": "https://x.com/Tqbz0adPzjIOdGT/status/2121151473753166027",
+   "user": "Tqbz0adPzjIOdGT",
+   "created_utc": "2026-11-13T08:01:35Z",
+   "created_jst": "2026-11-13T17:01:35+09:00",
+   "ts": 1794556895,
+   "metrics": {
+    "impression_count": 788580,
+    "like_count": 6078,
+    "retweet_count": null,
+    "reply_count": 126,
+    "quote_count": 78,
+    "bookmark_count": 288
+   },
+   "text": "アホな大人だらけで申し訳なかった https://t.co/7kv0lGfHYY",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_YBXzaIAAru_W.jpg",
+     "width": 1440,
+     "height": 1080
+    }
+   ]
   },
   {
    "id": "2121151095338828026",
@@ -483,6 +1082,57 @@
      "url": "https://pbs.twimg.com/media/HW_XrSPaQAAMLpZ.jpg",
      "width": 1206,
      "height": 2001
+    }
+   ]
+  },
+  {
+   "id": "2121150110843437290",
+   "url": "https://x.com/saki__avvv/status/2121150110843437290",
+   "user": "saki__avvv",
+   "created_utc": "2026-11-13T07:56:10Z",
+   "created_jst": "2026-11-13T16:56:10+09:00",
+   "ts": 1794556570,
+   "metrics": {
+    "impression_count": 370450,
+    "like_count": 2081,
+    "retweet_count": null,
+    "reply_count": 4,
+    "quote_count": 25,
+    "bookmark_count": 420
+   },
+   "text": "お互い大好きと言い合うヨメックとカノ君\n\nクリスマス前にフリーの身でこれ見て心折れそう😭 https://t.co/tnnT2V7wer https://t.co/LA1i32U4zv",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2121150021878108160/img/eeEAd0L2TYWIgJJt.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121150021878108160/vid/avc1/430x270/dnK1B8zvw94mHTEh.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121150021878108160/vid/avc1/574x360/zPbk40d__aiUkf-j.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121150021878108160/vid/avc1/1180x738/3sXKF-MRSh5ow8Hm.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2121150021878108160/pl/9M-nBfYtz0I7MV37.m3u8"
+      }
+     ],
+     "width": 1180,
+     "height": 738
     }
    ]
   },
@@ -566,6 +1216,64 @@
      "height": 720
     }
    ]
+  },
+  {
+   "id": "2121139205795639297",
+   "url": "https://x.com/Cgukce1383500/status/2121139205795639297",
+   "user": "Cgukce1383500",
+   "created_utc": "2026-11-13T07:12:50Z",
+   "created_jst": "2026-11-13T16:12:50+09:00",
+   "ts": 1794553970,
+   "metrics": {
+    "impression_count": 1345949,
+    "like_count": 2691,
+    "retweet_count": null,
+    "reply_count": 0,
+    "quote_count": 23,
+    "bookmark_count": 1022
+   },
+   "text": "뭔가 조금 다른 걸 더 그려봤어 https://t.co/20jRCUglxh https://t.co/GDzVVstQuX",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_M3S_acAA4m1m.jpg",
+     "width": 2048,
+     "height": 1452
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_M3S4aUAA1LhB.jpg",
+     "width": 1654,
+     "height": 2048
+    }
+   ]
+  },
+  {
+   "id": "2121139036769440139",
+   "url": "https://x.com/ryachio_/status/2121139036769440139",
+   "user": "ryachio_",
+   "created_utc": "2026-11-13T07:12:09Z",
+   "created_jst": "2026-11-13T16:12:09+09:00",
+   "ts": 1794553929,
+   "metrics": {
+    "impression_count": 579883,
+    "like_count": 2669,
+    "retweet_count": null,
+    "reply_count": 297,
+    "quote_count": 32,
+    "bookmark_count": 348
+   },
+   "text": "まじで疑問なんですが\n\nXを始めて1ヶ月でフォロワー1000人いく人、最初の1週間何してたんですか？",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2121136731512869346",
@@ -698,6 +1406,52 @@
    ]
   },
   {
+   "id": "2121131938841014605",
+   "url": "https://x.com/Sankei_news/status/2121131938841014605",
+   "user": "Sankei_news",
+   "created_utc": "2026-11-13T06:43:57Z",
+   "created_jst": "2026-11-13T15:43:57+09:00",
+   "ts": 1794552237,
+   "metrics": {
+    "impression_count": 580441,
+    "like_count": 2145,
+    "retweet_count": null,
+    "reply_count": 1183,
+    "quote_count": 884,
+    "bookmark_count": 214
+   },
+   "text": "首相経験者の石破、野田両氏、互いに「信頼できる」　消費税減税法案採決退席にも共感\nhttps://t.co/dZvCYiKgPf\n\n司会者から互いのイメージを問われ、石破氏は「人間として信頼できる人、政治家として信頼できる人、裏表のない人、そして約束を必ず守る人だと思っている」と述べた。",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2121130080625996054",
+   "url": "https://x.com/Yanmasayoshi/status/2121130080625996054",
+   "user": "Yanmasayoshi",
+   "created_utc": "2026-11-13T06:36:34Z",
+   "created_jst": "2026-11-13T15:36:34+09:00",
+   "ts": 1794551794,
+   "metrics": {
+    "impression_count": 395358,
+    "like_count": 7837,
+    "retweet_count": null,
+    "reply_count": 11,
+    "quote_count": 17,
+    "bookmark_count": 1410
+   },
+   "text": "やば、ドットアニメーションの参考にしたいくらいカッコイイ\n途中の回転切りですぐ切り払うのではなく、一瞬タメ入るのが凄く良い https://t.co/xbsLIAyNff",
+   "categories": [
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "quote:トー横"
+   ],
+   "is_watched": false
+  },
+  {
    "id": "2121126740185792928",
    "url": "https://x.com/hezuruy/status/2121126740185792928",
    "user": "hezuruy",
@@ -724,6 +1478,36 @@
      "url": "https://pbs.twimg.com/media/HW_BgbqaAAAa1jM.jpg",
      "width": 768,
      "height": 1024
+    }
+   ]
+  },
+  {
+   "id": "2121125239841312774",
+   "url": "https://x.com/oricon/status/2121125239841312774",
+   "user": "oricon",
+   "created_utc": "2026-11-13T06:17:20Z",
+   "created_jst": "2026-11-13T15:17:20+09:00",
+   "ts": 1794550640,
+   "metrics": {
+    "impression_count": 904911,
+    "like_count": 4681,
+    "retweet_count": null,
+    "reply_count": 133,
+    "quote_count": 582,
+    "bookmark_count": 338
+   },
+   "text": "【紅白歌合戦】\n追加出場歌手の発表ある？\n制作統括が“隠し玉”に言及\nhttps://t.co/QWF2LAELGt\n⠀\n出場歌手の発表が今後もあるか聞かれると「大みそか当日まで最後まで粘って交渉して、もし交渉が実ればその段階で発表させていただくということはありうるかもしれません」と説明した\n⠀\n#紅白歌合戦 https://t.co/4XO1GvKx98",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW_AGfKakAAMpHn.jpg",
+     "width": 1920,
+     "height": 1080
     }
    ]
   },
@@ -822,6 +1606,54 @@
    ]
   },
   {
+   "id": "2121120877332865488",
+   "url": "https://x.com/hokenLuna/status/2121120877332865488",
+   "user": "hokenLuna",
+   "created_utc": "2026-11-13T06:00:00Z",
+   "created_jst": "2026-11-13T15:00:00+09:00",
+   "ts": 1794549600,
+   "metrics": {
+    "impression_count": 3526532,
+    "like_count": 9105,
+    "retweet_count": null,
+    "reply_count": 24,
+    "quote_count": 155,
+    "bookmark_count": 2912
+   },
+   "text": "ツイ消しされたけどヘチャンとジャニのオ〇ホにされて喜ぶの、理解不能すぎる https://t.co/FZ6SxvV6Js",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW1AQ52aQAAkVos.jpg",
+     "width": 520,
+     "height": 900
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW1ARDsaYAAjLx_.jpg",
+     "width": 515,
+     "height": 900
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW1ARz3bYAAzea2.jpg",
+     "width": 509,
+     "height": 900
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW1AR-QaEAAUWJT.jpg",
+     "width": 576,
+     "height": 900
+    }
+   ]
+  },
+  {
    "id": "2121117966507155619",
    "url": "https://x.com/oricon/status/2121117966507155619",
    "user": "oricon",
@@ -870,6 +1702,28 @@
    ]
   },
   {
+   "id": "2121117727259762721",
+   "url": "https://x.com/greynomado/status/2121117727259762721",
+   "user": "greynomado",
+   "created_utc": "2026-11-13T05:47:29Z",
+   "created_jst": "2026-11-13T14:47:29+09:00",
+   "ts": 1794548849,
+   "metrics": {
+    "impression_count": 864138,
+    "like_count": 3621,
+    "retweet_count": null,
+    "reply_count": 102,
+    "quote_count": 233,
+    "bookmark_count": 1328
+   },
+   "text": "住んでいる最寄駅でわかる人間性一覧。\n\n・渋谷：いつまでも若者でいたい\n・六本木：金と人脈が人生のすべて\n・麻布十番：選民意識の塊\n・広尾：庶民と関わりたくない\n・白金高輪：上品な金持ちを演じたい\n・中目黒：センスがいいと思われたい\n・代官山：他人と同じが許せない",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2121114267449716774",
    "url": "https://x.com/nanashidayo99/status/2121114267449716774",
    "user": "nanashidayo99",
@@ -877,12 +1731,12 @@
    "created_jst": "2026-11-13T14:33:44+09:00",
    "ts": 1794548024,
    "metrics": {
-    "impression_count": 5015168,
-    "like_count": 1589,
+    "impression_count": 5996173,
+    "like_count": 2084,
     "retweet_count": null,
-    "reply_count": 59,
-    "quote_count": 82,
-    "bookmark_count": 673
+    "reply_count": 71,
+    "quote_count": 99,
+    "bookmark_count": 832
    },
    "text": "マスク外したら美女は1人だけだった😱\nみんな騙されないでね！ https://t.co/28POqo2Hz5 https://t.co/6b4vFAZuWC",
    "categories": [
@@ -907,12 +1761,12 @@
    "created_jst": "2026-11-13T14:31:17+09:00",
    "ts": 1794547877,
    "metrics": {
-    "impression_count": 7615346,
-    "like_count": 27428,
+    "impression_count": 8590411,
+    "like_count": 31330,
     "retweet_count": null,
-    "reply_count": 56,
-    "quote_count": 349,
-    "bookmark_count": 1552
+    "reply_count": 68,
+    "quote_count": 377,
+    "bookmark_count": 1799
    },
    "text": "= LOVE←わかる、おめでとう🎉\n\nCUTIE STREET←わかる\n\nAKB←OBパワーではなく勝ち取ったのは凄い。伊藤百花かっこよすぎ\n\n乃木坂←凄いけどなんの曲やるの？是非に及ばずでﾁｬｯﾁｬｰって始まってお茶の間を凍らせて欲しい\n\nFRUITSZIPPER←東京ドーム以降の話題は不仲のくせにおかしいだろ",
    "categories": [
@@ -1037,11 +1891,11 @@
    "created_jst": "2026-11-13T14:00:00+09:00",
    "ts": 1794546000,
    "metrics": {
-    "impression_count": 307289,
-    "like_count": 32,
+    "impression_count": 313502,
+    "like_count": 36,
     "retweet_count": null,
     "reply_count": 1,
-    "quote_count": 2,
+    "quote_count": 3,
     "bookmark_count": 25
    },
    "text": "給料の3分の1ならホストに使っても良いと言うノアさん\n\n時計は残るけどホストは残らないって反論するリノさん\n\nその言葉が一番刺さってるローランドさんw https://t.co/hKELGFdyon",
@@ -1140,12 +1994,12 @@
    "created_jst": "2026-11-13T13:59:29+09:00",
    "ts": 1794545969,
    "metrics": {
-    "impression_count": 1055019,
-    "like_count": 6323,
+    "impression_count": 1255286,
+    "like_count": 7030,
     "retweet_count": null,
-    "reply_count": 44,
-    "quote_count": 108,
-    "bookmark_count": 415
+    "reply_count": 47,
+    "quote_count": 120,
+    "bookmark_count": 455
    },
    "text": "モゥ🐮💕ここタﾝ🐙💕\n\nこんな〜に👀👀❓ちっちゃくなっちゃったのは\n\nぱっぱ👨のお弁当が恋しくなっちゃったからでちゅか💋❓❓❓\n\nそんなに焦らなくてももうすぐ収録で逢えまちゅよ✌️✌️✌️\n\n月に１度💕僕の織姫ここタﾝ🐙🐙💋\n\ncalciumイィィィぱぃ💕のお弁当用意しちゃうんだからぁぁぁ🍙🍙 https://t.co/f8092ZODa1",
    "categories": [
@@ -1166,6 +2020,50 @@
    "in_bookmarks": true
   },
   {
+   "id": "2121101447660257438",
+   "url": "https://x.com/heligero/status/2121101447660257438",
+   "user": "heligero",
+   "created_utc": "2026-11-13T04:42:47Z",
+   "created_jst": "2026-11-13T13:42:47+09:00",
+   "ts": 1794544967,
+   "metrics": {
+    "impression_count": 629234,
+    "like_count": 6386,
+    "retweet_count": null,
+    "reply_count": 35,
+    "quote_count": 146,
+    "bookmark_count": 1405
+   },
+   "text": "「男性は基本的に目上の男性以外の全てに失礼であり、女性を見下しており、恋人にするのもモノ扱いするためであり、セックスしか人生の目的がない生物であるし、男性たちは常にそう表明している」という認識があるため、珍しく誠実な方と話していると、「いい人だなあ。でもこれは私を騙すための嘘に違",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
+   "id": "2121100522946220444",
+   "url": "https://x.com/yuri_ruEDF/status/2121100522946220444",
+   "user": "yuri_ruEDF",
+   "created_utc": "2026-11-13T04:39:07Z",
+   "created_jst": "2026-11-13T13:39:07+09:00",
+   "ts": 1794544747,
+   "metrics": {
+    "impression_count": 719569,
+    "like_count": 3651,
+    "retweet_count": null,
+    "reply_count": 27,
+    "quote_count": 52,
+    "bookmark_count": 318
+   },
+   "text": "なら半分の給料で半分だけ働きゃいいやん、なんで半分の仕事しかしないやつに満額給料渡さないといけないわけ？\n\nって反論されたらどう答えるつもりなんだろう。少し気になる（純粋な疑問なので悪口じゃないです） https://t.co/yWO7ybmzXa",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2121097128915431442",
    "url": "https://x.com/mtgjdpa/status/2121097128915431442",
    "user": "mtgjdpa",
@@ -1173,12 +2071,12 @@
    "created_jst": "2026-11-13T13:25:38+09:00",
    "ts": 1794543938,
    "metrics": {
-    "impression_count": 775030,
-    "like_count": 1242,
+    "impression_count": 929468,
+    "like_count": 1554,
     "retweet_count": null,
     "reply_count": 3,
-    "quote_count": 27,
-    "bookmark_count": 269
+    "quote_count": 32,
+    "bookmark_count": 320
    },
    "text": "【悲報】ホストコールさん、ビジュが補正される\n\n同じメンバーで並べてみるとわかりやすいのだが、見違えるレベルに肌や法令線が美しくなっており、この短期間に切開リフト＋ポテンツァ100回＋裏ハムラでもやったのかという位の若返りを感じざるを得ない。\n\n補正カメラの真相はいかに https://t.co/P1Ix0HE8Pt",
    "categories": [
@@ -1215,12 +2113,12 @@
    "created_jst": "2026-11-13T13:22:36+09:00",
    "ts": 1794543756,
    "metrics": {
-    "impression_count": 770762,
-    "like_count": 1522,
+    "impression_count": 1142411,
+    "like_count": 3697,
     "retweet_count": null,
-    "reply_count": 3,
-    "quote_count": 21,
-    "bookmark_count": 140
+    "reply_count": 14,
+    "quote_count": 35,
+    "bookmark_count": 332
    },
    "text": "風俗嬢｢あんあんあん｣\n\n僕(噓喘ぎしてるなぁ。あー、変な事を考えてたら萎えてしまった)\n\n風俗嬢｢あんあんあん｣\n\n僕｢(完全に萎えてるのに嘘喘ぎ続けてる。プロだなぁ。)すいません。手コキにして貰えますか？｣\n\n風俗嬢｢いいですよー。…あんあんあん｣\n\n僕(手コキで喘ぐのは絶対に違うだろ！) https://t.co/Eg8RGG5Xss",
    "categories": [
@@ -1240,12 +2138,12 @@
    "created_jst": "2026-11-13T13:20:03+09:00",
    "ts": 1794543603,
    "metrics": {
-    "impression_count": 397602,
-    "like_count": 1648,
+    "impression_count": 510369,
+    "like_count": 2185,
     "retweet_count": null,
     "reply_count": 1,
-    "quote_count": 5,
-    "bookmark_count": 423
+    "quote_count": 7,
+    "bookmark_count": 538
    },
    "text": "ここにゃんちょっと初々しくて可愛く見えてきた🤣\n\nゆいぴすのスタイル際立っててやばい！\n隣にいるだけで盛れる笑 https://t.co/mzkukmPZ9u",
    "categories": [
@@ -1294,12 +2192,12 @@
    "created_jst": "2026-11-13T13:20:02+09:00",
    "ts": 1794543602,
    "metrics": {
-    "impression_count": 3916896,
-    "like_count": 214320,
+    "impression_count": 4679703,
+    "like_count": 242143,
     "retweet_count": null,
-    "reply_count": 854,
-    "quote_count": 1755,
-    "bookmark_count": 4181
+    "reply_count": 938,
+    "quote_count": 1885,
+    "bookmark_count": 4782
    },
    "text": "今年の冬は大晦日まで「暖冬」となります。皆さま謹んで、宜しくお願い申し上げます。\n#第77回NHK紅白歌合戦\n#TMRevolution #西川貴教 https://t.co/FyTA178QRZ",
    "categories": [
@@ -1324,12 +2222,12 @@
    "created_jst": "2026-11-13T13:12:53+09:00",
    "ts": 1794543173,
    "metrics": {
-    "impression_count": 4049867,
-    "like_count": 88198,
+    "impression_count": 4842951,
+    "like_count": 96637,
     "retweet_count": null,
     "reply_count": 3,
-    "quote_count": 1542,
-    "bookmark_count": 18599
+    "quote_count": 1778,
+    "bookmark_count": 19795
    },
    "text": "Aぇめちゃくちゃ緊張してると思ったら晶哉ちゃん肝座りすぎてて記者の方から笑いまで取ってて強いwwwwwwww https://t.co/4yf7WtSmH6",
    "categories": [
@@ -1437,12 +2335,12 @@
    "created_jst": "2026-11-13T13:03:49+09:00",
    "ts": 1794542629,
    "metrics": {
-    "impression_count": 43318515,
-    "like_count": 443060,
+    "impression_count": 47439840,
+    "like_count": 450985,
     "retweet_count": null,
-    "reply_count": 3135,
-    "quote_count": 52146,
-    "bookmark_count": 32773
+    "reply_count": 3291,
+    "quote_count": 53015,
+    "bookmark_count": 33221
    },
    "text": "🔴第77回 #NHK紅白 ⚪️\n\n出場歌手が決定✨\n\n紅組20組、白組21組\n初出場は、紅組2組、白組5組です。\n\n#紅白歌合戦 公式HP：\nhttps://t.co/CEJCuoF2O4 https://t.co/DLixLrqvI5",
    "categories": [
@@ -1678,12 +2576,12 @@
    "created_jst": "2026-11-13T11:56:49+09:00",
    "ts": 1794538609,
    "metrics": {
-    "impression_count": 1101730,
-    "like_count": 214,
+    "impression_count": 1432676,
+    "like_count": 269,
     "retweet_count": null,
-    "reply_count": 80,
+    "reply_count": 97,
     "quote_count": 8,
-    "bookmark_count": 59
+    "bookmark_count": 78
    },
    "text": "出張中の夫からの連絡。\n「熱が出たので、今日は帰れない…」\n\nこれを見た妻は激怒した。\n\n理由わかる？ https://t.co/pHFnjDIi42 https://t.co/ik1hwtIEmE",
    "categories": [
@@ -1701,6 +2599,48 @@
    ]
   },
   {
+   "id": "2121073362114158699",
+   "url": "https://x.com/JOVawbN3YC93866/status/2121073362114158699",
+   "user": "JOVawbN3YC93866",
+   "created_utc": "2026-11-13T02:51:11Z",
+   "created_jst": "2026-11-13T11:51:11+09:00",
+   "ts": 1794538271,
+   "metrics": {
+    "impression_count": 1224288,
+    "like_count": 1633,
+    "retweet_count": null,
+    "reply_count": 70,
+    "quote_count": 101,
+    "bookmark_count": 601
+   },
+   "text": "こういう、クラスで３番目にかわいい子、みたいな女の子を生成するのが好き https://t.co/V9oNw3EMxk",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW-QyBtakAAnfLP.jpg",
+     "width": 1328,
+     "height": 1760
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW-QyBqbMAAArFw.jpg",
+     "width": 1328,
+     "height": 1760
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW-QyBubYAAjzV-.jpg",
+     "width": 1328,
+     "height": 1760
+    }
+   ]
+  },
+  {
    "id": "2121069863406031267",
    "url": "https://x.com/epichan77/status/2121069863406031267",
    "user": "epichan77",
@@ -1708,12 +2648,12 @@
    "created_jst": "2026-11-13T11:37:17+09:00",
    "ts": 1794537437,
    "metrics": {
-    "impression_count": 2768692,
-    "like_count": 7932,
+    "impression_count": 3147610,
+    "like_count": 9283,
     "retweet_count": null,
-    "reply_count": 21,
-    "quote_count": 34,
-    "bookmark_count": 1157
+    "reply_count": 23,
+    "quote_count": 38,
+    "bookmark_count": 1326
    },
    "text": "芸能人ってこれだもんね。 https://t.co/lBHrFk1bPE https://t.co/3ViPUOXlrk",
    "categories": [
@@ -1747,6 +2687,36 @@
      "url": "https://pbs.twimg.com/media/HW-NzEBagAAwjkm.jpg",
      "width": 478,
      "height": 612
+    }
+   ]
+  },
+  {
+   "id": "2121066777052647584",
+   "url": "https://x.com/shonanpen/status/2121066777052647584",
+   "user": "shonanpen",
+   "created_utc": "2026-11-13T02:25:01Z",
+   "created_jst": "2026-11-13T11:25:01+09:00",
+   "ts": 1794536701,
+   "metrics": {
+    "impression_count": 503970,
+    "like_count": 11556,
+    "retweet_count": null,
+    "reply_count": 257,
+    "quote_count": 268,
+    "bookmark_count": 767
+   },
+   "text": "なんで高野山にコンドーム自販機があんだよ　教えはどうなってんだ教えは https://t.co/tuVl4ycXel",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW-K96IbMAAasws.jpg",
+     "width": 2629,
+     "height": 2122
     }
    ]
   },
@@ -1859,12 +2829,12 @@
    "created_jst": "2026-11-13T10:32:16+09:00",
    "ts": 1794533536,
    "metrics": {
-    "impression_count": 3876611,
-    "like_count": 8228,
+    "impression_count": 5087527,
+    "like_count": 10163,
     "retweet_count": null,
-    "reply_count": 30,
-    "quote_count": 21,
-    "bookmark_count": 2447
+    "reply_count": 36,
+    "quote_count": 29,
+    "bookmark_count": 2975
    },
    "text": "ヨメック、擦り付けるのは本能なのかラウンジで付けたテクニックなのかww https://t.co/eFE1ACFXQc https://t.co/X4UK21FTDG",
    "categories": [
@@ -1951,6 +2921,28 @@
    ]
   },
   {
+   "id": "2121052052583535050",
+   "url": "https://x.com/lGMKQPjbc5zzk1Y/status/2121052052583535050",
+   "user": "lGMKQPjbc5zzk1Y",
+   "created_utc": "2026-11-13T01:26:31Z",
+   "created_jst": "2026-11-13T10:26:31+09:00",
+   "ts": 1794533191,
+   "metrics": {
+    "impression_count": 373609,
+    "like_count": 11,
+    "retweet_count": null,
+    "reply_count": 19,
+    "quote_count": 24,
+    "bookmark_count": 9
+   },
+   "text": "@paper7803 オス呼ばわりがセクハラねぇ\n物語シリーズでもそういう発言あるけど、そこは無視？\nオスは男性差別だセクハラだってクソほどくだらない\nキモイやつを批判しただけの事で大多数はほとんど関係ないのに何を怒るの？",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2121049968094200199",
    "url": "https://x.com/___mobko____/status/2121049968094200199",
    "user": "___mobko____",
@@ -1988,12 +2980,12 @@
    "created_jst": "2026-11-13T09:47:47+09:00",
    "ts": 1794530867,
    "metrics": {
-    "impression_count": 12433093,
-    "like_count": 27076,
+    "impression_count": 13772306,
+    "like_count": 29499,
     "retweet_count": null,
-    "reply_count": 462,
-    "quote_count": 716,
-    "bookmark_count": 6338
+    "reply_count": 506,
+    "quote_count": 776,
+    "bookmark_count": 6722
    },
    "text": "【超絶悲報】\n\n本日13時～ 新宿でカメラマンを\"有償募集\"\nされてる 千歳りな\"さん\" 案の定 大炎上 https://t.co/lLiY19VyKp",
    "categories": [
@@ -2029,6 +3021,58 @@
    ]
   },
   {
+   "id": "2121041505871946046",
+   "url": "https://x.com/sigure1216/status/2121041505871946046",
+   "user": "sigure1216",
+   "created_utc": "2026-11-13T00:44:36Z",
+   "created_jst": "2026-11-13T09:44:36+09:00",
+   "ts": 1794530676,
+   "metrics": {
+    "impression_count": 1212211,
+    "like_count": 1212,
+    "retweet_count": null,
+    "reply_count": 85,
+    "quote_count": 14,
+    "bookmark_count": 245
+   },
+   "text": "【速報】\n元KAT-TUN田口淳之介(40)の妻、初顔出し！\nめっちゃ綺麗やん... https://t.co/0heb2gkYVQ",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW9zYQAaEAAD1Sp.jpg",
+     "width": 1244,
+     "height": 1244
+    }
+   ]
+  },
+  {
+   "id": "2121031707424133474",
+   "url": "https://x.com/eharamasahiro/status/2121031707424133474",
+   "user": "eharamasahiro",
+   "created_utc": "2026-11-13T00:05:40Z",
+   "created_jst": "2026-11-13T09:05:40+09:00",
+   "ts": 1794528340,
+   "metrics": {
+    "impression_count": 1189079,
+    "like_count": 7870,
+    "retweet_count": null,
+    "reply_count": 294,
+    "quote_count": 64,
+    "bookmark_count": 166
+   },
+   "text": "【業務連絡】\n堀大輔さんのモノマネを含めたショーをお願いしますというお仕事の依頼が来ました。\n\n開示請求されたらおっかないのでやめておきました🙏現場からは以上です。",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
+  },
+  {
    "id": "2121023905427243452",
    "url": "https://x.com/deathdolnote/status/2121023905427243452",
    "user": "deathdolnote",
@@ -2036,12 +3080,12 @@
    "created_jst": "2026-11-13T08:34:40+09:00",
    "ts": 1794526480,
    "metrics": {
-    "impression_count": 1723106,
-    "like_count": 4632,
+    "impression_count": 1879977,
+    "like_count": 4900,
     "retweet_count": null,
-    "reply_count": 45,
-    "quote_count": 630,
-    "bookmark_count": 804
+    "reply_count": 47,
+    "quote_count": 646,
+    "bookmark_count": 852
    },
    "text": "【知名度C】\n\nFOMARE\nアマダシンスケ @AMADA__SHINSUKE \n\n備考 : キャバ嬢に晒される https://t.co/2gtz8KVp5e",
    "categories": [
@@ -2136,12 +3180,12 @@
    "created_jst": "2026-11-13T08:04:08+09:00",
    "ts": 1794524648,
    "metrics": {
-    "impression_count": 1607441,
-    "like_count": 5976,
+    "impression_count": 1965333,
+    "like_count": 7383,
     "retweet_count": null,
-    "reply_count": 22,
-    "quote_count": 9,
-    "bookmark_count": 1952
+    "reply_count": 24,
+    "quote_count": 13,
+    "bookmark_count": 2269
    },
    "text": "事実なら、それぞれの担当ホストが冷や汗かいとるやろな https://t.co/GmugGEz7R8",
    "categories": [
@@ -2162,12 +3206,12 @@
    "created_jst": "2026-11-13T07:51:15+09:00",
    "ts": 1794523875,
    "metrics": {
-    "impression_count": 335537,
-    "like_count": 158,
+    "impression_count": 362259,
+    "like_count": 169,
     "retweet_count": null,
     "reply_count": 47,
     "quote_count": 5,
-    "bookmark_count": 37
+    "bookmark_count": 43
    },
    "text": "【衝撃】大人気キャバ嬢・ゆいぴすの整形歴が凄すぎる。\n\n昔からの変化が凄すぎる...。 https://t.co/BH1gW0sFDq",
    "categories": [
@@ -2188,6 +3232,28 @@
      "height": 1086
     }
    ]
+  },
+  {
+   "id": "2121011837055738052",
+   "url": "https://x.com/kana_xiao/status/2121011837055738052",
+   "user": "kana_xiao",
+   "created_utc": "2026-11-12T22:46:43Z",
+   "created_jst": "2026-11-13T07:46:43+09:00",
+   "ts": 1794523603,
+   "metrics": {
+    "impression_count": 1522315,
+    "like_count": 2687,
+    "retweet_count": null,
+    "reply_count": 274,
+    "quote_count": 355,
+    "bookmark_count": 373
+   },
+   "text": "いや〜産まれたのが娘で助かった🤓\n\nでも君らが高身長女子を求めたところで\n彼女らが小さい男を選ぶ訳もなく。\n\n真美子も翔平が好きやしな！笑 https://t.co/xiZ2IPJwdV",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false
   },
   {
    "id": "2121008896768930170",
@@ -2263,6 +3329,69 @@
    ]
   },
   {
+   "id": "2121004316899344615",
+   "url": "https://x.com/ShinjukuSokai/status/2121004316899344615",
+   "user": "ShinjukuSokai",
+   "created_utc": "2026-11-12T22:16:50Z",
+   "created_jst": "2026-11-13T07:16:50+09:00",
+   "ts": 1794521810,
+   "metrics": {
+    "impression_count": 849958,
+    "like_count": 5677,
+    "retweet_count": null,
+    "reply_count": 44,
+    "quote_count": 16,
+    "bookmark_count": 2170
+   },
+   "text": "やっぱりこういう風にしないと競輪YouTubeこれ以上伸びない気がする。\n最低週3日稼働/配信3時間半/日給15000円\nこの条件で女性アシスタントを募集。\n既存フォロワー数も重視。\n競輪はなんとなくラインと三連単くらい知ってて谷間があれば特に問題なし。\n応募はDMまでお気軽にどうぞ。 https://t.co/r4PR6EvJmn",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2121004279381327872/img/PVD8M-jL9b5vCU2d.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121004279381327872/vid/avc1/490x270/C4mIkLtIXz2PIiCj.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121004279381327872/vid/avc1/654x360/nqvEsFeC_V16-75r.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2121004279381327872/vid/avc1/1180x648/4rRVXDx9HkRjv_hq.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2121004279381327872/pl/qRvwn874xMERmjAY.m3u8"
+      }
+     ],
+     "width": 1180,
+     "height": 648
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW9SJ41akAA-_CZ.jpg",
+     "width": 1179,
+     "height": 1917
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW9SJ42aAAAzhmj.jpg",
+     "width": 1179,
+     "height": 1831
+    }
+   ]
+  },
+  {
    "id": "2121001842666594635",
    "url": "https://x.com/super_sachico/status/2121001842666594635",
    "user": "super_sachico",
@@ -2307,12 +3436,12 @@
    "created_jst": "2026-11-13T06:59:20+09:00",
    "ts": 1794520760,
    "metrics": {
-    "impression_count": 2044339,
-    "like_count": 1610,
+    "impression_count": 2166461,
+    "like_count": 1756,
     "retweet_count": null,
-    "reply_count": 77,
-    "quote_count": 18,
-    "bookmark_count": 775
+    "reply_count": 83,
+    "quote_count": 19,
+    "bookmark_count": 818
    },
    "text": "風俗で遊ぶなら、この7つのルールは守れ：\n\n1. 髪の毛を撫でるのは絶対NG 🚫",
    "categories": [
@@ -2325,6 +3454,85 @@
    "is_watched": false
   },
   {
+   "id": "2120993902031516108",
+   "url": "https://x.com/disk_j/status/2120993902031516108",
+   "user": "disk_j",
+   "created_utc": "2026-11-12T21:35:27Z",
+   "created_jst": "2026-11-13T06:35:27+09:00",
+   "ts": 1794519327,
+   "metrics": {
+    "impression_count": 1034849,
+    "like_count": 24084,
+    "retweet_count": null,
+    "reply_count": 78,
+    "quote_count": 200,
+    "bookmark_count": 2821
+   },
+   "text": "0:08 叩きつけからの回転斬りがなかなかリキの入ったモーションで良い https://t.co/SqbIJp3DLF",
+   "categories": [
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "quote:トー横",
+    "report:歌舞伎町"
+   ],
+   "is_watched": false
+  },
+  {
+   "id": "2120989055852921181",
+   "url": "https://x.com/hoshikabuki/status/2120989055852921181",
+   "user": "hoshikabuki",
+   "created_utc": "2026-11-12T21:16:11Z",
+   "created_jst": "2026-11-13T06:16:11+09:00",
+   "ts": 1794518171,
+   "metrics": {
+    "impression_count": 1576298,
+    "like_count": 3050,
+    "retweet_count": null,
+    "reply_count": 45,
+    "quote_count": 345,
+    "bookmark_count": 961
+   },
+   "text": "歌舞伎民イキナリ発狂しだす、、　#歌舞伎　#トー横　#配信者 https://t.co/1VgKPmshXU",
+   "categories": [
+    "歌舞伎町"
+   ],
+   "matched_terms": [
+    "トー横",
+    "report:歌舞伎町"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2120989030854856704/img/v70J6nqFiNSiQ23k.jpg",
+     "variants": [
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120989030854856704/vid/avc1/490x270/EIh9oQKl97Izvwha.mp4"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120989030854856704/vid/avc1/654x360/19yD85pAzRsaoQVG.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120989030854856704/vid/avc1/960x528/QUnwAkL3JP0S9Loa.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2120989030854856704/pl/bGFL-qhgQmjXkg8-.m3u8?v=cfc"
+      }
+     ],
+     "width": 960,
+     "height": 528
+    }
+   ]
+  },
+  {
    "id": "2120986249276346429",
    "url": "https://x.com/kiyo_money28/status/2120986249276346429",
    "user": "kiyo_money28",
@@ -2332,12 +3540,12 @@
    "created_jst": "2026-11-13T06:05:02+09:00",
    "ts": 1794517502,
    "metrics": {
-    "impression_count": 19097120,
-    "like_count": 2096,
+    "impression_count": 22228618,
+    "like_count": 2173,
     "retweet_count": null,
-    "reply_count": 454,
-    "quote_count": 56,
-    "bookmark_count": 603
+    "reply_count": 486,
+    "quote_count": 61,
+    "bookmark_count": 652
    },
    "text": "朝6時。部下からの連絡。\n「熱が出たので、仕事休みます…」\n\n上司は翌日、激怒した。\n\n理由わかる？ https://t.co/BRFQYF72Fo",
    "categories": [
@@ -2440,12 +3648,12 @@
    "created_jst": "2026-11-13T05:03:06+09:00",
    "ts": 1794513786,
    "metrics": {
-    "impression_count": 12387323,
-    "like_count": 15902,
+    "impression_count": 13460079,
+    "like_count": 17743,
     "retweet_count": null,
-    "reply_count": 226,
-    "quote_count": 79,
-    "bookmark_count": 2083
+    "reply_count": 235,
+    "quote_count": 87,
+    "bookmark_count": 2235
    },
    "text": "【話題】\nやす子　芸人\n\nまたかよ…\n\nやりすぎだよね https://t.co/SMUpFiidLG",
    "categories": [
@@ -2500,12 +3708,12 @@
    "created_jst": "2026-11-13T04:38:51+09:00",
    "ts": 1794512331,
    "metrics": {
-    "impression_count": 6694087,
-    "like_count": 7002,
+    "impression_count": 6953238,
+    "like_count": 7235,
     "retweet_count": null,
-    "reply_count": 75,
-    "quote_count": 274,
-    "bookmark_count": 2540
+    "reply_count": 76,
+    "quote_count": 287,
+    "bookmark_count": 2597
    },
    "text": "田口淳之介の嫁やっぱりタージャーハオのリリやったな！\nリリの承認欲求塊w\nてか田口、インスタやらん言うとったのにブレブレでオモロ🫢 https://t.co/G37RitFCmw",
    "categories": [
@@ -2596,12 +3804,12 @@
    "created_jst": "2026-11-13T03:38:09+09:00",
    "ts": 1794508689,
    "metrics": {
-    "impression_count": 535939,
-    "like_count": 6752,
+    "impression_count": 574768,
+    "like_count": 7679,
     "retweet_count": null,
-    "reply_count": 20,
-    "quote_count": 27,
-    "bookmark_count": 377
+    "reply_count": 25,
+    "quote_count": 28,
+    "bookmark_count": 434
    },
    "text": "私が女だから解像度低いだけかもしれないんだけど、\n風俗って美容院とか病院とかと一緒で「プロの時間を買い上げさせてもらってサービスを受ける」場所でしょ？\n\nなんで風俗でだけ「理解ある俺の余裕っぷりを見せて、あわよくば嬢とワンチャン✌️」みたいな変な期待が湧くんだろ…謎すぎ🥹距離感バグ？ https://t.co/lJi8HMVWWI",
    "categories": [
@@ -2642,19 +3850,20 @@
    "created_jst": "2026-11-13T02:26:27+09:00",
    "ts": 1794504387,
    "metrics": {
-    "impression_count": 3023711,
-    "like_count": 4631,
+    "impression_count": 3595203,
+    "like_count": 5005,
     "retweet_count": null,
-    "reply_count": 29,
-    "quote_count": 101,
-    "bookmark_count": 658
+    "reply_count": 34,
+    "quote_count": 115,
+    "bookmark_count": 730
    },
    "text": "長年風俗やってきて1番イライラするタイプの客今日決定した。ほろ酔いで呼んでシャワー先延ばしにしてうがい前にキスしてくる「一緒にいてくれるだけでいいんだけどな(ﾎﾞｿｯ」。やっと風呂連れて行ったら乳首とか触ってくる→ベッドもｺﾞﾆｮｺﾞﾆｮ言って、俺はそういうのいいのにみたいな体で",
    "categories": [
     "夜職その他"
    ],
    "matched_terms": [
-    "風俗"
+    "風俗",
+    "report:夜職その他"
    ],
    "is_watched": false
   },
@@ -2666,12 +3875,12 @@
    "created_jst": "2026-11-13T01:47:24+09:00",
    "ts": 1794502044,
    "metrics": {
-    "impression_count": 2250046,
-    "like_count": 1451,
+    "impression_count": 3132286,
+    "like_count": 1608,
     "retweet_count": null,
-    "reply_count": 41,
-    "quote_count": 162,
-    "bookmark_count": 767
+    "reply_count": 44,
+    "quote_count": 190,
+    "bookmark_count": 830
    },
    "text": "【🔥速報🔥】元KAT-TUN・田口嫁《顔出し》‼️\n「私、亀梨くんと断捨離したことある」\n\nあの国民的アイドルが、一般女性と夫婦動画撮ってるの、改めて不思議な気分^-﹏-^ ੭💭\n\nファンからしたら、やっぱり複雑なのかな？？\n\n仁亀コラボはさすがになくても、田中聖君あたりはあったりする、、、⁉️笑 https://t.co/fkH3KZLsPk",
    "categories": [
@@ -2735,12 +3944,12 @@
    "created_jst": "2026-11-13T01:29:13+09:00",
    "ts": 1794500953,
    "metrics": {
-    "impression_count": 705538,
-    "like_count": 1771,
-    "retweet_count": null,
-    "reply_count": 8,
-    "quote_count": 19,
-    "bookmark_count": 877
+    "impression_count": 758759,
+    "like_count": 1921,
+    "retweet_count": 61,
+    "reply_count": 11,
+    "quote_count": 21,
+    "bookmark_count": 940
    },
    "text": "【南柚子、炎上の件について重い口をあける…】\n\n・今回の件についてDMで多数来てた。\n・Tiktokのライブ配信を南柚子自身も仕事中に観て、コメントしてたが気づかれてなかった(若しくは営業中だったので最後まで確認出来なかった。)\n・その後、LINE送ったが既読が付かなかった。 https://t.co/a7sT7LpKo0",
    "categories": [
@@ -2792,12 +4001,12 @@
    "created_jst": "2026-11-13T01:21:11+09:00",
    "ts": 1794500471,
    "metrics": {
-    "impression_count": 8798366,
-    "like_count": 5461,
+    "impression_count": 9630686,
+    "like_count": 5654,
     "retweet_count": null,
-    "reply_count": 174,
-    "quote_count": 693,
-    "bookmark_count": 1515
+    "reply_count": 180,
+    "quote_count": 719,
+    "bookmark_count": 1558
    },
    "text": "田口淳之介の奥さん顔出ししてる😳\n港区女子！！って感じする🌹\nきれー https://t.co/VZLzcabJGG",
    "categories": [
@@ -2998,12 +4207,12 @@
    "created_jst": "2026-11-12T23:49:25+09:00",
    "ts": 1794494965,
    "metrics": {
-    "impression_count": 3140725,
-    "like_count": 4575,
+    "impression_count": 3290909,
+    "like_count": 4807,
     "retweet_count": null,
     "reply_count": 42,
-    "quote_count": 13,
-    "bookmark_count": 1575
+    "quote_count": 14,
+    "bookmark_count": 1637
    },
    "text": "ノアちゃん元風俗嬢だったのびっくり😭 https://t.co/cMqiP56RTa",
    "categories": [
@@ -3022,12 +4231,12 @@
    "created_jst": "2026-11-12T23:45:11+09:00",
    "ts": 1794494711,
    "metrics": {
-    "impression_count": 1566669,
-    "like_count": 1945,
+    "impression_count": 1687062,
+    "like_count": 2022,
     "retweet_count": null,
-    "reply_count": 35,
+    "reply_count": 36,
     "quote_count": 17,
-    "bookmark_count": 233
+    "bookmark_count": 243
    },
    "text": "【予告】\n平本蓮、進撃のノア、暴○団",
    "categories": [
@@ -3045,12 +4254,12 @@
    "created_jst": "2026-11-12T23:41:40+09:00",
    "ts": 1794494500,
    "metrics": {
-    "impression_count": 467139,
-    "like_count": 7641,
+    "impression_count": 519662,
+    "like_count": 8091,
     "retweet_count": null,
     "reply_count": 9,
-    "quote_count": 35,
-    "bookmark_count": 232
+    "quote_count": 37,
+    "bookmark_count": 248
    },
    "text": "どんなに相手の方がかわいいと言われたとしても、相手はただのキャバ嬢で自分はモデルなんだから圧倒的に地位が違うし夜職同士仲良く付き合わせといて、るるはもっといい人見つけて欲しい🙂‍↕️🙂‍↕️ https://t.co/pKMFawSmZU",
    "categories": [
@@ -3073,8 +4282,8 @@
    "created_jst": "2026-11-12T23:38:49+09:00",
    "ts": 1794494329,
    "metrics": {
-    "impression_count": 337571,
-    "like_count": 872,
+    "impression_count": 346890,
+    "like_count": 880,
     "retweet_count": null,
     "reply_count": 0,
     "quote_count": 2,
@@ -3175,12 +4384,12 @@
    "created_jst": "2026-11-12T23:35:50+09:00",
    "ts": 1794494150,
    "metrics": {
-    "impression_count": 2216175,
-    "like_count": 7521,
-    "retweet_count": 1666,
-    "reply_count": 209,
-    "quote_count": 128,
-    "bookmark_count": 1247
+    "impression_count": 2330295,
+    "like_count": 7920,
+    "retweet_count": 1751,
+    "reply_count": 217,
+    "quote_count": 144,
+    "bookmark_count": 1286
    },
    "text": "京浜東北線の痴漢常習犯。\n怖すぎる… https://t.co/Ek0NydGAUh",
    "categories": [
@@ -3275,6 +4484,36 @@
    ]
   },
   {
+   "id": "2120883603848741259",
+   "url": "https://x.com/Cgukce1383500/status/2120883603848741259",
+   "user": "Cgukce1383500",
+   "created_utc": "2026-11-12T14:17:09Z",
+   "created_jst": "2026-11-12T23:17:09+09:00",
+   "ts": 1794493029,
+   "metrics": {
+    "impression_count": 1273708,
+    "like_count": 2418,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 12,
+    "bookmark_count": 606
+   },
+   "text": "😇💐 https://t.co/u7XDMaAVNg",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HW7kZIEaUAADT9p.jpg",
+     "width": 2048,
+     "height": 1452
+    }
+   ]
+  },
+  {
    "id": "2120883375732896062",
    "url": "https://x.com/ori_newsroom2/status/2120883375732896062",
    "user": "ori_newsroom2",
@@ -3282,12 +4521,12 @@
    "created_jst": "2026-11-12T23:16:15+09:00",
    "ts": 1794492975,
    "metrics": {
-    "impression_count": 808510,
-    "like_count": 1150,
+    "impression_count": 876841,
+    "like_count": 1200,
     "retweet_count": null,
-    "reply_count": 12,
-    "quote_count": 57,
-    "bookmark_count": 321
+    "reply_count": 13,
+    "quote_count": 59,
+    "bookmark_count": 330
    },
    "text": "【激イタ美容外科医】\n\nHAABクリニック　梶千尋\nホストコール　UTA\n\n説明\n•梶千尋の元夫は有名ホスト森翔太。\n•美容を語るも酒浸りで歌舞伎町から今も抜け出せない。\n•ふたり人目を憚らず溝口キッス💋\n•公衆の面前で終始お互いの身体を弄り合う。 https://t.co/7JYYEPVvLb https://t.co/lIDAXlESWf",
    "categories": [
@@ -3365,12 +4604,12 @@
    "created_jst": "2026-11-12T23:05:22+09:00",
    "ts": 1794492322,
    "metrics": {
-    "impression_count": 752624,
-    "like_count": 779,
+    "impression_count": 769892,
+    "like_count": 792,
     "retweet_count": null,
     "reply_count": 4,
-    "quote_count": 12,
-    "bookmark_count": 182
+    "quote_count": 11,
+    "bookmark_count": 187
    },
    "text": "きほって子だけ日本のキャバ嬢で唯一可愛いと思うわ https://t.co/4HMJqnFrmc",
    "categories": [
@@ -3392,12 +4631,12 @@
    "created_jst": "2026-11-12T22:50:15+09:00",
    "ts": 1794491415,
    "metrics": {
-    "impression_count": 5477981,
-    "like_count": 100,
+    "impression_count": 6548823,
+    "like_count": 137,
     "retweet_count": null,
-    "reply_count": 5,
+    "reply_count": 6,
     "quote_count": 4,
-    "bookmark_count": 79
+    "bookmark_count": 93
    },
    "text": "合コンにマスク姿の4人が来たら誰を選ぶ？\n① 左端\n② 左から2番目\n③ 左から3番目\n④ 右端\n※マスクを外した後のことは保証しません。 https://t.co/ZZuHpf9gqS",
    "categories": [
@@ -3540,6 +4779,64 @@
    "is_watched": false
   },
   {
+   "id": "2120865053327192332",
+   "url": "https://x.com/mietokyo/status/2120865053327192332",
+   "user": "mietokyo",
+   "created_utc": "2026-11-12T13:03:27Z",
+   "created_jst": "2026-11-12T22:03:27+09:00",
+   "ts": 1794488607,
+   "metrics": {
+    "impression_count": 3099510,
+    "like_count": 1287,
+    "retweet_count": 36,
+    "reply_count": 26,
+    "quote_count": 123,
+    "bookmark_count": 389
+   },
+   "text": "ラストコールでバズった為谷陽香。\n\n豊胸と骨切り後、なんか全体的にボリュームが増したような、、。\n正直、前の雰囲気の方が好みだったな。\n\n整形って、全員が成功するとは限らないんだな。 https://t.co/dApajYkmkv",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "ラストコール"
+   ],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2120864966899326976/img/4MNTQ5iTZulBDUri.jpg",
+     "variants": [
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120864966899326976/vid/avc1/1206x2176/6pR3orpi59whSStE.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120864966899326976/vid/avc1/720x1298/l_5XcBNgV7Twy1h5.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120864966899326976/vid/avc1/480x866/7snTXtkC0uO4XTz_.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2120864966899326976/pl/HR5RYXrUPQc-Uh1L.m3u8"
+      },
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2120864966899326976/vid/avc1/320x576/xxD2Q3-2G3N6jL_1.mp4"
+      }
+     ],
+     "width": 1206,
+     "height": 2176
+    }
+   ]
+  },
+  {
    "id": "2120864733108883640",
    "url": "https://x.com/urahostcall/status/2120864733108883640",
    "user": "urahostcall",
@@ -3675,12 +4972,12 @@
    "created_jst": "2026-11-12T21:17:16+09:00",
    "ts": 1794485836,
    "metrics": {
-    "impression_count": 742024,
-    "like_count": 3063,
+    "impression_count": 754972,
+    "like_count": 3112,
     "retweet_count": null,
     "reply_count": 7,
-    "quote_count": 6,
-    "bookmark_count": 685
+    "quote_count": 7,
+    "bookmark_count": 691
    },
    "text": "レイラさんとキララちゃんの元カップルがまさかの復縁⁉️wwwホストコール https://t.co/TxpwJLj9ii",
    "categories": [
@@ -3736,12 +5033,12 @@
    "created_jst": "2026-11-12T21:16:43+09:00",
    "ts": 1794485803,
    "metrics": {
-    "impression_count": 231951,
-    "like_count": 415,
+    "impression_count": 235971,
+    "like_count": 423,
     "retweet_count": null,
-    "reply_count": 49,
-    "quote_count": 16,
-    "bookmark_count": 78
+    "reply_count": 51,
+    "quote_count": 15,
+    "bookmark_count": 79
    },
    "text": "炎上している件について https://t.co/O0dxpHWFhy @YouTubeより",
    "categories": [
@@ -3764,12 +5061,12 @@
    "created_jst": "2026-11-12T21:14:18+09:00",
    "ts": 1794485658,
    "metrics": {
-    "impression_count": 380160,
-    "like_count": 2370,
+    "impression_count": 384841,
+    "like_count": 2395,
     "retweet_count": null,
     "reply_count": 7,
     "quote_count": 11,
-    "bookmark_count": 481
+    "bookmark_count": 484
    },
    "text": "ホストコール定番の痛客タイム…\n千兎千尋さん×かえでちゃんおばかコンビがやばいwww最後ww https://t.co/qZNeGEmA8H",
    "categories": [
@@ -3823,12 +5120,12 @@
    "created_jst": "2026-11-12T21:13:19+09:00",
    "ts": 1794485599,
    "metrics": {
-    "impression_count": 2462390,
-    "like_count": 10677,
-    "retweet_count": null,
-    "reply_count": 38,
-    "quote_count": 49,
-    "bookmark_count": 2882
+    "impression_count": 6468106,
+    "like_count": 26219,
+    "retweet_count": 600,
+    "reply_count": 60,
+    "quote_count": 110,
+    "bookmark_count": 6563
    },
    "text": "オカズはまさかの明日花キララさんで会場大爆笑wwwwwホストコール https://t.co/sKhiD03Oxc",
    "categories": [
@@ -3879,12 +5176,12 @@
    "created_jst": "2026-11-12T21:09:02+09:00",
    "ts": 1794485342,
    "metrics": {
-    "impression_count": 195102,
-    "like_count": 646,
+    "impression_count": 195719,
+    "like_count": 647,
     "retweet_count": null,
     "reply_count": 8,
     "quote_count": 0,
-    "bookmark_count": 138
+    "bookmark_count": 137
    },
    "text": "ホストコールで明日花キララさんと桐生レイラさんがまさかの復縁！？wwwww https://t.co/6L6yBgvVV3",
    "categories": [
@@ -3939,12 +5236,12 @@
    "created_jst": "2026-11-12T21:08:31+09:00",
    "ts": 1794485311,
    "metrics": {
-    "impression_count": 2716500,
-    "like_count": 11829,
+    "impression_count": 2818323,
+    "like_count": 11992,
     "retweet_count": null,
     "reply_count": 1,
-    "quote_count": 153,
-    "bookmark_count": 1566
+    "quote_count": 154,
+    "bookmark_count": 1575
    },
    "text": "るるがかずくんとかりんちゃんの上海デートについて話してる‼️‼️‼️‼️‼️‼️‼️\n何も知らないのもおもろいけどXで荒れる前に中国人ファンがるるにかずまが違う女性と歩いてる！って写真付きで送ってたのがおもろいwwww https://t.co/W6F9MTJi1H",
    "categories": [
@@ -3992,12 +5289,12 @@
    "created_jst": "2026-11-12T21:08:10+09:00",
    "ts": 1794485290,
    "metrics": {
-    "impression_count": 874259,
-    "like_count": 1574,
+    "impression_count": 922777,
+    "like_count": 1638,
     "retweet_count": null,
     "reply_count": 5,
     "quote_count": 7,
-    "bookmark_count": 548
+    "bookmark_count": 570
    },
    "text": "社美緒さんが志願者さんに踏み込んだ質問をぶつける⁉️ホストコール https://t.co/BWWl5HX1RX",
    "categories": [
@@ -4191,12 +5488,12 @@
    "created_jst": "2026-11-12T20:54:26+09:00",
    "ts": 1794484466,
    "metrics": {
-    "impression_count": 2788496,
-    "like_count": 920,
+    "impression_count": 3163536,
+    "like_count": 1074,
     "retweet_count": null,
     "reply_count": 2,
-    "quote_count": 26,
-    "bookmark_count": 219
+    "quote_count": 28,
+    "bookmark_count": 249
    },
    "text": "えまぢであのいつも可愛いって言われてる子達探しちゃった💦\n顔ちがくない？\n逆加工⁉️\n\n芸能人とパンピの違いってそこなのかなー\n芸能人って集合写真で何この人ガワイッ‼️みたいな人多くない⁉️\n馴染んでないだろみたいな。\n\nこれ全員馴染んじゃってるお。。。 https://t.co/q42BmDi5vw",
    "categories": [
@@ -4333,12 +5630,12 @@
    "created_jst": "2026-11-12T20:14:16+09:00",
    "ts": 1794482056,
    "metrics": {
-    "impression_count": 691112,
-    "like_count": 10118,
+    "impression_count": 695082,
+    "like_count": 10172,
     "retweet_count": null,
     "reply_count": 10,
     "quote_count": 41,
-    "bookmark_count": 686
+    "bookmark_count": 689
    },
    "text": "【ヒマチの嬢王おまけ】ホストのリキヤくんとレイくんとオーナーのギンジさん　　その2 https://t.co/9tIfw1pNPQ",
    "categories": [
@@ -4747,12 +6044,12 @@
    "created_jst": "2026-11-12T18:30:31+09:00",
    "ts": 1794475831,
    "metrics": {
-    "impression_count": 1857007,
-    "like_count": 1022,
+    "impression_count": 2264210,
+    "like_count": 1245,
     "retweet_count": null,
-    "reply_count": 25,
-    "quote_count": 31,
-    "bookmark_count": 742
+    "reply_count": 27,
+    "quote_count": 35,
+    "bookmark_count": 902
    },
    "text": "【悲報】香港でA〇イベントに参加予定だったセクシー女優、ビザ取得済みなのに全員が入国拒否される\n\nセクシー女優ら30人が入国できず「MEGA FANS EXPO 2026」が急遽中止に。\n\nどえらい赤字になりそう･･･。\n#入国拒否 #MFE2026\nhttps://t.co/9orlTxV0NC https://t.co/eLGEvEnrgo",
    "categories": [
@@ -4950,12 +6247,12 @@
    "created_jst": "2026-11-12T17:44:27+09:00",
    "ts": 1794473067,
    "metrics": {
-    "impression_count": 480577,
-    "like_count": 26134,
+    "impression_count": 501168,
+    "like_count": 27694,
     "retweet_count": null,
-    "reply_count": 370,
-    "quote_count": 229,
-    "bookmark_count": 496
+    "reply_count": 377,
+    "quote_count": 238,
+    "bookmark_count": 522
    },
    "text": "ほら見てみろよ！！\n\n歌舞伎町ぼったくりバーの責任者、ナイジェリア人。\n\n観光客を酔わせてクレカ不正利用。\n\n相談340件、被害の7割が外国人。\n\nどうすんのこれ。 https://t.co/qG30LUEKBt https://t.co/6spEuMkYJr",
    "categories": [
@@ -5144,12 +6441,12 @@
    "created_jst": "2026-11-12T15:42:47+09:00",
    "ts": 1794465767,
    "metrics": {
-    "impression_count": 3097625,
-    "like_count": 1026,
+    "impression_count": 3782479,
+    "like_count": 1179,
     "retweet_count": null,
     "reply_count": 3,
-    "quote_count": 7,
-    "bookmark_count": 350
+    "quote_count": 8,
+    "bookmark_count": 414
    },
    "text": "かのくん早漏で２週間に1回の頻度らしいし、ヨメック性欲溜まってそうw\n\n早漏ならせめて何回戦かはできて欲しいよねww https://t.co/ugc1aLNaEe https://t.co/bBqFoLchaJ",
    "categories": [
@@ -5577,12 +6874,12 @@
    "created_jst": "2026-11-12T13:08:57+09:00",
    "ts": 1794456537,
    "metrics": {
-    "impression_count": 2480610,
-    "like_count": 2174,
+    "impression_count": 2505753,
+    "like_count": 2182,
     "retweet_count": null,
     "reply_count": 34,
     "quote_count": 59,
-    "bookmark_count": 648
+    "bookmark_count": 652
    },
    "text": "整形フル課金キャバ嬢の実写とパネルを比較すると、顔から影無くす事が爆美女への近道だと痛感する。\n\nメーラーファット脂肪吸引による顔コケ、目の下のクマ、法令線（鼻翼基部凹み）、マリオネットラインこれら全てが顔の影となりパネルとのギャップを生み出す。 https://t.co/qSqj09ZwLY",
    "categories": [
@@ -5707,12 +7004,12 @@
    "created_jst": "2026-11-12T12:45:12+09:00",
    "ts": 1794455112,
    "metrics": {
-    "impression_count": 745097,
-    "like_count": 4527,
+    "impression_count": 775570,
+    "like_count": 4613,
     "retweet_count": null,
-    "reply_count": 267,
-    "quote_count": 330,
-    "bookmark_count": 217
+    "reply_count": 269,
+    "quote_count": 334,
+    "bookmark_count": 219
    },
    "text": "歌舞伎町「ぼったくりバー」責任者のナイジェリア人ら逮捕　泥酔させられクレカ不正利用被害相次ぐ　外国人観光客狙いか #FNNプライムオンライン https://t.co/HkB53Fa5ZD",
    "categories": [
@@ -5970,12 +7267,12 @@
    "created_jst": "2026-11-12T12:08:20+09:00",
    "ts": 1794452900,
    "metrics": {
-    "impression_count": 638552,
-    "like_count": 1398,
+    "impression_count": 639134,
+    "like_count": 1394,
     "retweet_count": null,
     "reply_count": 24,
     "quote_count": 5,
-    "bookmark_count": 162
+    "bookmark_count": 161
    },
    "text": "もと風俗嬢が何を偉そうにw https://t.co/ONzUZLzdnW",
    "categories": [
@@ -7896,12 +9193,12 @@
    "created_jst": "2026-11-11T22:31:16+09:00",
    "ts": 1794403876,
    "metrics": {
-    "impression_count": 3822040,
-    "like_count": 2003,
-    "retweet_count": 57,
+    "impression_count": 3911969,
+    "like_count": 2013,
+    "retweet_count": null,
     "reply_count": 5,
     "quote_count": 22,
-    "bookmark_count": 647
+    "bookmark_count": 645
    },
    "text": "【🔥激白🔥】みゆう「悪口言ってたくせに、不倫騒動のときコラボ依頼してきた」「キャバ嬢なんですけど」\n\n・以前もその人物のことを「🈵ジャ口界隈」って言ってた\n・ゆいぴすを煽るような（？）動画を松潤と撮影\n↓\nゆいぴすのことでは？とネットで《話題》🤔💭 https://t.co/e95iu5D3lD https://t.co/U1o90qql2h",
    "categories": [
@@ -9067,12 +10364,12 @@
    "created_jst": "2026-11-11T19:22:58+09:00",
    "ts": 1794392578,
    "metrics": {
-    "impression_count": 5296507,
-    "like_count": 2409,
+    "impression_count": 5466097,
+    "like_count": 2479,
     "retweet_count": null,
-    "reply_count": 56,
-    "quote_count": 26,
-    "bookmark_count": 642
+    "reply_count": 55,
+    "quote_count": 28,
+    "bookmark_count": 663
    },
    "text": "進撃のノアさん\n「世の中の男こんじょう無いねんー！」\nと不満を漏らす\n\n確かにヒカルさんの後はハードル高そう‥最後の幸せになりたいが切実🥹 https://t.co/PSw9QolVp7",
    "categories": [
@@ -11932,8 +13229,8 @@
    "created_jst": "2026-11-11T00:15:55+09:00",
    "ts": 1794323755,
    "metrics": {
-    "impression_count": 5940208,
-    "like_count": 11475,
+    "impression_count": 5963976,
+    "like_count": 11489,
     "retweet_count": null,
     "reply_count": 113,
     "quote_count": 242,
@@ -15611,12 +16908,12 @@
    "created_jst": "2026-11-09T22:02:27+09:00",
    "ts": 1794229347,
    "metrics": {
-    "impression_count": 1350776,
-    "like_count": 691,
+    "impression_count": 1380852,
+    "like_count": 699,
     "retweet_count": null,
-    "reply_count": 6,
+    "reply_count": 7,
     "quote_count": 13,
-    "bookmark_count": 156
+    "bookmark_count": 157
    },
    "text": "【不同意性行】\n\nHAABクリニック　梶千尋\nユグドラシル　黒崎琥珀\nリスタート　本田嵐\nMatt\n\n説明\nMattと本田嵐の件で知り合いから頼まれたから黙っててやったのにお前らカマシ入れてくるなんて随分行儀が良いな。 https://t.co/3AcSzNoi7Q https://t.co/jP6ti2PfjV",
    "categories": [
@@ -16622,12 +17919,12 @@
    "created_jst": "2026-11-09T20:20:56+09:00",
    "ts": 1794223256,
    "metrics": {
-    "impression_count": 2092679,
-    "like_count": 2457,
+    "impression_count": 2283033,
+    "like_count": 2480,
     "retweet_count": null,
-    "reply_count": 25,
+    "reply_count": 24,
     "quote_count": 11,
-    "bookmark_count": 513
+    "bookmark_count": 525
    },
    "text": "ヒカル元嫁進撃のノアの三股炎上に言及😳\n\nノアちゃんの炎上でヒカルの上がった好感度をすぐに調整しに行くの流石ヒカル笑👏\n\n3股に対してダブルスコアの7股草🤣 wwww https://t.co/uketZi0hqM",
    "categories": [
@@ -25823,12 +27120,12 @@
    "created_jst": "2026-11-07T23:19:51+09:00",
    "ts": 1794061191,
    "metrics": {
-    "impression_count": 1346932,
-    "like_count": 2207,
-    "retweet_count": 145,
-    "reply_count": 24,
-    "quote_count": 58,
-    "bookmark_count": 1034
+    "impression_count": 1437303,
+    "like_count": 2272,
+    "retweet_count": 152,
+    "reply_count": 27,
+    "quote_count": 61,
+    "bookmark_count": 1039
    },
    "text": "【激イタ美容外科医】\n\n令和の虎Xクリニック　孫駿一郎@xclinic_son \n\n説明\n・不倫\n・性癖が気持ち悪い。 https://t.co/8OxhicaLCF https://t.co/Ui3Ste7MJ0",
    "categories": [
@@ -27398,12 +28695,12 @@
    "created_jst": "2026-11-07T18:30:09+09:00",
    "ts": 1794043809,
    "metrics": {
-    "impression_count": 425642,
-    "like_count": 277,
-    "retweet_count": null,
-    "reply_count": 15,
-    "quote_count": 5,
-    "bookmark_count": 138
+    "impression_count": 1080891,
+    "like_count": 1033,
+    "retweet_count": 69,
+    "reply_count": 26,
+    "quote_count": 11,
+    "bookmark_count": 381
    },
    "text": "【恐怖】ラブホのエレベーターに無理やり引きずり込まれるフラフラの女性が見つかる\n\n女性はホテルのロビーで喚きながら嘔吐もしていたとのこと。\n\nどう見ても抵抗しているようにしか見えない･･･。\n#ラブホテル\nhttps://t.co/MCFM5kXG2x https://t.co/EhichEQ2Bi",
    "categories": [
@@ -41174,7 +42471,7 @@
    "created_jst": "2026-11-04T00:35:36+09:00",
    "ts": 1793720136,
    "metrics": {
-    "impression_count": 3928355,
+    "impression_count": 3955571,
     "like_count": 2284,
     "retweet_count": 47,
     "reply_count": 30,
@@ -41500,6 +42797,72 @@
      "url": "https://pbs.twimg.com/media/HWNBHDmaIAA9rp-.jpg",
      "width": 1125,
      "height": 1905
+    }
+   ]
+  },
+  {
+   "id": "2117601274153902339",
+   "url": "https://x.com/super_sachico/status/2117601274153902339",
+   "user": "super_sachico",
+   "created_utc": "2026-11-03T12:54:21Z",
+   "created_jst": "2026-11-03T21:54:21+09:00",
+   "ts": 1793710461,
+   "metrics": {
+    "impression_count": 422939,
+    "like_count": 89,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 2,
+    "bookmark_count": 17
+   },
+   "text": "ゆいぴす「よくエンリケに顔が似てるって言われる」\n\nきゃにょんの《エンリケモノマネ》、クオリティ高くて笑った😂www\n#ラストコール https://t.co/hVnXJJ54IJ https://t.co/7SUHF8ZQxO",
+   "categories": [
+    "キャバクラ",
+    "監視アカウント"
+   ],
+   "matched_terms": [
+    "ラストコール",
+    "ゆいぴす"
+   ],
+   "is_watched": true,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2117601231967588352/img/m2cgiwunVV6P5b7d.jpg",
+     "variants": [
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117601231967588352/vid/avc1/1256x720/lnMSXE2of4KZ921B.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2117601231967588352/pl/MUgOxjAr-V1Ot0lJ.m3u8?v=a75"
+      },
+      {
+       "bit_rate": 832000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117601231967588352/vid/avc1/628x360/dQChnWNEv9-XGekl.mp4"
+      },
+      {
+       "bit_rate": 10368000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117601231967588352/vid/avc1/1962x1124/WkLDrNzZy8SU4Mu7.mp4"
+      },
+      {
+       "bit_rate": 256000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2117601231967588352/vid/avc1/470x270/zUL9i0XFLuAo57oq.mp4"
+      }
+     ],
+     "width": 1962,
+     "height": 1124
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HWM7GdOaUAAV6vY.jpg",
+     "width": 1125,
+     "height": 701
     }
    ]
   },
@@ -50615,12 +51978,12 @@
    "created_jst": "2026-11-01T17:55:03+09:00",
    "ts": 1793523303,
    "metrics": {
-    "impression_count": 6130405,
-    "like_count": 2948,
-    "retweet_count": 148,
-    "reply_count": 98,
+    "impression_count": 6145024,
+    "like_count": 2952,
+    "retweet_count": 149,
+    "reply_count": 99,
     "quote_count": 86,
-    "bookmark_count": 1137
+    "bookmark_count": 1136
    },
    "text": "進撃のノア本人から、まさかの『男が3人かぶっていた』という衝撃の暴露が・・・。 https://t.co/RAEyJYm0Bu",
    "categories": [
@@ -58063,12 +59426,12 @@
    "created_jst": "2026-10-31T12:26:30+09:00",
    "ts": 1793417190,
    "metrics": {
-    "impression_count": 1750702,
-    "like_count": 5309,
-    "retweet_count": 108,
-    "reply_count": 18,
+    "impression_count": 1819557,
+    "like_count": 5331,
+    "retweet_count": 107,
+    "reply_count": 19,
     "quote_count": 9,
-    "bookmark_count": 1113
+    "bookmark_count": 1057
    },
    "text": "【ニルス、るな卒業に進撃のノア号泣😭】\n\n遂に10月30日にニルスのるなが卒業☪︎*｡꙳\n\n進撃のノアは堪らず泣いてないと言うものの、\n\n「るなちゃんは誰が育てたの？」の質問に\n\n『ノアが育てたぁぁぁあ‼️😭』\n\n一時期に不仲説も流れたがノア社長のこの顔は寂しさが伝わるね⋆☾·̩͙꙳ https://t.co/52HxOzhhLM https://t.co/FKWGDVZVtt",
    "categories": [
@@ -104941,6 +106304,69 @@
    "matched_terms": [],
    "is_watched": false,
    "in_bookmarks": true
+  },
+  {
+   "id": "2112765856799433208",
+   "url": "https://x.com/deathdolnote/status/2112765856799433208",
+   "user": "deathdolnote",
+   "created_utc": "2026-10-21T04:40:08Z",
+   "created_jst": "2026-10-21T13:40:08+09:00",
+   "ts": 1792557608,
+   "metrics": {
+    "impression_count": 6335376,
+    "like_count": 6126,
+    "retweet_count": 170,
+    "reply_count": 41,
+    "quote_count": 249,
+    "bookmark_count": 857
+   },
+   "text": "【知名度E】\n\nTikToker\nぽぽヂャン\n\n備考 : 未成年飲酒(闘病中) https://t.co/0qrlpaofVy",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2112765844434694144/img/rXORBHzmcxZ48Rkb.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2112765844434694144/vid/avc1/320x568/iJxUhlavbsvKNxW7.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2112765844434694144/vid/avc1/480x852/EV2xEVhTYAwwucIQ.mp4"
+      },
+      {
+       "bit_rate": 2176000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2112765844434694144/vid/avc1/720x1280/WAO0WLgqqYrpQeB8.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2112765844434694144/pl/2YySPdR0tjidA998.m3u8"
+      }
+     ],
+     "width": 720,
+     "height": 1280
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HVINV3OaYAAd4_T.jpg",
+     "width": 1657,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HVINV3PaAAA9PGW.jpg",
+     "width": 945,
+     "height": 2048
+    }
+   ]
   },
   {
    "id": "2112764471827718580",
@@ -165877,7 +167303,7 @@
    "created_jst": "2026-10-12T21:55:41+09:00",
    "ts": 1791809741,
    "metrics": {
-    "impression_count": 2698503,
+    "impression_count": 2698530,
     "like_count": 8483,
     "retweet_count": null,
     "reply_count": 61,
@@ -172533,7 +173959,7 @@
    "created_jst": "2026-10-11T16:03:16+09:00",
    "ts": 1791702196,
    "metrics": {
-    "impression_count": 132944,
+    "impression_count": 132945,
     "like_count": 269,
     "retweet_count": null,
     "reply_count": 23,
@@ -173072,7 +174498,7 @@
    "created_jst": "2026-10-11T15:02:12+09:00",
    "ts": 1791698532,
    "metrics": {
-    "impression_count": 690160,
+    "impression_count": 690209,
     "like_count": 1917,
     "retweet_count": null,
     "reply_count": 44,
@@ -173469,7 +174895,7 @@
    "created_jst": "2026-10-11T13:33:56+09:00",
    "ts": 1791693236,
    "metrics": {
-    "impression_count": 1057984,
+    "impression_count": 1057995,
     "like_count": 913,
     "retweet_count": null,
     "reply_count": 0,
