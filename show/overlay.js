@@ -1,4 +1,5 @@
-// OBS 用オーバーレイ（段階2・4）。overlay.html?part=topicbar|card|title|fx|all（&scale=1.2&motion=off&demo=1&sound=on）
+// OBS 用オーバーレイ（段階2・4）。overlay.html?part=topicbar|card|title|fx|comments|all（&scale=1.2&motion=off&demo=1&sound=on）
+// 流れるコメント（part=comments）は type: 'chat' のメッセージ（ytchat.js）。&top= &lanes= &laneh= &size= &speed= で流れ方を上書きできる
 // データの受け取り: OBS のブラウザソースでは window の 'xtrend-show' イベント（obs-websocket の CallVendorRequest → obs-browser の
 // emit_event。detail はオブジェクトでも JSON 文字列でも可）。同じブラウザ内のプレビューでは BroadcastChannel。
 // 外部テキストはすべて textContent。画像は pbs.twimg.com のみ。
@@ -7,12 +8,15 @@ import { OVERLAY_PARTS, LAYOUT_GUIDE } from './js/overlayinfo.js';
 import { OBS_EVENT_NAME, OVERLAY_CHANNEL, shouldAccept, readDetail, titleVisible, demoPayload } from './js/payload.js';
 import { createEffectGate, effectDef, thanksText, makeEffect } from './js/effects.js';
 import { validImageDataUrl } from './js/imaging.js';
+import { createChatReceiver, sanitizeChatCfg, CHAT_CFG_DEFAULTS, CHAT_PIN_BOX, buildChatMessage, demoChatItem, demoChatPin, inkFor, initialOf } from './js/ytchat.js';
+import { createLaneScheduler, lanesOverlapping, laneY, travelMs, laneBusyMs, STAGE_W } from './js/lanes.js';
 
 const PARTS = { all: { w: 1920, h: 1080 } };
 for (const p of OVERLAY_PARTS) PARTS[p.key] = { w: p.w, h: p.h };
 // 全部入り（確認用）での配置。参考配置図（overlayinfo.js）と同じ。タイトルは全面
 const LAYOUT = {};
 for (const g of LAYOUT_GUIDE) if (g.key) LAYOUT[g.key] = { x: g.x, y: g.y, w: g.w, h: g.h };
+LAYOUT.comments = { x: 0, y: 0, w: 1920, h: 1080 }; // 流れるコメントは全面（いちばん下＝投稿カードの裏を通る）
 LAYOUT.title = { x: 0, y: 0, w: 1920, h: 1080 };
 LAYOUT.fx = { x: 0, y: 0, w: 1920, h: 1080 }; // 演出はいちばん上
 const FX_BOX = Object.fromEntries(LAYOUT_GUIDE.filter((g) => g.fx).map((g) => [g.fx, g]));
@@ -121,8 +125,10 @@ function setup() {
       if (k === 'card') buildCard(inner);
       if (k === 'title') buildTitle(inner);
       if (k === 'fx') buildFx(inner);
+      if (k === 'comments') buildComments(inner);
     }
-  } else if (part === 'topicbar') buildTopicbar(stage);
+  } else if (part === 'comments') buildComments(stage);
+  else if (part === 'topicbar') buildTopicbar(stage);
   else if (part === 'card') buildCard(stage);
   else if (part === 'title') buildTitle(stage);
   else if (part === 'fx') buildFx(stage);
@@ -376,10 +382,195 @@ function playSound(kind) {
   else if (kind === 'thanks') [880, 1320, 1760].forEach((f, i) => tone(c, out, { f, t: i * 0.14, dur: 1.1, type: 'sine', vol: 0.18 }));
 }
 
+// ---------------------------------------------------------------- 流れるコメント（YouTube ライブ。type: 'chat'）
+// 右から左へ一定の速さで流す（lanes.js が列を決める）。固定コメントは中央の箱（重なる列には新しいコメントを入れない）。
+// 文字はすべて textContent。アイコンは YouTube の画像（ytchat.js の safeIcon が通したもの）か頭文字の丸。
+
+const chatOverride = {};
+for (const [q, k] of [['top', 'top'], ['lanes', 'lanes'], ['laneh', 'laneH'], ['size', 'size'], ['speed', 'speed']]) {
+  if (params.has(q) && params.get(q) !== '' && Number.isFinite(Number(params.get(q)))) chatOverride[k] = Number(params.get(q));
+}
+const chat = {
+  base: { ...CHAT_CFG_DEFAULTS }, cfg: sanitizeChatCfg({ ...CHAT_CFG_DEFAULTS, ...chatOverride }), receiver: createChatReceiver(),
+  sched: null, active: new Map(), pin: null, blocked: [], launched: [], received: 0, timer: null,
+};
+st.chat = chat; // E2E・確認用
+
+const AV_COLORS = ['#e02a1b', '#1f5fe0', '#e0157a', '#7b2ff2', '#1e9e50', '#c77700', '#0088a8', '#6d4c41'];
+function avatar(item, cls) {
+  const initial = () => {
+    const sp = el('span', `${cls} cm-initial`, initialOf(item.name));
+    let n = 0;
+    for (const ch of String(item.name || '')) n = (n * 31 + ch.codePointAt(0)) >>> 0;
+    sp.style.background = AV_COLORS[n % AV_COLORS.length];
+    return sp;
+  };
+  if (!item.icon) return initial();
+  const img = el('img', cls);
+  img.alt = '';
+  img.referrerPolicy = 'no-referrer';
+  img.decoding = 'async';
+  img.addEventListener('error', () => { if (img.isConnected) img.replaceWith(initial()); });
+  img.src = item.icon;
+  return img;
+}
+
+function buildComments(host) {
+  const layer = el('div', 'cm');
+  const flow = el('div', 'cm-flow');
+  const pin = el('div', 'cm-pin');
+  pin.hidden = true;
+  Object.assign(pin.style, { left: `${CHAT_PIN_BOX.x}px`, top: `${CHAT_PIN_BOX.y}px`, width: `${CHAT_PIN_BOX.w}px` });
+  layer.append(flow, pin);
+  host.append(layer);
+  view.cm = { layer, flow, pin };
+  chat.sched = createLaneScheduler({ lanes: chat.cfg.lanes });
+  applyChatCfg(chat.base);
+  chat.timer = setInterval(pumpChat, 100);
+}
+
+/** 流れ方の設定（送り手の設定に URL の上書きを重ねる） */
+function applyChatCfg(cfg) {
+  chat.base = cfg;
+  const next = sanitizeChatCfg({ ...cfg, ...chatOverride });
+  const was = chat.cfg;
+  chat.cfg = next;
+  view.cm.layer.style.setProperty('--cm-size', `${next.size}px`);
+  view.cm.layer.dataset.flow = String(next.flow);
+  if (chat.sched.lanes !== next.lanes) chat.sched.resize(next.lanes);
+  if (!next.flow) { chat.sched.clear(); for (const id of [...chat.active.keys()]) removeComment(id); }
+  if (chat.pin && (was.top !== next.top || was.laneH !== next.laneH || was.lanes !== next.lanes)) updateBlocked();
+}
+
+function updateBlocked() {
+  const p = view.cm.pin;
+  chat.blocked = chat.pin && !p.hidden ? lanesOverlapping(chat.cfg, { y: p.offsetTop, h: p.offsetHeight }) : [];
+}
+
+function commentEl(item) {
+  const node = el('div', `cm-item is-${item.kind}`);
+  node.dataset.id = item.id;
+  const text = el('div', 'cm-text');
+  if (item.kind !== 'text') {
+    if (item.color) { text.style.background = item.color; text.style.color = inkFor(item.color); }
+    if (item.amount) text.append(el('span', 'cm-amount', item.amount));
+  }
+  if (item.text) text.append(el('span', 'cm-body', item.text));
+  const meta = el('div', 'cm-meta');
+  meta.append(avatar(item, 'cm-icon'), el('span', 'cm-name', item.name));
+  node.append(text, meta);
+  return node;
+}
+
+function launch(item, lane, now) {
+  const v = view.cm;
+  const node = commentEl(item);
+  node.style.top = `${laneY(chat.cfg, lane)}px`;
+  node.style.transform = `translateX(${STAGE_W}px)`;
+  node.dataset.lane = String(lane);
+  v.flow.append(node);
+  const w = node.offsetWidth;
+  const quiet = calm();
+  chat.sched.occupy(lane, now + laneBusyMs(w, chat.cfg, { calm: quiet }), item.id);
+  const dur = quiet ? Math.round(chat.cfg.speed * 1000) : travelMs(w, chat.cfg);
+  let anim = null;
+  if (quiet) {
+    // 動きを減らす: 流さずに列の左寄りでフェードイン・アウト
+    node.style.transform = 'translateX(40px)';
+    if (typeof node.animate === 'function') anim = node.animate([{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.9 }, { opacity: 0 }], { duration: dur, fill: 'forwards' });
+  } else if (typeof node.animate === 'function') {
+    anim = node.animate([{ transform: `translateX(${STAGE_W}px)` }, { transform: `translateX(${-w}px)` }], { duration: dur, easing: 'linear', fill: 'forwards' });
+  }
+  const t = setTimeout(() => removeComment(item.id, false), dur + 50);
+  chat.active.set(item.id, { node, anim, lane, t });
+  chat.launched.push({ id: item.id, lane, at: now });
+  if (chat.launched.length > 300) chat.launched.splice(0, chat.launched.length - 300);
+}
+
+function removeComment(id, release = true) {
+  chat.sched.remove(id);
+  const a = chat.active.get(id);
+  if (!a) return;
+  chat.active.delete(id);
+  clearTimeout(a.t);
+  if (a.anim) { try { a.anim.cancel(); } catch { /* 無視 */ } }
+  a.node.remove();
+  if (release) chat.sched.release(id, Date.now());
+}
+
+function pumpChat() {
+  if (!view.cm || !chat.cfg.flow) return;
+  const now = Date.now();
+  let r;
+  while ((r = chat.sched.take(now, chat.blocked))) launch(r.item, r.lane, now);
+}
+
+function renderPin(pin) {
+  const v = view.cm;
+  if (!pin) {
+    if (!chat.pin) return;
+    chat.pin = null;
+    chat.blocked = [];
+    v.pin.classList.add('is-out');
+    const hideAt = Date.now();
+    chat.pinHideAt = hideAt;
+    setTimeout(() => { if (!chat.pin && chat.pinHideAt === hideAt) { v.pin.hidden = true; v.pin.classList.remove('is-out'); } }, calm() ? 0 : 280);
+    return;
+  }
+  const same = chat.pin && JSON.stringify(chat.pin) === JSON.stringify(pin);
+  chat.pin = pin;
+  if (same && !v.pin.hidden) return; // 再送では出し直さない
+  while (v.pin.firstChild) v.pin.firstChild.remove();
+  v.pin.dataset.id = pin.id;
+  v.pin.className = `cm-pin is-${pin.kind}`;
+  const head = el('div', 'cm-pin-head');
+  head.append(el('span', 'cm-pin-name', pin.name));
+  if (pin.kind !== 'text' && pin.amount) {
+    const amt = el('span', 'cm-pin-amount', pin.amount);
+    if (pin.color) { amt.style.background = pin.color; amt.style.color = inkFor(pin.color); }
+    head.append(amt);
+  }
+  const body = el('div', 'cm-pin-body');
+  body.append(head, el('p', 'cm-pin-text', pin.text || ''));
+  v.pin.append(el('span', 'cm-pin-tag', '固定中'), avatar(pin, 'cm-pin-icon'), body);
+  v.pin.hidden = false;
+  v.pin.classList.remove('is-in');
+  void v.pin.offsetWidth;
+  v.pin.classList.add('is-in');
+  updateBlocked();
+}
+
+function receiveChat(msg) {
+  if (!view.cm) return;
+  const r = chat.receiver.accept(msg, Date.now());
+  if (!r) return;
+  chat.received++;
+  if (r.cfg) applyChatCfg(r.cfg);
+  for (const id of r.remove) removeComment(id);
+  if (r.pin !== undefined) renderPin(r.pin);
+  if (chat.pin && r.remove.includes(chat.pin.id)) renderPin(null);
+  if (chat.cfg.flow) for (const it of r.add) chat.sched.enqueue(it);
+  pumpChat();
+}
+
+/** ?demo=1: 見本のコメントを流し続け、見本の固定コメントを出す（配置の確認用。名前は架空） */
+function chatDemo() {
+  let i = 0;
+  let seq = 0;
+  const pin = demoChatPin();
+  const tick = () => {
+    const now = Date.now();
+    receiveChat(buildChatMessage({ sid: 'demo', seq: ++seq, at: now, add: [demoChatItem(i++, now)], pin }));
+  };
+  tick();
+  setInterval(tick, 900);
+}
+
 // ---------------------------------------------------------------- 受信
 
 function receive(raw) {
   const p = readDetail(raw);
+  if (p && p.type === 'chat') { receiveChat(p); return; }
   // 画像の本体（再送の古い seq でも受け取ってキャッシュ。待っていた画像なら描き直す）
   if (p && p.media && typeof p.media.hash === 'string' && /^[0-9a-f]{8,64}$/.test(p.media.hash) && validImageDataUrl(p.media.dataUrl)) {
     const fresh = !imageCache.has(p.media.hash);
@@ -406,4 +597,5 @@ if (params.get('demo') === '1') {
   const fx = params.get('fx');
   if (fx) d.effect = makeEffect(fx, { name: params.get('name') || 'サンプル', amount: params.get('amount') || '¥10,000' });
   receive(d);
+  if (view.cm) chatDemo();
 }

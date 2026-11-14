@@ -101,6 +101,37 @@ body { font-family: var(--font); color: #fff; }
 .fx-item.is-calm .fx-clap { bottom: 60px; }
 .fx-item.is-calm .fx-flame { bottom: 0; }
 
+/* ---------------- 流れるコメント（1920×1080 全面。YouTube ライブのコメント） */
+.cm { position: absolute; inset: 0; pointer-events: none; overflow: hidden; --cm-size: 34px; }
+.cm-flow { position: absolute; inset: 0; z-index: 1; }
+.cm-item { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap; will-change: transform; }
+.cm-text { display: inline-flex; align-items: center; gap: 10px; font-size: var(--cm-size); font-weight: 800; line-height: 1.12; color: #fff;
+  paint-order: stroke fill; -webkit-text-stroke: 6px rgba(0, 0, 0, .88); text-shadow: 0 2px 6px rgba(0, 0, 0, .55); }
+.cm-meta { display: flex; align-items: center; gap: 6px; margin-top: 1px; padding-left: 2px; font-size: 17px; font-weight: 700; line-height: 22px; color: #e2e2e8;
+  text-shadow: 0 1px 2px #000, 0 0 4px #000, 0 0 2px #000; }
+.cm-icon { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex: none; box-shadow: 0 0 0 2px rgba(0, 0, 0, .6); }
+.cm-initial { display: inline-grid; place-items: center; color: #fff; font-size: 12px; font-weight: 800; text-shadow: none; }
+.cm-name { white-space: nowrap; }
+/* スーパーチャット・ステッカー: 色つきの帯と金額 */
+.is-super .cm-text, .is-sticker .cm-text { padding: 0 16px 0 6px; border-radius: 14px; -webkit-text-stroke: 0; text-shadow: none; box-shadow: 0 3px 0 rgba(0, 0, 0, .45); }
+.cm-amount { font-size: .78em; font-weight: 900; padding: 0 12px; border-radius: 999px; background: rgba(0, 0, 0, .28); }
+/* 固定コメント（中央。流れるコメントより上） */
+.cm-pin { position: absolute; z-index: 2; display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 18px; align-items: start;
+  padding: 18px 26px 16px 22px; border: 4px solid #ff3c6e; border-radius: 26px; background: rgba(14, 14, 20, .86); color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .55); transition: opacity .28s, transform .28s; }
+.cm-pin[hidden] { display: none; }
+.cm-pin.is-in { animation: cm-pin-in .38s cubic-bezier(.2, .9, .3, 1.2) both; }
+.cm-pin.is-out { opacity: 0; transform: translateY(10px) scale(.98); }
+@keyframes cm-pin-in { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+.cm-pin-tag { position: absolute; left: 22px; top: -17px; padding: 1px 14px; border-radius: 999px; background: #ff3c6e; color: #fff; font-size: 18px; font-weight: 900; letter-spacing: .06em; }
+.cm-pin-icon { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.cm-pin-icon.cm-initial { font-size: 24px; }
+.cm-pin-body { min-width: 0; }
+.cm-pin-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.cm-pin-name { font-size: 20px; font-weight: 700; color: #cfcfd8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cm-pin-amount { flex: none; font-size: 20px; font-weight: 900; padding: 0 12px; border-radius: 999px; }
+.cm-pin-text { margin: 2px 0 0; font-size: 34px; font-weight: 800; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+
 /* 動きを抑える（OS の設定か ?motion=off） */
 .no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) {

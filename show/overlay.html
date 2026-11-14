@@ -4,8 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- OBS のブラウザソース用（背景透明）。通信は自サイトのみ。進行画面から OBS 経由（window の xtrend-show イベント）か、
-       同じブラウザ内の BroadcastChannel でデータを受け取るだけ。画像は X の画像（pbs.twimg.com）の小サイズのみ -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pbs.twimg.com; connect-src 'self' ws://127.0.0.1:* ws://localhost:*; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+       同じブラウザ内の BroadcastChannel でデータを受け取るだけ。画像は X の画像（pbs.twimg.com）の小サイズと、
+       流れるコメントの YouTube のアイコン（yt3/yt4.ggpht.com・yt3/lh3.googleusercontent.com）だけ -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://pbs.twimg.com https://yt3.ggpht.com https://yt4.ggpht.com https://yt3.googleusercontent.com https://lh3.googleusercontent.com; connect-src 'self' ws://127.0.0.1:* ws://localhost:*; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <title>オーバーレイ｜番組</title>

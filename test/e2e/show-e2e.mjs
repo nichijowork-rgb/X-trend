@@ -983,6 +983,179 @@ async function main() {
       return REF_IMAGE ? '合成スクショあり' : '合成スクショなし（OBS_REF_IMAGE 未指定）';
     });
 
+    // ---- 4c'. YouTube ライブのコメント（googleapis はモック。同じブラウザのオーバーレイへ BroadcastChannel）
+    await check('YouTube のコメント（googleapis はモック）: 設定→開始・最初の応答はログだけ・新しいコメントがアイコン＋名前で流れる・固定で中央の箱（重なる列は使わない）・削除・NG・画面から消す・流すオフ・ルートを変えても続く・上限で止めて案内', async () => {
+      const KEY = 'AIzaSyE2E-test_key_0123456789abcdefgh';
+      const c = await newCtx();
+      await c.addInitScript(() => { localStorage.setItem('xtrend-show-ytchat-fast', '300'); });
+      const yt = { calls: [], referers: [], queue: [], mode: 'ok' };
+      const icon = makePng(8, 8, [220, 60, 110]);
+      const routeYt = async (pg) => {
+        await pg.route('https://www.googleapis.com/youtube/v3/**', async (route) => {
+          const r = route.request();
+          const u = new URL(r.url());
+          yt.calls.push({ path: u.pathname, key: u.searchParams.get('key') === KEY, token: u.searchParams.get('pageToken') });
+          yt.referers.push(r.headers().referer || '');
+          const cors = { 'access-control-allow-origin': '*' };
+          if (u.pathname.endsWith('/videos')) return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ items: [{ liveStreamingDetails: { activeLiveChatId: 'CHAT-E2E' } }] }) });
+          if (yt.mode === 'quota') return route.fulfill({ status: 403, headers: cors, contentType: 'application/json', body: JSON.stringify({ error: { code: 403, errors: [{ reason: 'quotaExceeded' }] } }) });
+          return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ items: yt.queue.shift() || [], nextPageToken: `P${yt.calls.length}`, pollingIntervalMillis: 100 }) });
+        });
+        await pg.route(/^https:\/\/yt3\.ggpht\.com\//, (route) => route.fulfill({ status: 200, contentType: 'image/png', body: icon }));
+      };
+      const T = (id, msg, extra = {}) => ({ id, snippet: { type: 'textMessageEvent', publishedAt: new Date().toISOString(), displayMessage: msg }, authorDetails: { channelId: `UC${id}`, displayName: `@viewer_${id}`, profileImageUrl: `https://yt3.ggpht.com/icon_${id}=s64`, ...extra } });
+      const SC = (id) => ({ id, snippet: { type: 'superChatEvent', superChatDetails: { amountDisplayString: '¥1,000', userComment: 'スパチャです', tier: 4 } }, authorDetails: { channelId: `UC${id}`, displayName: `@fan_${id}` } });
+      const ST = (id) => ({ id, snippet: { type: 'superStickerEvent', superStickerDetails: { amountDisplayString: '¥500', tier: 3 } }, authorDetails: { channelId: `UC${id}`, displayName: `@fan_${id}` } });
+      // オーバーレイ（同じブラウザ。1920×1080・速さ 4 秒）
+      const ov = await c.newPage();
+      await ov.setViewportSize({ width: 1920, height: 1080 });
+      await setupRoutes(ov, { data: SAMPLE_404 });
+      await routeYt(ov);
+      watchConsole(ov, errors);
+      await ov.goto(`${show}overlay.html?part=comments&speed=4`);
+      await ov.waitForFunction(() => window.__overlay && window.__overlay.chat);
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      await routeYt(page);
+      watchConsole(page, errors);
+      await page.goto(`${show}#live`);
+      await ready(page);
+      // パネル（既定は閉じている）→ 開く。未設定の案内
+      assert((await page.textContent('[data-key="yc-status"]')).includes('未設定'), 'status 未設定');
+      await page.click('[data-key="yc-open"]');
+      await page.waitForSelector('[data-key="yc-url"]');
+      // 設定: API キー（パスワード欄・表示の切替）・NG ワード
+      await page.click('[data-key="yc-settings"]');
+      await page.waitForSelector('dialog.yc-dialog[open]');
+      assert((await page.getAttribute('[data-key="yc-key"]', 'type')) === 'password', 'password');
+      await page.fill('[data-key="yc-key"]', KEY);
+      await page.check('[data-key="yc-show-key"]');
+      assert((await page.getAttribute('[data-key="yc-key"]', 'type')) === 'text', 'show key');
+      await page.fill('[data-key="yc-ng"]', 'ng、宣伝');
+      assert((await page.textContent('[data-key="yc-quota"]')).includes('10,000'), 'quota');
+      await page.screenshot({ path: path.join(SHOTS, 'live-comments-settings-960.png') });
+      await page.click('[data-key="yc-save"]');
+      await page.waitForSelector('dialog.yc-dialog', { state: 'detached' });
+      const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')));
+      assert(stored.key === KEY && stored.ng === 'ng、宣伝', 'saved prefs');
+      assert(await page.evaluate((k) => !JSON.stringify(window.__show.saved).includes(k), KEY), 'キーは番組の保存データ（書き出し）に入らない');
+      // 開始前のコメント（最初の応答）と、そのあとの新しいコメント
+      yt.queue.push([T('old-1', '開始前のコメント'), T('old-2', 'これも前')]);
+      yt.queue.push([T('b1', 'こんばんは！'), SC('sc1'), ST('st1'), T('ng1', 'これはＮＧワード入り'), T('b5', 'これは固定するための長いコメントです。'.repeat(4))]);
+      await page.fill('[data-key="yc-url"]', 'https://www.youtube.com/live/dQw4w9WgXcQ?si=share');
+      await page.click('[data-key="yc-toggle-run"]');
+      await page.waitForFunction(() => document.querySelectorAll('.yc-row').length >= 7, null, { timeout: 8000 });
+      assert((await page.textContent('[data-key="yc-status"]')).includes('取得中'), await page.textContent('[data-key="yc-status"]'));
+      assert((await page.textContent('[data-key="yc-toggle-run"]')) === '停止', 'stop label');
+      const firstRow = await page.getAttribute('.yc-log > li:first-child', 'data-id');
+      assert(firstRow === 'b5', `新しいものが上 ${firstRow}`);
+      assert((await page.textContent('.yc-row[data-id="old-1"]')).includes('開始前'), 'backlog badge');
+      assert(await page.$('.yc-row[data-id="ng1"].is-ng'), 'NG は灰色');
+      assert(await page.$eval('.yc-row[data-id="ng1"] [data-key="yc-pin"]', (b) => b.disabled), 'NG は固定できない');
+      assert(await page.$('.yc-row[data-id="b1"] img.yc-icon'), 'log icon');
+      // オーバーレイで流れる（アイコン＋名前）。開始前・NG は流さない
+      await ov.waitForFunction(() => document.querySelector('.cm-item[data-id="b1"]'), null, { timeout: 5000 });
+      const b1 = await ov.evaluate(() => { const e = document.querySelector('.cm-item[data-id="b1"]'); return { name: e.querySelector('.cm-name').textContent, icon: e.querySelector('img.cm-icon') ? e.querySelector('img.cm-icon').src : null, text: e.querySelector('.cm-text').textContent, top: e.style.top }; });
+      assert(b1.name === '@viewer_b1' && b1.icon && b1.icon.startsWith('https://yt3.ggpht.com/') && b1.text === 'こんばんは！' && b1.top === '660px', JSON.stringify(b1));
+      await ov.waitForFunction(() => document.querySelector('.cm-item.is-super .cm-amount'), null, { timeout: 5000 });
+      assert((await ov.textContent('.cm-item.is-super .cm-amount')) === '¥1,000', 'super amount');
+      assert((await ov.textContent('.cm-item.is-sticker')).includes('¥500'), 'sticker');
+      assert(await ov.evaluate(() => getComputedStyle(document.querySelector('.cm-item.is-sticker .cm-initial')).borderRadius === '50%'), 'アイコンが無ければ頭文字の丸');
+      await ov.screenshot({ path: path.join(SHOTS, 'comments-flow-1920.png') });
+      let launched = await ov.evaluate(() => window.__overlay.chat.launched.map((x) => x.id));
+      assert(!launched.includes('old-1') && !launched.includes('old-2') && !launched.includes('ng1'), `開始前・NG は流さない ${launched}`);
+      // Referer は origin だけ（キーの制限＝ウェブサイトのため）・キーは URL だけ
+      const origin = new URL(base).origin;
+      assert(yt.referers.length >= 3 && yt.referers.every((r) => r === `${origin}/`), `referer ${[...new Set(yt.referers)]}`);
+      assert(yt.calls.every((x) => x.key) && yt.calls[0].path.endsWith('/videos'), 'calls');
+      // 固定 → 中央の箱。重なる列（1・2 列目）には新しいコメントを入れない
+      await page.click('.yc-row[data-id="b5"] [data-key="yc-pin"]');
+      await ov.waitForFunction(() => { const p = document.querySelector('.cm-pin'); return p && !p.hidden && p.dataset.id === 'b5'; }, null, { timeout: 5000 });
+      const pin = await ov.evaluate(() => { const p = document.querySelector('.cm-pin'); return { left: p.offsetLeft, top: p.offsetTop, w: p.offsetWidth, h: p.offsetHeight, tag: p.querySelector('.cm-pin-tag').textContent, name: p.querySelector('.cm-pin-name').textContent, blocked: window.__overlay.chat.blocked, lines: Math.round(p.querySelector('.cm-pin-text').clientHeight / parseFloat(getComputedStyle(p.querySelector('.cm-pin-text')).lineHeight)) }; });
+      assert(pin.left === 655 && pin.top === 600 && pin.w === 1170 && pin.tag === '固定中' && pin.name === '@viewer_b5' && pin.lines === 2, JSON.stringify(pin));
+      assert(JSON.stringify(pin.blocked) === '[0,1]', `blocked ${JSON.stringify(pin.blocked)}`);
+      assert(await page.$('.yc-row[data-id="b5"].is-pinned [data-key="yc-unpin"]'), 'log pinned');
+      assert((await page.textContent('[data-key="yc-pinned"]')).includes('固定中'), 'pinned summary');
+      const pinnedAt = await ov.evaluate(() => Date.now());
+      yt.queue.push(Array.from({ length: 6 }, (_, i) => T(`c${i + 1}`, `固定中のコメント ${i + 1}`)));
+      await ov.waitForFunction(() => window.__overlay.chat.launched.filter((x) => /^c\d$/.test(x.id)).length >= 4, null, { timeout: 8000 });
+      const after = await ov.evaluate((t) => window.__overlay.chat.launched.filter((x) => x.at >= t), pinnedAt);
+      assert(after.length >= 4 && after.every((x) => x.lane >= 2), `固定と重なる列は使わない ${JSON.stringify(after)}`);
+      await ov.screenshot({ path: path.join(SHOTS, 'comments-pin-1920.png') });
+      // 画面から消す（流れていれば消える。一覧は残る）
+      await ov.waitForFunction(() => document.querySelector('.cm-item[data-id="c3"]') || window.__overlay.chat.launched.some((x) => x.id === 'c3'), null, { timeout: 8000 });
+      await page.click('.yc-row[data-id="c3"] [data-key="yc-hide"]');
+      await ov.waitForFunction(() => !document.querySelector('.cm-item[data-id="c3"]'), null, { timeout: 3000 });
+      assert(await page.$('.yc-row[data-id="c3"].is-hidden'), 'hidden row');
+      // YouTube で削除: 固定中のもの・流れているもの → 一覧・画面・固定から消える
+      yt.queue.push([{ id: 'd1', snippet: { type: 'messageDeletedEvent', messageDeletedDetails: { deletedMessageId: 'b5' } } }, { id: 'd2', snippet: { type: 'messageDeletedEvent', messageDeletedDetails: { deletedMessageId: 'c6' } } }]);
+      await ov.waitForFunction(() => document.querySelector('.cm-pin').hidden && !document.querySelector('.cm-item[data-id="c6"]'), null, { timeout: 5000 });
+      await page.waitForFunction(() => !document.querySelector('.yc-row[data-id="b5"]') && !document.querySelector('.yc-row[data-id="c6"]'), null, { timeout: 5000 });
+      assert(await page.$eval('[data-key="yc-pinned"]', (e) => e.hidden), 'pinned summary gone');
+      assert(await ov.evaluate(() => window.__overlay.chat.blocked.length === 0), 'unblocked');
+      // 「画面に流す」をオフ → 取得は続くが流さない
+      await page.uncheck('[data-key="yc-flow"]');
+      yt.queue.push([T('f1', '流さないコメント')]);
+      await page.waitForSelector('.yc-row[data-id="f1"]', { timeout: 5000 });
+      await page.waitForTimeout(400);
+      assert(!(await ov.evaluate(() => window.__overlay.chat.launched.some((x) => x.id === 'f1'))), 'flow off');
+      assert(await ov.evaluate(() => document.querySelector('.cm').dataset.flow === 'false'), 'overlay flow false');
+      await page.check('[data-key="yc-flow"]');
+      // 編成へ移っても取得は続き、オーバーレイへ流れる
+      await page.evaluate(() => { location.hash = '#plan'; });
+      await page.waitForFunction(() => window.__show.route === 'plan');
+      yt.queue.push([T('r1', '編成画面にいる間のコメント')]);
+      await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 'r1'), null, { timeout: 5000 });
+      await page.evaluate(() => { location.hash = '#live'; });
+      await page.waitForSelector('.yc-row[data-id="r1"]', { timeout: 5000 });
+      // XSS: 名前・本文は文字のまま
+      const evil = '<img src=x onerror="window.__xss=1">';
+      yt.queue.push([T('x1', evil, { displayName: evil, profileImageUrl: 'javascript:alert(1)' })]);
+      await ov.waitForFunction(() => document.querySelector('.cm-item[data-id="x1"]'), null, { timeout: 5000 });
+      assert((await ov.textContent('.cm-item[data-id="x1"] .cm-body')) === evil && !(await ov.$('.cm-item[data-id="x1"] img')), 'overlay xss');
+      assert((await page.textContent('.yc-row[data-id="x1"] .yc-text')) === evil, 'log xss');
+      assert(await page.evaluate(() => window.__xss === undefined) && await ov.evaluate(() => window.__xss === undefined), 'xss');
+      await page.$eval('.yc-log', (e) => e.scrollIntoView({ block: 'center' }));
+      await page.screenshot({ path: path.join(SHOTS, 'live-comments-960.png') });
+      // 今日の上限 → 止めて案内（それ以上は取りに行かない）
+      yt.mode = 'quota';
+      await page.waitForFunction(() => document.querySelector('[data-key="yc-status"]').dataset.state === 'error', null, { timeout: 5000 });
+      const status = await page.textContent('[data-key="yc-status"]');
+      assert(status.includes('上限') && (await page.textContent('[data-key="yc-toggle-run"]')) === '開始', status);
+      const n = yt.calls.length;
+      await page.waitForTimeout(1000);
+      assert(yt.calls.length === n, `止めたら取りに行かない ${yt.calls.length - n}`);
+      await page.screenshot({ path: path.join(SHOTS, 'live-comments-quota-960.png') });
+      // 横スクロールなし
+      assert((await sw(page)) <= 960, 'scrollWidth');
+      await c.close();
+      return `API 呼び出し ${n} 回`;
+    });
+
+    await check('流れるコメントの見本（?demo=1&part=comments）と全部入りの合成スクショ（1920×1080・暗い背景）', async () => {
+      const c = await newCtx({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+      const p = await c.newPage();
+      await setupRoutes(p, { data: SAMPLE_404 });
+      watchConsole(p, errors);
+      await p.goto(`${show}overlay.html?part=comments&demo=1`);
+      await p.waitForFunction(() => document.querySelectorAll('.cm-item').length >= 2 && !document.querySelector('.cm-pin').hidden, null, { timeout: 8000 });
+      const bg = await p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+      assert(bg === 'rgba(0, 0, 0, 0)', `透明 ${bg}`);
+      // ?motion=off: 流さずにフェード（列の左寄り）
+      await p.goto(`${show}overlay.html?part=comments&demo=1&motion=off&top=700&lanes=3`);
+      await p.waitForFunction(() => document.querySelectorAll('.cm-item').length >= 1, null, { timeout: 8000 });
+      const calmItem = await p.evaluate(() => { const e = document.querySelector('.cm-item'); return { tf: e.style.transform, top: e.style.top, lanes: window.__overlay.chat.cfg.lanes, blocked: window.__overlay.chat.blocked }; });
+      // 帯 700〜886・3 列。見本の固定（600〜750 前後）と重なる 1 列目は使わない
+      assert(calmItem.tf === 'translateX(40px)' && ['762px', '824px'].includes(calmItem.top) && calmItem.lanes === 3 && JSON.stringify(calmItem.blocked) === '[0]', JSON.stringify(calmItem));
+      await p.goto(`${show}overlay.html?part=all&demo=1`);
+      await p.waitForFunction(() => document.querySelectorAll('.cm-item').length >= 3 && !document.querySelector('.cm-pin').hidden, null, { timeout: 10000 });
+      await p.evaluate(() => { document.body.style.setProperty('background', 'linear-gradient(135deg, #1b1d26, #0c0d12 60%, #22161d)', 'important'); document.body.style.height = '1080px'; const t = document.querySelector('.tt'); if (t) t.hidden = true; });
+      await p.waitForTimeout(1500);
+      await p.screenshot({ path: '/tmp/claude-0/-home-user-X-trend/a81aec43-1a67-5668-bfb1-57f0ed28e406/scratchpad/comments-overlay.png' });
+      await p.screenshot({ path: path.join(SHOTS, 'comments-overlay-all-1920.png') });
+      await c.close();
+    });
+
     // ---- 4d. 演出（段階4）。偽の OBS（認証なし）で emit_event を受け、fx パーツへ配る
     await check('演出: パレット（開閉の保存）・ボタンと Shift+1〜6 で emit_event に effect・fx パーツで出て消える・再送や同じ id で二重に出ない・連打・感謝バナー（Enter・XSS）・音は既定で鳴らさない', async () => {
       const obs = { payloads: [], targets: [] };
@@ -1702,6 +1875,8 @@ async function main() {
       assert(!(await page.isVisible('.live-lead-box .live-lead')), 'リード文は既定で閉じる');
       await page.click('[data-key="lead-toggle"]');
       await page.waitForFunction(() => document.querySelector('.live-lead-box').open);
+      // details の toggle イベントは次のタスクで来る（保存はそのあと）
+      await page.waitForFunction(() => localStorage.getItem('xtrend-show-lead-open') === '1', null, { timeout: 3000 }).catch(() => {});
       assert(await page.evaluate(() => localStorage.getItem('xtrend-show-lead-open')) === '1', 'saved');
       // 列の数
       const cols = () => page.evaluate(() => new Set([...document.querySelectorAll('.li-item')].slice(0, 4).map((e) => Math.round(e.getBoundingClientRect().left))).size);

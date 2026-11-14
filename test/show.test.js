@@ -1297,16 +1297,29 @@ test('オーバーレイ: 再送の判定（samePayload）と受け手の seq・
 });
 
 test('オーバーレイのパーツと参考配置', () => {
-  assert.deepEqual(OVERLAY_PARTS.map((p) => [p.key, p.w, p.h]), [['topicbar', 1300, 150], ['card', 640, 760], ['title', 1920, 1080], ['fx', 1920, 1080]]);
+  assert.deepEqual(OVERLAY_PARTS.map((p) => [p.key, p.w, p.h]), [['topicbar', 1300, 150], ['card', 640, 760], ['title', 1920, 1080], ['fx', 1920, 1080], ['comments', 1920, 1080]]);
+  // CastCraft のコメント列・吹き出しは無くなった（流れるコメントに置き換え）
+  assert.ok(!LAYOUT_GUIDE.some((g) => /CastCraft|吹き出し/.test(g.label)));
   const ours = LAYOUT_GUIDE.filter((g) => g.ours);
-  const others = LAYOUT_GUIDE.filter((g) => !g.ours && !/吹き出し/.test(g.label));
+  const others = LAYOUT_GUIDE.filter((g) => !g.ours);
   const overlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   for (const o of ours) {
     assert.ok(o.x >= 0 && o.y >= 0 && o.x + o.w <= 1920 && o.y + o.h <= 1080, `${o.label} 画面内`);
     const part = OVERLAY_PARTS.find((p) => p.key === o.key);
-    if (part) assert.ok(Math.abs(o.w / o.h - part.w / part.h) < 0.05, `${o.label} 縦横比`);
-    for (const x of others) assert.ok(!overlap(o, x), `${o.label} と ${x.label} が重なる`);
+    // 流れるコメントは全面のパーツのうち「流れる範囲」（帯）なので縦横比は見ない
+    if (part && !o.range) assert.ok(Math.abs(o.w / o.h - part.w / part.h) < 0.05, `${o.label} 縦横比`);
+    for (const x of others) {
+      // 帯（全幅）はイラストの上端に 13px だけかかる（オーナー指定の 660＋4 列×62＝908）
+      if (o.range && x.label === 'イラスト') { assert.ok(o.y + o.h - x.y <= 13, 'イラストにかかるのは 13px まで'); continue; }
+      assert.ok(!overlap(o, x), `${o.label} と ${x.label} が重なる`);
+    }
   }
+  const band = LAYOUT_GUIDE.find((g) => g.key === 'comments');
+  const tb = LAYOUT_GUIDE.find((g) => g.key === 'topicbar');
+  assert.deepEqual([band.x, band.y, band.w, band.h], [0, 660, 1920, 248]);
+  assert.ok(band.y + band.h <= tb.y, 'コメントの帯はトピック帯より上');
+  const pin = LAYOUT_GUIDE.find((g) => g.pin);
+  assert.deepEqual([pin.x, pin.y, pin.w, pin.h], [655, 600, 1170, 160]);
 });
 
 // ================================================================ 段階3: Grok ボット連携（bot.js・buildTopics・feedback.js）

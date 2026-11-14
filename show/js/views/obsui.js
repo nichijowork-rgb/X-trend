@@ -80,7 +80,7 @@ export function renderObsSetup(app) {
     h('li', {}, h('b', {}, 'OBS の WebSocket を有効にする：'), 'OBS の「ツール → WebSocket サーバー設定」で「WebSocket サーバーを有効にする」をオン。ポートは 4455 のまま、「認証を有効にする」をオンにしてパスワードを決める（「接続情報を表示」でコピーできます）。'),
     h('li', {}, h('b', {}, 'この番組サイトからつなぐ：'), '［進行］か、この画面の右上の「OBS：未接続」を押し、パスワードを入れて「接続」。Chrome の許可の確認が出たら「許可」。「接続済み」になれば OK。「テスト表示」でオーバーレイに見本が出ます。'),
     h('li', {}, h('b', {}, 'パーツを貼る：'), 'OBS の「ソース → ＋ → ブラウザ」で、下の URL と幅・高さを入れる（「ページの権限」は既定のまま。「カスタム CSS」は空でもかまいません。背景は透明です）。パーツごとに 1 つずつ貼り、位置と大きさは自由に動かせます。'),
-    h('li', {}, h('b', {}, '配置：'), '下の参考配置のように、コメント（CastCraft）・どね/スパチャのバー（Doneru）・LINE・イラストと重ならない場所へ。')));
+    h('li', {}, h('b', {}, '配置：'), '下の参考配置のように、どね/スパチャのバー（Doneru）・LINE・イラストと重ならない場所へ。コメントは CastCraft の列・吹き出しの代わりに「流れるコメント」パーツを全面に貼り、投稿カードより下に置きます（CastCraft のコメント欄は OBS で非表示に）。')));
   const table = h('div', { class: 'setup-parts' });
   for (const p of OVERLAY_PARTS.filter((x) => FEATURES.effects || x.key !== 'fx')) {
     const url = urlOf(`part=${p.key}`);
@@ -94,7 +94,7 @@ export function renderObsSetup(app) {
         h('a', { class: 'btn btn-small btn-ghost', href: urlOf(`part=${p.key}&demo=1`), target: '_blank', rel: 'noopener' }, '見本を開く'))));
   }
   root.append(h('h3', { class: 'sub-title' }, 'パーツ（ブラウザソースに 1 つずつ）'), table);
-  root.append(h('p', { class: 'muted' }, 'オプション（URL の後ろに付ける）: ', h('code', {}, '&scale=1.2'), '（拡大）・', h('code', {}, '&motion=off'), '（動きを止める。演出はフェードだけ）・', h('code', {}, '&demo=1'), '（見本を表示。配置の確認用。演出は ', h('code', {}, '&demo=1&fx=confetti'), ' など）・', h('code', {}, '&sound=on'), '（演出の効果音を鳴らす。演出パーツだけ）。全部入りの確認用: ', h('code', {}, 'part=all')));
+  root.append(h('p', { class: 'muted' }, 'オプション（URL の後ろに付ける）: ', h('code', {}, '&scale=1.2'), '（拡大）・', h('code', {}, '&motion=off'), '（動きを止める。演出はフェードだけ）・', h('code', {}, '&demo=1'), '（見本を表示。配置の確認用。演出は ', h('code', {}, '&demo=1&fx=confetti'), ' など）・', h('code', {}, '&sound=on'), '（演出の効果音を鳴らす。演出パーツだけ）・', h('code', {}, '&top=660&lanes=4&laneh=62&size=34&speed=8'), '（流れるコメントの位置・列の数・列の高さ・文字の大きさ・速さ。ふだんは進行画面の「コメント」の設定で変えます）。全部入りの確認用: ', h('code', {}, 'part=all')));
   if (FEATURES.effects) {
   root.append(h('h3', { class: 'sub-title' }, '演出（拍手・紙吹雪・神回！・えぇっ！？・炎上・感謝バナー）'));
   root.append(h('ul', { class: 'setup-steps setup-fx' },
@@ -107,11 +107,11 @@ export function renderObsSetup(app) {
   const fig = h('figure', { class: 'setup-fig' });
   const canvas = h('div', { class: 'setup-canvas', attrs: { role: 'img', 'aria-label': '参考配置図' } });
   for (const g of LAYOUT_GUIDE.filter((x) => FEATURES.effects || !x.fx)) {
-    const b = h('div', { class: `setup-box ${g.ours ? 'is-ours' : 'is-other'}${g.key ? ` part-${g.key}` : ''}${g.fx ? ` part-fx-${g.fx}` : ''}` }, h('span', {}, g.label));
+    const b = h('div', { class: `setup-box ${g.ours ? 'is-ours' : 'is-other'}${g.key ? ` part-${g.key}` : ''}${g.fx ? ` part-fx-${g.fx}` : ''}${g.pin ? ' part-pin' : ''}` }, h('span', {}, g.label));
     Object.assign(b.style, { left: `${(g.x / 1920) * 100}%`, top: `${(g.y / 1080) * 100}%`, width: `${(g.w / 1920) * 100}%`, height: `${(g.h / 1080) * 100}%` });
     canvas.append(b);
   }
-  fig.append(canvas, h('figcaption', { class: 'muted' }, '参考配置（1920×1080）。灰色＝ほかのツール（重ねない）、色つき＝この番組サイトのパーツ。コーナータイトルは全面に数秒だけ出ます。CastCraft のコメント吹き出しは投稿カードと重なることがあるので、吹き出しは左寄せにしてください。'));
+  fig.append(canvas, h('figcaption', { class: 'muted' }, '参考配置（1920×1080）。灰色＝ほかのツール（重ねない）、色つき＝この番組サイトのパーツ。コーナータイトルは全面に数秒だけ出ます。コメントは帯（y 660〜908）を右から左へ流れ、固定コメントは中央に出ます（流れるコメントのパーツを投稿カードより下に置くと、カードの裏を通ります）。'));
   root.append(h('h3', { class: 'sub-title' }, '参考配置'), fig);
   root.append(h('p', { class: 'muted' }, '※ 進行画面（またはこの画面）を開いている間だけ、オーバーレイへ進行状態を送ります（変化したとき＋5 秒おき）。OBS を後から開いても数秒で追いつきます。'));
   if (app.ui.obsDlg) {

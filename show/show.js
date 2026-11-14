@@ -23,6 +23,11 @@ import { makeEffect, createCooldown, EFFECT_TTL_MS, effectDef } from './js/effec
 import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBACK_SENT_KEY } from './js/feedback.js';
 import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload, mediaPlan } from './js/payload.js';
 import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
+import {
+  YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, createChatPoller, applyChatBatch, ngMatcher, parseNgWords,
+  buildChatMessage, sanitizeChatCfg, restorePin, demoChatItem, quotaUnits,
+} from './js/ytchat.js';
+import { refreshChatPanel } from './js/views/chatui.js';
 import { obsStatusLabel, renderObsSetup, refreshObsDialog } from './js/views/obsui.js';
 import { loadSaved, saveState, openSync } from './js/store.js';
 import { h, clear, isEditable, startEmbeds } from './js/dom.js';
@@ -786,7 +791,7 @@ function ensureObs() {
   app.obs = createObsClient({
     onStatus: (st) => {
       updateObsPill();
-      if (st.state === 'connected') { sendOverlay(true); }
+      if (st.state === 'connected') { sendOverlay(true); if (chatActive()) sendChat(); }
       if (app.ui.obsDlg) refreshObsDialog(st);
     },
   });
@@ -809,6 +814,173 @@ app.obsTest = () => {
   const on = app.obs && app.obs.status().state === 'connected';
   toast(on ? 'テスト表示を OBS に送りました（8 秒後に今の進行状態に戻します）' : 'OBS に接続していないので、このブラウザで開いたパーツにだけテスト表示を送りました');
   setTimeout(() => sendOverlay(true), 8000);
+};
+
+// ================================================================ YouTube ライブのコメント（読み取り専用・API キー。ytchat.js）
+// 取得は画面（ルート）に関係なく続ける。新しいコメントは type: 'chat' のメッセージで OBS（接続中なら）と同じブラウザのパーツへ。
+// API キー・設定は localStorage（xtrend-show-ytchat）だけ。コメントの一覧は保存しない（固定コメントだけ 3 時間まで復元）。
+
+function loadChatPrefs() {
+  try { return parseChatPrefs(localStorage.getItem(YT_CHAT_PREF_KEY)); } catch { return parseChatPrefs(null); }
+}
+app.chatPrefs = loadChatPrefs();
+// 確認用（E2E）: 取得間隔の最短を短くする（localStorage xtrend-show-ytchat-fast＝ms。ふだんは使わない）
+const chatFastMs = (() => { try { const n = Number(localStorage.getItem('xtrend-show-ytchat-fast')); return Number.isFinite(n) && n > 0 ? n : null; } catch { return null; } })();
+app.chat = {
+  status: 'idle', reason: '', code: '', videoId: null, log: [], count: 0, hidden: new Set(), banned: new Set(),
+  calls: { videos: 0, messages: 0 }, pin: restorePin(app.chatPrefs), demoUntil: 0,
+};
+app.chatOpen = (() => { try { return localStorage.getItem('xtrend-show-ytchat-open') === '1'; } catch { return false; } })();
+let chatPoller = null;
+let chatNg = ngMatcher(parseNgWords(app.chatPrefs.ng));
+const chatWire = { sid: Math.random().toString(36).slice(2, 10), seq: 0 };
+
+const chatRunning = () => ['starting', 'running', 'retrying'].includes(app.chat.status);
+function chatActive() {
+  return chatRunning() || Boolean(app.chat.pin) || app.chat.demoUntil > Date.now();
+}
+app.chatRunning = chatRunning;
+app.chatUnits = () => quotaUnits(app.chat.calls);
+function chatCfg() {
+  const p = app.chatPrefs;
+  return sanitizeChatCfg({ top: p.top, lanes: p.lanes, laneH: p.laneH, size: p.size, speed: p.speed, flow: p.flow });
+}
+/** オーバーレイへ（同じブラウザは BroadcastChannel、OBS は接続中なら emit_event）。add・remove が無くても固定・設定は毎回載る */
+function sendChat({ add = [], remove = [] } = {}) {
+  const msg = buildChatMessage({ sid: chatWire.sid, seq: ++chatWire.seq, at: Date.now(), add, remove, pin: app.chat.pin, cfg: chatCfg() });
+  app.lastChatSent = msg;
+  if (overlay.bc) { try { overlay.bc.postMessage(msg); } catch { /* 無視 */ } }
+  if (app.obs && app.obs.status().state === 'connected') app.obs.emit(OBS_EVENT_NAME, msg);
+}
+function resendChat() {
+  if (chatActive()) sendChat();
+}
+function refreshChat() {
+  if (app.ready && app.route === 'live') refreshChatPanel(app);
+}
+app.refreshChat = refreshChat;
+function saveChatPrefs() {
+  try { localStorage.setItem(YT_CHAT_PREF_KEY, JSON.stringify(app.chatPrefs)); } catch { /* 保存できなくても動く */ }
+}
+/** 設定を保存（NG ワードを変えたら一覧の印を付け直し、NG になったものは画面から消す） */
+app.chatSavePrefs = (patch) => {
+  app.chatPrefs = parseChatPrefs({ ...app.chatPrefs, ...patch });
+  saveChatPrefs();
+  if (patch && 'ng' in patch) {
+    chatNg = ngMatcher(parseNgWords(app.chatPrefs.ng));
+    const remove = [];
+    app.chat.log = app.chat.log.map((e) => {
+      const word = chatNg(e) || null;
+      if (word && !e.ng) remove.push(e.id);
+      return word === e.ng ? e : { ...e, ng: word };
+    });
+    if (app.chat.pin && remove.includes(app.chat.pin.id)) setChatPin(null);
+    if (remove.length) sendChat({ remove });
+  }
+  if (chatPoller) chatPoller.setInterval(chatFastMs || app.chatPrefs.interval);
+  sendChat();
+  refreshChat();
+};
+app.setChatOpen = (open) => {
+  app.chatOpen = Boolean(open);
+  try { localStorage.setItem('xtrend-show-ytchat-open', open ? '1' : '0'); } catch { /* 保存できなくても切り替える */ }
+  app.render();
+};
+function setChatPin(item) {
+  app.chat.pin = item ? { id: item.id, kind: item.kind, text: item.text, name: item.name, icon: item.icon, amount: item.amount, color: item.color, at: Date.now() } : null;
+  app.chatPrefs = { ...app.chatPrefs, pin: app.chat.pin, pinnedAt: app.chat.pin ? Date.now() : null };
+  saveChatPrefs();
+}
+/** 一覧から固定（NG・画面から消したものは固定できない） */
+app.chatPin = (id) => {
+  const e = app.chat.log.find((x) => x.id === id);
+  if (!e || e.ng || app.chat.hidden.has(id)) return;
+  setChatPin(e);
+  sendChat();
+  refreshChat();
+};
+app.chatUnpin = () => {
+  setChatPin(null);
+  sendChat();
+  refreshChat();
+};
+/** 画面から消す（流れていれば消し、これから流さない。固定中なら外す） */
+app.chatHide = (id) => {
+  app.chat.hidden.add(id);
+  if (app.chat.pin && app.chat.pin.id === id) setChatPin(null);
+  sendChat({ remove: [id] });
+  refreshChat();
+};
+app.chatSetFlow = (on) => {
+  app.chatPrefs = { ...app.chatPrefs, flow: Boolean(on) };
+  saveChatPrefs();
+  sendChat();
+  refreshChat();
+};
+function ensureObsForChat() {
+  if (app.obsPrefs.enabled && app.obsPrefs.auto && !app.obs) ensureObs().connect(app.obsPrefs);
+}
+function onChatBatch(norm, { backlog }) {
+  const r = applyChatBatch(app.chat.log, norm.events, { backlog, ng: chatNg, hidden: app.chat.hidden, banned: app.chat.banned, max: CHAT_LOG_MAX });
+  app.chat.log = r.log;
+  app.chat.count += r.added;
+  for (const b of r.banned) app.chat.banned.add(b);
+  if (app.chat.pin && r.removed.includes(app.chat.pin.id)) setChatPin(null);
+  const add = app.chatPrefs.flow ? r.flow : [];
+  if (add.length || r.removed.length) sendChat({ add, remove: r.removed });
+  refreshChat();
+}
+/** 開始（url を省略したら前回の URL） */
+app.chatStart = (url) => {
+  const input = String(url != null ? url : app.chatPrefs.url || '').trim();
+  const fail = (reason) => { app.chat.status = 'error'; app.chat.reason = reason; app.chat.code = 'setup'; refreshChat(); toast(`コメント：${reason}`); return false; };
+  if (!validKey(app.chatPrefs.key)) return fail('API キーが未設定です（「⚙ 設定」で入れてください）');
+  const id = parseVideoId(input);
+  if (!id) return fail('配信の URL を読み取れませんでした（https://www.youtube.com/live/… や youtu.be/… の形）');
+  app.chatPrefs = { ...app.chatPrefs, url: input };
+  saveChatPrefs();
+  if (chatPoller) chatPoller.stop();
+  if (app.chat.videoId !== id) { app.chat.log = []; app.chat.count = 0; app.chat.hidden = new Set(); app.chat.banned = new Set(); }
+  app.chat.videoId = id;
+  chatPoller = createChatPoller({
+    key: app.chatPrefs.key, videoId: id, interval: chatFastMs || app.chatPrefs.interval,
+    fetchImpl: (u, o) => fetch(u, o),
+    onUnits: (kind) => { app.chat.calls[kind] = (app.chat.calls[kind] || 0) + 1; },
+    onStatus: (st) => {
+      const was = app.chat.status;
+      Object.assign(app.chat, { status: st.status, reason: st.reason, code: st.code });
+      if (st.status === 'error' && was !== 'error') toast(`コメント：${st.reason}`);
+      refreshChat();
+    },
+    onBatch: onChatBatch,
+  });
+  chatPoller.start();
+  ensureObsForChat();
+  sendChat();
+  return true;
+};
+app.chatStop = () => {
+  if (chatPoller) chatPoller.stop();
+  chatPoller = null;
+  app.chat.status = 'stopped';
+  app.chat.reason = '';
+  refreshChat();
+};
+app.chatToggle = (url) => (chatRunning() ? app.chatStop() : app.chatStart(url));
+/** 見本を流す（API を使わない。OBS・このブラウザのパーツの確認用。一覧にも「見本」で入る） */
+app.chatDemo = () => {
+  const now = Date.now();
+  const n = 10;
+  app.chat.demoUntil = now + n * 800 + 3000;
+  ensureObsForChat();
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const it = demoChatItem(i, Date.now(), 'sample');
+      onChatBatch({ events: [{ type: 'add', item: it }] }, { backlog: false });
+    }, i * 800);
+  }
+  const on = app.obs && app.obs.status().state === 'connected';
+  toast(on ? '見本のコメントを OBS に流しています' : '見本のコメントを流しています（OBS に接続していないので、このブラウザで開いたパーツにだけ）');
 };
 
 // ================================================================ 元に戻す・やり直す（編成のすべての編集操作）
@@ -1092,6 +1264,7 @@ function renderRoute() {
   const hdr = document.querySelector('.sh-header');
   if (hdr) document.documentElement.style.setProperty('--hdr', `${hdr.offsetHeight + (document.getElementById('sample-banner')?.hidden ? 0 : document.getElementById('sample-banner').offsetHeight)}px`);
   if (app.afterRender) app.afterRender();
+  if (app.route === 'live') refreshChatPanel(app);
   startEmbeds(root, app.embedder);
   updateHistoryButtons();
   if (lastFocusKey) {
@@ -1207,6 +1380,7 @@ async function main() {
     else if (app.route === 'onair') tickOnair(app);
   }, 1000);
   setInterval(resendOverlay, RESEND_MS);
+  setInterval(resendChat, RESEND_MS);
   $('obs-pill').addEventListener('click', () => { app.ui.obsDlg = true; renderRoute(); });
   $('bot-pill').addEventListener('click', () => {
     const st = app.autoSendState;
