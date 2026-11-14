@@ -1039,12 +1039,14 @@ async function main() {
       await page.check('[data-key="yc-show-key"]');
       assert((await page.getAttribute('[data-key="yc-key"]', 'type')) === 'text', 'show key');
       await page.fill('[data-key="yc-ng"]', 'ng、宣伝');
+      // この確認は「数秒ごと」（liveChat/messages）で。プッシュ型は別の確認で
+      await page.selectOption('[data-key="yc-mode"]', 'poll');
       assert((await page.textContent('[data-key="yc-quota"]')).includes('10,000'), 'quota');
       await page.screenshot({ path: path.join(SHOTS, 'live-comments-settings-960.png') });
       await page.click('[data-key="yc-save"]');
       await page.waitForSelector('dialog.yc-dialog', { state: 'detached' });
       const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')));
-      assert(stored.key === KEY && stored.ng === 'ng、宣伝', 'saved prefs');
+      assert(stored.key === KEY && stored.ng === 'ng、宣伝' && stored.mode === 'poll', 'saved prefs');
       assert(await page.evaluate((k) => !JSON.stringify(window.__show.saved).includes(k), KEY), 'キーは番組の保存データ（書き出し）に入らない');
       // 開始前のコメント（最初の応答）と、そのあとの新しいコメント
       yt.queue.push([T('old-1', '開始前のコメント'), T('old-2', 'これも前')]);
@@ -1063,7 +1065,8 @@ async function main() {
       // オーバーレイで流れる（アイコン＋名前）。開始前・NG は流さない
       await ov.waitForFunction(() => document.querySelector('.cm-item[data-id="b1"]'), null, { timeout: 5000 });
       const b1 = await ov.evaluate(() => { const e = document.querySelector('.cm-item[data-id="b1"]'); return { name: e.querySelector('.cm-name').textContent, icon: e.querySelector('img.cm-icon') ? e.querySelector('img.cm-icon').src : null, text: e.querySelector('.cm-text').textContent, top: e.style.top }; });
-      assert(b1.name === '@viewer_b1' && b1.icon && b1.icon.startsWith('https://yt3.ggpht.com/') && b1.text === 'こんばんは！' && b1.top === '660px', JSON.stringify(b1));
+      assert(b1.name === '@viewer_b1' && b1.icon && b1.icon.startsWith('https://yt3.ggpht.com/') && b1.text === 'こんばんは！' && b1.top === '0px', JSON.stringify(b1));
+      assert(await ov.evaluate(() => { const f = document.querySelector('.cm-flow'); return f.offsetTop === 660 && f.offsetLeft === 0 && f.offsetWidth === 1920 && f.offsetHeight === 248 && Boolean(f.querySelector('.cm-item[data-id="b1"]')); }), '帯（0,660 / 1920×248）の中を流れる');
       await ov.waitForFunction(() => document.querySelector('.cm-item.is-super .cm-amount'), null, { timeout: 5000 });
       assert((await ov.textContent('.cm-item.is-super .cm-amount')) === '¥1,000', 'super amount');
       assert((await ov.textContent('.cm-item.is-sticker')).includes('¥500'), 'sticker');
@@ -1153,14 +1156,236 @@ async function main() {
       await p.waitForFunction(() => document.querySelectorAll('.cm-item').length >= 1, null, { timeout: 8000 });
       const calmItem = await p.evaluate(() => { const e = document.querySelector('.cm-item'); return { tf: e.style.transform, top: e.style.top, lanes: window.__overlay.chat.cfg.lanes, blocked: window.__overlay.chat.blocked }; });
       // 帯 700〜886・3 列。見本の固定（600〜750 前後）と重なる 1 列目は使わない
-      assert(calmItem.tf === 'translateX(40px)' && ['762px', '824px'].includes(calmItem.top) && calmItem.lanes === 3 && JSON.stringify(calmItem.blocked) === '[0]', JSON.stringify(calmItem));
+      assert(calmItem.tf === 'translateX(40px)' && ['62px', '124px'].includes(calmItem.top) && calmItem.lanes === 3 && JSON.stringify(calmItem.blocked) === '[0]', JSON.stringify(calmItem));
+      assert(await p.evaluate(() => document.querySelector('.cm-flow').offsetTop === 700), '&top= は帯の位置');
       await p.goto(`${show}overlay.html?part=all&demo=1`);
       await p.waitForFunction(() => document.querySelectorAll('.cm-item').length >= 3 && !document.querySelector('.cm-pin').hidden, null, { timeout: 10000 });
       await p.evaluate(() => { document.body.style.setProperty('background', 'linear-gradient(135deg, #1b1d26, #0c0d12 60%, #22161d)', 'important'); document.body.style.height = '1080px'; const t = document.querySelector('.tt'); if (t) t.hidden = true; });
       await p.waitForTimeout(1500);
-      await p.screenshot({ path: '/tmp/claude-0/-home-user-X-trend/a81aec43-1a67-5668-bfb1-57f0ed28e406/scratchpad/comments-overlay.png' });
       await p.screenshot({ path: path.join(SHOTS, 'comments-overlay-all-1920.png') });
       await c.close();
+    });
+
+    // ---- 4c''. コメントの取得方式（プッシュ型 stream・数秒おきへの切り替え）とチャンネルから自動で探す（googleapis はモック）
+    await check('YouTube のコメント（プッシュ型）: stream の JSON 配列で受け取り・最初の要素はログだけ・続きから再接続／stream が使えなければ数秒おきに切り替え／URL が空ならチャンネルから今の配信を探す（検索も）', async () => {
+      const KEY = 'AIzaSyE2E-test_key_0123456789abcdefgh';
+      const UC = `UC${'e2eTestChannel_abcdefg'.slice(0, 22)}`;
+      const T = (id, msg) => ({ id, snippet: { type: 'textMessageEvent', publishedAt: new Date().toISOString(), displayMessage: msg }, authorDetails: { channelId: `UC${id}`, displayName: `@viewer_${id}` } });
+      const run = async ({ streamMode, channel = null }) => {
+        const c = await newCtx();
+        await c.addInitScript(([k, ch]) => {
+          localStorage.setItem('xtrend-show-ytchat-fast', '300');
+          if (!localStorage.getItem('xtrend-show-ytchat')) localStorage.setItem('xtrend-show-ytchat', JSON.stringify({ key: k, channel: ch || '' }));
+          localStorage.setItem('xtrend-show-ytchat-open', '1');
+        }, [KEY, channel]);
+        const yt = { calls: [], streamQueue: [[T('s-old', '開始前'), 'S1'], [T('s1', 'プッシュで届いたコメント'), 'S2']], pollQueue: [[T('p-old', '開始前（数秒おき）')], [T('p1', '数秒おきで届いたコメント')]], referers: [] };
+        const routeYt = async (pg) => {
+          await pg.route('https://www.googleapis.com/youtube/v3/**', async (route) => {
+            const r = route.request();
+            const u = new URL(r.url());
+            const cors = { 'access-control-allow-origin': '*' };
+            const json = (body, status = 200) => route.fulfill({ status, headers: cors, contentType: 'application/json', body: typeof body === 'string' ? body : JSON.stringify(body) });
+            const pth = u.pathname.replace('/youtube/v3', '');
+            yt.calls.push({ path: pth, token: u.searchParams.get('pageToken'), forHandle: u.searchParams.get('forHandle'), id: u.searchParams.get('id') });
+            yt.referers.push(r.headers().referer || '');
+            if (pth === '/channels') return json({ items: [{ id: UC, snippet: { title: 'テストのチャンネル' }, contentDetails: { relatedPlaylists: { uploads: 'UUe2e' } } }] });
+            if (pth === '/playlistItems') return json({ items: [{ contentDetails: { videoId: 'upcoming001' } }] });
+            if (pth === '/search') return json({ items: [{ id: { kind: 'youtube#video', videoId: 'livefound01' } }] });
+            if (pth === '/videos') {
+              if (u.searchParams.get('id') === 'upcoming001') return json({ items: [{ id: 'upcoming001', snippet: { title: '来週の配信' }, liveStreamingDetails: { scheduledStartTime: '2026-11-21T13:00:00Z', activeLiveChatId: 'NOPE' } }] });
+              if (u.searchParams.get('id') === 'livefound01') return json({ items: [{ id: 'livefound01', snippet: { title: '今夜のテスト配信' }, liveStreamingDetails: { actualStartTime: new Date(Date.now() - 600000).toISOString(), activeLiveChatId: 'CHAT-FOUND' } }] });
+              return json({ items: [{ liveStreamingDetails: { activeLiveChatId: 'CHAT-URL' } }] });
+            }
+            if (pth === '/liveChat/messages/stream') {
+              if (streamMode === 'fail') return route.abort('failed');
+              const parts = [];
+              while (yt.streamQueue.length && parts.length < 2) { const [it, tok] = yt.streamQueue.shift(); parts.push(JSON.stringify({ items: [it], nextPageToken: tok, pollingIntervalMillis: 0 })); }
+              return json(`[${parts.length ? parts.join('\n,') : JSON.stringify({ items: [], nextPageToken: 'S9' })}]`);
+            }
+            if (pth === '/liveChat/messages') return json({ items: yt.pollQueue.shift() || [], nextPageToken: `Q${yt.calls.length}`, pollingIntervalMillis: 100 });
+            return json({ error: { code: 404 } }, 404);
+          });
+        };
+        const ov = await c.newPage();
+        await ov.setViewportSize({ width: 1920, height: 1080 });
+        await setupRoutes(ov, { data: SAMPLE_404 });
+        watchConsole(ov, errors);
+        await ov.goto(`${show}overlay.html?part=comments`);
+        await ov.waitForFunction(() => window.__overlay && window.__overlay.chat);
+        const page = await c.newPage();
+        await setupRoutes(page, { data: SAMPLE_404 });
+        await routeYt(page);
+        watchConsole(page, errors);
+        await page.goto(`${show}#live`);
+        await ready(page);
+        return { c, page, ov, yt };
+      };
+      // ① プッシュ（stream）
+      {
+        const { c, page, ov, yt } = await run({ streamMode: 'ok' });
+        await page.fill('[data-key="yc-url"]', 'https://youtu.be/dQw4w9WgXcQ');
+        await page.click('[data-key="yc-toggle-run"]');
+        await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 's1'), null, { timeout: 8000 });
+        await page.waitForSelector('.yc-row[data-id="s-old"]');
+        assert((await page.textContent('.yc-row[data-id="s-old"]')).includes('開始前'), 'backlog');
+        assert(!(await ov.evaluate(() => window.__overlay.chat.launched.some((x) => x.id === 's-old'))), '最初の要素は流さない');
+        assert((await page.textContent('[data-key="yc-status"]')).includes('取得中（プッシュ）'), await page.textContent('[data-key="yc-status"]'));
+        await page.waitForFunction(() => true);
+        await new Promise((r) => setTimeout(r, 900));
+        const streams = yt.calls.filter((x) => x.path === '/liveChat/messages/stream');
+        assert(streams.length >= 2 && streams[0].token === null && streams[1].token === 'S2', `続きから ${JSON.stringify(streams.slice(0, 3))}`);
+        assert(!yt.calls.some((x) => x.path === '/liveChat/messages'), '数秒おきは使わない');
+        const origin = new URL(base).origin;
+        assert(yt.referers.every((r) => r === `${origin}/`), 'referer origin');
+        await page.screenshot({ path: path.join(SHOTS, 'live-comments-push-960.png') });
+        await c.close();
+      }
+      // ② stream が使えない（CORS・通信）→ 数秒おき
+      {
+        const { c, page, ov, yt } = await run({ streamMode: 'fail' });
+        await page.fill('[data-key="yc-url"]', 'https://youtu.be/dQw4w9WgXcQ');
+        await page.click('[data-key="yc-toggle-run"]');
+        await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 'p1'), null, { timeout: 8000 });
+        const st = await page.textContent('[data-key="yc-status"]');
+        assert(st.includes('秒ごと') && st.includes('※プッシュが使えないため'), st);
+        assert(!(await ov.evaluate(() => window.__overlay.chat.launched.some((x) => x.id === 'p-old'))), '切り替えても開始前は流さない');
+        assert(yt.calls.filter((x) => x.path === '/liveChat/messages/stream').length === 1, 'stream は 1 回だけ試す');
+        await page.screenshot({ path: path.join(SHOTS, 'live-comments-fallback-960.png') });
+        await c.close();
+      }
+      // ③ URL が空 → 登録したチャンネルの今の配信を探す（再生リストに無い → 検索）
+      {
+        const { c, page, ov, yt } = await run({ streamMode: 'ok', channel: '@e2e_test_channel' });
+        assert((await page.getAttribute('[data-key="yc-url"]', 'placeholder')).includes('空にすると'), 'placeholder');
+        assert((await page.inputValue('[data-key="yc-url"]')) === '', 'URL は空');
+        await page.click('[data-key="yc-toggle-run"]');
+        await page.waitForSelector('[data-key="yc-found"]:not([hidden])', { timeout: 8000 });
+        assert((await page.textContent('[data-key="yc-found"]')).includes('見つけた配信：今夜のテスト配信'), await page.textContent('[data-key="yc-found"]'));
+        await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 's1'), null, { timeout: 8000 });
+        const paths = yt.calls.map((x) => x.path);
+        assert(paths[0] === '/channels' && yt.calls[0].forHandle === '@e2e_test_channel', `channels ${JSON.stringify(yt.calls[0])}`);
+        assert(paths.includes('/playlistItems') && paths.includes('/search'), paths.join(','));
+        assert(yt.calls.find((x) => x.path === '/liveChat/messages/stream'), 'stream');
+        const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).channelInfo);
+        assert(saved && saved.id === UC && saved.uploads === 'UUe2e' && saved.input === '@e2e_test_channel', JSON.stringify(saved));
+        const units = await page.evaluate(() => window.__show.chatUnits());
+        assert(units >= 1 + 1 + 1 + 100 + 1 + 5, `quota ${units}`);
+        await page.screenshot({ path: path.join(SHOTS, 'live-comments-found-960.png') });
+        // 2 回目は覚えたチャンネルで channels.list を省く
+        await page.click('[data-key="yc-toggle-run"]');
+        const n = yt.calls.length;
+        await page.click('[data-key="yc-toggle-run"]');
+        await page.waitForSelector('[data-key="yc-found"]:not([hidden])', { timeout: 8000 });
+        assert(!yt.calls.slice(n).some((x) => x.path === '/channels'), 'channels.list は 1 回だけ');
+        await c.close();
+      }
+    });
+
+    await check('レイアウト調整: 固定コメントをマウスでドラッグ → OBS（同じブラウザ）の固定がその場で動く・保存で残る・キャンセルで戻る／帯をドラッグ → 新しい帯の中を流れる・数値・既定に戻す', async () => {
+      const c = await newCtx();
+      const ov = await c.newPage();
+      await ov.setViewportSize({ width: 1920, height: 1080 });
+      await setupRoutes(ov, { data: SAMPLE_404 });
+      watchConsole(ov, errors);
+      await ov.goto(`${show}overlay.html?part=comments`);
+      await ov.waitForFunction(() => window.__overlay && window.__overlay.chat);
+      const page = await c.newPage();
+      await setupRoutes(page, { data: SAMPLE_404 });
+      watchConsole(page, errors);
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.click('[data-key="yc-open"]');
+      await page.click('[data-key="yc-layout"]');
+      await page.waitForSelector('dialog.le-dialog[open]');
+      // 見本: 編集画面の中（iframe）と OBS（BroadcastChannel）に見本の固定・流れるコメント
+      await ov.waitForFunction(() => { const p = document.querySelector('.cm-pin'); return p && !p.hidden && p.dataset.id === 'demo-pin-0' && document.querySelectorAll('.cm-item').length > 0; }, null, { timeout: 8000 });
+      const inner = page.frameLocator('iframe.le-frame');
+      await inner.locator('.cm-pin:not([hidden])').waitFor({ timeout: 8000 });
+      const leState = () => page.evaluate(() => window.__show.layoutEditorState());
+      let st = await leState();
+      assert(st.scale > 0.4 && st.scale < 0.55, `scale ${st.scale}`);
+      assert(await page.evaluate(() => document.documentElement.scrollWidth) <= 960, 'no h-scroll');
+      // 固定コメントをドラッグ（左へ 100px・上へ 40px の画面上の距離。右へは画面の端 1920−1170＝750 で止まる）
+      const drag = async (sel, dx, dy, at = [0.5, 0.5]) => {
+        const b = await page.locator(sel).boundingBox();
+        const x = b.x + b.width * at[0];
+        const y = b.y + b.height * at[1];
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        for (let i = 1; i <= 5; i++) await page.mouse.move(x + (dx * i) / 5, y + (dy * i) / 5);
+        await page.mouse.up();
+      };
+      await drag('.le-pin', 400, 0, [0.3, 0.5]);
+      assert((await leState()).draft.pin.x === 750, '右の端で止まる');
+      await drag('.le-pin', -100, -40, [0.3, 0.5]);
+      st = await leState();
+      const px = st.draft.pin.x;
+      const py = st.draft.pin.y;
+      // 10px ごとか、参考の枠の辺（例: LINE ID の右端 1715）にそろう
+      assert(Math.abs(px - (750 - 100 / st.scale)) <= 12 && (px % 10 === 0 || [1715, 1720, 1900].includes(px + 1170)) && py < 600, `pin draft ${px},${py}`);
+      await ov.waitForFunction((x) => document.querySelector('.cm-pin').offsetLeft === x, px, { timeout: 3000 });
+      assert((await page.inputValue('[data-key="le-pin-x"]')) === String(px), 'readout');
+      await page.screenshot({ path: path.join(SHOTS, 'layout-editor-960.png') });
+      await page.click('[data-key="le-save"]');
+      await page.waitForSelector('dialog.le-dialog', { state: 'detached' });
+      let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout);
+      assert(saved.pin.x === px && saved.pin.y === py, JSON.stringify(saved.pin));
+      await ov.waitForFunction((x) => window.__overlay.chat.cfg.pin.x === x && document.querySelector('.cm-pin').hidden, px, { timeout: 3000 });
+      // もう一度開いて動かし、キャンセル → 開く前に戻る
+      await page.click('[data-key="yc-layout"]');
+      await page.waitForSelector('dialog.le-dialog[open]');
+      await drag('.le-pin', -100, 0, [0.3, 0.5]);
+      const moved = (await leState()).draft.pin.x;
+      assert(moved < px, `moved ${moved}`);
+      await ov.waitForFunction((x) => document.querySelector('.cm-pin').offsetLeft === x, moved, { timeout: 3000 });
+      await page.click('[data-key="le-cancel"]');
+      await page.waitForSelector('dialog.le-dialog', { state: 'detached' });
+      await ov.waitForFunction((x) => window.__overlay.chat.cfg.pin.x === x, px, { timeout: 3000 });
+      saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout);
+      assert(saved.pin.x === px, 'キャンセルは保存しない');
+      // 帯をドラッグ（上へ）→ OBS の帯が動き、その中を流れる。数値で幅、列を増やす
+      await page.click('[data-key="yc-layout"]');
+      await page.waitForSelector('dialog.le-dialog[open]');
+      st = await leState();
+      await drag('.le-band', 0, -100, [0.12, 0.85]);
+      st = await leState();
+      const by = st.draft.band.y;
+      assert(by < 600 && by % 10 === 0, `band y ${by}`);
+      await page.fill('[data-key="le-band-w"]', '1200');
+      await page.press('[data-key="le-band-w"]', 'Enter');
+      await page.click('[data-key="le-lanes-plus"]');
+      st = await leState();
+      assert(st.draft.band.w === 1200 && st.draft.lanes === 5, JSON.stringify(st.draft));
+      await ov.waitForFunction((y) => { const f = document.querySelector('.cm-flow'); return f.offsetTop === y && f.offsetWidth === 1200 && window.__overlay.chat.cfg.lanes === 5; }, by, { timeout: 3000 });
+      await ov.waitForFunction(() => window.__overlay.chat.launched.filter((x) => x.at > Date.now() - 3000).length > 0 && document.querySelector('.cm-flow .cm-item'), null, { timeout: 5000 });
+      // 矢印キーで 1px・Shift で 10px
+      await page.focus('.le-band');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Shift+ArrowDown');
+      assert((await leState()).draft.band.y === by + 11, 'arrow keys');
+      await ov.screenshot({ path: path.join(SHOTS, 'layout-editor-obs-band.png') });
+      await page.click('[data-key="le-save"]');
+      await page.waitForSelector('dialog.le-dialog', { state: 'detached' });
+      saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout);
+      assert(saved.band.y === by + 11 && saved.band.w === 1200 && saved.lanes === 5, JSON.stringify(saved));
+      // 既定に戻す（保存はしない）
+      await page.click('[data-key="yc-layout"]');
+      await page.waitForSelector('dialog.le-dialog[open]');
+      await page.click('[data-key="le-default"]');
+      st = await leState();
+      assert(st.draft.band.y === 660 && st.draft.pin.x === 655 && st.draft.lanes === 4, JSON.stringify(st.draft));
+      await page.click('[data-key="le-cancel"]');
+      await c.close();
+      // 1920 の画面（OBS タブから開く）
+      const c2 = await newCtx({ viewport: { width: 1920, height: 1080 } });
+      const { page: p2 } = await open(c2, `${show}#obs-setup`);
+      await p2.click('[data-key="setup-layout"]');
+      await p2.waitForSelector('dialog.le-dialog[open]');
+      await p2.frameLocator('iframe.le-frame').locator('.cm-pin:not([hidden])').waitFor({ timeout: 8000 });
+      await p2.waitForTimeout(1500);
+      await p2.screenshot({ path: path.join(SHOTS, 'layout-editor-1920.png') });
+      await p2.click('[data-key="le-cancel"]');
+      await c2.close();
     });
 
     // ---- 4d. 演出（段階4）。偽の OBS（認証なし）で emit_event を受け、fx パーツへ配る

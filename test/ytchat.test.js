@@ -6,8 +6,11 @@ import {
   videosUrl, messagesUrl, quotaUnits, quotaPerHour, normalizeNg, parseNgWords, ngMatcher, applyChatBatch, sanitizeChatCfg, parseChatPrefs, restorePin,
   wireItem, buildChatMessage, createChatReceiver, createChatPoller, demoChatItem, demoChatPin,
   CHAT_CFG_DEFAULTS, CHAT_INTERVALS, CHAT_STALE_MS, CHAT_PIN_BOX, CHAT_PIN_RESTORE_MS, YT_API,
+  createJsonArrayParser, createStreamBodyReader, streamErrorDecision, streamUrl, createChatClient, STREAM_BACKOFF_MS, applyChatOverrides,
+  parseChannelInput, channelsUrl, channelInfoOf, playlistItemsUrl, videosDetailUrl, searchLiveUrl, videoIdsOf, pickActiveLive, createLiveFinder, FINDER_WAIT_TEXT,
+  pinBoxHeight,
 } from '../show/js/ytchat.js';
-import { createLaneScheduler, lanesOverlapping, laneY, travelMs, laneBusyMs, pxPerMs, LANE_GAP, QUEUE_MAX } from '../show/js/lanes.js';
+import { createLaneScheduler, lanesOverlapping, laneY, laneH, laneTop, travelMs, laneBusyMs, pxPerMs, LANE_GAP, QUEUE_MAX } from '../show/js/lanes.js';
 
 const KEY = 'AIzaSyA-test_key_0123456789abcdefghij';
 
@@ -172,19 +175,39 @@ test('ログ: 最初の応答はログだけ（流さない）・重複・NG・�
   assert.equal(r.log[0].id, 'n20', '古いものから捨てる');
 });
 
-test('設定: 範囲に丸める・取得間隔は選択肢だけ・帯が画面からはみ出す列は減らす・固定は 3 時間まで復元', () => {
-  assert.deepEqual(sanitizeChatCfg(null), { ...CHAT_CFG_DEFAULTS });
-  assert.deepEqual(sanitizeChatCfg({ top: -5, lanes: 99, laneH: 10, size: 500, speed: 0, flow: false }), { top: 0, lanes: 12, laneH: 30, size: 96, speed: 3, flow: false });
-  assert.equal(sanitizeChatCfg({ top: 1000, lanes: 4, laneH: 62 }).lanes, 1, '1080 からはみ出さない');
+test('設定: 範囲に丸める・取得間隔は選択肢だけ・古い形（top・laneH）は帯へ・1 列 24px 未満の列は減らす・固定は 3 時間まで復元', () => {
+  const D = sanitizeChatCfg(null);
+  assert.deepEqual(D, { band: { x: 0, y: 660, w: 1920, h: 248 }, lanes: 4, size: 34, speed: 8, pin: { x: 655, y: 600, w: 1170, size: 34, lines: 2 }, flow: true });
+  assert.deepEqual(D, sanitizeChatCfg(CHAT_CFG_DEFAULTS));
+  // 古い形 → 帯 { x: 0, y: top, w: 1920, h: lanes × laneH }
+  assert.deepEqual(sanitizeChatCfg({ top: 700, lanes: 3, laneH: 62 }).band, { x: 0, y: 700, w: 1920, h: 186 });
+  assert.deepEqual(sanitizeChatCfg({ top: 1000, lanes: 4, laneH: 62 }).band, { x: 0, y: 832, w: 1920, h: 248 }, '画面からはみ出さない');
+  const big = sanitizeChatCfg({ band: { x: -50, y: 2000, w: 5000, h: 10 }, lanes: 99, size: 500, speed: 0, flow: false, pin: { x: 9999, y: -3, w: 10, size: 5, lines: 9 } });
+  assert.deepEqual(big.band, { x: 0, y: 1050, w: 1920, h: 30 });
+  assert.equal(big.lanes, 1, '1 列 24px 未満にならない');
+  assert.deepEqual([big.size, big.speed, big.flow], [96, 3, false]);
+  assert.deepEqual(big.pin, { x: 1620, y: 0, w: 300, size: 16, lines: 3 });
+  assert.equal(sanitizeChatCfg({ band: { x: 0, y: 0, w: 1920, h: 100 }, lanes: 12 }).lanes, 4);
   assert.equal(sanitizeChatCfg({ speed: 7.3 }).speed, 7.5);
-  assert.equal(sanitizeChatCfg({ top: 'abc' }).top, 660);
+  assert.equal(sanitizeChatCfg({ band: { x: 'abc', y: 700, w: 1000, h: 200 } }).band.x, 0);
+  assert.equal(sanitizeChatCfg({ pin: { lines: 'x' } }).pin.lines, 2);
+  // 古い保存（top・lanes・laneH・size・speed が直下）→ layout へ
+  const old = parseChatPrefs({ top: 700, lanes: 3, laneH: 50, size: 40, speed: 6, flow: false });
+  assert.deepEqual(old.layout, { band: { x: 0, y: 700, w: 1920, h: 150 }, lanes: 3, size: 40, speed: 6, pin: { x: 655, y: 600, w: 1170, size: 34, lines: 2 } });
+  assert.equal(old.flow, false);
+  assert.deepEqual(parseChatPrefs({ layout: { band: { x: 100, y: 500, w: 800, h: 200 }, lanes: 2, pin: { x: 10, y: 20, w: 400, size: 40, lines: 1 } } }).layout.pin, { x: 10, y: 20, w: 400, size: 40, lines: 1 });
+  assert.equal(parseChatPrefs({ mode: 'poll' }).mode, 'poll');
+  assert.equal(parseChatPrefs({ mode: 'evil' }).mode, 'auto');
+  assert.equal(parseChatPrefs({ channel: ' @HajimeRikuto ' }).channel, '@HajimeRikuto');
+  assert.equal(parseChatPrefs({ channelInfo: { id: 'bad', uploads: 'UU' } }).channelInfo, null);
   const p = parseChatPrefs(JSON.stringify({ key: `  ${KEY}  `, url: ' https://youtu.be/dQw4w9WgXcQ ', interval: 7000, ng: 'a、b', top: 700, pin: { id: 'p1', kind: 'text', text: 'x', name: '@a', icon: 'https://evil.example/a.png' }, pinnedAt: 1000 }));
   assert.equal(p.key, KEY);
   assert.equal(p.url, 'https://youtu.be/dQw4w9WgXcQ');
   assert.equal(p.interval, 6000, '選択肢に無い間隔は既定');
   assert.ok(CHAT_INTERVALS.includes(parseChatPrefs({ interval: 15000 }).interval));
-  assert.equal(p.top, 700);
+  assert.equal(p.layout.band.y, 700);
   assert.equal(p.pin.icon, null);
+  assert.equal(p.layout.pin.x, 655, '固定したコメント（pin）はレイアウトの箱ではない');
   assert.deepEqual(parseChatPrefs('{broken'), parseChatPrefs(null));
   assert.equal(parseChatPrefs(null).flow, true);
   assert.equal(restorePin(p, 1000 + CHAT_PIN_RESTORE_MS - 1).id, 'p1');
@@ -193,7 +216,7 @@ test('設定: 範囲に丸める・取得間隔は選択肢だけ・帯が画面
 
 test('オーバーレイへのメッセージ: 画面用に短く・余計な値は落とす', () => {
   const m = buildChatMessage({ sid: 's', seq: 3, at: 100, add: [{ id: 'a', kind: 'super', text: 'あ'.repeat(80), name: '@n', icon: 'https://yt3.ggpht.com/x', amount: '¥500', color: '#FFCA28', at: 90, channelId: 'UCsecret', extra: 1 }, { id: 'bad id' }],
-    remove: ['x', 'bad id', 3], pin: { id: 'p', kind: 'text', text: 'い'.repeat(200), name: '@p', color: '#ffffff' }, cfg: { top: 700 } });
+    remove: ['x', 'bad id', 3], pin: { id: 'p', kind: 'text', text: 'い'.repeat(200), name: '@p', color: '#ffffff' }, cfg: { band: { x: 0, y: 700, w: 1920, h: 186 }, lanes: 3 } });
   assert.equal(m.type, 'chat');
   assert.equal(m.v, 1);
   assert.equal(m.add.length, 1);
@@ -203,7 +226,8 @@ test('オーバーレイへのメッセージ: 画面用に短く・余計な値
   assert.deepEqual(m.remove, ['x']);
   assert.equal(Array.from(m.pin.text).length, 140);
   assert.equal(m.pin.color, null, '通常のコメントに色は付けない');
-  assert.equal(m.cfg.top, 700);
+  assert.equal(m.cfg.band.y, 700);
+  assert.equal(m.cfg.lanes, 3);
   assert.equal(wireItem({ id: 'a', kind: 'evil', text: 'x' }).kind, 'text');
 });
 
@@ -237,15 +261,24 @@ test('受け手: id で重複を除く・古いもの（30 秒）は流さない
 });
 
 test('列: 上から空いている列・同じ速さなので前のお尻＋40px で次・空きが無ければ待つ（40 件まで）・固定と重なる列は使わない', () => {
-  const cfg = { ...CHAT_CFG_DEFAULTS };
+  const cfg = sanitizeChatCfg(CHAT_CFG_DEFAULTS);
   assert.equal(laneY(cfg, 0), 660);
   assert.equal(laneY(cfg, 3), 846);
-  assert.equal(laneY(cfg, 3) + cfg.laneH, 908, '帯の下端 908（トピック帯 915 の上）');
+  assert.equal(laneY(cfg, 3) + laneH(cfg), 908, '帯の下端 908（トピック帯 915 の上）');
+  assert.equal(laneTop(cfg, 2), 124, '帯の中の位置');
   assert.equal(pxPerMs(cfg), 1920 / 8000);
   assert.equal(travelMs(480, cfg), 10000);
   assert.equal(laneBusyMs(200, cfg), Math.ceil((200 + LANE_GAP) / (1920 / 8000)));
   assert.equal(laneBusyMs(200, cfg, { calm: true }), 8000);
+  // 帯の幅で速さが決まる（狭い帯は同じ秒数でゆっくり）
+  const narrow = sanitizeChatCfg({ band: { x: 960, y: 660, w: 960, h: 248 } });
+  assert.equal(pxPerMs(narrow), 960 / 8000);
+  assert.equal(travelMs(240, narrow), 10000);
+  // 横に重ならない固定コメントは列をふさがない
+  assert.deepEqual(lanesOverlapping(narrow, { x: 0, y: 600, w: 900, h: 160 }), []);
+  assert.deepEqual(lanesOverlapping(narrow, { x: 900, y: 600, w: 100, h: 160 }), [0, 1]);
   // 固定コメントの箱（600〜760）と重なるのは 1・2 列目（660〜722・722〜784）
+  assert.deepEqual(lanesOverlapping(cfg, { x: CHAT_PIN_BOX.x, y: CHAT_PIN_BOX.y, w: CHAT_PIN_BOX.w, h: 160 }), [0, 1]);
   assert.deepEqual(lanesOverlapping(cfg, { y: CHAT_PIN_BOX.y, h: 160 }), [0, 1]);
   assert.deepEqual(lanesOverlapping(cfg, { y: 600, h: 60 }), [], '1 行の固定は帯にかからない');
   assert.deepEqual(lanesOverlapping(cfg, { y: 600, h: 61 }), [0]);
@@ -422,3 +455,351 @@ test('looksLikeGoogleKey: AIza で始まるキーだけ（ブラウザが自動�
   assert.ok(looksLikeGoogleKey('AIzaSyD0123456789abcdefghijklmnopqrstu'));
   for (const k of ['', 'hunter2-password-1234567890', 'github_pat_11ABCDEFG0123456789_abcdefghijklmnop', 'AIza', `${KEY} `, null]) assert.ok(!looksLikeGoogleKey(k), String(k));
 });
+
+// ================================================================ プッシュ型（stream）・チャンネルから探す・URL の上書き
+
+test('JSON 配列を少しずつ: どのバイト位置で切っても同じ要素（文字列の中の " \\ [ ] { }・日本語・絵文字・改行区切り）', () => {
+  const data = [
+    { items: [{ id: 'a', snippet: { displayMessage: 'こんばんは！"引用"と \\ と [角] {波} 😀👍🏽' } }], nextPageToken: 'T1', pollingIntervalMillis: 0 },
+    { items: [], nextPageToken: 'T2' },
+    { error: { code: 403, message: 'x', errors: [{ reason: 'quotaExceeded' }] } },
+    [1, 'two', { three: 3 }], 'str,]', 42, true, null,
+  ];
+  const body = `[${data.map((x) => JSON.stringify(x)).join('\n,')}]`;
+  const bytes = new TextEncoder().encode(body);
+  for (let k = 0; k <= bytes.length; k++) {
+    const rd = createStreamBodyReader();
+    const got = [...rd.push(bytes.slice(0, k)), ...rd.push(bytes.slice(k))];
+    const end = rd.end();
+    got.push(...end.items);
+    assert.deepEqual(got, data, `split at ${k}`);
+    assert.equal(end.truncated, false);
+    assert.equal(end.closed, true);
+  }
+  // 1 バイトずつ
+  const rd = createStreamBodyReader();
+  const one = [];
+  for (const b of bytes) one.push(...rd.push(new Uint8Array([b])));
+  one.push(...rd.end().items);
+  assert.deepEqual(one, data);
+  // 途中で切れた・単体のオブジェクト（エラーの本文）・空・壊れた要素
+  const cut = createJsonArrayParser();
+  assert.deepEqual(cut.push('[{"a":1},{"b":'), [{ a: 1 }]);
+  assert.equal(cut.end().truncated, true);
+  assert.deepEqual(createJsonArrayParser().push('  {"error":{"code":400}}'), [{ error: { code: 400 } }]);
+  assert.deepEqual(createJsonArrayParser().push('[]'), []);
+  const bad = createJsonArrayParser();
+  assert.deepEqual(bad.push('[{"a":1},{bad},{"c":3}]'), [{ a: 1 }, { c: 3 }]);
+  assert.equal(bad.end().bad, 1);
+});
+
+test('プッシュのエラー: 上限・配信なし・キーは止める／404・405・501・理由の分からない 4xx は切り替え／混雑はつなぎ直す（配列で包まれた本文も読む）', () => {
+  const wrap = (code, reason, extra = {}) => [{ error: { code, message: 'm', errors: reason ? [{ reason }] : [], ...extra } }];
+  assert.equal(streamErrorDecision(403, wrap(403, 'quotaExceeded')).action, 'stop');
+  assert.equal(streamErrorDecision(403, wrap(403, 'quotaExceeded')).error.code, 'quota');
+  assert.equal(streamErrorDecision(404, wrap(404, 'liveChatNotFound')).action, 'stop');
+  assert.equal(streamErrorDecision(403, wrap(403, 'liveChatEnded')).action, 'stop');
+  assert.equal(streamErrorDecision(400, wrap(400, 'badRequest', { details: [{ reason: 'API_KEY_INVALID' }] })).action, 'stop');
+  assert.equal(streamErrorDecision(403, wrap(403, null, { details: [{ reason: 'API_KEY_HTTP_REFERRER_BLOCKED' }] })).action, 'stop');
+  assert.equal(streamErrorDecision(403, wrap(403, 'accessNotConfigured')).action, 'stop');
+  for (const st of [404, 405, 501]) assert.equal(streamErrorDecision(st, null).action, st === 501 ? 'retry' : 'fallback', String(st));
+  assert.equal(streamErrorDecision(400, wrap(400, 'invalidArgument')).action, 'fallback');
+  assert.equal(streamErrorDecision(401, null).action, 'fallback');
+  assert.equal(streamErrorDecision(503, wrap(503, 'backendError')).action, 'retry');
+  assert.equal(streamErrorDecision(429, null).action, 'retry');
+  assert.equal(classifyApiError(403, wrap(403, 'quotaExceeded')).code, 'quota', '配列で包まれた本文');
+  assert.equal(streamUrl('C/1', KEY, 'P'), `${YT_API}/liveChat/messages/stream?liveChatId=C%2F1&part=snippet,authorDetails&maxResults=200&pageToken=P&key=${KEY}`);
+});
+
+/** 偽の時計・fetch（stream は配列の本文を chunks で返す） */
+function streamHarness(handler) {
+  let t = 0;
+  let timers = [];
+  const calls = [];
+  const enc = new TextEncoder();
+  const fetchImpl = async (url, opts) => {
+    calls.push({ url, opts });
+    const r = await handler(url, calls.length, opts);
+    if (r === 'network') throw new TypeError('Failed to fetch');
+    const chunks = r.chunks || [JSON.stringify(r.body ?? {})];
+    return {
+      ok: (r.status || 200) < 400, status: r.status || 200,
+      json: async () => JSON.parse(chunks.join('')),
+      text: async () => chunks.join(''),
+      body: {
+        getReader() {
+          let i = 0;
+          return {
+            read: () => {
+              if (r.hang && i >= chunks.length) return new Promise((_, rej) => { opts.signal.addEventListener('abort', () => rej(new Error('aborted'))); });
+              if (r.dropAfter != null && i >= r.dropAfter) return Promise.reject(new Error('dropped'));
+              return Promise.resolve(i < chunks.length ? { done: false, value: enc.encode(chunks[i++]) } : { done: true });
+            },
+            cancel() {},
+          };
+        },
+      },
+    };
+  };
+  return {
+    calls, fetchImpl,
+    now: () => t,
+    setTimer: (fn, ms) => { const x = { fn, at: t + ms }; timers.push(x); return x; },
+    clearTimer: (x) => { timers = timers.filter((y) => y !== x); },
+    pending: () => timers.map((x) => x.at - t).sort((a, b) => a - b),
+    async flush() { for (let i = 0; i < 5; i++) await new Promise((r) => setImmediate(r)); },
+    async advance(ms) {
+      const end = t + ms;
+      for (;;) {
+        const next = timers.filter((x) => x.at <= end).sort((a, b) => a.at - b.at)[0];
+        if (!next) break;
+        t = next.at;
+        timers = timers.filter((x) => x !== next);
+        next.fn();
+        await this.flush();
+      }
+      t = end;
+      await this.flush();
+    },
+  };
+}
+const videosOk = { body: { items: [{ liveStreamingDetails: { activeLiveChatId: 'CH' } }] } };
+const el = (ids, token) => JSON.stringify({ items: ids.map((id) => text(id, `本文${id}`)), nextPageToken: token, pollingIntervalMillis: 0 });
+
+test('プッシュ: 最初の要素はログだけ・あとは流す・切れたら続き（pageToken）から 5 秒に 1 回まで・1 接続 5 単位', async () => {
+  const h = streamHarness((url, n) => {
+    if (url.includes('/videos?')) return videosOk;
+    if (n === 2) return { chunks: [`[${el(['old'], 'T1')}`, `\n,${el(['n1'], 'T2')}`, '\n]'] };
+    return { chunks: [`[${el([`r${n}`], `T${n}`)}]`] };
+  });
+  const batches = [];
+  const units = [];
+  const states = [];
+  const c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', interval: 6000, ...h, onBatch: (n, o) => batches.push([n.events.map((e) => e.item.id), o.backlog]), onUnits: (k) => units.push(k), onStatus: (s) => states.push(`${s.status}:${s.via}`) });
+  c.start();
+  await h.flush();
+  assert.deepEqual(batches, [[['old'], true], [['n1'], false]]);
+  assert.ok(h.calls[1].url.startsWith(`${YT_API}/liveChat/messages/stream?liveChatId=CH`));
+  assert.ok(!h.calls[1].url.includes('pageToken'));
+  assert.equal(h.calls[1].opts.referrerPolicy, 'origin');
+  assert.equal(h.calls[1].opts.credentials, 'omit');
+  assert.deepEqual(h.pending(), [0], 'すぐつなぎ直す（予約）');
+  await h.advance(0);
+  assert.deepEqual(h.pending(), [5000], '5 秒に 1 回まで');
+  await h.advance(5000);
+  assert.ok(h.calls[2].url.includes('pageToken=T2'), '続きから');
+  assert.deepEqual(batches[2], [['r3'], false]);
+  assert.deepEqual(units, ['videos', 'stream', 'stream']);
+  assert.equal(c.status().via, 'stream');
+  assert.ok(states.includes('running:stream'));
+  c.stop();
+  assert.deepEqual(h.pending(), []);
+});
+
+test('プッシュ: 最初の接続で通信の失敗（CORS）・404 → 数秒おきに切り替え（開始前のコメントはログだけ）', async () => {
+  for (const first of ['network', { status: 404, chunks: ['Not Found'] }, { status: 400, chunks: [JSON.stringify([{ error: { code: 400, errors: [{ reason: 'invalidArgument' }] } }])] }]) {
+    const h = streamHarness((url) => {
+      if (url.includes('/videos?')) return videosOk;
+      if (url.includes('/stream?')) return first;
+      return { body: { items: [text('p1', '数秒おき')], nextPageToken: 'Q1', pollingIntervalMillis: 0 } };
+    });
+    const batches = [];
+    const c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', interval: 6000, ...h, onBatch: (n, o) => batches.push([n.events.map((e) => e.item.id), o.backlog]) });
+    c.start();
+    await h.flush();
+    const st = c.status();
+    assert.equal(st.via, 'poll');
+    assert.equal(st.fallback, 'プッシュが使えないため');
+    assert.equal(st.status, 'running');
+    assert.ok(h.calls.some((x) => x.url.includes('/liveChat/messages?')));
+    assert.ok(!h.calls.some((x, i) => i > 1 && x.url.includes('/videos?')), 'chatId は使い回す');
+    assert.deepEqual(batches, [[['p1'], true]]);
+    c.stop();
+  }
+});
+
+test('プッシュ: 上限（配列のエラー）は止める・混雑はつなぎ直す・30 秒に要素なしで 3 回切れたら切り替え・届いたあとの切断はつなぎ直す', async () => {
+  // 上限
+  let h = streamHarness((url) => (url.includes('/videos?') ? videosOk : { status: 403, chunks: [JSON.stringify([{ error: { code: 403, errors: [{ reason: 'quotaExceeded' }] } }])] }));
+  let c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', ...h });
+  c.start();
+  await h.flush();
+  assert.equal(c.status().status, 'error');
+  assert.equal(c.status().code, 'quota');
+  assert.deepEqual(h.pending(), []);
+  // 混雑 → 1 秒（と 5 秒に 1 回）でつなぎ直す
+  h = streamHarness((url, n) => (url.includes('/videos?') ? videosOk : n === 2 ? { status: 503, chunks: ['[]'] } : { chunks: [`[${el(['ok'], 'T')}]`] }));
+  c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', ...h });
+  c.start();
+  await h.flush();
+  assert.equal(c.status().status, 'retrying');
+  assert.deepEqual(h.pending(), [STREAM_BACKOFF_MS[1]]);
+  await h.advance(5000);
+  assert.equal(c.status().status, 'running');
+  assert.equal(c.status().via, 'stream');
+  c.stop();
+  // 何も届かないまま 3 回切れる → 数秒おき
+  h = streamHarness((url) => (url.includes('/videos?') ? videosOk : url.includes('/stream?') ? { chunks: ['[]'] } : { body: { items: [], pollingIntervalMillis: 0 } }));
+  c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', ...h });
+  c.start();
+  await h.flush();
+  await h.advance(20000);
+  assert.equal(c.status().via, 'poll');
+  assert.equal(c.status().fallback, 'プッシュが続かないため');
+  assert.equal(h.calls.filter((x) => x.url.includes('/stream?')).length, 3);
+  c.stop();
+  // 届いたあとに切れた → 数秒おきにはせず、続きからつなぎ直す
+  h = streamHarness((url, n) => (url.includes('/videos?') ? videosOk : n === 2 ? { chunks: [`[${el(['a'], 'TA')}`, `,${el(['b'], 'TB')}`], dropAfter: 1 } : { chunks: [`[${el(['c'], 'TC')}]`] }));
+  c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', ...h });
+  c.start();
+  await h.flush();
+  await h.advance(6000);
+  assert.equal(c.status().via, 'stream');
+  assert.ok(h.calls[2].url.includes('pageToken=TA'));
+  c.stop();
+});
+
+test('プッシュ: 何も届かないまま 120 秒（見張り）→ 切って続きからつなぎ直す／数秒ごとのみの設定ならプッシュは使わない', async () => {
+  const h = streamHarness((url, n) => (url.includes('/videos?') ? videosOk : n === 2 ? { chunks: [`[${el(['a'], 'TA')}`], hang: true } : { chunks: [`[${el(['b'], 'TB')}]`] }));
+  const c = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', ...h, idleMs: 120000 });
+  c.start();
+  await h.flush();
+  assert.equal(h.calls.length, 2);
+  await h.advance(119000);
+  assert.equal(h.calls.length, 2, 'まだ待つ');
+  await h.advance(1000);
+  assert.equal(h.calls.length, 3, '見張りで切ってつなぎ直す');
+  assert.ok(h.calls[2].url.includes('pageToken=TA'));
+  c.stop();
+  const h2 = streamHarness((url) => (url.includes('/videos?') ? videosOk : { body: { items: [], pollingIntervalMillis: 0 } }));
+  const p = createChatClient({ key: KEY, videoId: 'dQw4w9WgXcQ', mode: 'poll', ...h2 });
+  p.start();
+  await h2.flush();
+  assert.ok(!h2.calls.some((x) => x.url.includes('/stream?')));
+  assert.equal(p.status().via, 'poll');
+  assert.equal(p.status().fallback, '');
+  p.stop();
+});
+
+test('チャンネルの入力: @ハンドル・URL（/@x・/@x/live・/channel/UC…・m.）・UC… の ID。それ以外は null', () => {
+  const uc = `UC${'a1_-'.repeat(5)}ab`;
+  assert.deepEqual(parseChannelInput('@HajimeRikuto'), { handle: '@HajimeRikuto' });
+  assert.deepEqual(parseChannelInput(' https://www.youtube.com/@HajimeRikuto/live '), { handle: '@HajimeRikuto' });
+  assert.deepEqual(parseChannelInput('youtube.com/@yoru.buzz-ch'), { handle: '@yoru.buzz-ch' });
+  assert.deepEqual(parseChannelInput(`https://m.youtube.com/${encodeURIComponent('@よるバズ')}`), { handle: '@よるバズ' });
+  assert.equal(parseChannelInput('@よる'), null, '3 文字から');
+  assert.deepEqual(parseChannelInput(`https://www.youtube.com/channel/${uc}`), { id: uc });
+  assert.deepEqual(parseChannelInput(uc), { id: uc });
+  for (const x of ['', 'HajimeRikuto', '@a', '@has space', 'https://example.com/@abc', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'UCshort', 'javascript:alert(1)']) assert.equal(parseChannelInput(x), null, x);
+  assert.equal(channelsUrl({ handle: '@よる' }, KEY), `${YT_API}/channels?part=snippet,contentDetails&forHandle=%40%E3%82%88%E3%82%8B&key=${KEY}`);
+  assert.ok(channelsUrl({ id: uc }, KEY).includes(`&id=${uc}&`));
+  assert.ok(playlistItemsUrl('UUx', KEY).includes('playlistId=UUx&maxResults=10'));
+  assert.ok(videosDetailUrl(['a', 'b'], KEY).includes('part=snippet,liveStreamingDetails&id=a,b'));
+  assert.ok(searchLiveUrl(uc, KEY).includes('eventType=live&type=video&maxResults=5'));
+  assert.deepEqual(channelInfoOf({ items: [{ id: uc, snippet: { title: 'はじめ' }, contentDetails: { relatedPlaylists: { uploads: 'UUabc' } } }] }), { id: uc, uploads: 'UUabc', title: 'はじめ' });
+  assert.ok(channelInfoOf({ items: [] }).error);
+  assert.deepEqual(videoIdsOf({ items: [{ contentDetails: { videoId: 'dQw4w9WgXcQ' } }, { id: { videoId: 'aaaaaaaaaaa' } }, { id: { videoId: 'bad' } }, { contentDetails: { videoId: 'dQw4w9WgXcQ' } }] }), ['dQw4w9WgXcQ', 'aaaaaaaaaaa']);
+});
+
+const vid = (id, d, title = `配信${id}`) => ({ id, snippet: { title }, liveStreamingDetails: d });
+test('今の配信を選ぶ: 始まっていて終わっていない・チャットあり・いちばん新しい（予定・終わった・チャットなしは選ばない）', () => {
+  const body = { items: [
+    vid('upcoming001', { scheduledStartTime: '2026-11-14T20:00:00Z', activeLiveChatId: 'C1' }),
+    vid('ended000001', { actualStartTime: '2026-11-14T10:00:00Z', actualEndTime: '2026-11-14T11:00:00Z', activeLiveChatId: 'C2' }),
+    vid('nochat00001', { actualStartTime: '2026-11-14T13:00:00Z' }),
+    vid('live0000001', { actualStartTime: '2026-11-14T12:00:00Z', activeLiveChatId: 'C3' }),
+    vid('live0000002', { actualStartTime: '2026-11-14T12:30:00Z', activeLiveChatId: 'C4' }, '今夜の配信'),
+    { id: 'novideo0001' },
+  ] };
+  assert.deepEqual(pickActiveLive(body), { videoId: 'live0000002', chatId: 'C4', title: '今夜の配信', startedAt: Date.parse('2026-11-14T12:30:00Z') });
+  assert.equal(pickActiveLive({ items: body.items.slice(0, 3) }), null);
+  assert.equal(pickActiveLive(null), null);
+});
+
+test('チャンネルから探す: ハンドル→アップロード→videos で見つける／無ければ検索（100）／見つからなければ 30 秒おき・検索は 5 分に 1 回・15 分であきらめる', async () => {
+  const uc = `UC${'x'.repeat(22)}`;
+  const chBody = { items: [{ id: uc, snippet: { title: 'はじめ' }, contentDetails: { relatedPlaylists: { uploads: 'UUx' } } }] };
+  // 安い方法で見つかる
+  let h = streamHarness((url) => {
+    if (url.includes('/channels?')) return { body: chBody };
+    if (url.includes('/playlistItems?')) return { body: { items: [{ contentDetails: { videoId: 'ended000001' } }, { contentDetails: { videoId: 'live0000001' } }] } };
+    if (url.includes('/videos?')) return { body: { items: [vid('ended000001', { actualStartTime: '2026-11-14T10:00:00Z', actualEndTime: '2026-11-14T11:00:00Z', activeLiveChatId: 'C2' }), vid('live0000001', { actualStartTime: '2026-11-14T12:00:00Z', activeLiveChatId: 'C3' })] } };
+    return { status: 500, chunks: ['{}'] };
+  });
+  let found = null;
+  let info = null;
+  const units = [];
+  let f = createLiveFinder({ key: KEY, channel: { handle: '@HajimeRikuto' }, ...h, onFound: (v) => { found = v; }, onChannel: (i) => { info = i; }, onUnits: (k) => units.push(k) });
+  f.start();
+  await h.flush();
+  assert.equal(found.videoId, 'live0000001');
+  assert.equal(found.chatId, 'C3');
+  assert.deepEqual(info, { id: uc, uploads: 'UUx', title: 'はじめ' });
+  assert.deepEqual(units, ['channels', 'playlistItems', 'videos']);
+  assert.ok(h.calls[0].url.includes('forHandle=%40HajimeRikuto'));
+  // 覚えたチャンネルは channels.list を省く。再生リストに無ければ検索
+  h = streamHarness((url) => {
+    if (url.includes('/playlistItems?')) return { body: { items: [{ contentDetails: { videoId: 'upcoming001' } }] } };
+    if (url.includes('/search?')) return { body: { items: [{ id: { kind: 'youtube#video', videoId: 'live0000009' } }] } };
+    if (url.includes('id=upcoming001')) return { body: { items: [vid('upcoming001', { scheduledStartTime: '2026-11-15T12:00:00Z' })] } };
+    if (url.includes('id=live0000009')) return { body: { items: [vid('live0000009', { actualStartTime: '2026-11-14T12:00:00Z', activeLiveChatId: 'C9' }, '限定じゃない配信')] } };
+    return { status: 500, chunks: ['{}'] };
+  });
+  found = null;
+  units.length = 0;
+  f = createLiveFinder({ key: KEY, channel: { handle: '@x_y_z' }, cached: { id: uc, uploads: 'UUx', title: 't' }, ...h, onFound: (v) => { found = v; }, onUnits: (k) => units.push(k) });
+  f.start();
+  await h.flush();
+  assert.equal(found.videoId, 'live0000009');
+  assert.deepEqual(units, ['playlistItems', 'videos', 'search', 'videos']);
+  // どこにも無い: 30 秒おきに安い方法、検索は 5 分に 1 回、15 分であきらめる
+  h = streamHarness((url) => {
+    if (url.includes('/playlistItems?')) return { body: { items: [] } };
+    if (url.includes('/search?')) return { body: { items: [] } };
+    return { body: { items: [] } };
+  });
+  const states = [];
+  f = createLiveFinder({ key: KEY, channel: { id: uc }, cached: { id: uc, uploads: 'UUx' }, ...h, onStatus: (s) => states.push(s.status) });
+  f.start();
+  await h.flush();
+  assert.equal(f.status().status, 'searching');
+  assert.equal(f.status().reason, FINDER_WAIT_TEXT);
+  assert.equal(f.searches(), 1, '最初は検索も');
+  assert.deepEqual(h.pending(), [30000]);
+  await h.advance(30000);
+  assert.equal(f.searches(), 1, '5 分たつまで検索しない');
+  assert.equal(h.calls.filter((x) => x.url.includes('/playlistItems?')).length, 2);
+  await h.advance(270000);
+  assert.equal(f.searches(), 2, '5 分たったら検索');
+  await h.advance(600000);
+  assert.equal(f.status().status, 'error');
+  assert.match(f.status().reason, /15 分/);
+  assert.deepEqual(h.pending(), []);
+  assert.ok(f.searches() <= 4, `検索は 5 分に 1 回まで ${f.searches()}`);
+  // 上限は止める
+  h = streamHarness(() => ({ status: 403, chunks: [JSON.stringify({ error: { errors: [{ reason: 'quotaExceeded' }] } })] }));
+  f = createLiveFinder({ key: KEY, channel: { handle: '@abc' }, ...h });
+  f.start();
+  await h.flush();
+  assert.equal(f.status().code, 'quota');
+  // チャンネルが無い
+  h = streamHarness(() => ({ body: { items: [] } }));
+  f = createLiveFinder({ key: KEY, channel: { handle: '@nobody' }, ...h });
+  f.start();
+  await h.flush();
+  assert.equal(f.status().status, 'error');
+  assert.match(f.status().reason, /チャンネルが見つかりません/);
+});
+
+test('オーバーレイの URL の上書き（&top= &lanes= &laneh= &size= &speed=）は帯に当てる・使った量（stream・search も）・固定の高さの目安', () => {
+  const base = sanitizeChatCfg(null);
+  assert.deepEqual(applyChatOverrides(base, {}), base);
+  assert.deepEqual(applyChatOverrides(base, { top: 700, lanes: 3 }).band, { x: 0, y: 700, w: 1920, h: 186 }, '列の高さはそのまま');
+  assert.deepEqual(applyChatOverrides(base, { lanes: 2, laneH: 80 }).band, { x: 0, y: 660, w: 1920, h: 160 });
+  const o = applyChatOverrides(base, { size: 40, speed: 5 });
+  assert.deepEqual([o.size, o.speed], [40, 5]);
+  assert.equal(quotaUnits({ stream: 2, channels: 1, playlistItems: 3, search: 1, videos: 2, messages: 1 }), 10 + 1 + 3 + 100 + 2 + 5);
+  assert.ok(Math.abs(pinBoxHeight({ size: 34, lines: 2 }) - 160) <= 3, String(pinBoxHeight({ size: 34, lines: 2 })));
+  assert.ok(pinBoxHeight({ size: 34, lines: 1 }) < pinBoxHeight({ size: 34, lines: 3 }));
+});
+

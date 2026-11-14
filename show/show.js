@@ -24,8 +24,8 @@ import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBAC
 import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload, mediaPlan } from './js/payload.js';
 import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
 import {
-  YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, looksLikeGoogleKey, createChatPoller, applyChatBatch, ngMatcher, parseNgWords,
-  buildChatMessage, sanitizeChatCfg, restorePin, demoChatItem, quotaUnits,
+  YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, looksLikeGoogleKey, createChatClient, applyChatBatch, ngMatcher, parseNgWords,
+  buildChatMessage, sanitizeChatCfg, restorePin, demoChatItem, demoChatPin, quotaUnits, parseChannelInput, createLiveFinder,
 } from './js/ytchat.js';
 import { refreshChatPanel } from './js/views/chatui.js';
 import { obsStatusLabel, renderObsSetup, refreshObsDialog } from './js/views/obsui.js';
@@ -827,27 +827,37 @@ app.chatPrefs = loadChatPrefs();
 // 確認用（E2E）: 取得間隔の最短を短くする（localStorage xtrend-show-ytchat-fast＝ms。ふだんは使わない）
 const chatFastMs = (() => { try { const n = Number(localStorage.getItem('xtrend-show-ytchat-fast')); return Number.isFinite(n) && n > 0 ? n : null; } catch { return null; } })();
 app.chat = {
-  status: 'idle', reason: '', code: '', videoId: null, log: [], count: 0, hidden: new Set(), banned: new Set(),
-  calls: { videos: 0, messages: 0 }, pin: restorePin(app.chatPrefs), demoUntil: 0,
+  status: 'idle', reason: '', code: '', via: null, fallback: '', videoId: null, found: null, log: [], count: 0, hidden: new Set(), banned: new Set(),
+  calls: { videos: 0, messages: 0, stream: 0, channels: 0, playlistItems: 0, search: 0 }, pin: restorePin(app.chatPrefs), demoUntil: 0,
 };
 app.chatOpen = (() => { try { return localStorage.getItem('xtrend-show-ytchat-open') === '1'; } catch { return false; } })();
-let chatPoller = null;
+let chatPoller = null; // createChatClient（プッシュ→だめなら数秒おき）
+let chatFinder = null; // チャンネルから今の配信を探す
+// レイアウト調整を開いている間: { cfg（調整中）, obs（OBS にも見本を出す）, timer（見本を流す） }
+let chatPreview = null;
 let chatNg = ngMatcher(parseNgWords(app.chatPrefs.ng));
 const chatWire = { sid: Math.random().toString(36).slice(2, 10), seq: 0 };
 
-const chatRunning = () => ['starting', 'running', 'retrying'].includes(app.chat.status);
+const chatRunning = () => ['starting', 'running', 'retrying', 'searching'].includes(app.chat.status);
 function chatActive() {
-  return chatRunning() || Boolean(app.chat.pin) || app.chat.demoUntil > Date.now();
+  return chatRunning() || Boolean(app.chat.pin) || app.chat.demoUntil > Date.now() || Boolean(chatPreview && chatPreview.obs);
 }
 app.chatRunning = chatRunning;
 app.chatUnits = () => quotaUnits(app.chat.calls);
+/** 保存している流れ方（レイアウト） */
 function chatCfg() {
   const p = app.chatPrefs;
-  return sanitizeChatCfg({ top: p.top, lanes: p.lanes, laneH: p.laneH, size: p.size, speed: p.speed, flow: p.flow });
+  return sanitizeChatCfg({ ...p.layout, flow: p.flow });
 }
-/** オーバーレイへ（同じブラウザは BroadcastChannel、OBS は接続中なら emit_event）。add・remove が無くても固定・設定は毎回載る */
+app.chatCfg = chatCfg;
+/** オーバーレイへ（同じブラウザは BroadcastChannel、OBS は接続中なら emit_event）。add・remove が無くても固定・設定は毎回載る。
+ *  レイアウト調整中（OBS にも見本）は、調整中の設定と見本の固定コメント */
 function sendChat({ add = [], remove = [] } = {}) {
-  const msg = buildChatMessage({ sid: chatWire.sid, seq: ++chatWire.seq, at: Date.now(), add, remove, pin: app.chat.pin, cfg: chatCfg() });
+  const pv = chatPreview && chatPreview.obs ? chatPreview : null;
+  const msg = buildChatMessage({
+    sid: chatWire.sid, seq: ++chatWire.seq, at: Date.now(), add, remove,
+    pin: pv ? demoChatPin(0) : app.chat.pin, cfg: pv ? sanitizeChatCfg({ ...pv.cfg, flow: true }) : chatCfg(),
+  });
   app.lastChatSent = msg;
   if (overlay.bc) { try { overlay.bc.postMessage(msg); } catch { /* 無視 */ } }
   if (app.obs && app.obs.status().state === 'connected') app.obs.emit(OBS_EVENT_NAME, msg);
@@ -878,6 +888,10 @@ app.chatSavePrefs = (patch) => {
     if (remove.length) sendChat({ remove });
   }
   if (chatPoller) chatPoller.setInterval(chatFastMs || app.chatPrefs.interval);
+  if (patch && 'channel' in patch && (!app.chatPrefs.channelInfo || app.chatPrefs.channelInfo.input !== app.chatPrefs.channel)) {
+    app.chatPrefs = { ...app.chatPrefs, channelInfo: null };
+    saveChatPrefs();
+  }
   sendChat();
   refreshChat();
 };
@@ -930,39 +944,78 @@ function onChatBatch(norm, { backlog }) {
   if (add.length || r.removed.length) sendChat({ add, remove: r.removed });
   refreshChat();
 }
-/** 開始（url を省略したら前回の URL） */
+const countUnits = (kind) => { app.chat.calls[kind] = (app.chat.calls[kind] || 0) + 1; };
+function chatStatusFrom(st) {
+  const was = app.chat.status;
+  Object.assign(app.chat, { status: st.status, reason: st.reason, code: st.code });
+  if ('via' in st) app.chat.via = st.via;
+  if ('fallback' in st) app.chat.fallback = st.fallback;
+  if (st.status === 'error' && was !== 'error') toast(`コメント：${st.reason}`);
+  refreshChat();
+}
+/** 動画（videoId）か、分かっていればチャット（chatId）につないで取得を始める */
+function startChatClient({ videoId, chatId = null }) {
+  if (chatPoller) chatPoller.stop();
+  if (app.chat.videoId !== videoId) { app.chat.log = []; app.chat.count = 0; app.chat.hidden = new Set(); app.chat.banned = new Set(); }
+  app.chat.videoId = videoId;
+  chatPoller = createChatClient({
+    key: app.chatPrefs.key, videoId, chatId, mode: app.chatPrefs.mode, interval: chatFastMs || app.chatPrefs.interval,
+    gapMs: chatFastMs ? Math.min(chatFastMs, 5000) : undefined,
+    fetchImpl: (u, o) => fetch(u, o),
+    onUnits: countUnits,
+    onStatus: chatStatusFrom,
+    onBatch: onChatBatch,
+  });
+  chatPoller.start();
+}
+/** 開始（url を省略したら入力欄・前回の URL。URL が空でチャンネルを登録していれば、そのチャンネルの今の配信を探す） */
 app.chatStart = (url) => {
   const input = String(url != null ? url : app.chatPrefs.url || '').trim();
   const fail = (reason) => { app.chat.status = 'error'; app.chat.reason = reason; app.chat.code = 'setup'; refreshChat(); toast(`コメント：${reason}`); return false; };
   if (!validKey(app.chatPrefs.key)) return fail('API キーが未設定です（「⚙ 設定」で入れてください）');
   if (!looksLikeGoogleKey(app.chatPrefs.key)) return fail('API キーの形が違います（「AIza」で始まるキーを「⚙ 設定」で入れ直してください）');
+  if (chatPoller) { chatPoller.stop(); chatPoller = null; }
+  if (chatFinder) { chatFinder.stop(); chatFinder = null; }
+  if (!input) {
+    const ch = parseChannelInput(app.chatPrefs.channel);
+    if (!ch) return fail(app.chatPrefs.channel ? 'チャンネルを読み取れませんでした（「⚙ 設定」で @ハンドルか URL を入れてください）' : '配信の URL を入れるか、「⚙ 設定」でチャンネルを登録してください');
+    app.chatPrefs = { ...app.chatPrefs, url: '' };
+    saveChatPrefs();
+    app.chat.found = null;
+    app.chat.via = null;
+    const cached = app.chatPrefs.channelInfo && app.chatPrefs.channelInfo.input === app.chatPrefs.channel ? app.chatPrefs.channelInfo : null;
+    chatFinder = createLiveFinder({
+      key: app.chatPrefs.key, channel: ch, cached, fetchImpl: (u, o) => fetch(u, o),
+      cheapMs: chatFastMs ? Math.max(chatFastMs, 300) : undefined,
+      onUnits: countUnits,
+      onChannel: (info) => { app.chatPrefs = { ...app.chatPrefs, channelInfo: { ...info, input: app.chatPrefs.channel } }; saveChatPrefs(); },
+      onStatus: (st) => { if (st.status !== 'found' && st.status !== 'stopped') chatStatusFrom(st); },
+      onFound: (v) => {
+        chatFinder = null;
+        app.chat.found = { title: v.title, videoId: v.videoId };
+        startChatClient({ videoId: v.videoId, chatId: v.chatId });
+      },
+    });
+    chatFinder.start();
+    ensureObsForChat();
+    sendChat();
+    return true;
+  }
   const id = parseVideoId(input);
-  if (!id) return fail('配信の URL を読み取れませんでした（https://www.youtube.com/live/… や youtu.be/… の形）');
+  if (!id) return fail('配信の URL を読み取れませんでした（https://www.youtube.com/live/… や youtu.be/… の形。空にするとチャンネルから探します）');
   app.chatPrefs = { ...app.chatPrefs, url: input };
   saveChatPrefs();
-  if (chatPoller) chatPoller.stop();
-  if (app.chat.videoId !== id) { app.chat.log = []; app.chat.count = 0; app.chat.hidden = new Set(); app.chat.banned = new Set(); }
-  app.chat.videoId = id;
-  chatPoller = createChatPoller({
-    key: app.chatPrefs.key, videoId: id, interval: chatFastMs || app.chatPrefs.interval,
-    fetchImpl: (u, o) => fetch(u, o),
-    onUnits: (kind) => { app.chat.calls[kind] = (app.chat.calls[kind] || 0) + 1; },
-    onStatus: (st) => {
-      const was = app.chat.status;
-      Object.assign(app.chat, { status: st.status, reason: st.reason, code: st.code });
-      if (st.status === 'error' && was !== 'error') toast(`コメント：${st.reason}`);
-      refreshChat();
-    },
-    onBatch: onChatBatch,
-  });
-  chatPoller.start();
+  app.chat.found = null;
+  startChatClient({ videoId: id });
   ensureObsForChat();
   sendChat();
   return true;
 };
 app.chatStop = () => {
   if (chatPoller) chatPoller.stop();
+  if (chatFinder) chatFinder.stop();
   chatPoller = null;
+  chatFinder = null;
   app.chat.status = 'stopped';
   app.chat.reason = '';
   refreshChat();
@@ -982,6 +1035,65 @@ app.chatDemo = () => {
   }
   const on = app.obs && app.obs.status().state === 'connected';
   toast(on ? '見本のコメントを OBS に流しています' : '見本のコメントを流しています（OBS に接続していないので、このブラウザで開いたパーツにだけ）');
+};
+
+// ---------------------------------------------------------------- レイアウト調整（流れる範囲・固定コメントの箱）
+// 開いている間は「OBS にも見本を出す」（既定オン）で、調整中の設定・見本のコメント・見本の固定を OBS へ 100ms ごとまでに送る。
+// 閉じたら本物の固定・流れ方に戻す。保存すると設定（layout）に入る。
+let previewSendTimer = null;
+let previewLastSend = 0;
+function sendPreviewSoon() {
+  if (!chatPreview || !chatPreview.obs) return;
+  const wait = Math.max(0, previewLastSend + 100 - Date.now());
+  if (previewSendTimer) return;
+  previewSendTimer = setTimeout(() => { previewSendTimer = null; previewLastSend = Date.now(); if (chatPreview && chatPreview.obs) sendChat(); }, wait);
+}
+app.chatPreviewOpen = (cfg) => {
+  chatPreview = { cfg: sanitizeChatCfg(cfg), obs: chatPreview ? chatPreview.obs : true, i: 0, timer: null };
+  ensureObsForChat();
+  chatPreview.timer = setInterval(() => {
+    if (!chatPreview || !chatPreview.obs) return;
+    sendChat({ add: [demoChatItem(chatPreview.i++, Date.now(), 'layout')] });
+  }, 900);
+  sendChat();
+};
+app.chatPreviewUpdate = (cfg) => {
+  if (!chatPreview) return;
+  chatPreview.cfg = sanitizeChatCfg(cfg);
+  sendPreviewSoon();
+};
+app.chatPreviewObs = (on) => {
+  if (!chatPreview) return;
+  chatPreview.obs = Boolean(on);
+  sendChat();
+};
+app.chatPreviewState = () => (chatPreview ? { obs: chatPreview.obs } : null);
+/** レイアウト調整を開く・閉じる（save: 保存して閉じる／false: 開く前に戻す） */
+app.openLayoutEditor = () => {
+  if (app.ui.le) return;
+  const c = chatCfg();
+  app.ui.le = { orig: c, draft: JSON.parse(JSON.stringify(c)), sel: 'pin' };
+  app.chatPreviewOpen(c);
+  app.render();
+};
+app.closeLayoutEditor = (save) => {
+  const le = app.ui.le;
+  if (!le) return;
+  app.ui.le = null;
+  app.chatPreviewClose(Boolean(save), le.draft);
+  toast(save ? 'レイアウトを保存しました' : 'レイアウトを開く前に戻しました');
+  app.render();
+};
+/** 閉じる（save: true なら設定に保存）。本物の固定・流れ方に戻す */
+app.chatPreviewClose = (save, cfg) => {
+  if (chatPreview && chatPreview.timer) clearInterval(chatPreview.timer);
+  chatPreview = null;
+  clearTimeout(previewSendTimer);
+  previewSendTimer = null;
+  if (save && cfg) {
+    const c = sanitizeChatCfg(cfg);
+    app.chatSavePrefs({ layout: { band: c.band, lanes: c.lanes, size: c.size, speed: c.speed, pin: c.pin } });
+  } else sendChat();
 };
 
 // ================================================================ 元に戻す・やり直す（編成のすべての編集操作）

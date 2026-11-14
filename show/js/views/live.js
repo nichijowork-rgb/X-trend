@@ -8,6 +8,7 @@ import { obsDialog } from './obsui.js';
 import { viewerDialog } from './viewerui.js';
 import { urlAddDialog } from './urladd.js';
 import { chatPanel, chatSettingsDialog } from './chatui.js';
+import { layoutEditor } from './layouteditor.js';
 import { FEATURES, TEXT } from '../config.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
@@ -88,6 +89,10 @@ export function renderLive(app) {
   }
   if (app.ui.ycDlg) {
     root.append(chatSettingsDialog(app));
+    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
+  }
+  if (app.ui.le) {
+    root.append(layoutEditor(app));
     app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
   }
   tickLive(app, root);

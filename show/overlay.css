@@ -103,7 +103,7 @@ body { font-family: var(--font); color: #fff; }
 
 /* ---------------- 流れるコメント（1920×1080 全面。YouTube ライブのコメント） */
 .cm { position: absolute; inset: 0; pointer-events: none; overflow: hidden; --cm-size: 34px; }
-.cm-flow { position: absolute; inset: 0; z-index: 1; }
+.cm-flow { position: absolute; left: 0; top: 660px; width: 1920px; height: 248px; overflow: hidden; z-index: 1; }
 .cm-item { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap; will-change: transform; }
 .cm-text { display: inline-flex; align-items: center; gap: 10px; font-size: var(--cm-size); font-weight: 800; line-height: 1.12; color: #fff;
   paint-order: stroke fill; -webkit-text-stroke: 6px rgba(0, 0, 0, .88); text-shadow: 0 2px 6px rgba(0, 0, 0, .55); }
@@ -130,7 +130,7 @@ body { font-family: var(--font); color: #fff; }
 .cm-pin-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .cm-pin-name { font-size: 20px; font-weight: 700; color: #cfcfd8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cm-pin-amount { flex: none; font-size: 20px; font-weight: 900; padding: 0 12px; border-radius: 999px; }
-.cm-pin-text { margin: 2px 0 0; font-size: 34px; font-weight: 800; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.cm-pin-text { margin: 2px 0 0; font-size: var(--pin-size, 34px); font-weight: 800; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--pin-lines, 2); overflow-wrap: anywhere; }
 
 /* 動きを抑える（OS の設定か ?motion=off） */
 .no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }

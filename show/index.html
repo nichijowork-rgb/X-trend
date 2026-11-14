@@ -8,10 +8,10 @@
        GitHub API（api.github.com。ツールの「ボットに修正を送る」で GitHub に保存したとき・自動送信をオンにしたときだけ。feedback/ にだけ書く）、
        X の oEmbed（publish.twitter.com。URL で追加した「データに無い投稿」の本文・投稿者を取るときだけ。文字だけ使う）。
        YouTube Data API（www.googleapis.com。進行の「コメント」で開始したときだけ。読み取りのみ・API キーはこのブラウザだけに保存）と
-       コメントのアイコン（yt3/yt4.ggpht.com・yt3/lh3.googleusercontent.com）。
+       コメントのアイコン（yt3/yt4.ggpht.com・yt3/lh3.googleusercontent.com）。frame-src 'self' はレイアウト調整の見本（overlay.html を iframe で）。
        フォントは端末の標準ゴシック（外部フォントは読まない）。
        widgets.js が iframe に style 属性を付けるため style-src に 'unsafe-inline' を許可（本文は常に textContent で挿入） -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com https://publish.twitter.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com https://yt3.ggpht.com https://yt4.ggpht.com https://yt3.googleusercontent.com https://lh3.googleusercontent.com; media-src https://video.twimg.com; frame-src https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com https://api.github.com https://publish.twitter.com https://www.googleapis.com ws:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://platform.twitter.com https://cdn.syndication.twimg.com https://publish.twitter.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://pbs.twimg.com https://abs.twimg.com https://syndication.twitter.com https://platform.twitter.com https://yt3.ggpht.com https://yt4.ggpht.com https://yt3.googleusercontent.com https://lh3.googleusercontent.com; media-src https://video.twimg.com; frame-src 'self' https://platform.twitter.com https://syndication.twitter.com; connect-src 'self' https://syndication.twitter.com https://cdn.syndication.twimg.com https://api.github.com https://publish.twitter.com https://www.googleapis.com ws:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark">

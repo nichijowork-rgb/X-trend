@@ -1,5 +1,6 @@
 // OBS 用オーバーレイ（段階2・4）。overlay.html?part=topicbar|card|title|fx|comments|all（&scale=1.2&motion=off&demo=1&sound=on）
-// 流れるコメント（part=comments）は type: 'chat' のメッセージ（ytchat.js）。&top= &lanes= &laneh= &size= &speed= で流れ方を上書きできる
+// 流れるコメント（part=comments）は type: 'chat' のメッセージ（ytchat.js）。&top= &lanes= &laneh= &size= &speed= で流れ方を上書きできる。
+// &preview=1 はレイアウト調整の中の見本（OBS・BroadcastChannel は聞かず、親の画面から postMessage で設定を受け取る）
 // データの受け取り: OBS のブラウザソースでは window の 'xtrend-show' イベント（obs-websocket の CallVendorRequest → obs-browser の
 // emit_event。detail はオブジェクトでも JSON 文字列でも可）。同じブラウザ内のプレビューでは BroadcastChannel。
 // 外部テキストはすべて textContent。画像は pbs.twimg.com のみ。
@@ -8,8 +9,8 @@ import { OVERLAY_PARTS, LAYOUT_GUIDE } from './js/overlayinfo.js';
 import { OBS_EVENT_NAME, OVERLAY_CHANNEL, shouldAccept, readDetail, titleVisible, demoPayload } from './js/payload.js';
 import { createEffectGate, effectDef, thanksText, makeEffect } from './js/effects.js';
 import { validImageDataUrl } from './js/imaging.js';
-import { createChatReceiver, sanitizeChatCfg, CHAT_CFG_DEFAULTS, CHAT_PIN_BOX, buildChatMessage, demoChatItem, demoChatPin, inkFor, initialOf } from './js/ytchat.js';
-import { createLaneScheduler, lanesOverlapping, laneY, travelMs, laneBusyMs, STAGE_W } from './js/lanes.js';
+import { createChatReceiver, sanitizeChatCfg, applyChatOverrides, CHAT_CFG_DEFAULTS, buildChatMessage, demoChatItem, demoChatPin, inkFor, initialOf } from './js/ytchat.js';
+import { createLaneScheduler, lanesOverlapping, laneTop, travelMs, laneBusyMs } from './js/lanes.js';
 
 const PARTS = { all: { w: 1920, h: 1080 } };
 for (const p of OVERLAY_PARTS) PARTS[p.key] = { w: p.w, h: p.h };
@@ -390,8 +391,11 @@ const chatOverride = {};
 for (const [q, k] of [['top', 'top'], ['lanes', 'lanes'], ['laneh', 'laneH'], ['size', 'size'], ['speed', 'speed']]) {
   if (params.has(q) && params.get(q) !== '' && Number.isFinite(Number(params.get(q)))) chatOverride[k] = Number(params.get(q));
 }
+const previewMode = params.get('preview') === '1';
+// 番組サイト（color-scheme: dark）の中の iframe では、配色をそろえないと背景が白く塗られる
+if (previewMode) document.documentElement.style.colorScheme = 'dark';
 const chat = {
-  base: { ...CHAT_CFG_DEFAULTS }, cfg: sanitizeChatCfg({ ...CHAT_CFG_DEFAULTS, ...chatOverride }), receiver: createChatReceiver(),
+  base: sanitizeChatCfg(CHAT_CFG_DEFAULTS), cfg: applyChatOverrides(sanitizeChatCfg(CHAT_CFG_DEFAULTS), chatOverride), receiver: createChatReceiver(),
   sched: null, active: new Map(), pin: null, blocked: [], launched: [], received: 0, timer: null,
 };
 st.chat = chat; // E2E・確認用
@@ -417,34 +421,45 @@ function avatar(item, cls) {
 
 function buildComments(host) {
   const layer = el('div', 'cm');
+  // 流れる範囲（帯）。はみ出した部分は見せない（帯の右端から入って左端で消える）
   const flow = el('div', 'cm-flow');
   const pin = el('div', 'cm-pin');
   pin.hidden = true;
-  Object.assign(pin.style, { left: `${CHAT_PIN_BOX.x}px`, top: `${CHAT_PIN_BOX.y}px`, width: `${CHAT_PIN_BOX.w}px` });
   layer.append(flow, pin);
   host.append(layer);
   view.cm = { layer, flow, pin };
   chat.sched = createLaneScheduler({ lanes: chat.cfg.lanes });
-  applyChatCfg(chat.base);
+  applyChatCfg(chat.base, true);
   chat.timer = setInterval(pumpChat, 100);
 }
 
-/** 流れ方の設定（送り手の設定に URL の上書きを重ねる） */
-function applyChatCfg(cfg) {
+/** 流れ方の設定（送り手の設定に URL の上書きを重ねる）: 帯の位置と大きさ・列の数・文字・速さ・固定コメントの箱 */
+function applyChatCfg(cfg, force = false) {
   chat.base = cfg;
-  const next = sanitizeChatCfg({ ...cfg, ...chatOverride });
+  const next = applyChatOverrides(sanitizeChatCfg(cfg), chatOverride);
   const was = chat.cfg;
   chat.cfg = next;
-  view.cm.layer.style.setProperty('--cm-size', `${next.size}px`);
-  view.cm.layer.dataset.flow = String(next.flow);
+  const v = view.cm;
+  const b = next.band;
+  Object.assign(v.flow.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
+  v.layer.style.setProperty('--cm-size', `${next.size}px`);
+  v.layer.dataset.flow = String(next.flow);
+  const pb = next.pin;
+  Object.assign(v.pin.style, { left: `${pb.x}px`, top: `${pb.y}px`, width: `${pb.w}px` });
+  v.pin.style.setProperty('--pin-size', `${pb.size}px`);
+  v.pin.style.setProperty('--pin-lines', String(pb.lines));
   if (chat.sched.lanes !== next.lanes) chat.sched.resize(next.lanes);
   if (!next.flow) { chat.sched.clear(); for (const id of [...chat.active.keys()]) removeComment(id); }
-  if (chat.pin && (was.top !== next.top || was.laneH !== next.laneH || was.lanes !== next.lanes)) updateBlocked();
+  if (force || JSON.stringify(was) !== JSON.stringify(next)) {
+    // 列の高さが変わったら、流れているコメントも新しい列の位置へ
+    for (const a of chat.active.values()) a.node.style.top = `${laneTop(next, Math.min(a.lane, next.lanes - 1))}px`;
+    updateBlocked();
+  }
 }
 
 function updateBlocked() {
   const p = view.cm.pin;
-  chat.blocked = chat.pin && !p.hidden ? lanesOverlapping(chat.cfg, { y: p.offsetTop, h: p.offsetHeight }) : [];
+  chat.blocked = chat.pin && !p.hidden ? lanesOverlapping(chat.cfg, { x: p.offsetLeft, y: p.offsetTop, w: p.offsetWidth, h: p.offsetHeight }) : [];
 }
 
 function commentEl(item) {
@@ -465,8 +480,9 @@ function commentEl(item) {
 function launch(item, lane, now) {
   const v = view.cm;
   const node = commentEl(item);
-  node.style.top = `${laneY(chat.cfg, lane)}px`;
-  node.style.transform = `translateX(${STAGE_W}px)`;
+  const bw = chat.cfg.band.w;
+  node.style.top = `${laneTop(chat.cfg, lane)}px`;
+  node.style.transform = `translateX(${bw}px)`;
   node.dataset.lane = String(lane);
   v.flow.append(node);
   const w = node.offsetWidth;
@@ -479,7 +495,7 @@ function launch(item, lane, now) {
     node.style.transform = 'translateX(40px)';
     if (typeof node.animate === 'function') anim = node.animate([{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.9 }, { opacity: 0 }], { duration: dur, fill: 'forwards' });
   } else if (typeof node.animate === 'function') {
-    anim = node.animate([{ transform: `translateX(${STAGE_W}px)` }, { transform: `translateX(${-w}px)` }], { duration: dur, easing: 'linear', fill: 'forwards' });
+    anim = node.animate([{ transform: `translateX(${bw}px)` }, { transform: `translateX(${-w}px)` }], { duration: dur, easing: 'linear', fill: 'forwards' });
   }
   const t = setTimeout(() => removeComment(item.id, false), dur + 50);
   chat.active.set(item.id, { node, anim, lane, t });
@@ -557,7 +573,7 @@ function receiveChat(msg) {
 function chatDemo() {
   let i = 0;
   let seq = 0;
-  const pin = demoChatPin();
+  const pin = demoChatPin(0); // id を固定（レイアウト調整の画面から送る見本と同じもの＝出し直さない）
   const tick = () => {
     const now = Date.now();
     receiveChat(buildChatMessage({ sid: 'demo', seq: ++seq, at: now, add: [demoChatItem(i++, now)], pin }));
@@ -586,10 +602,15 @@ function receive(raw) {
 }
 
 setup();
-window.addEventListener(OBS_EVENT_NAME, (e) => receive(e.detail));
-try {
-  if ('BroadcastChannel' in window) new BroadcastChannel(OVERLAY_CHANNEL).onmessage = (e) => receive(e.data);
-} catch { /* 無視 */ }
+if (previewMode) {
+  // レイアウト調整の見本: 親（同じサイト）の画面からだけ受け取る
+  window.addEventListener('message', (e) => { if (e.origin === location.origin && e.source === window.parent) receive(e.data); });
+} else {
+  window.addEventListener(OBS_EVENT_NAME, (e) => receive(e.detail));
+  try {
+    if ('BroadcastChannel' in window) new BroadcastChannel(OVERLAY_CHANNEL).onmessage = (e) => receive(e.data);
+  } catch { /* 無視 */ }
+}
 window.addEventListener('resize', fit);
 if (params.get('demo') === '1') {
   const d = demoPayload();
@@ -598,4 +619,4 @@ if (params.get('demo') === '1') {
   if (fx) d.effect = makeEffect(fx, { name: params.get('name') || 'サンプル', amount: params.get('amount') || '¥10,000' });
   receive(d);
   if (view.cm) chatDemo();
-}
+} else if (previewMode && view.cm) chatDemo();
