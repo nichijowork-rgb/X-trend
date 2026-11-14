@@ -1,6 +1,84 @@
 {
- "generated_at": "2026-11-14T22:25:57+09:00",
+ "generated_at": "2026-11-15T00:12:31+09:00",
  "daily": [
+  {
+   "date": "2026-11-14",
+   "rising": [
+    {
+     "id": "2121549630664294611",
+     "views": 367686,
+     "hours_since_post": 3.97,
+     "views_per_hour": 92549,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2121518119684579730",
+     "views": 490085,
+     "hours_since_post": 6.06,
+     "views_per_hour": 80874,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2121523015003537712",
+     "views": 456901,
+     "hours_since_post": 5.74,
+     "views_per_hour": 79660,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2121488993548476911",
+     "views": 497018,
+     "hours_since_post": 7.99,
+     "views_per_hour": 62215,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2121553636610265397",
+     "views": 179880,
+     "hours_since_post": 3.71,
+     "views_per_hour": 48516,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウントの投稿で、追いかける話題（エルコレ）の続報"
+    }
+   ],
+   "review": [
+    {
+     "id": "2121217335566672122",
+     "before_views": 353624,
+     "after_views": 1569807,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2121191804016197720",
+     "before_views": 206712,
+     "after_views": 519158,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2121170339208335546",
+     "before_views": 238254,
+     "after_views": 715389,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-11-13",
    "rising": [
