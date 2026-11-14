@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T00:28:27+09:00",
+ "generated_at": "2026-11-15T06:41:40+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -664,7 +664,8 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "夜職"
+    "夜職",
+    "report:夜職その他"
    ],
    "is_watched": false,
    "in_reports": true,
@@ -1022,7 +1023,8 @@
     "夜職その他"
    ],
    "matched_terms": [
-    "夜職"
+    "夜職",
+    "report:夜職その他"
    ],
    "is_watched": false,
    "media": [
