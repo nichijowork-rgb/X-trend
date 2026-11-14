@@ -24,7 +24,7 @@ import { buildFeedback, saveFeedbackToGitHub, parseGhPrefs, GH_PREF_KEY, FEEDBAC
 import { buildPayload, samePayload, OBS_EVENT_NAME, OVERLAY_CHANNEL, RESEND_MS, demoPayload, mediaPlan } from './js/payload.js';
 import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
 import {
-  YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, createChatPoller, applyChatBatch, ngMatcher, parseNgWords,
+  YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, looksLikeGoogleKey, createChatPoller, applyChatBatch, ngMatcher, parseNgWords,
   buildChatMessage, sanitizeChatCfg, restorePin, demoChatItem, quotaUnits,
 } from './js/ytchat.js';
 import { refreshChatPanel } from './js/views/chatui.js';
@@ -935,6 +935,7 @@ app.chatStart = (url) => {
   const input = String(url != null ? url : app.chatPrefs.url || '').trim();
   const fail = (reason) => { app.chat.status = 'error'; app.chat.reason = reason; app.chat.code = 'setup'; refreshChat(); toast(`コメント：${reason}`); return false; };
   if (!validKey(app.chatPrefs.key)) return fail('API キーが未設定です（「⚙ 設定」で入れてください）');
+  if (!looksLikeGoogleKey(app.chatPrefs.key)) return fail('API キーの形が違います（「AIza」で始まるキーを「⚙ 設定」で入れ直してください）');
   const id = parseVideoId(input);
   if (!id) return fail('配信の URL を読み取れませんでした（https://www.youtube.com/live/… や youtu.be/… の形）');
   app.chatPrefs = { ...app.chatPrefs, url: input };

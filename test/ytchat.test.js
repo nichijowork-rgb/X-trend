@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseVideoId, validKey, safeIcon, initialOf, inkFor, cleanText, screenText, normalizeChatItem, normalizeChatResponse, liveChatIdOf, classifyApiError,
+  parseVideoId, validKey, looksLikeGoogleKey, safeIcon, initialOf, inkFor, cleanText, screenText, normalizeChatItem, normalizeChatResponse, liveChatIdOf, classifyApiError,
   videosUrl, messagesUrl, quotaUnits, quotaPerHour, normalizeNg, parseNgWords, ngMatcher, applyChatBatch, sanitizeChatCfg, parseChatPrefs, restorePin,
   wireItem, buildChatMessage, createChatReceiver, createChatPoller, demoChatItem, demoChatPin,
   CHAT_CFG_DEFAULTS, CHAT_INTERVALS, CHAT_STALE_MS, CHAT_PIN_BOX, CHAT_PIN_RESTORE_MS, YT_API,
@@ -415,4 +415,10 @@ test('見本のコメント（API を使わない）: 架空の名前・毎回�
   assert.deepEqual([...kinds].sort(), ['sticker', 'super', 'text']);
   const pin = demoChatPin(5);
   assert.ok(wireItem(pin, 140));
+});
+
+test('looksLikeGoogleKey: AIza で始まるキーだけ（ブラウザが自動で入れたパスワードを弾く）', () => {
+  assert.ok(looksLikeGoogleKey(KEY));
+  assert.ok(looksLikeGoogleKey('AIzaSyD0123456789abcdefghijklmnopqrstu'));
+  for (const k of ['', 'hunter2-password-1234567890', 'github_pat_11ABCDEFG0123456789_abcdefghijklmnop', 'AIza', `${KEY} `, null]) assert.ok(!looksLikeGoogleKey(k), String(k));
 });

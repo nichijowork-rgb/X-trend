@@ -192,7 +192,7 @@ function botSection(app) {
   const repo = h('input', { class: 'input input-sm', type: 'text', value: prefs.repo, dataset: { key: 'gh-repo' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
   const branch = h('input', { class: 'input input-sm', type: 'text', value: prefs.branch, dataset: { key: 'gh-branch' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
   // トークンは画面に出さない（保存済みでも入力欄は空。変えるときだけ入れる）
-  const token = h('input', { class: 'input input-sm', type: 'password', value: '', placeholder: prefs.token ? '保存済み（変えるときだけ入力）' : 'github_pat_… を貼り付け', dataset: { key: 'gh-token' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
+  const token = h('input', { class: 'input input-sm', type: 'password', value: '', placeholder: prefs.token ? '保存済み（変えるときだけ入力）' : 'github_pat_… を貼り付け', dataset: { key: 'gh-token' }, attrs: { autocomplete: 'new-password', spellcheck: 'false', 'data-1p-ignore': '', 'data-lpignore': 'true' } });
   const values = () => ({ repo: repo.value.trim(), branch: branch.value.trim(), token: token.value.trim() || app.ghPrefs.token });
   const msg = u.fbMsg ? h('p', { class: `import-msg is-${u.fbMsg.kind}`, attrs: { role: 'status' }, dataset: { key: 'fb-msg' } }, u.fbMsg.text,
     u.fbMsg.url ? h('a', { href: u.fbMsg.url, target: '_blank', rel: 'noopener noreferrer', class: 'fb-link' }, 'コミットを開く') : null) : null;

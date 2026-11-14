@@ -1028,6 +1028,13 @@ async function main() {
       await page.click('[data-key="yc-settings"]');
       await page.waitForSelector('dialog.yc-dialog[open]');
       assert((await page.getAttribute('[data-key="yc-key"]', 'type')) === 'password', 'password');
+      assert((await page.getAttribute('[data-key="yc-key"]', 'autocomplete')) === 'new-password', 'no autofill');
+      // API キーでないもの（ブラウザが自動で入れたパスワードなど）は保存しない
+      await page.fill('[data-key="yc-key"]', 'hunter2-saved-password-123456');
+      await page.click('[data-key="yc-save"]');
+      await page.waitForSelector('[data-key="yc-key-msg"]:not([hidden])');
+      assert((await page.textContent('[data-key="yc-key-msg"]')).includes('AIza'), 'key warning');
+      assert(await page.isVisible('dialog.yc-dialog[open]'), 'dialog stays open');
       await page.fill('[data-key="yc-key"]', KEY);
       await page.check('[data-key="yc-show-key"]');
       assert((await page.getAttribute('[data-key="yc-key"]', 'type')) === 'text', 'show key');

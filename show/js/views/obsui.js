@@ -36,7 +36,7 @@ export function obsDialog(app) {
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
   const host = h('input', { class: 'input', type: 'text', value: prefs.host, dataset: { key: 'obs-host' }, attrs: { autocomplete: 'off', spellcheck: 'false' } });
   const port = h('input', { class: 'input', type: 'number', min: 1, max: 65535, value: String(prefs.port), dataset: { key: 'obs-port' } });
-  const pass = h('input', { class: 'input', type: 'password', value: prefs.password, dataset: { key: 'obs-password' }, attrs: { autocomplete: 'off' } });
+  const pass = h('input', { class: 'input', type: 'password', value: prefs.password, dataset: { key: 'obs-password' }, attrs: { autocomplete: 'new-password', 'data-1p-ignore': '', 'data-lpignore': 'true' } });
   const showPass = h('input', { type: 'checkbox', dataset: { key: 'obs-show-pass' } });
   showPass.addEventListener('change', () => { pass.type = showPass.checked ? 'text' : 'password'; });
   const auto = h('input', { type: 'checkbox', checked: prefs.auto, dataset: { key: 'obs-auto' } });

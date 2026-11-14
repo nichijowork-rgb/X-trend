@@ -2,7 +2,7 @@
 // 取得のたびに画面全体は描き直さない: refreshChatPanel が状態の 1 行・固定中の表示・一覧（id ごとに差分）だけ更新する。
 // 文字はすべて textContent。
 import { h, btn, field } from '../dom.js';
-import { CHAT_INTERVALS, CHAT_CFG_DEFAULTS, CHAT_CFG_LIMITS, YT_QUOTA_DAILY, quotaPerHour, validKey, initialOf, inkFor } from '../ytchat.js';
+import { CHAT_INTERVALS, CHAT_CFG_DEFAULTS, CHAT_CFG_LIMITS, YT_QUOTA_DAILY, quotaPerHour, validKey, looksLikeGoogleKey, initialOf, inkFor } from '../ytchat.js';
 
 const fmt = (n) => Number(n || 0).toLocaleString('ja-JP');
 
@@ -150,11 +150,14 @@ export function chatSettingsDialog(app) {
   const u = app.ui;
   if (!u.ycDraft) u.ycDraft = { key: p.key, interval: p.interval, top: p.top, lanes: p.lanes, laneH: p.laneH, size: p.size, speed: p.speed, ng: p.ng };
   const d = u.ycDraft;
-  const close = () => { u.ycDlg = false; u.ycDraft = null; app.render(); };
+  const close = () => { u.ycDlg = false; u.ycDraft = null; u.ycKeyMsg = ''; app.render(); };
   const dlg = h('dialog', { class: 'obs-dialog yc-dialog', attrs: { 'data-modal': '', 'aria-labelledby': 'yc-title' }, dataset: { keep: 'yc-dialog' } });
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
   const bind = (input, k, num = false) => { input.addEventListener('input', () => { d[k] = num ? Number(input.value) : input.value; }); return input; };
-  const key = bind(h('input', { class: 'input', type: 'password', value: d.key, dataset: { key: 'yc-key' }, attrs: { autocomplete: 'off', spellcheck: 'false', 'aria-label': 'API キー' } }), 'key');
+  // ブラウザが保存したパスワードを自動で入れないように（new-password。パスワード管理ソフトも無視させる）
+  const key = bind(h('input', { class: 'input', type: 'password', value: d.key, dataset: { key: 'yc-key' }, attrs: { autocomplete: 'new-password', spellcheck: 'false', 'aria-label': 'API キー', 'data-1p-ignore': '', 'data-lpignore': 'true' } }), 'key');
+  const keyMsg = h('p', { class: 'obs-warn', attrs: { role: 'alert' }, dataset: { key: 'yc-key-msg' } }, u.ycKeyMsg || '');
+  keyMsg.hidden = !u.ycKeyMsg;
   const showKey = h('input', { type: 'checkbox', dataset: { key: 'yc-show-key' } });
   showKey.addEventListener('change', () => { key.type = showKey.checked ? 'text' : 'password'; });
   const interval = h('select', { class: 'input', dataset: { key: 'yc-interval' } },
@@ -167,7 +170,17 @@ export function chatSettingsDialog(app) {
   const ng = bind(h('textarea', { class: 'input', rows: 3, value: d.ng, placeholder: '例：荒らし、宣伝（「、」か改行で区切る）', dataset: { key: 'yc-ng' }, attrs: { 'aria-label': 'NG ワード' } }), 'ng');
   ng.value = d.ng;
   const save = () => {
-    app.chatSavePrefs({ key: String(d.key || '').trim(), interval: d.interval, top: d.top, lanes: d.lanes, laneH: d.laneH, size: d.size, speed: d.speed, ng: d.ng });
+    const k = String(d.key || '').trim();
+    // Google の API キーは「AIza」で始まる。違うものは保存しない（自動で入ったパスワードなどを Google に送らない）
+    if (k && !looksLikeGoogleKey(k)) {
+      u.ycKeyMsg = '⚠ これは Google の API キーではないようです（API キーは「AIza」で始まる 39 文字です）。ブラウザが保存したパスワードが自動で入っていないか確かめ、いったん消してから貼り直してください。';
+      keyMsg.textContent = u.ycKeyMsg;
+      keyMsg.hidden = false;
+      key.focus();
+      return;
+    }
+    u.ycKeyMsg = '';
+    app.chatSavePrefs({ key: k, interval: d.interval, top: d.top, lanes: d.lanes, laneH: d.laneH, size: d.size, speed: d.speed, ng: d.ng });
     u.ycDraft = null;
     u.ycDlg = false;
     app.toast('コメントの設定を保存しました');
@@ -179,6 +192,7 @@ export function chatSettingsDialog(app) {
     h('div', { class: 'obs-body' },
       h('p', { class: 'muted' }, 'YouTube ライブのコメントを読み取り、OBS の「流れるコメント」パーツに流します（読むだけ。YouTube に書き込むことはありません）。'),
       field('API キー（YouTube Data API v3）', key),
+      keyMsg,
       h('label', { class: 'check-line' }, showKey, h('span', {}, 'キーを表示')),
       h('p', { class: 'obs-warn' }, '⚠ API キーはこのパソコンのこのブラウザにだけ保存します（YouTube の API 以外には送りません。書き出しにも入りません）。共用のパソコンでは使い終わったら消してください。'),
       field('取得間隔', interval, '（短いほど早く出ますが、1 日の上限を早く使います）'),

@@ -79,6 +79,11 @@ export function validKey(k) {
   return typeof k === 'string' && /^[A-Za-z0-9_-]{20,100}$/.test(k);
 }
 
+/** Google の API キーらしいか（「AIza」で始まり、英数字と _ - だけ。ふつうは 39 文字）。保存前の確かめ用 */
+export function looksLikeGoogleKey(k) {
+  return typeof k === 'string' && /^AIza[A-Za-z0-9_-]{30,45}$/.test(k);
+}
+
 /** プロフィール画像の URL（https の YouTube の画像置き場だけ。ほかは null＝頭文字の丸） */
 export function safeIcon(url) {
   if (typeof url !== 'string' || url.length > 600) return null;
