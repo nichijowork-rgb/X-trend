@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T01:25:20+09:00",
+  "generated_at": "2026-11-15T01:30:23+09:00",
   "week": "2026-11-14",
   "genre_overrides": [
     {
@@ -404,6 +404,22 @@
       ]
     },
     {
+      "topic_id": "c:2119068487507136641",
+      "source": "site",
+      "name": "@ori_newsroom2 の話題",
+      "genre": "ホスト",
+      "post_ids": [
+        "2119069886936990134",
+        "2119094268598087882",
+        "2119777641058218154",
+        "2121473508374925463"
+      ],
+      "deleted": false,
+      "edits": [
+        "posts"
+      ]
+    },
+    {
       "topic_id": "c:2119081112685478019",
       "source": "site",
       "name": "@orihara_bakuro の話題",
@@ -583,13 +599,15 @@
     {
       "topic_id": "m:mwgm38atra",
       "source": "site",
-      "name": "HAABクリニック梶千尋 ホストコールUTA　路チュー流出",
-      "genre": "夜職その他",
+      "name": "ホスト　キス動画流出まとめ",
+      "genre": "ホスト",
       "post_ids": [
+        "2119068487507136641",
         "2120883375732896062"
       ],
       "deleted": false,
       "edits": [
+        "genre",
         "posts",
         "new"
       ]
