@@ -1,7 +1,8 @@
-// レイアウト調整（「触りながら調整」）: 流れるコメントの帯と固定コメントの箱を、1920×1080 の縮図の上でドラッグして決める。
-// 見本は本物のオーバーレイ（overlay.html?part=comments&preview=1）を iframe で重ね、調整中の設定を postMessage で送る。
-// 「OBS にも見本を出す」がオンなら、同じ設定と見本のコメントを OBS（と同じブラウザのパーツ）にも送る（show.js の chatPreview）。
-// ドラッグ中は画面全体を描き直さない（このダイアログは data-keep-leaf。中身はここで直接更新する）。文字はすべて textContent。
+// レイアウト（「触りながら調整」）: ［コメント］ページの中で、流れるコメントの帯と固定コメントの箱を 1920×1080 の縮図の上でドラッグして決める。
+// 動かすとすぐ OBS に反映（100ms ごとまで）・自動で保存（400ms あと）。元に戻す／やり直す（Ctrl+Z／Ctrl+Shift+Z）・既定に戻す（確かめてから）。
+// 見本は本物のオーバーレイ（overlay.html?part=comments&preview=1）を iframe で重ね、今の設定を postMessage で送る。
+// 「OBS にも見本を出す」（既定オフ。配信中にも使うため）がオンなら、見本のコメント・固定を OBS にも出す（取りまとめ役のウィンドウが送る）。
+// このパネルはページを開いたときに 1 回だけ作り（data-keep-leaf の入れ物に入れる）、ドラッグ中も画面全体は描き直さない。文字はすべて textContent。
 import { h, btn } from '../dom.js';
 import { LAYOUT_GUIDE } from '../overlayinfo.js';
 import { CHAT_CFG_DEFAULTS, CHAT_CFG_LIMITS, sanitizeChatCfg, clampPinBox, buildChatMessage, demoChatPin, pinBoxHeight, laneHeightOf } from '../ytchat.js';
@@ -23,13 +24,26 @@ function loadBg() {
   try { const s = localStorage.getItem(BG_KEY); return s && /^data:image\/(jpeg|png|webp);base64,/.test(s) ? s : null; } catch { return null; }
 }
 
-/** レイアウト調整のダイアログ。app.ui.le = { orig, draft, sel } */
+/** ページの入れ物（data-keep-leaf）。中身は mountLayoutEditor が 1 回だけ作る */
+export function layoutHolder() {
+  return h('section', { class: 'cmp-layout-col', attrs: { 'aria-label': 'レイアウト（流れる範囲・固定コメント）' }, dataset: { keep: 'cmp-layout', keepLeaf: '', key: 'cmp-layout' } });
+}
+/** 描いたあとに呼ぶ: 入れ物が空なら作る */
+export function mountLayoutEditor(app) {
+  const holder = document.querySelector('[data-key="cmp-layout"]');
+  if (!holder || holder.firstElementChild) return;
+  holder.append(layoutEditor(app));
+}
+
+const layoutOf = (app) => ({ ...sanitizeChatCfg({ ...app.chatPrefs.layout, flow: true }) });
+
+/** レイアウトのパネル（ページの中に置く） */
 export function layoutEditor(app) {
+  if (!app.ui.le) app.ui.le = { sel: 'pin', past: [], future: [] };
   const le = app.ui.le;
-  const ui = { ...loadUi(), bg: loadBg(), scale: 0.5, pinH: pinBoxHeight(le.draft.pin), seq: 0 };
-  const d = () => le.draft;
-  const dlg = h('dialog', { class: 'le-dialog', attrs: { 'data-modal': '', 'aria-labelledby': 'le-title' }, dataset: { keep: 'le-dialog', keepLeaf: '', key: 'le-dialog' } });
-  dlg.addEventListener('cancel', (e) => { e.preventDefault(); app.closeLayoutEditor(false); });
+  const ui = { ...loadUi(), bg: loadBg(), scale: 0.5, pinH: pinBoxHeight(layoutOf(app).pin), seq: 0, dragging: false, lastRec: 0, confirm: false };
+  const d = () => layoutOf(app);
+  const dlg = h('div', { class: 'le-root', attrs: { role: 'region', 'aria-labelledby': 'le-title' }, dataset: { key: 'le-root' } });
 
   // ---- 縮図（1920×1080 の舞台を枠いっぱいに縮小）
   const wrap = h('div', { class: 'le-wrap', dataset: { key: 'le-wrap' } });
@@ -125,17 +139,37 @@ export function layoutEditor(app) {
     setVal(psize, p.size); psizeOut.textContent = `${p.size}px`;
     setVal(plines, p.lines);
     for (const [k, b2] of Object.entries(selBtns)) b2.setAttribute('aria-pressed', String(le.sel === k));
-    if (send) { postFrame(); app.chatPreviewUpdate(c); }
+    if (send) postFrame();
   }
-  /** 調整中の設定を差し替え（範囲に丸める） */
+  /** 設定を差し替え（範囲に丸める）→ すぐ OBS へ・自動で保存 */
   function commit(next) {
     const c = sanitizeChatCfg({ ...d(), ...next, flow: true });
     // 固定コメントは実際の高さで画面の中に
     const r = clampRect({ x: c.pin.x, y: c.pin.y, w: c.pin.w, h: ui.pinH }, { minW: CHAT_CFG_LIMITS.pinMinW, minH: 1 });
     c.pin = clampPinBox({ ...c.pin, x: r.x, y: r.y, w: r.w });
-    le.draft = { ...c, flow: le.orig.flow };
+    app.chatLayoutSet(c);
+    setSaved('保存中…');
     paint();
   }
+  // ---- 元に戻す／やり直す（ドラッグ 1 回・数値 1 回・続けて動かしたスライダーや矢印キーは 0.6 秒の間をまとめて 1 回）
+  const snap = () => JSON.stringify(d());
+  function record(force = false) {
+    const now = Date.now();
+    if (!force && now - ui.lastRec < 600) { ui.lastRec = now; return; }
+    ui.lastRec = now;
+    const cur = snap();
+    if (le.past[le.past.length - 1] !== cur) le.past.push(cur);
+    if (le.past.length > 100) le.past.shift();
+    le.future = [];
+    updHist();
+  }
+  function restore(json) {
+    try { const c = JSON.parse(json); app.chatLayoutSet(c); ui.pinH = pinBoxHeight(sanitizeChatCfg(c).pin); setSaved('保存中…'); paint(); } catch { /* 無視 */ }
+  }
+  function undo() { if (!le.past.length) return; le.future.push(snap()); restore(le.past.pop()); updHist(); }
+  function redo() { if (!le.future.length) return; le.past.push(snap()); restore(le.future.pop()); updHist(); }
+  function updHist() { undoBtn.disabled = !le.past.length; redoBtn.disabled = !le.future.length; }
+  function setSaved(t) { savedOut.textContent = t; }
 
   // ---- ドラッグ（pointer events。マウス・タッチ・ペン）
   function startDrag(e, obj, handle) {
@@ -153,6 +187,8 @@ export function layoutEditor(app) {
     const minH = obj === 'band' ? Math.max(CHAT_CFG_LIMITS.bandMinH, d().lanes * CHAT_CFG_LIMITS.laneMinH) : ui.pinH;
     try { e.target.setPointerCapture(e.pointerId); } catch { /* 無視 */ }
     stage.classList.add('is-dragging');
+    ui.dragging = true;
+    record(true);
     const move = (ev) => {
       const dx = (ev.clientX - sx) / ui.scale;
       const dy = (ev.clientY - sy) / ui.scale;
@@ -162,6 +198,7 @@ export function layoutEditor(app) {
       else commit({ pin: { ...d().pin, x: r.x, y: r.y, w: r.w } });
     };
     const up = () => {
+      ui.dragging = false;
       e.target.removeEventListener('pointermove', move);
       e.target.removeEventListener('pointerup', up);
       e.target.removeEventListener('pointercancel', up);
@@ -179,16 +216,22 @@ export function layoutEditor(app) {
   // 矢印キーで 1px（Shift で 10px）
   dlg.addEventListener('keydown', (e) => {
     const t = e.target;
+    // Ctrl+Z 元に戻す／Ctrl+Shift+Z・Ctrl+Y やり直す（入力欄の中では文字の取り消しを優先）
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && t.type !== 'range' && t.type !== 'checkbox')) {
+      if (e.key === 'z' || e.key === 'Z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
+      if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); redo(); return; }
+    }
     if (!t || !t.dataset || !t.dataset.obj) return;
     const dv = nudgeDelta(e.key, e.shiftKey);
     if (!dv) return;
     e.preventDefault();
+    record();
     if (t.dataset.obj === 'band') commit({ band: moveRect(d().band, dv[0], dv[1]) });
     else commit({ pin: { ...d().pin, x: d().pin.x + dv[0], y: d().pin.y + dv[1] } });
   });
 
   // ---- 数値の入力
-  const onNum = (input, fn) => input.addEventListener('change', () => { const v = Number(input.value); if (Number.isFinite(v)) fn(v); else paint(false); });
+  const onNum = (input, fn) => input.addEventListener('change', () => { const v = Number(input.value); if (Number.isFinite(v)) { record(true); fn(v); } else paint(false); });
   onNum(bx, (v) => commit({ band: { ...d().band, x: v } }));
   onNum(by, (v) => commit({ band: { ...d().band, y: v } }));
   onNum(bw, (v) => commit({ band: { ...d().band, w: v } }));
@@ -196,14 +239,15 @@ export function layoutEditor(app) {
   onNum(px, (v) => commit({ pin: { ...d().pin, x: v } }));
   onNum(py, (v) => commit({ pin: { ...d().pin, y: v } }));
   onNum(pw, (v) => commit({ pin: { ...d().pin, w: v } }));
-  size.addEventListener('input', () => commit({ size: Number(size.value) }));
-  speed.addEventListener('input', () => commit({ speed: Number(speed.value) }));
-  psize.addEventListener('input', () => commit({ pin: { ...d().pin, size: Number(psize.value) } }));
-  plines.addEventListener('change', () => commit({ pin: { ...d().pin, lines: Number(plines.value) } }));
+  size.addEventListener('input', () => { record(); commit({ size: Number(size.value) }); });
+  speed.addEventListener('input', () => { record(); commit({ speed: Number(speed.value) }); });
+  psize.addEventListener('input', () => { record(); commit({ pin: { ...d().pin, size: Number(psize.value) } }); });
+  plines.addEventListener('change', () => { record(true); commit({ pin: { ...d().pin, lines: Number(plines.value) } }); });
   const lanesBtn = (delta, label, key) => btn(label, () => {
     const n = Math.max(CHAT_CFG_LIMITS.lanes[0], Math.min(CHAT_CFG_LIMITS.lanes[1], d().lanes + delta));
     // 列を増やして 1 列が細くなりすぎるときは帯を高くする
     const b = { ...d().band, h: Math.max(d().band.h, n * CHAT_CFG_LIMITS.laneMinH) };
+    record(true);
     commit({ lanes: n, band: b });
   }, 'btn btn-small le-step', { 'data-key': key, 'aria-label': label === '−' ? '列を減らす' : '列を増やす' });
 
@@ -241,18 +285,25 @@ export function layoutEditor(app) {
   });
   const clearBg = btn('背景を消す', () => { ui.bg = null; bgImg.hidden = true; bgImg.removeAttribute('src'); try { localStorage.removeItem(BG_KEY); } catch { /* 無視 */ } bgMsg.textContent = ''; }, 'btn btn-small btn-ghost-dark', { 'data-key': 'le-bg-clear' });
 
+  const undoBtn = btn('↶ 元に戻す', () => undo(), 'btn btn-small btn-ghost-dark', { 'data-key': 'le-undo', title: '元に戻す（Ctrl+Z）', disabled: !le.past.length });
+  const redoBtn = btn('↷ やり直す', () => redo(), 'btn btn-small btn-ghost-dark', { 'data-key': 'le-redo', title: 'やり直す（Ctrl+Shift+Z）', disabled: !le.future.length });
+  const savedOut = h('span', { class: 'le-saved', attrs: { role: 'status' }, dataset: { key: 'le-saved' } }, '変えるとすぐ OBS に出て、自動で保存されます');
+  app.onLayoutSaved = () => setSaved('自動で保存しました');
+  const confirmBox = h('span', { class: 'le-confirm', hidden: true, dataset: { key: 'le-confirm' } },
+    h('span', {}, '既定（帯 0,660 1920×248・4 列／固定 655,600 幅 1170）に戻しますか？'),
+    btn('戻す', () => { confirmBox.hidden = true; defBtn.hidden = false; record(true); const c = sanitizeChatCfg(CHAT_CFG_DEFAULTS); ui.pinH = pinBoxHeight(c.pin); commit(c); }, 'btn btn-small btn-red', { 'data-key': 'le-default-yes' }),
+    btn('やめる', () => { confirmBox.hidden = true; defBtn.hidden = false; }, 'btn btn-small btn-ghost-dark', { 'data-key': 'le-default-no' }));
+  const defBtn = btn('既定に戻す', () => { confirmBox.hidden = false; defBtn.hidden = true; }, 'btn btn-small btn-ghost-dark', { 'data-key': 'le-default' });
   dlg.append(
     h('header', { class: 'le-head' },
-      h('h2', { id: 'le-title' }, 'レイアウト調整', h('span', { class: 'le-sub' }, '（1920×1080。ドラッグで移動、つまみで大きさ、矢印キーで 1px・Shift で 10px）')),
-      h('div', { class: 'le-acts' },
-        btn('保存', () => app.closeLayoutEditor(true), 'btn btn-small btn-red', { 'data-key': 'le-save' }),
-        btn('キャンセル（開く前に戻す）', () => app.closeLayoutEditor(false), 'btn btn-small', { 'data-key': 'le-cancel' }),
-        btn('既定に戻す', () => { le.draft = { ...sanitizeChatCfg(CHAT_CFG_DEFAULTS), flow: le.orig.flow }; ui.pinH = pinBoxHeight(le.draft.pin); paint(); }, 'btn btn-small btn-ghost', { 'data-key': 'le-default' }))),
+      h('h2', { id: 'le-title' }, 'レイアウト', h('span', { class: 'le-sub' }, '（1920×1080。ドラッグで移動、つまみで大きさ、矢印キーで 1px・Shift で 10px）')),
+      h('div', { class: 'le-acts' }, undoBtn, redoBtn, defBtn, confirmBox),
+      savedOut),
     h('div', { class: 'le-tools' },
       h('span', { class: 'le-seg', attrs: { role: 'group', 'aria-label': '選ぶもの' } }, selBtns.band, selBtns.pin),
       check('le-snap', 'ぴったり合わせる（10px・端・枠）', ui.snap, (v) => { ui.snap = v; saveUi(ui); }, 'ドラッグしたとき 10px ごと・画面の端・参考の枠の辺にそろえます'),
       check('le-refs', '参考の枠', ui.refs, (v) => { ui.refs = v; refs.hidden = !v; saveUi(ui); }, 'どね貯金・LINE・イラスト・トピック帯・投稿カードの場所を薄く表示'),
-      check('le-obs', 'OBS にも見本を出す', pv ? pv.obs : true, (v) => app.chatPreviewObs(v), '調整中の位置と見本のコメントを OBS（とこのブラウザで開いたパーツ）にも出します。閉じると元に戻ります'),
+      check('le-obs', 'OBS にも見本を出す', Boolean(pv && pv.obs), (v) => app.chatPreviewObs(v), '見本のコメントと見本の固定を OBS（とこのブラウザで開いたパーツ）にも出します。配信中は本物のコメントがあるので、ふだんはオフ。オフにすると本物の固定・流れ方にすぐ戻ります'),
       h('label', { class: 'btn btn-small btn-ghost-dark', attrs: { for: 'le-bg-file', title: '配信画面のスクショを背景に置きます（貼り付け Ctrl+V でも。このブラウザにだけ保存）' } }, '背景にスクショ…'), file, clearBg, bgMsg),
     wrap,
     h('div', { class: 'le-panels' },
@@ -277,7 +328,9 @@ export function layoutEditor(app) {
   if (typeof ResizeObserver === 'function') new ResizeObserver(fit).observe(wrap);
   requestAnimationFrame(fit);
   frame.addEventListener('load', () => postFrame());
-  app.layoutEditorState = () => ({ scale: ui.scale, pinH: ui.pinH, draft: d() });
+  app.layoutEditorState = () => ({ scale: ui.scale, pinH: ui.pinH, draft: d(), past: le.past.length, future: le.future.length });
+  // ほかのウィンドウが変えたとき（ドラッグ中は描き直さない）
+  app.refreshLayoutEditor = () => { if (!ui.dragging && dlg.isConnected) paint(false); postFrame(); };
   paint(false);
   requestAnimationFrame(() => { fit(); paint(false); });
   return dlg;

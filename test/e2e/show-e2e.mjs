@@ -1018,11 +1018,10 @@ async function main() {
       await setupRoutes(page, { data: SAMPLE_404 });
       await routeYt(page);
       watchConsole(page, errors);
-      await page.goto(`${show}#live`);
+      await page.goto(`${show}#comments`);
       await ready(page);
-      // パネル（既定は閉じている）→ 開く。未設定の案内
+      // ［コメント］のページ。未設定の案内
       assert((await page.textContent('[data-key="yc-status"]')).includes('未設定'), 'status 未設定');
-      await page.click('[data-key="yc-open"]');
       await page.waitForSelector('[data-key="yc-url"]');
       // 設定: API キー（パスワード欄・表示の切替）・NG ワード
       await page.click('[data-key="yc-settings"]');
@@ -1116,7 +1115,15 @@ async function main() {
       await page.waitForFunction(() => window.__show.route === 'plan');
       yt.queue.push([T('r1', '編成画面にいる間のコメント')]);
       await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 'r1'), null, { timeout: 5000 });
+      // 進行は 1 行のバーだけ（状態・開始/停止・コメントのページへ・別ウィンドウ）
       await page.evaluate(() => { location.hash = '#live'; });
+      await page.waitForSelector('.yc-bar [data-key="yc-status"]');
+      assert((await page.textContent('.yc-bar [data-key="yc-status"]')).includes('取得中'), 'live bar status');
+      assert((await page.textContent('.yc-bar [data-key="yc-toggle-run"]')) === '停止' && await page.$('.yc-bar a[href="#comments"]') && await page.$('.yc-bar [data-key="yc-popout"]'), 'live bar buttons');
+      assert(!(await page.$('#view .yc-log')) && !(await page.$('#view .le-root')), '進行に一覧・レイアウトは無い');
+      await page.$eval('.yc-bar', (e) => e.scrollIntoView({ block: 'center' }));
+      await page.screenshot({ path: path.join(SHOTS, 'live-comment-bar-960.png') });
+      await page.click('.yc-bar a[href="#comments"]');
       await page.waitForSelector('.yc-row[data-id="r1"]', { timeout: 5000 });
       // XSS: 名前・本文は文字のまま
       const evil = '<img src=x onerror="window.__xss=1">';
@@ -1126,7 +1133,15 @@ async function main() {
       assert((await page.textContent('.yc-row[data-id="x1"] .yc-text')) === evil, 'log xss');
       assert(await page.evaluate(() => window.__xss === undefined) && await ov.evaluate(() => window.__xss === undefined), 'xss');
       await page.$eval('.yc-log', (e) => e.scrollIntoView({ block: 'center' }));
-      await page.screenshot({ path: path.join(SHOTS, 'live-comments-960.png') });
+      await page.screenshot({ path: path.join(SHOTS, 'comments-page-960.png') });
+      // 広い画面（1200px 以上）は 2 列（一覧・レイアウト）
+      await page.setViewportSize({ width: 1920, height: 1080 });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(300);
+      const two = await page.evaluate(() => { const a = document.querySelector('.cmp-log-col').getBoundingClientRect(); const b = document.querySelector('.cmp-layout-col').getBoundingClientRect(); return Math.abs(a.top - b.top) < 4 && b.width > a.width; });
+      assert(two, '1920 は 2 列');
+      await page.screenshot({ path: path.join(SHOTS, 'comments-page-1920.png') });
+      await page.setViewportSize({ width: 960, height: 1040 });
       // 今日の上限 → 止めて案内（それ以上は取りに行かない）
       yt.mode = 'quota';
       await page.waitForFunction(() => document.querySelector('[data-key="yc-status"]').dataset.state === 'error', null, { timeout: 5000 });
@@ -1176,7 +1191,6 @@ async function main() {
         await c.addInitScript(([k, ch]) => {
           localStorage.setItem('xtrend-show-ytchat-fast', '300');
           if (!localStorage.getItem('xtrend-show-ytchat')) localStorage.setItem('xtrend-show-ytchat', JSON.stringify({ key: k, channel: ch || '' }));
-          localStorage.setItem('xtrend-show-ytchat-open', '1');
         }, [KEY, channel]);
         const yt = { calls: [], streamQueue: [[T('s-old', '開始前'), 'S1'], [T('s1', 'プッシュで届いたコメント'), 'S2']], pollQueue: [[T('p-old', '開始前（数秒おき）')], [T('p1', '数秒おきで届いたコメント')]], referers: [] };
         const routeYt = async (pg) => {
@@ -1216,7 +1230,7 @@ async function main() {
         await setupRoutes(page, { data: SAMPLE_404 });
         await routeYt(page);
         watchConsole(page, errors);
-        await page.goto(`${show}#live`);
+        await page.goto(`${show}#comments`);
         await ready(page);
         return { c, page, ov, yt };
       };
@@ -1281,7 +1295,7 @@ async function main() {
       }
     });
 
-    await check('レイアウト調整: 固定コメントをマウスでドラッグ → OBS（同じブラウザ）の固定がその場で動く・保存で残る・キャンセルで戻る／帯をドラッグ → 新しい帯の中を流れる・数値・既定に戻す', async () => {
+    await check('［コメント］ページのレイアウト（その場で調整）: 固定コメントをマウスでドラッグ → OBS（同じブラウザ）の固定がすぐ動き、押さなくても保存・元に戻す／やり直す・帯をドラッグ → 新しい帯の中を流れる・数値・矢印キー・既定に戻す（確かめてから）・OBS にも見本（既定オフ）', async () => {
       const c = await newCtx();
       const ov = await c.newPage();
       await ov.setViewportSize({ width: 1920, height: 1080 });
@@ -1292,21 +1306,19 @@ async function main() {
       const page = await c.newPage();
       await setupRoutes(page, { data: SAMPLE_404 });
       watchConsole(page, errors);
-      await page.goto(`${show}#live`);
+      await page.goto(`${show}#comments`);
       await ready(page);
-      await page.click('[data-key="yc-open"]');
-      await page.click('[data-key="yc-layout"]');
-      await page.waitForSelector('dialog.le-dialog[open]');
-      // 見本: 編集画面の中（iframe）と OBS（BroadcastChannel）に見本の固定・流れるコメント
-      await ov.waitForFunction(() => { const p = document.querySelector('.cm-pin'); return p && !p.hidden && p.dataset.id === 'demo-pin-0' && document.querySelectorAll('.cm-item').length > 0; }, null, { timeout: 8000 });
-      const inner = page.frameLocator('iframe.le-frame');
-      await inner.locator('.cm-pin:not([hidden])').waitFor({ timeout: 8000 });
+      await page.waitForSelector('.le-root');
+      // 画面の中の見本（iframe）に見本の固定。OBS への見本は既定オフ
+      await page.frameLocator('iframe.le-frame').locator('.cm-pin:not([hidden])').waitFor({ timeout: 8000 });
+      assert(!(await page.isChecked('[data-key="le-obs"]')), 'OBS にも見本は既定オフ');
+      const stored = () => page.evaluate(() => (JSON.parse(localStorage.getItem('xtrend-show-ytchat') || '{}').layout || null));
       const leState = () => page.evaluate(() => window.__show.layoutEditorState());
       let st = await leState();
-      assert(st.scale > 0.4 && st.scale < 0.55, `scale ${st.scale}`);
+      assert(st.scale > 0.4 && st.scale < 0.52, `scale ${st.scale}`);
       assert(await page.evaluate(() => document.documentElement.scrollWidth) <= 960, 'no h-scroll');
-      // 固定コメントをドラッグ（左へ 100px・上へ 40px の画面上の距離。右へは画面の端 1920−1170＝750 で止まる）
       const drag = async (sel, dx, dy, at = [0.5, 0.5]) => {
+        await page.locator(sel).scrollIntoViewIfNeeded();
         const b = await page.locator(sel).boundingBox();
         const x = b.x + b.width * at[0];
         const y = b.y + b.height * at[1];
@@ -1315,77 +1327,158 @@ async function main() {
         for (let i = 1; i <= 5; i++) await page.mouse.move(x + (dx * i) / 5, y + (dy * i) / 5);
         await page.mouse.up();
       };
+      // 固定コメントをドラッグ（右へは画面の端 1920−1170＝750 で止まる）→ OBS の固定がすぐ動く（本物の固定コメントが無くても箱の位置は届く）
       await drag('.le-pin', 400, 0, [0.3, 0.5]);
       assert((await leState()).draft.pin.x === 750, '右の端で止まる');
       await drag('.le-pin', -100, -40, [0.3, 0.5]);
       st = await leState();
       const px = st.draft.pin.x;
       const py = st.draft.pin.y;
-      // 10px ごとか、参考の枠の辺（例: LINE ID の右端 1715）にそろう
-      assert(Math.abs(px - (750 - 100 / st.scale)) <= 12 && (px % 10 === 0 || [1715, 1720, 1900].includes(px + 1170)) && py < 600, `pin draft ${px},${py}`);
-      await ov.waitForFunction((x) => document.querySelector('.cm-pin').offsetLeft === x, px, { timeout: 3000 });
+      assert(Math.abs(px - (750 - 100 / st.scale)) <= 12 && py < 600, `pin ${px},${py}`);
+      await ov.waitForFunction((x) => window.__overlay.chat.cfg.pin.x === x && document.querySelector('.cm-pin').style.left === `${x}px`, px, { timeout: 3000 });
+      // 押さなくても保存（400ms あと）
+      await page.waitForFunction((x) => { const l = JSON.parse(localStorage.getItem('xtrend-show-ytchat') || '{}').layout; return l && l.pin.x === x; }, px, { timeout: 3000 });
+      assert((await page.textContent('[data-key="le-saved"]')).includes('保存'), 'saved note');
       assert((await page.inputValue('[data-key="le-pin-x"]')) === String(px), 'readout');
-      await page.screenshot({ path: path.join(SHOTS, 'layout-editor-960.png') });
-      await page.click('[data-key="le-save"]');
-      await page.waitForSelector('dialog.le-dialog', { state: 'detached' });
-      let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout);
-      assert(saved.pin.x === px && saved.pin.y === py, JSON.stringify(saved.pin));
-      await ov.waitForFunction((x) => window.__overlay.chat.cfg.pin.x === x && document.querySelector('.cm-pin').hidden, px, { timeout: 3000 });
-      // もう一度開いて動かし、キャンセル → 開く前に戻る
-      await page.click('[data-key="yc-layout"]');
-      await page.waitForSelector('dialog.le-dialog[open]');
-      await drag('.le-pin', -100, 0, [0.3, 0.5]);
-      const moved = (await leState()).draft.pin.x;
-      assert(moved < px, `moved ${moved}`);
-      await ov.waitForFunction((x) => document.querySelector('.cm-pin').offsetLeft === x, moved, { timeout: 3000 });
-      await page.click('[data-key="le-cancel"]');
-      await page.waitForSelector('dialog.le-dialog', { state: 'detached' });
-      await ov.waitForFunction((x) => window.__overlay.chat.cfg.pin.x === x, px, { timeout: 3000 });
-      saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout);
-      assert(saved.pin.x === px, 'キャンセルは保存しない');
-      // 帯をドラッグ（上へ）→ OBS の帯が動き、その中を流れる。数値で幅、列を増やす
-      await page.click('[data-key="yc-layout"]');
-      await page.waitForSelector('dialog.le-dialog[open]');
-      st = await leState();
+      // 元に戻す（ボタン）→ 750 に戻る・保存も戻る／やり直す（Ctrl+Shift+Z）
+      await page.click('[data-key="le-undo"]');
+      assert((await leState()).draft.pin.x === 750, 'undo');
+      await ov.waitForFunction(() => window.__overlay.chat.cfg.pin.x === 750, null, { timeout: 3000 });
+      await page.waitForFunction(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout.pin.x === 750, null, { timeout: 3000 });
+      await page.focus('.le-pin');
+      await page.keyboard.press('Control+Shift+Z');
+      assert((await leState()).draft.pin.x === px, 'redo');
+      await page.keyboard.press('Control+z');
+      await page.keyboard.press('Control+z');
+      assert((await leState()).draft.pin.x === 655, 'undo ×2 → 最初');
+      await page.keyboard.press('Control+y');
+      await page.keyboard.press('Control+y');
+      assert((await leState()).draft.pin.x === px, 'redo ×2');
+      await page.waitForFunction((x) => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout.pin.x === x, px, { timeout: 3000 });
+      // 帯をドラッグ（上へ）→ OBS の帯が動き、見本をオンにするとその中を流れる。数値で幅、列を増やす
       await drag('.le-band', 0, -100, [0.12, 0.85]);
       st = await leState();
       const by = st.draft.band.y;
-      assert(by < 600 && by % 10 === 0, `band y ${by}`);
+      assert(by < 600, `band y ${by}`);
       await page.fill('[data-key="le-band-w"]', '1200');
       await page.press('[data-key="le-band-w"]', 'Enter');
       await page.click('[data-key="le-lanes-plus"]');
       st = await leState();
       assert(st.draft.band.w === 1200 && st.draft.lanes === 5, JSON.stringify(st.draft));
       await ov.waitForFunction((y) => { const f = document.querySelector('.cm-flow'); return f.offsetTop === y && f.offsetWidth === 1200 && window.__overlay.chat.cfg.lanes === 5; }, by, { timeout: 3000 });
-      await ov.waitForFunction(() => window.__overlay.chat.launched.filter((x) => x.at > Date.now() - 3000).length > 0 && document.querySelector('.cm-flow .cm-item'), null, { timeout: 5000 });
+      await page.check('[data-key="le-obs"]');
+      await ov.waitForFunction(() => { const p = document.querySelector('.cm-pin'); return p && !p.hidden && p.dataset.id === 'demo-pin-0' && document.querySelector('.cm-flow .cm-item'); }, null, { timeout: 6000 });
       // 矢印キーで 1px・Shift で 10px
       await page.focus('.le-band');
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('Shift+ArrowDown');
       assert((await leState()).draft.band.y === by + 11, 'arrow keys');
-      await ov.screenshot({ path: path.join(SHOTS, 'layout-editor-obs-band.png') });
-      await page.click('[data-key="le-save"]');
-      await page.waitForSelector('dialog.le-dialog', { state: 'detached' });
-      saved = await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout);
-      assert(saved.band.y === by + 11 && saved.band.w === 1200 && saved.lanes === 5, JSON.stringify(saved));
-      // 既定に戻す（保存はしない）
-      await page.click('[data-key="yc-layout"]');
-      await page.waitForSelector('dialog.le-dialog[open]');
+      await page.locator('.le-root').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(SHOTS, 'comments-layout-960.png') });
+      // 見本をオフ → 本物（固定なし）にすぐ戻る
+      await page.uncheck('[data-key="le-obs"]');
+      await ov.waitForFunction(() => document.querySelector('.cm-pin').hidden, null, { timeout: 3000 });
+      await page.waitForFunction((y) => { const l = JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout; return l.band.y === y && l.band.w === 1200 && l.lanes === 5; }, by + 11, { timeout: 3000 });
+      // 既定に戻す（確かめてから）
       await page.click('[data-key="le-default"]');
+      assert(await page.isVisible('[data-key="le-confirm"]'), 'confirm');
+      await page.click('[data-key="le-default-no"]');
+      assert((await leState()).draft.band.y === by + 11, 'やめる');
+      await page.click('[data-key="le-default"]');
+      await page.click('[data-key="le-default-yes"]');
       st = await leState();
       assert(st.draft.band.y === 660 && st.draft.pin.x === 655 && st.draft.lanes === 4, JSON.stringify(st.draft));
-      await page.click('[data-key="le-cancel"]');
+      await page.click('[data-key="le-undo"]');
+      assert((await leState()).draft.band.y === by + 11, '既定に戻すも元に戻せる');
+      // 開き直しても保存したレイアウト
+      await page.waitForTimeout(600);
+      await page.reload();
+      await ready(page);
+      await page.waitForSelector('.le-root');
+      assert((await leState()).draft.band.y === by + 11, 'reload');
       await c.close();
-      // 1920 の画面（OBS タブから開く）
+      // 1920 の画面
       const c2 = await newCtx({ viewport: { width: 1920, height: 1080 } });
-      const { page: p2 } = await open(c2, `${show}#obs-setup`);
-      await p2.click('[data-key="setup-layout"]');
-      await p2.waitForSelector('dialog.le-dialog[open]');
+      const { page: p2 } = await open(c2, `${show}#comments`);
+      await p2.waitForSelector('.le-root');
       await p2.frameLocator('iframe.le-frame').locator('.cm-pin:not([hidden])').waitFor({ timeout: 8000 });
-      await p2.waitForTimeout(1500);
-      await p2.screenshot({ path: path.join(SHOTS, 'layout-editor-1920.png') });
-      await p2.click('[data-key="le-cancel"]');
+      await p2.waitForTimeout(1200);
+      await p2.screenshot({ path: path.join(SHOTS, 'comments-page-1920-empty.png') });
+      assert(await p2.evaluate(() => document.documentElement.scrollWidth) <= 1920, 'no h-scroll 1920');
+      const cols = await p2.evaluate(() => { const a = document.querySelector('.cmp-log-col').getBoundingClientRect(); const b = document.querySelector('.cmp-layout-col').getBoundingClientRect(); return { a: a.width, b: b.width, side: Math.abs(a.top - b.top) < 4 }; });
+      assert(cols.side && cols.b > cols.a, `2 列 ${JSON.stringify(cols)}`);
       await c2.close();
+      // OBS タブの「レイアウト調整」は［コメント］のページへ
+      const c3 = await newCtx();
+      const { page: p3 } = await open(c3, `${show}#obs-setup`);
+      await p3.click('[data-key="setup-layout"]');
+      await p3.waitForFunction(() => window.__show.route === 'comments');
+      await c3.close();
+    });
+
+    await check('複数ウィンドウ: A が取得（取りまとめ役）・B は一覧を映す・B の［固定］を A が実行して OBS に出る・B のレイアウト変更も A が OBS へ・A を閉じたら B が引き継いで取得を続ける（最初の分は流さない）', async () => {
+      const KEY = 'AIzaSyE2E-test_key_0123456789abcdefgh';
+      const c = await newCtx();
+      await c.addInitScript((k) => {
+        localStorage.setItem('xtrend-show-ytchat-fast', '300');
+        if (!localStorage.getItem('xtrend-show-ytchat')) localStorage.setItem('xtrend-show-ytchat', JSON.stringify({ key: k, mode: 'poll' }));
+      }, KEY);
+      const T = (id, msg) => ({ id, snippet: { type: 'textMessageEvent', publishedAt: new Date().toISOString(), displayMessage: msg }, authorDetails: { channelId: `UC${id}`, displayName: `@viewer_${id}` } });
+      const yt = { queue: [[T('m-old', '開始前')], [T('m1', 'A が取ったコメント'), T('m2', 'B から固定するコメント')]], calls: 0 };
+      const routeYt = async (pg) => {
+        await pg.route('https://www.googleapis.com/youtube/v3/**', async (route) => {
+          const u = new URL(route.request().url());
+          yt.calls++;
+          const cors = { 'access-control-allow-origin': '*' };
+          if (u.pathname.endsWith('/videos')) return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ items: [{ liveStreamingDetails: { activeLiveChatId: 'CHAT-MW' } }] }) });
+          return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ items: yt.queue.shift() || [], nextPageToken: `P${yt.calls}`, pollingIntervalMillis: 100 }) });
+        });
+      };
+      const ov = await c.newPage();
+      await ov.setViewportSize({ width: 1920, height: 1080 });
+      await setupRoutes(ov, { data: SAMPLE_404 });
+      watchConsole(ov, errors);
+      await ov.goto(`${show}overlay.html?part=comments`);
+      await ov.waitForFunction(() => window.__overlay && window.__overlay.chat);
+      const mk = async () => { const p = await c.newPage(); await setupRoutes(p, { data: SAMPLE_404 }); await routeYt(p); watchConsole(p, errors); await p.goto(`${show}#comments`); await ready(p); return p; };
+      const A = await mk();
+      assert(await A.evaluate(() => window.__show.chatIsLeader()), 'A は取りまとめ役');
+      const B = await mk();
+      await B.waitForTimeout(300);
+      assert(!(await B.evaluate(() => window.__show.chatIsLeader())), 'B はほか');
+      assert(await B.isVisible('[data-key="yc-role"]'), 'B に「ほかのウィンドウで取得中」');
+      // A で開始 → B に一覧が映る
+      await A.fill('[data-key="yc-url"]', 'https://youtu.be/dQw4w9WgXcQ');
+      await A.click('[data-key="yc-toggle-run"]');
+      await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 'm1'), null, { timeout: 8000 });
+      await B.waitForSelector('.yc-row[data-id="m2"]', { timeout: 5000 });
+      assert(await B.$('.yc-row[data-id="m-old"]'), 'B にも開始前の分');
+      assert((await B.textContent('[data-key="yc-status"]')).includes('取得中'), 'B status');
+      // B の［固定］→ A が実行 → OBS に固定・A と B の一覧に「固定中」
+      await B.click('.yc-row[data-id="m2"] [data-key="yc-pin"]');
+      await ov.waitForFunction(() => { const p = document.querySelector('.cm-pin'); return p && !p.hidden && p.dataset.id === 'm2'; }, null, { timeout: 5000 });
+      await A.waitForSelector('.yc-row[data-id="m2"].is-pinned', { timeout: 3000 });
+      await B.waitForSelector('.yc-row[data-id="m2"].is-pinned', { timeout: 3000 });
+      // B のレイアウト変更 → A が OBS へ（固定の幅）
+      await B.fill('[data-key="le-pin-w"]', '900');
+      await B.press('[data-key="le-pin-w"]', 'Enter');
+      await ov.waitForFunction(() => document.querySelector('.cm-pin').offsetWidth === 900, null, { timeout: 3000 });
+      // A の一覧の画面から消す → B にも
+      await A.click('.yc-row[data-id="m1"] [data-key="yc-hide"]');
+      await B.waitForSelector('.yc-row[data-id="m1"].is-hidden', { timeout: 3000 });
+      await B.screenshot({ path: path.join(SHOTS, 'comments-window-b-960.png') });
+      // A を閉じる → B が引き継ぐ（お知らせ）・新しいコメントが流れる・最初の分（つなぎ直しの開始前）は流さない
+      yt.queue.length = 0;
+      yt.queue.push([T('t-old', 'つなぎ直したときの開始前')], [T('t1', 'B が取ったコメント')]);
+      await A.close();
+      await B.waitForFunction(() => window.__show.chatIsLeader(), null, { timeout: 10000 });
+      await B.waitForFunction(() => /別ウィンドウが閉じられた/.test((document.getElementById('toast') || {}).textContent || ''), null, { timeout: 5000 });
+      await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 't1'), null, { timeout: 8000 });
+      assert(!(await ov.evaluate(() => window.__overlay.chat.launched.some((x) => x.id === 't-old'))), '引き継いだ最初の分は流さない');
+      await B.waitForSelector('.yc-row[data-id="t-old"]');
+      assert(await B.$('.yc-row[data-id="m2"]'), '一覧は引き継ぐ');
+      assert((await ov.evaluate(() => document.querySelector('.cm-pin').dataset.id)) === 'm2', '固定も引き継ぐ');
+      await c.close();
     });
 
     // ---- 4d. 演出（段階4）。偽の OBS（認証なし）で emit_event を受け、fx パーツへ配る

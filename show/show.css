@@ -1020,15 +1020,16 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 @media (prefers-reduced-motion: reduce) { .fxp-btn.is-fired { animation: none; outline: 2px solid var(--yellow); } }
 
 /* ---------------- 進行: YouTube ライブのコメント（パネル・一覧・設定） */
-.yc-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 8px; min-width: 0; margin-top: 6px; }
-.ycp-head { display: flex; align-items: center; gap: 8px; min-height: 32px; min-width: 0; }
+/* 進行の 1 行のバー */
+.yc-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 8px; min-width: 0; margin-top: 6px; }
+.ycb-label { font-weight: 800; font-size: 13px; flex: none; }
+.yc-bar .ycp-status { flex: 1 1 160px; }
 .ycp-status { flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ycp-status[data-state="running"] { color: var(--ok); font-weight: 800; }
 .ycp-status[data-state="error"] { color: #ff8a80; font-weight: 800; }
 .ycp-status[data-state="retrying"] { color: var(--warn); }
 .ycp-run { min-height: 30px; padding: 2px 14px; flex: none; }
 .ycp-run.is-on { background: var(--ink); color: #fff; border-color: var(--over); }
-.ycp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 0; }
 .ycp-url { flex: 1 1 280px; min-width: 0; }
 .ycp-flow { margin: 0; white-space: nowrap; }
 .yc-pinned { display: flex; align-items: center; gap: 8px; margin: 2px 0 6px; padding: 6px 8px; border: 2px solid #ff3c6e; border-radius: 12px; background: #2a1219; min-width: 0; }
@@ -1064,10 +1065,37 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .ycp-found b { color: var(--ok); margin-right: 4px; }
 
 /* ---------------- レイアウト調整（流れる範囲・固定コメント。1920×1080 の縮図） */
-.le-dialog { border: 0; border-radius: 16px; padding: 0; background: var(--surface); color: var(--text); width: min(1880px, calc(100vw - 16px)); max-width: none; max-height: calc(100vh - 16px); overflow: auto; }
-.le-dialog::backdrop { background: rgba(0, 0, 0, .78); }
-.le-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 14px 6px; position: sticky; top: 0; z-index: 3; background: var(--surface); border-bottom: 1px solid var(--line); }
+/* ---------------- ［コメント］ページ（上のバー・一覧・レイアウト） */
+.cmp { padding: 0 12px 24px; }
+.cmp-bar { position: sticky; top: 0; z-index: 15; background: var(--bg); padding: 6px 0 6px; display: grid; gap: 4px; box-shadow: 0 6px 12px -8px rgba(0, 0, 0, .8); }
+.cmp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.cmp-title { margin: 0; font-size: 18px; flex: none; }
+.cmp-bar .ycp-status { flex: 1 1 200px; font-size: 14px; }
+.cmp-bar .ycp-url { flex: 1 1 320px; }
+.cmp-bar .ycp-hint { margin: 0; }
+.cmp-role { margin-left: 8px; color: var(--warn); font-weight: 700; }
+.cmp-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 8px; }
+.cmp-log-col { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 10px; min-width: 0; display: flex; flex-direction: column; }
+.cmp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+.yc-chip { min-height: 34px; font-size: 13px; }
+.yc-chip.is-on { background: var(--g-white); color: var(--ink); border-color: var(--g-white); }
+.cmp .yc-log.cmp-log { max-height: none; height: 45vh; min-height: 240px; }
+.cmp .yc-row { grid-template-columns: 40px minmax(0, 1fr) auto; padding: 8px 4px; gap: 10px; }
+.cmp .yc-icon { width: 40px; height: 40px; }
+.cmp .yc-name { font-size: 13px; }
+.cmp .yc-text { font-size: 17px; line-height: 1.4; -webkit-line-clamp: 3; }
+.cmp .yc-btn { min-height: 38px; padding: 4px 12px; font-size: 13px; }
+.cmp .yc-pinned { padding: 8px 10px; }
+.cmp .yc-pinned-text { font-size: 15px; }
+.cmp-layout-col { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; min-width: 0; }
+@media (min-width: 1200px) {
+  .cmp-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); align-items: start; }
+  .cmp .yc-log.cmp-log { height: calc(100vh - var(--hdr, 160px) - 190px); min-height: 360px; }
+}
+.le-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 14px 6px; border-bottom: 1px solid var(--line); }
 .le-head h2 { margin: 0; font-size: 17px; flex: 1 1 auto; min-width: 0; }
+.le-saved { font-size: 12px; color: var(--muted); width: 100%; }
+.le-confirm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
 .le-sub { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
 .le-acts { display: flex; flex-wrap: wrap; gap: 6px; }
 .le-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 14px; }

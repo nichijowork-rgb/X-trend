@@ -2,7 +2,6 @@
 import { h, btn, field } from '../dom.js';
 import { LAYOUT_GUIDE, OVERLAY_PARTS } from '../overlayinfo.js';
 import { FEATURES } from '../config.js';
-import { layoutEditor } from './layouteditor.js';
 
 const STATE_LABEL = { idle: '未接続', connecting: '接続中…', connected: '接続済み', error: 'エラー' };
 
@@ -114,14 +113,10 @@ export function renderObsSetup(app) {
   }
   fig.append(canvas, h('figcaption', { class: 'muted' }, '参考配置（1920×1080）。灰色＝ほかのツール（重ねない）、色つき＝この番組サイトのパーツ。コーナータイトルは全面に数秒だけ出ます。コメントは帯（y 660〜908）を右から左へ流れ、固定コメントは中央に出ます（流れるコメントのパーツを投稿カードより下に置くと、カードの裏を通ります）。'));
   root.append(h('h3', { class: 'sub-title' }, '参考配置'), fig);
-  root.append(h('p', { class: 'row' }, btn('レイアウト調整（流れるコメント・固定コメント）', () => app.openLayoutEditor(), 'btn btn-small', { 'data-key': 'setup-layout', title: '流れる範囲と固定コメントの位置・大きさを、見本を見ながら調整します' })));
+  root.append(h('p', { class: 'row' }, h('a', { class: 'btn btn-small', href: '#comments', dataset: { key: 'setup-layout' }, attrs: { title: '［コメント］のページで、流れる範囲と固定コメントの位置・大きさを、見本を見ながら調整します' } }, 'レイアウト調整（［コメント］のページへ）')));
   root.append(h('p', { class: 'muted' }, '※ 進行画面（またはこの画面）を開いている間だけ、オーバーレイへ進行状態を送ります（変化したとき＋5 秒おき）。OBS を後から開いても数秒で追いつきます。'));
   if (app.ui.obsDlg) {
     root.append(obsDialog(app));
-    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
-  }
-  if (app.ui.le) {
-    root.append(layoutEditor(app));
     app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
   }
   return root;

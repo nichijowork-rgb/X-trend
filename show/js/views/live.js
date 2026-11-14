@@ -7,8 +7,7 @@ import { beginPointer } from './dnd.js';
 import { obsDialog } from './obsui.js';
 import { viewerDialog } from './viewerui.js';
 import { urlAddDialog } from './urladd.js';
-import { chatPanel, chatSettingsDialog } from './chatui.js';
-import { layoutEditor } from './layouteditor.js';
+import { chatBar } from './chatui.js';
 import { FEATURES, TEXT } from '../config.js';
 import { EFFECTS, THANKS_LIMITS, effectDef } from '../effects.js';
 
@@ -61,8 +60,8 @@ export function renderLive(app) {
           startArea)))));
 
   if (FEATURES.effects) root.append(fxPalette(app));
-  // YouTube ライブのコメント（取得は画面に関係なく続く。ここは操作と一覧）
-  root.append(chatPanel(app));
+  // YouTube ライブのコメント: 1 行の状態だけ（一覧・固定・レイアウトは［コメント］のページ。別ウィンドウでも開ける）
+  root.append(chatBar(app));
 
   const mainCard = h('section', { class: 'live-main', dataset: { keep: 'main' }, attrs: { 'aria-label': '今読むニュース' } });
   mainCard.append(cueContent(app, cue, wk));
@@ -85,14 +84,6 @@ export function renderLive(app) {
   }
   if (app.ui.obsDlg) {
     root.append(obsDialog(app));
-    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
-  }
-  if (app.ui.ycDlg) {
-    root.append(chatSettingsDialog(app));
-    app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
-  }
-  if (app.ui.le) {
-    root.append(layoutEditor(app));
     app.afterRender = () => { for (const d of document.querySelectorAll('#view dialog[data-modal]')) if (!d.open && typeof d.showModal === 'function') d.showModal(); };
   }
   tickLive(app, root);
