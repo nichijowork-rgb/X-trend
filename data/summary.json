@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-16T00:06:56+09:00",
+ "generated_at": "2026-11-16T00:29:50+09:00",
  "min_impressions": 300000,
- "total_posts": 5679,
+ "total_posts": 5680,
  "total_accounts": 2595,
  "below_threshold_posts": 77,
  "report_missing_ids": [
@@ -24,7 +24,7 @@
  "unknown_user_posts": 0,
  "period": {
   "oldest_jst": "2022-12-26T17:03:25+09:00",
-  "newest_jst": "2026-11-14T22:03:22+09:00"
+  "newest_jst": "2026-11-15T04:28:20+09:00"
  },
  "categories": [
   "ホスト",
@@ -158,9 +158,9 @@
    "likes": 2016871
   },
   "キャバクラ": {
-   "posts": 1010,
-   "impressions": 2293397445,
-   "likes": 5534616
+   "posts": 1011,
+   "impressions": 2296220983,
+   "likes": 5547079
   },
   "歌舞伎町": {
    "posts": 95,
@@ -745,6 +745,13 @@
    "likes": 49744
   },
   {
+   "user": "hirox246",
+   "is_watched": false,
+   "posts": 9,
+   "impressions": 18249795,
+   "likes": 104447
+  },
+  {
    "user": "hostcallch",
    "is_watched": false,
    "posts": 9,
@@ -785,13 +792,6 @@
    "posts": 8,
    "impressions": 15517778,
    "likes": 72089
-  },
-  {
-   "user": "hirox246",
-   "is_watched": false,
-   "posts": 8,
-   "impressions": 15426257,
-   "likes": 91984
   },
   {
    "user": "omegudayon",
@@ -21177,6 +21177,20 @@
     "夜職その他": 4,
     "監視アカウント": 6,
     "その他": 67
+   }
+  },
+  {
+   "date": "2026-11-15",
+   "posts": 1,
+   "impressions": 2823538,
+   "likes": 12463,
+   "categories": {
+    "ホスト": 0,
+    "キャバクラ": 1,
+    "歌舞伎町": 0,
+    "夜職その他": 0,
+    "監視アカウント": 0,
+    "その他": 0
    }
   }
  ],

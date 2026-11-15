@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T00:06:56+09:00",
+ "generated_at": "2026-11-16T00:29:50+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -10,6 +10,31 @@
   "その他"
  ],
  "posts": [
+  {
+   "id": "2121686688019968479",
+   "url": "https://x.com/hirox246/status/2121686688019968479",
+   "user": "hirox246",
+   "created_utc": "2026-11-14T19:28:20Z",
+   "created_jst": "2026-11-15T04:28:20+09:00",
+   "ts": 1794684500,
+   "metrics": {
+    "impression_count": 2823538,
+    "like_count": 12463,
+    "retweet_count": null,
+    "reply_count": 342,
+    "quote_count": 116,
+    "bookmark_count": 506
+   },
+   "text": "あっすん逮捕。\nNetflix『ラブ上等』出演とか、うまく行ってるように見えてたんだけど、なんで危ない橋をわざわざ渡るんだろう、、、？\n法の範囲内で経営が出来ただろうに。。。 https://t.co/CNYPzaTC06",
+   "categories": [
+    "キャバクラ"
+   ],
+   "matched_terms": [
+    "あっすん"
+   ],
+   "is_watched": false,
+   "in_bookmarks": true
+  },
   {
    "id": "2121589809676509466",
    "url": "https://x.com/LoveLive_staff/status/2121589809676509466",
