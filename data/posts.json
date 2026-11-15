@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T06:41:40+09:00",
+ "generated_at": "2026-11-16T00:06:56+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -372,6 +372,7 @@
    "is_watched": true,
    "in_reports": true,
    "report_refs": [
+    "review",
     "rising_watch"
    ],
    "below_threshold": true
@@ -431,6 +432,7 @@
    ],
    "in_reports": true,
    "report_refs": [
+    "review",
     "rising"
    ]
   },
@@ -641,6 +643,7 @@
    ],
    "in_reports": true,
    "report_refs": [
+    "review",
     "rising"
    ]
   },
@@ -670,6 +673,7 @@
    "is_watched": false,
    "in_reports": true,
    "report_refs": [
+    "review",
     "rising"
    ]
   },
@@ -923,6 +927,7 @@
    ],
    "in_reports": true,
    "report_refs": [
+    "review",
     "rising"
    ]
   },

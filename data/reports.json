@@ -1,6 +1,177 @@
 {
- "generated_at": "2026-11-15T00:12:31+09:00",
+ "generated_at": "2026-11-16T00:06:56+09:00",
  "daily": [
+  {
+   "date": "2026-11-15",
+   "rising": [
+    {
+     "id": "2121930461828280630",
+     "views": 459422,
+     "hours_since_post": 2.91,
+     "views_per_hour": 158058,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2121937547165352002",
+     "views": 360828,
+     "hours_since_post": 2.44,
+     "views_per_hour": 148032,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2121913168343822646",
+     "views": 450984,
+     "hours_since_post": 4.05,
+     "views_per_hour": 111301,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2121886053628023172",
+     "views": 491310,
+     "hours_since_post": 5.85,
+     "views_per_hour": 84016,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2121882219048485304",
+     "views": 477791,
+     "hours_since_post": 6.1,
+     "views_per_hour": 78305,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2121866428748009838",
+     "views": 460741,
+     "hours_since_post": 7.15,
+     "views_per_hour": 64462,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2121818034402972064",
+     "views": 492068,
+     "hours_since_post": 10.35,
+     "views_per_hour": 47531,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2121793575122022845",
+     "views": 490083,
+     "hours_since_post": 11.97,
+     "views_per_hour": 40934,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2121938666100838885",
+     "views": 216217,
+     "hours_since_post": 2.36,
+     "views_per_hour": 91488,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール関連の投稿が今夜まとまって伸びている"
+    },
+    {
+     "id": "2121916743186841679",
+     "views": 238703,
+     "hours_since_post": 3.82,
+     "views_per_hour": 62565,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上"
+    },
+    {
+     "id": "2121912635944058998",
+     "views": 253743,
+     "hours_since_post": 4.09,
+     "views_per_hour": 62082,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上"
+    },
+    {
+     "id": "2121937642745135139",
+     "views": 142827,
+     "hours_since_post": 2.43,
+     "views_per_hour": 58750,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール関連の投稿が今夜まとまって伸びている"
+    },
+    {
+     "id": "2121892033073951072",
+     "views": 297926,
+     "hours_since_post": 5.45,
+     "views_per_hour": 54649,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "あっすん逮捕の続報"
+    },
+    {
+     "id": "2121943944384970807",
+     "views": 104297,
+     "hours_since_post": 2.01,
+     "views_per_hour": 51789,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール関連の投稿が今夜まとまって伸びている"
+    },
+    {
+     "id": "2121920606878777837",
+     "views": 175727,
+     "hours_since_post": 3.56,
+     "views_per_hour": 49369,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "ラヴ上等出演者の続報"
+    }
+   ],
+   "review": [
+    {
+     "id": "2121549630664294611",
+     "before_views": 367686,
+     "after_views": 818246,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2121518119684579730",
+     "before_views": 490085,
+     "after_views": 757028,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2121523015003537712",
+     "before_views": 456901,
+     "after_views": 1085978,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2121488993548476911",
+     "before_views": 497018,
+     "after_views": 675641,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2121553636610265397",
+     "before_views": 179880,
+     "after_views": 412252,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-14",
    "rising": [
