@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-18T00:03:46+09:00",
+ "generated_at": "2026-11-18T00:32:03+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -5553,6 +5553,100 @@
    ]
   },
   {
+   "id": "2122293353006145897",
+   "url": "https://x.com/jjjdeeen/status/2122293353006145897",
+   "user": "jjjdeeen",
+   "created_utc": "2026-11-16T11:39:00Z",
+   "created_jst": "2026-11-16T20:39:00+09:00",
+   "ts": 1794829140,
+   "metrics": {
+    "impression_count": 9538,
+    "like_count": 22,
+    "retweet_count": null,
+    "reply_count": 2,
+    "quote_count": 1,
+    "bookmark_count": 10
+   },
+   "text": "復讐屋カモ、タレコミ山ちゃん\n痛い女子図鑑\nなどの複数アカウントを\n運用している仲間の\nサン・ヤードレスという\nアカウントを運用している持ち主を\nついに捕まえました。\n\n恐喝グループ達は\n手を組んで自分達や店舗や女の子に\n対して虚偽の情報を流して攻撃している事を白状しました。 https://t.co/aS6Na8cSFq",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2122293311541284864/img/9l_z6JHswRbo9hR1.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2122293311541284864/vid/avc1/320x568/HPJXzquqYynMDSKW.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2122293311541284864/vid/avc1/360x640/T9Y46OzYx5P_2TWl.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2122293311541284864/pl/MjA4s-i-Q6Bi171Q.m3u8"
+      }
+     ],
+     "width": 360,
+     "height": 640
+    },
+    {
+     "type": "video",
+     "preview_image_url": "https://pbs.twimg.com/amplify_video_thumb/2122293311553880064/img/3iDAYbkWPiwbCYOG.jpg",
+     "variants": [
+      {
+       "bit_rate": 632000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2122293311553880064/vid/avc1/320x568/wYU4eF_SnRTO1T6p.mp4"
+      },
+      {
+       "bit_rate": 950000,
+       "content_type": "video/mp4",
+       "url": "https://video.twimg.com/amplify_video/2122293311553880064/vid/avc1/360x640/ZxdTmD7Egf_-j8lz.mp4"
+      },
+      {
+       "content_type": "application/x-mpegURL",
+       "url": "https://video.twimg.com/amplify_video/2122293311553880064/pl/TpFPPD0quP6OJXX2.m3u8?v=cfc"
+      }
+     ],
+     "width": 360,
+     "height": 640
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXPmhcMbMAAptkz.jpg",
+     "width": 1521,
+     "height": 893
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXPmhb-aQAAJ6Ut.jpg",
+     "width": 960,
+     "height": 1672
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXPmhcKbgAA_lUt.jpg",
+     "width": 1202,
+     "height": 1364
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXPmhcFaYAAAceU.jpg",
+     "width": 1057,
+     "height": 1549
+    }
+   ],
+   "in_bookmarks": true,
+   "below_threshold": true
+  },
+  {
    "id": "2122292886993834377",
    "url": "https://x.com/mietokyo/status/2122292886993834377",
    "user": "mietokyo",
@@ -6086,7 +6180,8 @@
      "width": 1280,
      "height": 720
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2122282674463363565",
@@ -9363,12 +9458,12 @@
    "created_jst": "2026-11-16T09:30:08+09:00",
    "ts": 1794789008,
    "metrics": {
-    "impression_count": 203788,
-    "like_count": 1461,
+    "impression_count": 257262,
+    "like_count": 1786,
     "retweet_count": null,
     "reply_count": 9,
-    "quote_count": 28,
-    "bookmark_count": 135
+    "quote_count": 34,
+    "bookmark_count": 158
    },
    "text": "エンジェルはいつまでもコンカフェ嬢の夢です❗️\nふたりでした約束、約1年で叶えてくれてありがとう\n\n君は大事な人！ https://t.co/Ru9hgceuMQ",
    "categories": [
@@ -9937,7 +10032,8 @@
      "width": 1080,
      "height": 926
     }
-   ]
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2122057298474328518",
@@ -10236,8 +10332,8 @@
    "created_jst": "2026-11-16T01:04:10+09:00",
    "ts": 1794758650,
    "metrics": {
-    "impression_count": 15029,
-    "like_count": 58,
+    "impression_count": 15969,
+    "like_count": 59,
     "retweet_count": null,
     "reply_count": 1,
     "quote_count": 0,
@@ -10328,12 +10424,12 @@
    "created_jst": "2026-11-16T00:27:58+09:00",
    "ts": 1794756478,
    "metrics": {
-    "impression_count": 60778,
-    "like_count": 210,
+    "impression_count": 63582,
+    "like_count": 224,
     "retweet_count": null,
     "reply_count": 0,
-    "quote_count": 1,
-    "bookmark_count": 18
+    "quote_count": 2,
+    "bookmark_count": 19
    },
    "text": "何かがおかしい返信ニ選 https://t.co/q5aI5lpWXT",
    "categories": [
@@ -11217,6 +11313,37 @@
    "is_watched": false
   },
   {
+   "id": "2121931425717096584",
+   "url": "https://x.com/Yuutraining/status/2121931425717096584",
+   "user": "Yuutraining",
+   "created_utc": "2026-11-15T11:40:50Z",
+   "created_jst": "2026-11-15T20:40:50+09:00",
+   "ts": 1794742850,
+   "metrics": {
+    "impression_count": 6146909,
+    "like_count": 9620,
+    "retweet_count": null,
+    "reply_count": 267,
+    "quote_count": 194,
+    "bookmark_count": 1585
+   },
+   "text": "まじでババア過ぎる。これで33歳はきつい。\nマンジャロと酒とタバコと不摂生で身体中やられとるよな。 https://t.co/eO0iOwMDHV https://t.co/zNG2krBeQK",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HXKdYpHaMAAOeOS.jpg",
+     "width": 1070,
+     "height": 857
+    }
+   ],
+   "in_bookmarks": true
+  },
+  {
    "id": "2121930461828280630",
    "url": "https://x.com/mizuagesaretai/status/2121930461828280630",
    "user": "mizuagesaretai",
@@ -11814,12 +11941,12 @@
    "created_jst": "2026-11-15T18:27:52+09:00",
    "ts": 1794734872,
    "metrics": {
-    "impression_count": 185370,
-    "like_count": 728,
+    "impression_count": 193412,
+    "like_count": 768,
     "retweet_count": null,
     "reply_count": 2,
     "quote_count": 15,
-    "bookmark_count": 39
+    "bookmark_count": 42
    },
    "text": "昨日 濃かった 頭あがんね https://t.co/AHnr2tCx1D",
    "categories": [
@@ -12746,12 +12873,12 @@
    "created_jst": "2026-11-15T14:45:48+09:00",
    "ts": 1794721548,
    "metrics": {
-    "impression_count": 378520,
-    "like_count": 642,
+    "impression_count": 416049,
+    "like_count": 687,
     "retweet_count": null,
     "reply_count": 1,
     "quote_count": 3,
-    "bookmark_count": 52
+    "bookmark_count": 53
    },
    "text": "逮捕されたことによりまーくんとはビジネスカップルかつ44歳のおっさんと交際してることがバレたあっすんさん。 https://t.co/yi9pi19AQ3",
    "categories": [

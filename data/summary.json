@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-11-18T00:03:46+09:00",
+ "generated_at": "2026-11-18T00:32:03+09:00",
  "min_impressions": 300000,
- "total_posts": 6243,
- "total_accounts": 2785,
- "below_threshold_posts": 91,
+ "total_posts": 6245,
+ "total_accounts": 2787,
+ "below_threshold_posts": 92,
  "report_missing_ids": [],
  "unknown_user_posts": 0,
  "period": {
@@ -143,8 +143,8 @@
   },
   "キャバクラ": {
    "posts": 1119,
-   "impressions": 2622849961,
-   "likes": 6200829
+   "impressions": 2622887490,
+   "likes": 6200874
   },
   "歌舞伎町": {
    "posts": 99,
@@ -153,8 +153,8 @@
   },
   "夜職その他": {
    "posts": 443,
-   "impressions": 990950979,
-   "likes": 3077215
+   "impressions": 991004453,
+   "likes": 3077540
   },
   "監視アカウント": {
    "posts": 706,
@@ -162,9 +162,9 @@
    "likes": 4935649
   },
   "その他": {
-   "posts": 4468,
-   "impressions": 12571081497,
-   "likes": 82295740
+   "posts": 4470,
+   "impressions": 12577249730,
+   "likes": 82305437
   }
  },
  "by_account": [
@@ -4089,18 +4089,18 @@
    "likes": 77262
   },
   {
+   "user": "max_nooway",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1102758,
+   "likes": 1517
+  },
+  {
    "user": "UNEXT_football",
    "is_watched": false,
    "posts": 2,
    "impressions": 1066136,
    "likes": 16952
-  },
-  {
-   "user": "max_nooway",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 1065229,
-   "likes": 1472
   },
   {
    "user": "sake893corp",
@@ -5788,6 +5788,13 @@
    "posts": 1,
    "impressions": 6150521,
    "likes": 20955
+  },
+  {
+   "user": "Yuutraining",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 6146909,
+   "likes": 9620
   },
   {
    "user": "koc_staff",
@@ -19475,6 +19482,13 @@
    "likes": 4154
   },
   {
+   "user": "roa_prmk",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 257262,
+   "likes": 1786
+  },
+  {
    "user": "tomoyan_ontai",
    "is_watched": false,
    "posts": 1,
@@ -19489,18 +19503,18 @@
    "likes": 1128
   },
   {
-   "user": "roa_prmk",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 203788,
-   "likes": 1461
-  },
-  {
    "user": "tsuma_yohji",
    "is_watched": false,
    "posts": 1,
    "impressions": 196425,
    "likes": 3004
+  },
+  {
+   "user": "eiji_ygd",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 193412,
+   "likes": 768
   },
   {
    "user": "looks_or_cash",
@@ -19522,13 +19536,6 @@
    "posts": 1,
    "impressions": 185694,
    "likes": 336
-  },
-  {
-   "user": "eiji_ygd",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 185370,
-   "likes": 728
   },
   {
    "user": "kou_ichijyou",
@@ -19632,8 +19639,8 @@
    "user": "man7umm",
    "is_watched": false,
    "posts": 1,
-   "impressions": 60778,
-   "likes": 210
+   "impressions": 63582,
+   "likes": 224
   },
   {
    "user": "acqua_aki",
@@ -19653,8 +19660,15 @@
    "user": "jstk_002",
    "is_watched": false,
    "posts": 1,
-   "impressions": 15029,
-   "likes": 58
+   "impressions": 15969,
+   "likes": 59
+  },
+  {
+   "user": "jjjdeeen",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 9538,
+   "likes": 22
   },
   {
    "user": "xoxnyaqq",
@@ -22565,30 +22579,30 @@
   },
   {
    "date": "2026-11-15",
-   "posts": 138,
-   "impressions": 641731009,
-   "likes": 2275529,
+   "posts": 139,
+   "impressions": 647923489,
+   "likes": 2285234,
    "categories": {
     "ホスト": 7,
     "キャバクラ": 59,
     "歌舞伎町": 2,
     "夜職その他": 18,
     "監視アカウント": 10,
-    "その他": 65
+    "その他": 66
    }
   },
   {
    "date": "2026-11-16",
-   "posts": 234,
-   "impressions": 498906898,
-   "likes": 2418604,
+   "posts": 235,
+   "impressions": 498973654,
+   "likes": 2418966,
    "categories": {
     "ホスト": 4,
     "キャバクラ": 36,
     "歌舞伎町": 1,
     "夜職その他": 10,
     "監視アカウント": 8,
-    "その他": 189
+    "その他": 190
    }
   },
   {
