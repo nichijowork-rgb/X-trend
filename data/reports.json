@@ -1,6 +1,98 @@
 {
- "generated_at": "2026-11-16T00:06:56+09:00",
+ "generated_at": "2026-11-18T00:03:46+09:00",
  "daily": [
+  {
+   "date": "2026-11-17",
+   "rising": [
+    {
+     "id": "2122652300795842755",
+     "views": 444727,
+     "hours_since_post": 2.99,
+     "views_per_hour": 148764,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2122648742474170563",
+     "views": 355359,
+     "hours_since_post": 3.23,
+     "views_per_hour": 110178,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2122629819594588265",
+     "views": 454952,
+     "hours_since_post": 4.48,
+     "views_per_hour": 101589,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2122548826783506722",
+     "views": 400666,
+     "hours_since_post": 9.84,
+     "views_per_hour": 40709,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2122532546051547150",
+     "views": 403484,
+     "hours_since_post": 10.92,
+     "views_per_hour": 36947,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2122680376900329906",
+     "views": 130364,
+     "hours_since_post": 1.13,
+     "views_per_hour": 115362,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "中野の事件の続報"
+    },
+    {
+     "id": "2122653182874865832",
+     "views": 239797,
+     "hours_since_post": 2.93,
+     "views_per_hour": 81810,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ROLANDさんと高学歴ホストの番組の切り抜き"
+    },
+    {
+     "id": "2122655283998753170",
+     "views": 216030,
+     "hours_since_post": 2.79,
+     "views_per_hour": 77375,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿、黒崎みささんの急な引っ越しの話"
+    },
+    {
+     "id": "2122657438365339830",
+     "views": 124184,
+     "hours_since_post": 2.65,
+     "views_per_hour": 46876,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの投稿、あっすん逮捕の続報"
+    },
+    {
+     "id": "2122663391869465012",
+     "views": 103323,
+     "hours_since_post": 2.26,
+     "views_per_hour": 45819,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "中野の事件の続報（集英社オンライン）"
+    },
+    {
+     "id": "2122630489517482112",
+     "views": 198082,
+     "hours_since_post": 4.43,
+     "views_per_hour": 44671,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウントの投稿、星乃リアさんの誕生日イベントの協賛募集"
+    }
+   ],
+   "review": [],
+   "hit_rate": []
+  },
   {
    "date": "2026-11-15",
    "rising": [
