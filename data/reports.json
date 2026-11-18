@@ -1,6 +1,160 @@
 {
- "generated_at": "2026-11-18T00:03:46+09:00",
+ "generated_at": "2026-11-19T00:04:06+09:00",
  "daily": [
+  {
+   "date": "2026-11-18",
+   "rising": [
+    {
+     "id": "2123005044958404933",
+     "views": 397342,
+     "hours_since_post": 3.83,
+     "views_per_hour": 103880,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2122902218273861867",
+     "views": 453184,
+     "hours_since_post": 10.63,
+     "views_per_hour": 42614,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2122999698348970457",
+     "views": 227357,
+     "hours_since_post": 4.18,
+     "views_per_hour": 54406,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "大阪のキャバクラ「ランス」の演出が過激だという話"
+    },
+    {
+     "id": "2122988833583276230",
+     "views": 216528,
+     "hours_since_post": 4.9,
+     "views_per_hour": 44202,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "コンカフェ嬢と余命半年の男性客の漫画"
+    },
+    {
+     "id": "2123000183772565841",
+     "views": 155946,
+     "hours_since_post": 4.15,
+     "views_per_hour": 37605,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "エースグループのリリさんと進撃のノアさんの話"
+    },
+    {
+     "id": "2122997317561442434",
+     "views": 161676,
+     "hours_since_post": 4.34,
+     "views_per_hour": 37281,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "進撃のノアさんがヒカルさんとの0日婚について語った話"
+    }
+   ],
+   "review": [
+    {
+     "id": "2122652300795842755",
+     "before_views": 444727,
+     "after_views": 3116989,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2122648742474170563",
+     "before_views": 355359,
+     "after_views": 1216598,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2122629819594588265",
+     "before_views": 454952,
+     "after_views": 987306,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2122548826783506722",
+     "before_views": 400666,
+     "after_views": 426872,
+     "crossed_500k": false,
+     "source": "rising"
+    },
+    {
+     "id": "2122532546051547150",
+     "before_views": 403484,
+     "after_views": 494622,
+     "crossed_500k": false,
+     "source": "rising"
+    },
+    {
+     "id": "2122680376900329906",
+     "before_views": 130364,
+     "after_views": 3626972,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122653182874865832",
+     "before_views": 239797,
+     "after_views": 1055154,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122655283998753170",
+     "before_views": 216030,
+     "after_views": 761489,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122657438365339830",
+     "before_views": 124184,
+     "after_views": 521025,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122663391869465012",
+     "before_views": 103323,
+     "after_views": 755073,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122630489517482112",
+     "before_views": 198082,
+     "after_views": 315662,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 2,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 5,
+     "crossed": 5
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-17",
    "rising": [
