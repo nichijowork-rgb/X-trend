@@ -1,6 +1,142 @@
 {
- "generated_at": "2026-11-19T00:04:06+09:00",
+ "generated_at": "2026-11-20T00:10:10+09:00",
  "daily": [
+  {
+   "date": "2026-11-19",
+   "rising": [
+    {
+     "id": "2123280111546106267",
+     "views": 434196,
+     "hours_since_post": 9.48,
+     "views_per_hour": 45816,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2123269581284516071",
+     "views": 454017,
+     "hours_since_post": 10.17,
+     "views_per_hour": 44625,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    },
+    {
+     "id": "2123273650963087786",
+     "views": 415893,
+     "hours_since_post": 9.9,
+     "views_per_hour": 41990,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2123389815140032839",
+     "views": 189300,
+     "hours_since_post": 2.21,
+     "views_per_hour": 85605,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコール関連の投稿が同時に伸びている"
+    },
+    {
+     "id": "2123388893538242764",
+     "views": 166028,
+     "hours_since_post": 2.27,
+     "views_per_hour": 73062,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコール関連の投稿が同時に伸びている"
+    },
+    {
+     "id": "2123387166302863742",
+     "views": 147972,
+     "hours_since_post": 2.39,
+     "views_per_hour": 61994,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコール関連の投稿が同時に伸びている"
+    },
+    {
+     "id": "2123387281516171544",
+     "views": 135670,
+     "hours_since_post": 2.38,
+     "views_per_hour": 57026,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコール関連の投稿が同時に伸びている"
+    },
+    {
+     "id": "2123388164526248225",
+     "views": 109303,
+     "hours_since_post": 2.32,
+     "views_per_hour": 47098,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストコール関連の投稿が同時に伸びている"
+    },
+    {
+     "id": "2123380791740928438",
+     "views": 108365,
+     "hours_since_post": 2.81,
+     "views_per_hour": 38577,
+     "condition_label": "投稿から3時間以内で10万表示以上"
+    }
+   ],
+   "review": [
+    {
+     "id": "2123005044958404933",
+     "before_views": 397342,
+     "after_views": 947972,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2122902218273861867",
+     "before_views": 453184,
+     "after_views": 1083401,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2122999698348970457",
+     "before_views": 227357,
+     "after_views": 235211,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122988833583276230",
+     "before_views": 216528,
+     "after_views": 503055,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123000183772565841",
+     "before_views": 155946,
+     "after_views": 482536,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2122997317561442434",
+     "before_views": 161676,
+     "after_views": 601776,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 4,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-11-18",
    "rising": [
