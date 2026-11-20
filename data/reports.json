@@ -1,6 +1,120 @@
 {
- "generated_at": "2026-11-20T00:10:10+09:00",
+ "generated_at": "2026-11-21T00:02:58+09:00",
  "daily": [
+  {
+   "date": "2026-11-20",
+   "rising": [
+    {
+     "id": "2123734431764775316",
+     "views": 368831,
+     "hours_since_post": 3.47,
+     "views_per_hour": 106199,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2123709884663480762",
+     "views": 386962,
+     "hours_since_post": 5.1,
+     "views_per_hour": 75892,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2123706700926787858",
+     "views": 257453,
+     "hours_since_post": 5.31,
+     "views_per_hour": 48487,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "ARTEによるトー横キッズのドキュメンタリー紹介"
+    },
+    {
+     "id": "2123724391725121561",
+     "views": 155966,
+     "hours_since_post": 4.14,
+     "views_per_hour": 37691,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "オロチミコトさんの話題が同時に伸びている"
+    }
+   ],
+   "review": [
+    {
+     "id": "2123280111546106267",
+     "before_views": 434196,
+     "after_views": 1204759,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2123269581284516071",
+     "before_views": 454017,
+     "after_views": 582026,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2123273650963087786",
+     "before_views": 415893,
+     "after_views": 581413,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2123389815140032839",
+     "before_views": 189300,
+     "after_views": 684808,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123388893538242764",
+     "before_views": 166028,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123387166302863742",
+     "before_views": 147972,
+     "after_views": 319985,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123387281516171544",
+     "before_views": 135670,
+     "after_views": 361444,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123388164526248225",
+     "before_views": 109303,
+     "after_views": 7443347,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123380791740928438",
+     "before_views": 108365,
+     "after_views": 170467,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 6,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-11-19",
    "rising": [
