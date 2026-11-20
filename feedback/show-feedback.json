@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21T03:27:05+09:00",
+  "generated_at": "2026-11-21T03:32:07+09:00",
   "week": "2026-11-21",
   "genre_overrides": [
     {
@@ -404,8 +404,7 @@
       "genre": "ホスト",
       "post_ids": [
         "2119744172865274093",
-        "2121573779843518792",
-        "2122336389358321816"
+        "2121573779843518792"
       ],
       "deleted": false,
       "edits": [
@@ -863,6 +862,20 @@
       "deleted": false,
       "edits": [
         "genre",
+        "posts",
+        "new"
+      ]
+    },
+    {
+      "topic_id": "m:mwpbdarw3qq",
+      "source": "site",
+      "name": "高身長男性しか登録できないマチアプ登場",
+      "genre": "その他",
+      "post_ids": [
+        "2122474294710301080"
+      ],
+      "deleted": false,
+      "edits": [
         "posts",
         "new"
       ]
