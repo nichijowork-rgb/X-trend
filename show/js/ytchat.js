@@ -35,7 +35,7 @@ export const CHAT_CFG_LIMITS = Object.freeze({
   lanes: [1, 12], size: [16, 96], speed: [3, 30], pinSize: [16, 96], pinLines: [1, 3],
   bandMinW: 200, bandMinH: 30, laneMinH: 24, pinMinW: 300, pinMaxY: 1020,
 });
-export const CHAT_DEFAULTS = Object.freeze({ key: '', url: '', channel: '', channelInfo: null, mode: 'auto', interval: 6000, ng: '', pin: null, pinnedAt: null });
+export const CHAT_DEFAULTS = Object.freeze({ key: '', url: '', channel: '', channelInfo: null, mode: 'auto', interval: 6000, ng: '', pin: null, pinnedAt: null, autoStart: true });
 /** アイコンとして使ってよい画像の置き場所（YouTube のプロフィール画像） */
 export const YT_IMAGE_HOSTS = Object.freeze(['yt3.ggpht.com', 'yt4.ggpht.com', 'yt3.googleusercontent.com', 'lh3.googleusercontent.com']);
 /** スーパーチャットの色（tier 1〜7。YouTube の色に近い値） */
@@ -455,12 +455,30 @@ export function parseChatPrefs(raw) {
       ? { input: cleanText(ci.input, 200), id: ci.id, uploads: ci.uploads, title: cleanText(ci.title, 100) } : null,
     mode: CHAT_MODES.includes(o.mode) ? o.mode : 'auto',
     interval,
+    autoStart: o.autoStart !== false,
     ng: typeof o.ng === 'string' ? o.ng.slice(0, 5000) : '',
     layout: { band: cfg.band, lanes: cfg.lanes, size: cfg.size, speed: cfg.speed, pin: cfg.pin },
     flow: cfg.flow,
     pin,
     pinnedAt: pin && Number.isFinite(o.pinnedAt) ? o.pinnedAt : null,
   };
+}
+
+/**
+ * 進行の「配信開始」でコメントも自動で始めるときの段取り。
+ *  skip（off＝設定でオフ／nokey＝API キーが無い／nosource＝URL もチャンネルも無い）・
+ *  url（前回の URL で）・channel（チャンネルから探す）・check（前回の URL が今も配信中か確かめて、違えばチャンネルから探す）
+ */
+export function autoStartPlan(prefs, { force = false } = {}) {
+  const p = prefs || {};
+  if (p.autoStart === false && !force) return { action: 'skip', reason: 'off' };
+  if (!looksLikeGoogleKey(p.key)) return { action: 'skip', reason: 'nokey' };
+  const url = typeof p.url === 'string' && parseVideoId(p.url) ? p.url : '';
+  const channel = typeof p.channel === 'string' && parseChannelInput(p.channel) ? p.channel : '';
+  if (url && channel) return { action: 'check', url };
+  if (url) return { action: 'url', url };
+  if (channel) return { action: 'channel' };
+  return { action: 'skip', reason: 'nosource' };
 }
 
 /** 保存していた固定コメントを使うか（固定してから CHAT_PIN_RESTORE_MS 以内だけ） */

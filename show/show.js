@@ -26,6 +26,7 @@ import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
 import {
   YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, looksLikeGoogleKey, createChatClient, applyChatBatch, ngMatcher, parseNgWords,
   buildChatMessage, sanitizeChatCfg, restorePin, demoChatItem, demoChatPin, quotaUnits, parseChannelInput, createLiveFinder,
+  autoStartPlan, videosUrl, liveChatIdOf,
 } from './js/ytchat.js';
 import { refreshChatPanel } from './js/views/chatui.js';
 import { createLeaderLock, createSyncFilter, envelope, chatSnapshot, applySnapshot, isCollecting, SYNC_CHANNEL, SYNC_COMMANDS, LOCK_KEY, HEARTBEAT_MS } from './js/chatsync.js';
@@ -905,7 +906,7 @@ function onSyncMessage(msg) {
     const run = {
       start: () => leaderStart(a[0] == null ? undefined : a[0]), stop: () => leaderStop(), pin: () => leaderPin(a[0]), unpin: () => leaderUnpin(),
       hide: () => leaderHide(a[0]), flow: () => leaderSetFlow(a[0]), demo: () => leaderDemo(), previewObs: () => leaderPreviewObs(a[0]),
-      layout: () => applyLayoutFromOther(a[0]), prefs: () => reloadPrefsFromStorage(),
+      layout: () => applyLayoutFromOther(a[0]), prefs: () => reloadPrefsFromStorage(), autostart: () => leaderAutoStart({ force: Boolean(a[0]) }),
     }[msg.name];
     if (run) run();
   }
@@ -1161,6 +1162,38 @@ function leaderStop() {
   app.chat.reason = '';
   refreshChat();
 }
+/**
+ * 進行の「配信開始」でコメントも始める（設定「配信開始でコメントも始める」。既定オン）。
+ * 取得中なら何もしない。前回の URL とチャンネルの両方があれば、URL が今も配信中かを確かめ（1 単位）、違えばチャンネルから探す
+ * （先週の URL のまま始めてしまわないように）。
+ */
+async function leaderAutoStart({ force = false } = {}) {
+  if (chatRunning()) return false;
+  const plan = autoStartPlan(app.chatPrefs, { force });
+  if (plan.action === 'skip') {
+    if (plan.reason === 'nokey') toast('コメントは自動で始まりませんでした（「コメント」→「⚙ 設定」で API キーを入れてください）');
+    else if (plan.reason === 'nosource') toast('コメントは自動で始まりませんでした（「コメント」→「⚙ 設定」でチャンネルを登録するか、配信の URL を入れてください）');
+    return false;
+  }
+  let url = plan.action === 'channel' ? '' : plan.url;
+  if (plan.action === 'check') {
+    try {
+      const res = await fetch(videosUrl(parseVideoId(plan.url), app.chatPrefs.key), { method: 'GET', referrerPolicy: 'origin', credentials: 'omit', cache: 'no-store' });
+      countUnits('videos');
+      const body = await res.json().catch(() => null);
+      const r = res.ok ? liveChatIdOf(body) : { error: true };
+      if (r.error) url = ''; // 前回の URL は今は配信中でない → チャンネルから探す
+    } catch {
+      // つながらないときは前回の URL のまま（取得側が自動でやり直す）
+    }
+    if (chatRunning()) return false; // 確かめている間に手で始めた
+  }
+  const ok = leaderStart(url);
+  if (ok) toast(url ? 'コメントの取得も始めました' : 'コメントの取得も始めました（チャンネルから今の配信を探しています）');
+  return ok;
+}
+/** force: 設定「配信開始でコメントも始める」がオフでも始める（進行のバーの「開始」） */
+app.chatAutoStart = viaLeader('autostart', (force) => { leaderAutoStart({ force: Boolean(force) }); return true; });
 app.chatStart = viaLeader('start', (url) => leaderStart(url));
 app.chatStop = viaLeader('stop', leaderStop);
 app.chatToggle = (url) => (chatRunning() ? app.chatStop() : app.chatStart(url));
@@ -1314,6 +1347,7 @@ app.replaceSaved = (state) => {
 
 /** 進行の操作（読んだ・飛ばす・来週へ・戻す・開始・移動・リセット） */
 app.liveAction = (type, extra = {}) => {
+  const wasStarted = app.weekState().live.startedAt != null;
   app.update((wk) => {
     const prev = wk.live;
     wk.live = liveReduce(prev, { type, now: Date.now(), ...extra }, app.cues);
@@ -1321,6 +1355,8 @@ app.liveAction = (type, extra = {}) => {
     wk.carriedOut = syncCarriedOut(wk.carriedOut, app.topicsById, ids, app.weekKey, wk.script);
     wk.usedPostIds = usedPostIdsOf(wk.live, app.cues, app.topicsById);
   });
+  // 「配信開始」でコメントの取得も始める（設定でオフにできる）
+  if (type === 'start' && !wasStarted && app.weekState().live.startedAt != null) app.chatAutoStart();
 };
 
 // ================================================================ 整理（片付け・削除）と元に戻す

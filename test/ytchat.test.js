@@ -8,7 +8,7 @@ import {
   CHAT_CFG_DEFAULTS, CHAT_INTERVALS, CHAT_STALE_MS, CHAT_PIN_BOX, CHAT_PIN_RESTORE_MS, YT_API,
   createJsonArrayParser, createStreamBodyReader, streamErrorDecision, streamUrl, createChatClient, STREAM_BACKOFF_MS, applyChatOverrides,
   parseChannelInput, channelsUrl, channelInfoOf, playlistItemsUrl, videosDetailUrl, searchLiveUrl, videoIdsOf, pickActiveLive, createLiveFinder, FINDER_WAIT_TEXT,
-  pinBoxHeight,
+  pinBoxHeight, autoStartPlan,
 } from '../show/js/ytchat.js';
 import { createLaneScheduler, lanesOverlapping, laneY, laneH, laneTop, travelMs, laneBusyMs, pxPerMs, LANE_GAP, QUEUE_MAX } from '../show/js/lanes.js';
 
@@ -803,3 +803,21 @@ test('オーバーレイの URL の上書き（&top= &lanes= &laneh= &size= &spe
   assert.ok(pinBoxHeight({ size: 34, lines: 1 }) < pinBoxHeight({ size: 34, lines: 3 }));
 });
 
+
+test('autoStartPlan: 配信開始でコメントも始める段取り', () => {
+  const key = 'AIzaSyD0123456789abcdefghijklmnopqrstu';
+  const url = 'https://www.youtube.com/live/dQw4w9WgXcQ';
+  assert.deepEqual(autoStartPlan({ key, url: '', channel: '@someone' }), { action: 'channel' });
+  assert.deepEqual(autoStartPlan({ key, url, channel: '' }), { action: 'url', url });
+  assert.deepEqual(autoStartPlan({ key, url, channel: '@someone' }), { action: 'check', url });
+  assert.deepEqual(autoStartPlan({ key, url: '', channel: '' }), { action: 'skip', reason: 'nosource' });
+  assert.deepEqual(autoStartPlan({ key: '', url, channel: '@someone' }), { action: 'skip', reason: 'nokey' });
+  assert.deepEqual(autoStartPlan({ key, url, channel: '@someone', autoStart: false }), { action: 'skip', reason: 'off' });
+  assert.deepEqual(autoStartPlan({ key, url, channel: '@someone', autoStart: false }, { force: true }), { action: 'check', url });
+  // 読み取れない URL・チャンネルは無いものとして扱う
+  assert.deepEqual(autoStartPlan({ key, url: 'not a url', channel: '@someone' }), { action: 'channel' });
+  assert.deepEqual(autoStartPlan(null), { action: 'skip', reason: 'nokey' });
+  // 既定はオン（古い保存にも autoStart が無ければオン）
+  assert.equal(parseChatPrefs({}).autoStart, true);
+  assert.equal(parseChatPrefs({ autoStart: false }).autoStart, false);
+});

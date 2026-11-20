@@ -83,7 +83,7 @@ export function createSyncFilter(me) {
 }
 
 /** ほかのウィンドウから送れる操作 */
-export const SYNC_COMMANDS = Object.freeze(['start', 'stop', 'pin', 'unpin', 'hide', 'flow', 'layout', 'previewObs', 'demo', 'prefs']);
+export const SYNC_COMMANDS = Object.freeze(['start', 'stop', 'pin', 'unpin', 'hide', 'flow', 'layout', 'previewObs', 'demo', 'prefs', 'autostart']);
 
 /** 取りまとめ役が配る状態（一覧を含む。新しく開いたウィンドウにもこれ 1 つで足りる） */
 export function chatSnapshot(chat, extra = {}) {

@@ -160,7 +160,8 @@ export function chatBar(app) {
   return h('section', { class: 'yc-bar', attrs: { 'aria-label': 'YouTube のコメント' }, dataset: { keep: 'yc-bar' } },
     h('span', { class: 'ycb-label' }, 'コメント'),
     h('span', { class: 'ycp-status', attrs: { role: 'status', 'aria-live': 'polite' }, dataset: { key: 'yc-status', state: app.chat.status } }, chatStatusText(app)),
-    runBtn(app, () => app.chatToggle(app.chatPrefs.url || '')),
+    // 前回（先週）の URL のまま始めないように、URL が今も配信中かを確かめ、違えばチャンネルから探す
+    runBtn(app, () => (app.chatRunning() ? app.chatStop() : app.chatAutoStart(true))),
     h('a', { class: 'btn btn-small btn-ghost-dark', href: '#comments', dataset: { key: 'yc-goto' }, attrs: { title: 'コメントの一覧・固定・レイアウトのページへ' } }, 'コメントページへ'),
     btn('別ウィンドウで開く', () => app.openCommentsWindow(), 'btn btn-small btn-ghost-dark', { 'data-key': 'yc-popout', title: 'コメントのページを別のウィンドウで開きます（進行と並べて使えます）' }));
 }
@@ -205,7 +206,7 @@ export function commentsLogColumn(app) {
 export function chatSettingsDialog(app) {
   const p = app.chatPrefs;
   const u = app.ui;
-  if (!u.ycDraft) u.ycDraft = { key: p.key, interval: p.interval, mode: p.mode, channel: p.channel, ng: p.ng };
+  if (!u.ycDraft) u.ycDraft = { key: p.key, interval: p.interval, mode: p.mode, channel: p.channel, ng: p.ng, autoStart: p.autoStart !== false };
   const d = u.ycDraft;
   const close = () => { u.ycDlg = false; u.ycDraft = null; u.ycKeyMsg = ''; app.render(); };
   const dlg = h('dialog', { class: 'obs-dialog yc-dialog', attrs: { 'data-modal': '', 'aria-labelledby': 'yc-title' }, dataset: { keep: 'yc-dialog' } });
@@ -220,6 +221,8 @@ export function chatSettingsDialog(app) {
   const interval = h('select', { class: 'input', dataset: { key: 'yc-interval' } },
     ...CHAT_INTERVALS.map((ms) => h('option', { value: String(ms), selected: ms === Number(d.interval) }, `${ms / 1000} 秒${ms === 6000 ? '（おすすめ）' : ''}`)));
   interval.addEventListener('change', () => { d.interval = Number(interval.value); });
+  const autoStart = h('input', { type: 'checkbox', checked: d.autoStart !== false, dataset: { key: 'yc-autostart' } });
+  autoStart.addEventListener('change', () => { d.autoStart = autoStart.checked; });
   const mode = h('select', { class: 'input', dataset: { key: 'yc-mode' } },
     h('option', { value: 'auto', selected: d.mode !== 'poll' }, '自動（プッシュ→だめなら数秒ごと）'),
     h('option', { value: 'poll', selected: d.mode === 'poll' }, '数秒ごとのみ（取得間隔）'));
@@ -246,7 +249,7 @@ export function chatSettingsDialog(app) {
       channel.focus();
       return;
     }
-    app.chatSavePrefs({ key: k, interval: d.interval, mode: d.mode, channel: chIn, ng: d.ng });
+    app.chatSavePrefs({ key: k, interval: d.interval, mode: d.mode, channel: chIn, ng: d.ng, autoStart: d.autoStart !== false });
     u.ycDraft = null;
     u.ycDlg = false;
     app.toast('コメントの設定を保存しました');
@@ -262,6 +265,7 @@ export function chatSettingsDialog(app) {
       h('p', { class: 'obs-warn' }, '⚠ API キーはこのパソコンのこのブラウザにだけ保存します（YouTube の API 以外には送りません。書き出しにも入りません）。共用のパソコンでは使い終わったら消してください。'),
       field('チャンネル', channel, '（登録すると、配信の URL を空にして「開始」したとき、このチャンネルの今の配信を自動で探します）'),
       chMsg,
+      h('label', { class: 'check-line' }, autoStart, h('span', {}, '進行の「▶ 配信開始」でコメントの取得も始める（URL が入っていればその配信、無ければチャンネルから探します）')),
       field('取得方式', mode, '（プッシュはコメントがすぐ届きます。使えないときは自動で数秒ごとに切り替わります）'),
       field('取得間隔（数秒ごとのとき）', interval, '（短いほど早く出ますが、1 日の上限を早く使います）'),
       h('p', { class: 'muted yc-quota', dataset: { key: 'yc-quota' } }, quotaText(app)),

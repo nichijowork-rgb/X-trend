@@ -1293,6 +1293,32 @@ async function main() {
         assert(!yt.calls.slice(n).some((x) => x.path === '/channels'), 'channels.list は 1 回だけ');
         await c.close();
       }
+      // ④ 進行の「▶ 配信開始」でコメントの取得も始まる（URL 空・チャンネル登録あり → チャンネルから探す）
+      {
+        const { c, page, ov, yt } = await run({ streamMode: 'ok', channel: '@e2e_test_channel' });
+        await page.goto(`${show}#live`);
+        await ready(page);
+        await page.waitForSelector('[data-key="yc-bar"], .yc-bar');
+        assert(!yt.calls.length, '配信開始の前は YouTube に問い合わせない');
+        await page.click('[data-key="live-start"]');
+        await ov.waitForFunction(() => window.__overlay.chat.launched.some((x) => x.id === 's1'), null, { timeout: 8000 });
+        assert(yt.calls.some((x) => x.path === '/channels'), 'チャンネルから探した');
+        const st = await page.textContent('.yc-bar [data-key="yc-status"]');
+        assert(st.includes('取得中'), st);
+        await c.close();
+      }
+      // ⑤ 設定「配信開始でコメントも始める」をオフ → 配信開始では始まらない
+      {
+        const { c, page, ov, yt } = await run({ streamMode: 'ok', channel: '@e2e_test_channel' });
+        await page.evaluate(() => { const k = 'xtrend-show-ytchat'; const o = JSON.parse(localStorage.getItem(k)); o.autoStart = false; localStorage.setItem(k, JSON.stringify(o)); });
+        await page.goto(`${show}#live`);
+        await page.reload();
+        await ready(page);
+        await page.click('[data-key="live-start"]');
+        await new Promise((r) => setTimeout(r, 800));
+        assert(!yt.calls.length, 'オフなら配信開始で始めない');
+        await c.close();
+      }
     });
 
     await check('［コメント］ページのレイアウト（その場で調整）: 固定コメントをマウスでドラッグ → OBS（同じブラウザ）の固定がすぐ動き、押さなくても保存・元に戻す／やり直す・帯をドラッグ → 新しい帯の中を流れる・数値・矢印キー・既定に戻す（確かめてから）・OBS にも見本（既定オフ）', async () => {
