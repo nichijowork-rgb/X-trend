@@ -302,6 +302,11 @@ test('おまかせで下書き: 空いている所だけ（メインの空き枠
   // 雑談おすすめ（show_pick）が先
   assert.deepEqual(autoDraftPlan({ week: w.week, topics: many, pickIds: new Set(w.topicsById.get('g3').postIds) }).chat, ['g3', 'g1', 'g2']);
   assert.deepEqual(rankGeneral(many, new Set()).map((t) => t.id), ['g1', 'g2', 'g3']);
+  // 投稿がすべて対象期間の外（期間外）の話題は使わない。一部だけ期間外なら使う
+  const outside = many.map((t) => (t.id === 'h1' ? { ...t, outsideCount: t.stats.count } : t.id === 'k1' ? { ...t, outsideCount: 1 } : t));
+  const po = autoDraftPlan({ week: w.week, topics: outside });
+  assert.ok(![...po.main.map((m) => m.id), ...po.category, ...po.chat].includes('h1'), '全部期間外は使わない');
+  assert.equal(po.main[0].id, 'k1', '一部だけ期間外なら使う');
   // 入っている所は動かさない: メイン 2 が入っていれば 1・3 だけ、カテゴリ別に 1 つでもあれば足さない。メイン候補の話題は使わない
   drop(w, 'h3', 'slot:1');
   drop(w, 'h1', 'cand');

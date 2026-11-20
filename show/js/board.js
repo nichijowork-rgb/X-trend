@@ -292,9 +292,12 @@ export function addTargets(week, topic, topicsById = new Map()) {
  *  - カテゴリ別ニュース（空のときだけ）: 夜職の話題を、ジャンルを順に回しながら上から（BOARD.draftCategory 本まで）
  *  - 雑談（空のときだけ）: 一般のバズのおすすめの上から（show_pick が先。BOARD.draftChat 本まで）
  *  - 番組に入っている話題・メイン候補は使わない
+ *  - 投稿がすべて対象期間の外（「期間外」）の話題は使わない（2026-11-21）
  */
 export function autoDraftPlan(ctx) {
-  const { week, topics, pickIds = new Set(), priorityGenre = GENRE_PRIORITY.default } = ctx;
+  const { week, pickIds = new Set(), priorityGenre = GENRE_PRIORITY.default } = ctx;
+  const allOutside = (t) => Boolean(t.outsideCount) && t.outsideCount >= (t.stats ? t.stats.count : (t.postIds || []).length);
+  const topics = (ctx.topics || []).filter((t) => !allOutside(t));
   const used = placedTopicIds(week);
   const slots = mainSlots(week.rundown);
   const emptySlots = slots.map((id, k) => (id ? -1 : k)).filter((k) => k >= 0);
