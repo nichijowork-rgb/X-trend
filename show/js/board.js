@@ -1,10 +1,12 @@
-// かんたん編成（#plan。左＝素材・右＝番組の流れ）の純粋関数。DOM 非依存（node:test から import される）。
-// 素材の一覧（チップ・検索・番組に入っている印・ページ分け）／番組の流れ（コーナーごとの並び・時間）／
-// ドラッグして置いた先 → することを決める（置けない理由も）／「おまかせで下書き」の中身／開いた話題に足せる投稿。
+// かんたん編成（#plan）の純粋関数。DOM 非依存（node:test から import される）。
+// 2 つのステップ: ① 投稿からまとまりを作る（左＝投稿・右＝まとまり）／② まとまりを番組に並べる（左＝まとまり・右＝番組の流れ）。
+// ②: まとまりの一覧（チップ・検索・番組に入っている印・ページ分け）／番組の流れ（コーナーごとの並び・時間）／「おまかせで下書き」の中身／開いたまとまりに足せる投稿。
+// ①: 投稿の一覧（まだ入っていないものだけ／すべて・チップ・検索）／まとまりの一覧（作ったものが先）／チェックの選び方。
+// 共通: ドラッグして置いた先 → することを決める（置けない理由も）。画面のことばは「まとまり」（コードの中の名前は topic のまま）。
 // 置いた結果そのものは、フォルダの画面（#plan-folders）と同じ関数（folders.js の applyDrop など）で作る。
 import { searchKey } from '../../assets/js/core.js';
 import { BOARD, GENRE_PRIORITY, NIGHT_GENRES, SHOW_DEFAULTS } from './config.js';
-import { mainSlots, canBeMain, suggestMain, cornerDef, totalMinutes, postGenre, compareIds, isImageItem, genreLabel } from './logic.js';
+import { mainSlots, canBeMain, suggestMain, cornerDef, totalMinutes, postGenre, compareIds, isImageItem, genreLabel, topicPhrase, majorityGenre } from './logic.js';
 import { placeOf, placedTopicIds, queryTokens, searchPosts, rankGeneral, isNightGenre, isFolderTopic } from './folders.js';
 
 // ================================================================ チップ（素材のしぼり込み。1 つだけ選ぶ）
@@ -131,11 +133,13 @@ export function formatHm(min) {
 /**
  * 置き場所のキー:
  *   slot:0〜2 … メインの枠 ／ cand・cand#位置 … メイン候補 ／ corner:category・corner:chat（#位置）… コーナー
- *   material … 左の列（番組・話題から外す）／ open#位置 … 開いた話題の投稿の並び ／ topic:<話題id> … 右の列の話題のカード（投稿を移す）
+ *   material … 左の列（番組・まとまりから外す）／ open#位置 … 開いたまとまりの投稿の並び ／ topic:<話題id> … 右の列のまとまりのカード（投稿を足す・移す）
+ *   newgroup … ステップ①の「＋ 新しいまとまり」
  */
 export function parseDropKey(key) {
   const s = String(key || '');
   if (s === 'material') return { zone: 'material' };
+  if (s === 'newgroup') return { zone: 'newgroup' };
   if (s.startsWith('topic:')) return { zone: 'topic', topicId: s.slice(6) };
   const [base, pos] = s.split('#');
   const index = pos != null && pos !== '' && Number.isInteger(Number(pos)) ? Number(pos) : null;
@@ -151,32 +155,36 @@ export function parseDropKey(key) {
 export const WHY_NOT = Object.freeze({
   generalMain: '一般のバズはメインに入れられません（雑談へどうぞ）',
   generalCand: '一般のバズはメイン候補に入れられません（雑談へどうぞ）',
-  postZone: '投稿は、開いた話題の中かほかの話題のカードに入れます',
-  already: 'もうこの話題に入っています',
-  imageMove: '画像はほかの話題へ移せません',
-  missingMove: 'データに無い投稿はほかの話題へ移せません',
+  postZone: '投稿は、開いたまとまりの中か、ほかのまとまりのカードに入れます',
+  already: 'もうこのまとまりに入っています',
+  imageMove: '画像はほかのまとまりへ移せません',
+  missingMove: 'データに無い投稿はほかのまとまりへ移せません',
+  imageGroup: '画像だけでは新しいまとまりを作れません',
+  missingGroup: 'データに無い投稿だけでは新しいまとまりを作れません',
 });
 
 const no = (reason = null) => ({ ok: false, reason });
 
 /**
  * drag を key に置いたらどうなるか。
- * drag: { kind: 'topic', id } ／ { kind: 'post', id（投稿 id・画像は img:<id>）, source: 'open'（開いた話題の中）| 'addable'（左の「足せる投稿」）}
- * ctx: { week, topicsById, openId（開いている話題）, openItems（その並び。全件）, postsById }
+ * drag: { kind: 'topic', id } ／ { kind: 'post', id（投稿 id・画像は img:<id>）, source: 'open'（開いたまとまりの中）| 'addable'（②の左の「足せる投稿」）| 'list'（①の左の投稿の一覧）,
+ *         ids（'list' でチェックした行をまとめてつかんだとき、その全部。無ければ [id]）}
+ * ctx: { week, topicsById, openId（開いているまとまり）, openItems（その並び。全件）, postsById }
  * 返り値: { ok: true, action, hint } ／ { ok: false, reason（置けない理由。同じ場所など理由が無いときは null）}
  * action: { type: 'place', topicId, target（applyDrop に渡すキー）} ／ { type: 'unplace', topicId } ／ { type: 'reorder', topicId, order }
  *       ／ { type: 'addPost', topicId, postId, index } ／ { type: 'removePost', topicId, itemId } ／ { type: 'movePost', postId, to }
+ *       ／ { type: 'addPosts', topicId, postIds, index（null＝並びは決めない）, order（並びの最後に足すと決めるか）} ／ { type: 'newGroup', postIds }
  */
 export function resolveDrop(drag, key, ctx) {
   const k = parseDropKey(key);
   if (!drag || !k.zone) return no();
   const { week, topicsById = new Map() } = ctx;
-  const nameOf = (id) => (topicsById.get(id) || {}).name || '話題';
+  const nameOf = (id) => (topicsById.get(id) || {}).name || 'まとまり';
 
   if (drag.kind === 'topic') {
     const t = topicsById.get(drag.id);
     const at = placeOf(week, drag.id);
-    if (k.zone === 'material') return at ? { ok: true, action: { type: 'unplace', topicId: drag.id }, hint: '番組から外す（素材に戻す）' } : no();
+    if (k.zone === 'material') return at ? { ok: true, action: { type: 'unplace', topicId: drag.id }, hint: '番組から外す（左の一覧に戻す）' } : no();
     if (!t) return no();
     if (k.zone === 'slot') {
       if (!canBeMain(t)) return no(WHY_NOT.generalMain);
@@ -212,6 +220,31 @@ export function resolveDrop(drag, key, ctx) {
 
   if (drag.kind === 'post') {
     const { openId = null, openItems = [], postsById = new Map() } = ctx;
+    const ids = Array.isArray(drag.ids) && drag.ids.length ? drag.ids : [drag.id];
+    const count = (n) => (n > 1 ? `（${n}件）` : '');
+    // ①: 新しいまとまりを作る（一覧の投稿・開いたまとまりの中の投稿から。画像・データに無い投稿は入れない）
+    if (k.zone === 'newgroup') {
+      const usable = ids.filter((id) => !isImageItem(id) && postsById.has(id));
+      if (!usable.length) return no(ids.some((id) => isImageItem(id)) ? WHY_NOT.imageGroup : WHY_NOT.missingGroup);
+      return { ok: true, action: { type: 'newGroup', postIds: usable }, hint: `新しいまとまりを作る${count(usable.length)}` };
+    }
+    // ①: 一覧の投稿（チェックした行はまとめて）→ まとまりのカード・開いた並び
+    if (drag.source === 'list') {
+      if (k.zone === 'material') return no();
+      if (k.zone !== 'topic' && k.zone !== 'open') return no(WHY_NOT.postZone);
+      const toOpen = k.zone === 'open' || k.topicId === openId;
+      const dst = toOpen ? openId : k.topicId;
+      const t = dst ? topicsById.get(dst) : null;
+      if (!t) return no();
+      const have = new Set(toOpen ? openItems : [...(t.postIds || []), ...(t.missingIds || [])]);
+      const add = ids.filter((id) => !have.has(id));
+      if (!add.length) return no(WHY_NOT.already);
+      if (k.zone === 'open') {
+        const idx = k.index == null ? openItems.length : Math.max(0, Math.min(openItems.length, k.index));
+        return { ok: true, action: { type: 'addPosts', topicId: dst, postIds: add, index: idx, order: true }, hint: `「${nameOf(dst)}」に足す${count(add.length)}` };
+      }
+      return { ok: true, action: { type: 'addPosts', topicId: dst, postIds: add, index: null, order: toOpen }, hint: `このまとまりに足す${count(add.length)}` };
+    }
     if (k.zone === 'open') {
       if (!openId) return no();
       const n = openItems.length;
@@ -227,7 +260,7 @@ export function resolveDrop(drag, key, ctx) {
       return { ok: true, action: { type: 'addPost', topicId: openId, postId: drag.id, index: idx }, hint: `「${nameOf(openId)}」に足す` };
     }
     if (k.zone === 'material') {
-      return drag.source === 'open' && openId ? { ok: true, action: { type: 'removePost', topicId: openId, itemId: drag.id }, hint: 'この話題から外す' } : no();
+      return drag.source === 'open' && openId ? { ok: true, action: { type: 'removePost', topicId: openId, itemId: drag.id }, hint: 'このまとまりから外す' } : no();
     }
     if (k.zone === 'topic') {
       if (!topicsById.has(k.topicId)) return no();
@@ -271,7 +304,7 @@ export function stepTarget(week, topicId, delta) {
 export function addTargets(week, topic, topicsById = new Map()) {
   const slots = mainSlots(week.rundown);
   const mainOk = canBeMain(topic);
-  const name = (id) => (topicsById.get(id) || {}).name || '話題';
+  const name = (id) => (topicsById.get(id) || {}).name || 'まとまり';
   const out = slots.map((id, k) => ({
     key: `slot:${k}`, label: `メイン${k + 1}`, disabled: !mainOk,
     note: !mainOk ? WHY_NOT.generalMain : id ? `いまの「${name(id)}」はメイン候補へ` : '空き',
@@ -341,7 +374,7 @@ export function draftSummary(plan) {
   if (plan.chat.length) parts.push(`雑談 ${plan.chat.length}`);
   if (parts.length) return { filled: true, text: `${parts.join('・')} を入れました` };
   const anyEmpty = plan.empty.main > 0 || plan.empty.category || plan.empty.chat;
-  return { filled: false, text: anyEmpty ? '入れられる話題が見つかりませんでした（対象期間を広げるか、手で入れてください）' : '空いている所がありません（メイン・カテゴリ別・雑談とも入っています）' };
+  return { filled: false, text: anyEmpty ? '入れられるまとまりが見つかりませんでした（対象期間を広げるか、手で入れてください）' : '空いている所がありません（メイン・カテゴリ別・雑談とも入っています）' };
 }
 
 // ================================================================ 開いた話題に足せる投稿（左の列）
@@ -384,4 +417,98 @@ export function oldestFirst(items, postsById = new Map()) {
   const ts = (id) => { const p = postsById.get(id); return p && Number.isFinite(p.ts) ? p.ts : null; };
   const dated = items.filter((id) => ts(id) != null).sort((a, b) => ts(a) - ts(b) || compareIds(a, b));
   return [...dated, ...items.filter((id) => ts(id) == null)];
+}
+
+// ================================================================ ステップ①: 投稿からまとまりを作る
+
+/**
+ * 左の列の投稿の一覧（表示の多い順）。
+ * ctx: { weekPosts（今の対象期間の投稿。保留は入っていない）, postTopic（投稿 id → 話題 id）, topicsById,
+ *        visibleIds（片付け・削除・保留を除いた話題 id の Set）, recommended（一般のバズのおすすめの話題 id の Set）,
+ *        bookmarkIds（投稿 id の Set）, newPosts（前回のチェックより新しい投稿 id の Set）, openId（開いているまとまり）}
+ * opts: { chip（BOARD_CHIPS のキー）, query, filter（'free'＝まだまとまりに入っていないものだけ／'all'＝すべての投稿）, limit }
+ * 返り値: { items: [{ id, group（入っているまとまりの id。無ければ null）, inOpen（開いているまとまりに入っている）}], total, more, ids（しぼり込んだ全部の id。並び順）}
+ *  - 「入っている」＝その投稿の話題がまとまり（isFolderTopic。2 件以上か、手で作った・辞書・ボットなど）
+ *  - おすすめ: 夜職は全部、一般のバズはおすすめの話題の投稿だけ。検索中は全部から探す
+ *  - 削除（非表示）した投稿・片付けた／削除した／保留の話題の投稿は出さない
+ */
+export function postList(ctx, opts = {}) {
+  const { weekPosts = [], postTopic = new Map(), topicsById = new Map(), visibleIds = null, recommended = new Set(), bookmarkIds = new Set(), newPosts = new Set(), openId = null } = ctx;
+  const { chip = 'rec', query = '', filter = 'free', limit = BOARD.pageSize } = opts;
+  const c = BOARD_CHIPS.find((x) => x.key === chip) || BOARD_CHIPS[0];
+  const searching = queryTokens(query).length > 0;
+  const topicOf = (p) => topicsById.get(postTopic.get(p.id)) || null;
+  let list = weekPosts.filter((p) => { const t = topicOf(p); return Boolean(t) && (!visibleIds || visibleIds.has(t.id)); });
+  if (filter !== 'all') list = list.filter((p) => !isFolderTopic(topicOf(p)));
+  if (c.genre) list = list.filter((p) => postGenre(p) === c.genre);
+  else if (c.key === 'bookmarks') list = list.filter((p) => bookmarkIds.has(p.id));
+  else if (c.key === 'new') list = list.filter((p) => newPosts.has(p.id));
+  else if (!searching) list = list.filter((p) => { const t = topicOf(p); return isNightGenre(postGenre(p)) || isNightGenre(t.genre) || recommended.has(t.id); });
+  if (searching) {
+    const hit = new Set(searchPosts(list, query).map((p) => p.id));
+    list = list.filter((p) => hit.has(p.id));
+  }
+  const imp = (p) => (p.metrics && Number.isFinite(p.metrics.impression_count) ? p.metrics.impression_count : -1);
+  list = [...list].sort((a, b) => imp(b) - imp(a) || compareIds(a.id, b.id));
+  const shown = list.slice(0, Math.max(0, limit));
+  return {
+    items: shown.map((p) => { const t = topicOf(p); const g = isFolderTopic(t) ? t.id : null; return { id: p.id, group: g, inOpen: Boolean(openId) && t.id === openId }; }),
+    total: list.length,
+    more: Math.max(0, list.length - shown.length),
+    ids: list.map((p) => p.id),
+  };
+}
+
+/**
+ * 右の列のまとまりの一覧。手で作ったもの（新しい順・「作った」）→ 自動のもの（今の並び・「自動」）。
+ * ctx: { week, topics（片付け・削除・保留を除いた話題。話題性の順）}
+ * opts: { limit }
+ * 返り値: { items: [{ id, made（手で作った）, place（番組に入っていればその場所 { key, label }）}], total, more }
+ */
+export function groupList(ctx, opts = {}) {
+  const { week, topics = [] } = ctx;
+  const { limit = BOARD.pageSize } = opts;
+  const madeAt = new Map(((week.overrides && week.overrides.manual) || []).map((m, i) => [m.id, i]));
+  const groups = topics.filter((t) => isFolderTopic(t));
+  const made = groups.filter((t) => t.kind === 'manual').sort((a, b) => (madeAt.get(b.id) ?? -1) - (madeAt.get(a.id) ?? -1));
+  const auto = groups.filter((t) => t.kind !== 'manual');
+  const list = [...made, ...auto];
+  const shown = list.slice(0, Math.max(0, limit));
+  return {
+    items: shown.map((t) => ({ id: t.id, made: t.kind === 'manual', place: placeOf(week, t.id) })),
+    total: list.length,
+    more: Math.max(0, list.length - shown.length),
+  };
+}
+
+/** 番組（メイン・カテゴリ別・雑談）に入っている本数。メイン候補（キープ）は数えない */
+export function placedCount(week) {
+  return week.rundown.corners.reduce((n, c) => n + c.items.filter(Boolean).length, 0);
+}
+
+/**
+ * チェックの付け外し。shift を押していて前に押した行（anchor）が一覧にあれば、その間をまとめて選ぶ。
+ * 返り値: { sel: Set, anchor }
+ */
+export function toggleSelect(sel, anchor, ids, id, shift = false) {
+  const next = new Set(sel);
+  const i = ids.indexOf(id);
+  const a = anchor != null ? ids.indexOf(anchor) : -1;
+  if (shift && a >= 0 && i >= 0) {
+    for (let j = Math.min(a, i); j <= Math.max(a, i); j++) next.add(ids[j]);
+    return { sel: next, anchor };
+  }
+  if (next.has(id)) next.delete(id); else next.add(id);
+  return { sel: next, anchor: id };
+}
+
+/** つかんだ行と一緒に動かす投稿（チェックした行をつかんだらチェックした全部。一覧の並び順）。チェックしていない行はその 1 件 */
+export function dragIds(sel, ids, id) {
+  return sel.has(id) ? ids.filter((x) => sel.has(x)) : [id];
+}
+
+/** まとまりにするときの名前とジャンルの下書き（最初の投稿の言葉・多数決）。posts: 投稿の配列 */
+export function groupDraft(posts) {
+  const list = (posts || []).filter(Boolean);
+  return { name: list.length ? topicPhrase(list[0].text) : '新しいまとまり', genre: list.length ? majorityGenre(list) : 'night' };
 }

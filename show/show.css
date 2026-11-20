@@ -1291,8 +1291,8 @@ body.is-dragging .li-end { border-color: var(--line); }
 .rm-est { color: #9fd3ff; }
 .badge-est { background: #10304a; color: #cfe8ff; border-color: #5ea0ff; }
 
-/* ================================================================ かんたん編成（#plan）: 左＝素材、右＝番組の流れ。ドラッグ＆ドロップ
-   基準は画面半分（960×1040）の 2 列。1400px 以上は右にプレビューの列、760px 以下は 1 列（素材／番組の切り替え）。 */
+/* ================================================================ かんたん編成（#plan）: 2 つのステップ（① 左＝投稿・右＝まとまり／② 左＝まとまり・右＝番組の流れ）。ドラッグ＆ドロップ
+   基準は画面半分（960×1040）の 2 列。1400px 以上は右にプレビューの列、760px 以下は 1 列（左／右の切り替え）。 */
 .bd { display: flex; flex-direction: column; height: calc(100dvh - var(--hdr, 120px)); min-height: 480px; padding: 8px 12px 10px; gap: 8px; }
 .bd-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; }
 .bd-titlebox { flex: 1 1 220px; min-width: 0; }
@@ -1301,6 +1301,19 @@ body.is-dragging .li-end { border-color: var(--line); }
 .bd-more > summary { min-width: 44px; justify-content: center; }
 .bd-more .menu-list { min-width: 290px; }
 .bd-more a.menu-item { text-decoration: none; }
+/* ステップの切り替え（① 投稿からまとまりを作る → ② まとまりを番組に並べる） */
+.bd-steps { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; gap: 8px; }
+.bd-step { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; min-height: 52px; min-width: 0; padding: 6px 14px; border-radius: 16px; border: 2px solid var(--line); cursor: pointer; }
+.bd-step:hover { border-color: #77778a; }
+.bd-step:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.bd-step.is-on { background: var(--g-white); color: var(--ink); border-color: var(--g-white); cursor: default; }
+.bd-step-n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 14px; background: var(--surface-2); color: var(--text-2); }
+.bd-step.is-on .bd-step-n { background: var(--g-main); color: #fff; }
+.bd-step-tx { display: grid; min-width: 0; }
+.bd-step-t { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bd-step-s { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bd-step.is-on .bd-step-s { color: #55555f; }
+.bd-step-arrow { align-self: center; color: var(--muted); font-weight: 900; }
 .bd-cols { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 44fr) minmax(0, 56fr); gap: 12px; }
 @media (min-width: 1400px) { .bd.is-wide .bd-cols { grid-template-columns: minmax(0, 40fr) minmax(0, 50fr) minmax(440px, 46fr); } }
 .bd-col { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 8px; background: var(--surface); border-radius: 22px; padding: 12px 12px 0; border: 2px solid transparent; }
@@ -1328,6 +1341,38 @@ body.is-dragging .li-end { border-color: var(--line); }
 .bd-more-btn { align-self: center; }
 .bd-foot { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0 10px; border-top: 1px solid var(--line); }
 .bd-foot .btn { min-height: 40px; padding: 4px 12px; font-size: 13px; }
+
+/* ステップ①: 左の投稿の行（チェック・つまみ・本文）、選択中のバー、右のまとまりのカード */
+.bd-filter { flex: none; width: auto; max-width: 62%; min-height: 34px; padding-top: 2px; padding-bottom: 2px; font-size: 12.5px; }
+.bd-post.is-list { gap: 6px; }
+.bd-chk { flex: none; width: 40px; align-self: stretch; display: grid; place-items: center; cursor: pointer; margin-right: -8px; }
+.bd-chk.is-off { cursor: default; }
+.bd-chk-in { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; margin: 0; border-radius: 6px; border: 2px solid #8d8d99; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.bd-chk-in:checked { background: var(--yellow); border-color: var(--yellow); }
+.bd-chk-in:checked::after { content: "✓"; color: var(--ink); font-weight: 900; font-size: 15px; line-height: 1; }
+.bd-chk-in:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.bd-chk-in:disabled { visibility: hidden; }
+.bd-post.is-checked { border-color: rgba(255, 214, 10, .6); background: #2b2a22; }
+.bd-star { color: var(--yellow); margin-right: 4px; font-size: 12px; }
+.bd-selbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; padding: 7px 8px 7px 14px; border-radius: 16px; background: var(--g-white); color: var(--ink); box-shadow: 0 6px 18px rgba(0, 0, 0, .5); }
+.bd-selbar-n { font-weight: 800; font-size: 14px; margin-right: auto; white-space: nowrap; }
+.bd-selbar .btn { min-height: 40px; padding: 4px 14px; font-size: 13px; }
+.bd-selbar .bd-selbar-clear { background: #d9d9de; color: var(--ink); border-color: transparent; }
+.bd-card.is-group { cursor: pointer; }
+.bd-card.is-group .bd-tx { padding-left: 12px; }
+.bd-kind { flex: none; font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 0 7px; line-height: 17px; border: 1px solid var(--line); color: var(--text-2); white-space: nowrap; }
+.bd-kind.is-made { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
+.bd-place { flex: none; font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 0 6px; line-height: 17px; background: var(--g-main); color: #fff; white-space: nowrap; }
+.bd-chev { flex: none; width: 28px; height: 28px; display: grid; place-items: center; color: #c9c9d3; }
+.bd-chev::before { content: ""; width: 8px; height: 8px; border-right: 3px solid currentColor; border-bottom: 3px solid currentColor; transform: translateX(-2px) rotate(-45deg); }
+.bd-card.is-open-head .bd-chev::before { transform: translateY(-2px) rotate(45deg); }
+.bd-zone.is-new { cursor: pointer; min-height: 60px; }
+.bd-zone.is-new:hover { border-color: #8d8d99; color: var(--text-2); }
+.bd-zone.is-new:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+/* どのカードにも置けるので、置ける印はひかえめに（指の下のカードだけ強く光る） */
+.bd-card.is-group.is-drop-ok, .bd-groups .bd-open.is-drop-ok { border-color: rgba(255, 214, 10, .3); }
+.bd-lift-n { position: absolute; right: -8px; top: -11px; min-width: 26px; text-align: center; padding: 2px 8px; border-radius: 999px; background: var(--yellow); color: var(--ink); font-weight: 900; font-size: 12.5px; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); }
+.drag-lift > .bd-post, .drag-lift > .bd-card { position: relative; }
 
 /* カード（話題） */
 .bd-card { position: relative; display: flex; align-items: center; gap: 8px; background: var(--surface-2); border-radius: 14px; padding: 8px 8px 8px 0; min-height: 56px; min-width: 0; cursor: grab; user-select: none; -webkit-user-select: none; border: 2px solid transparent; }
@@ -1447,5 +1492,11 @@ body.is-dragging .toast { opacity: .12; }
 .bd.is-narrow.is-panel .bd-left, .bd.is-narrow.is-panel .bd-right { display: none; }
 .bd.is-narrow .bd-col { border-radius: 18px; padding: 10px 8px 0; }
 .bd.is-narrow .bd-redo { display: none; }
+.bd.is-narrow .bd-steps { gap: 4px; }
+.bd.is-narrow .bd-step { padding: 6px 8px; gap: 6px; min-height: 48px; }
+.bd.is-narrow .bd-step-n { width: 22px; height: 22px; font-size: 12px; }
+.bd.is-narrow .bd-step-t { font-size: 12.5px; line-height: 1.25; white-space: normal; }
+.bd.is-narrow .bd-step-s { font-size: 10.5px; }
+.bd.is-narrow .bd-selbar { position: sticky; bottom: 8px; z-index: 11; }
 .pt-back { text-decoration: none; }
 

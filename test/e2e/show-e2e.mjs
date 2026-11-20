@@ -2767,8 +2767,10 @@ async function main() {
       await c.close();
     });
 
-    // ---- 4z. かんたん編成（#plan。左＝素材・右＝番組の流れ。マウスのドラッグは 960×1040）
+    // ---- 4z. かんたん編成（#plan。ステップ①＝投稿からまとまりを作る／ステップ②＝まとまりを番組に並べる。マウスのドラッグは 960×1040）
     const bd = {
+      /** ステップ②（まとまりを番組に並べる）へ */
+      step2: async (pg) => { await pg.click('[data-key="bd-step-2"]'); await pg.waitForSelector('.bd[data-step="2"]'); },
       mat: (id) => `[data-key="mat-${id}"]`,
       flow: (id) => `[data-key="flow-${id}"]`,
       state: (pg) => pg.evaluate(() => {
@@ -2784,16 +2786,22 @@ async function main() {
         if (typeof to === 'string') await pg.locator(to).first().scrollIntoViewIfNeeded();
         await pg.locator(from).first().scrollIntoViewIfNeeded();
         const a = await pg.locator(from).first().boundingBox();
-        const z = typeof to === 'string' ? await pg.locator(to).first().boundingBox() : to;
+        let z = typeof to === 'string' ? await pg.locator(to).first().boundingBox() : to;
         const sx = a.x + a.width * fa[0];
         const sy = a.y + a.height * fa[1];
         await pg.mouse.move(sx, sy);
         await pg.mouse.down();
         await pg.mouse.move(sx + 8, sy + 8, { steps: 3 });
+        // つかんだあとで置き先が画面の外なら、列を送って見える所へ（つかんだままホイールで送るのと同じ）
+        if (typeof to === 'string' && (z.y < 0 || z.y + z.height > (await pg.evaluate(() => innerHeight)))) {
+          await pg.locator(to).first().evaluate((e) => e.scrollIntoView({ block: 'nearest' }));
+          z = await pg.locator(to).first().boundingBox();
+        }
         await pg.mouse.move(z.x + z.width * ta[0], z.y + z.height * ta[1], { steps: 8 });
         if (wait) await pg.waitForTimeout(wait);
         const info = await pg.evaluate(() => ({
           lift: Boolean(document.querySelector('.drag-lift')), tip: (document.querySelector('.drag-tip') || {}).textContent || '', no: Boolean(document.querySelector('.drag-tip.is-no')),
+          n: (document.querySelector('.drag-lift .bd-lift-n') || {}).textContent || '',
           line: Boolean(document.querySelector('.drop-line') && !document.querySelector('.drop-line').hidden),
           over: [...document.querySelectorAll('.is-drop-over')].map((e) => e.dataset.drop || ''), ok: document.querySelectorAll('.is-drop-ok').length,
           src: document.querySelectorAll('.is-drag-src').length, denied: document.querySelectorAll('.is-drop-no').length,
@@ -2815,6 +2823,10 @@ async function main() {
       const { page } = await open(c, show);
       assert(await page.evaluate(() => window.__show.route === 'plan') && await page.$('.bd') && !(await page.$('.plan2')), '既定はかんたん編成');
       assert((await page.getAttribute('.screen-tabs a[data-route="plan"]', 'aria-current')) === 'page', '編成タブ');
+      // 初めてはステップ①。「おまかせで下書き」は②だけ
+      assert(await page.$('.bd[data-step="1"]') && !(await page.$('[data-key="bd-draft"]')), '初めてはステップ①');
+      await bd.step2(page);
+      assert(await page.isVisible('[data-key="bd-draft"]') && (await page.textContent('.bd-left .bd-h')).startsWith('まとまり'), 'ステップ②');
       // 2 列が横に並び、それぞれの中でスクロール。横スクロールなし・押す所は 40px 以上・置き場所は 52px 以上
       const lay = await page.evaluate(() => {
         const r = (sel) => document.querySelector(sel).getBoundingClientRect();
@@ -2893,7 +2905,7 @@ async function main() {
       assert(st.main[0] == null && await page.$(`${bd.mat(OUJI)}:not(.is-used) .bd-add`) && (await bd.toast(page)).includes('番組から外しました'), JSON.stringify(st));
       // 左の列へ戻す → 外れる
       d = await bd.drag(page, bd.flow(TOYOKO), '[data-key="bd-lscroll"]', { ta: [0.5, 0.6] });
-      assert(d.tip === '番組から外す（素材に戻す）' && d.over.join() === 'material', JSON.stringify(d));
+      assert(d.tip === '番組から外す（左の一覧に戻す）' && d.over.join() === 'material', JSON.stringify(d));
       assert((await bd.state(page)).category.join() === BDAY, '左へ戻すと外れる');
       // Esc でやめる・外（ヘッダー）で離すと何もしない・ドラッグのあとに「押した」ことにならない
       const before = JSON.stringify(await bd.state(page));
@@ -2918,6 +2930,7 @@ async function main() {
     await check('かんたん編成: 「＋」のメニュー（押せない理由・キーボード）・おまかせで下書き（空いている所だけ・元に戻す）・チップ・検索・リロードで戻る・自動スクロール・フォルダで整理 ⇄ かんたん編成', async () => {
       const c = await newCtx();
       const { page } = await open(c, `${show}#plan`);
+      await bd.step2(page);
       // ＋ → 入れ先のメニュー
       await page.click(`[data-key="add-${HOST}"]`);
       await page.waitForSelector('.ctx-menu');
@@ -3021,6 +3034,7 @@ async function main() {
     await check('かんたん編成: 話題を開く → 投稿の並べ替え（先頭が代表・進行に反映）・✕・左の「足せる投稿」から ＋ とドラッグ（ほかの話題からは移す）・左へ戻して外す・ほかの話題へ移す・古い順・プレビュー・URL・名前・新しい話題・キーボード', async () => {
       const c = await newCtx();
       const { page } = await open(c, `${show}#plan`);
+      await bd.step2(page);
       await page.evaluate(([a, b, d]) => window.__show.edit('準備', (w) => { w.rundown.corners[0].items = [a]; w.rundown.corners[1].items = [b, d]; }), [HOST, BDAY, TOYOKO]);
       await page.waitForSelector(bd.flow(HOST));
       // 押すとその場で開く（1 つだけ）。左は「足せる投稿」に
@@ -3044,7 +3058,7 @@ async function main() {
       // ✕ で話題から外す → 左の「足せる投稿」に戻る（薄くない）
       await page.click(`[data-key="rm-${r[1]}"]`);
       it = await items();
-      assert(it.length === 7 && !it.includes(r[1]) && (await bd.toast(page)).includes('話題から外しました'), `rm ${it.length}`);
+      assert(it.length === 7 && !it.includes(r[1]) && (await bd.toast(page)).includes('まとまりから外しました'), `rm ${it.length}`);
       await page.waitForSelector(`[data-key="addable-${r[1]}"]:not(.is-in)`);
       assert(await page.$(`[data-key="addable-${r[0]}"].is-in`), '入っている投稿は薄く');
       // 左から ＋（最後に足す）
@@ -3063,12 +3077,12 @@ async function main() {
       await page.screenshot({ path: path.join(SHOTS, 'board-open-960.png') });
       // 開いた話題の投稿を左の列へ → 外れる
       d = await bd.drag(page, `[data-key="post-${fromOther}"]`, '[data-key="bd-lscroll"]', { ta: [0.5, 0.6] });
-      assert(d.tip === 'この話題から外す' && d.over.join() === 'material', JSON.stringify(d));
+      assert(d.tip === 'このまとまりから外す' && d.over.join() === 'material', JSON.stringify(d));
       assert((await items()).length === 8, '左へ戻すと外れる');
       // 投稿をほかの話題のカードへ → 移す。枠の置き場所には置けない（理由）
       it = await items();
       d = await bd.drag(page, `[data-key="post-${it[7]}"]`, '[data-key="slot-1"]', { drop: false });
-      assert(d.no && d.tip.includes('投稿は、開いた話題の中かほかの話題のカードに'), JSON.stringify(d));
+      assert(d.no && d.tip.includes('投稿は、開いたまとまりの中か、ほかのまとまりのカードに'), JSON.stringify(d));
       await page.keyboard.press('Escape');
       await page.mouse.up();
       d = await bd.drag(page, `[data-key="post-${it[7]}"]`, bd.flow(TOYOKO));
@@ -3132,7 +3146,7 @@ async function main() {
       await page.waitForFunction((sel) => { const e = document.querySelector(`${sel} .bd-name`); return e && e.textContent === 'コール特集'; }, bd.flow(HOST));
       // ← 素材に戻る（開いたまま）⇄ 足せる投稿を見る
       await page.click('[data-key="bd-back-material"]');
-      assert(await page.$('.bd-card.is-material') && await page.$('[data-key="bd-open"]') && (await page.textContent('[data-key="bd-left-sub"]')).includes('今週の話題'), '素材に戻る');
+      assert(await page.$('.bd-card.is-material') && await page.$('[data-key="bd-open"]') && (await page.textContent('[data-key="bd-left-sub"]')).includes('おすすめ順'), 'まとまりの一覧に戻る');
       await page.click('[data-key="bd-show-addable"]');
       assert(await page.$('.bd-post.is-addable') && (await page.textContent('[data-key="bd-left-sub"]')).includes('に足せる投稿'), '足せる投稿を見る');
       // 足せる投稿の検索（全投稿から）とジャンルのチップ
@@ -3224,6 +3238,7 @@ async function main() {
       // 1920: 3 列。カードを押すと右の列にプレビュー
       const c = await newCtx({ viewport: { width: 1920, height: 1080 } });
       const { page } = await open(c, `${show}#plan`);
+      await bd.step2(page);
       assert(await page.$('.bd.is-wide') && await page.isVisible('.bd-preview') && await page.$('[data-key="bd-pv-empty"]'), 'wide');
       const cols = await page.evaluate(() => ['.bd-left', '.bd-right', '.bd-preview'].map((s) => { const r = document.querySelector(s).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.width), Math.round(r.top)]; }));
       assert(cols[0][0] < cols[1][0] && cols[1][0] < cols[2][0] && cols[0][2] === cols[2][2] && cols[2][1] >= 440, `3 列 ${JSON.stringify(cols)}`);
@@ -3258,7 +3273,8 @@ async function main() {
       // 375: 素材／番組の切り替え。＋ で入れる・押して開く・足せる投稿のタブ
       const c2 = await newCtx({ viewport: { width: 375, height: 812 }, hasTouch: true });
       const { page: p } = await open(c2, `${show}#plan`);
-      assert(await p.$('.bd.is-narrow') && await p.isVisible('.bd-left') && await p.isHidden('.bd-right') && (await p.textContent('[data-key="bd-tab-flow"]')) === '番組の流れ（0）', 'narrow');
+      await bd.step2(p);
+      assert(await p.$('.bd.is-narrow') && await p.isVisible('.bd-left') && await p.isHidden('.bd-right') && (await p.textContent('[data-key="bd-tab-flow"]')) === '番組の流れ（0）' && (await p.textContent('[data-key="bd-tab-material"]')) === 'まとまり', 'narrow');
       await p.click(`[data-key="add-${HOST}"]`);
       await p.waitForSelector('.ctx-menu');
       const mr = await p.locator('.ctx-menu').boundingBox();
@@ -3286,6 +3302,281 @@ async function main() {
       assert((await p.textContent('[data-key="bd-tab-flow"]')) === '番組の流れ（1）', 'narrow remove');
       assert((await sw(p)) <= 375, `scrollWidth ${await sw(p)}`);
       await c2.close();
+    });
+
+    await check('かんたん編成 ステップ①（投稿からまとまりを作る）: ステップの切り替え（覚える・矢印キー）・投稿 → 新しいまとまり（名前）・カードへ足す・チェックして「まとまりにする」・チェックした行をまとめてドラッグ・置けない理由・開いて ＋／並べ替え・② で番組へ → 進行・Ctrl+Z', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, `${show}#plan`);
+      const lp = (id) => `[data-key="lp-${id}"]`;
+      const grp = (id) => `[data-key="grp-${id}"]`;
+      const listIds = () => page.$$eval('.bd-post.is-list', (els) => els.map((e) => e.dataset.post));
+      const cards = () => page.$$eval('.bd-card.is-group', (els) => els.map((e) => ({ id: e.dataset.topic, name: e.querySelector('.bd-name').textContent, kind: e.querySelector('.bd-kind').textContent, meta: e.querySelector('.bd-meta').textContent })));
+      const metaOf = (id) => page.textContent(`[data-key="gmeta-${id}"]`);
+      const topicOf = (id) => page.evaluate((x) => window.__show.postTopic.get(x), id);
+      // 初めてはステップ①: 左＝投稿（まだ入っていないものだけ・表示の多い順）、右＝まとまり（＋ 新しいまとまり → カード）
+      const s1 = await page.evaluate(() => {
+        const a = window.__show;
+        const rows = [...document.querySelectorAll('.bd-post.is-list')].map((e) => e.dataset.post);
+        const imp = rows.map((id) => { const p = a.postsById.get(id); return p.metrics && Number.isFinite(p.metrics.impression_count) ? p.metrics.impression_count : -1; });
+        return {
+          step: document.querySelector('.bd').dataset.step,
+          tabs: [...document.querySelectorAll('.bd-steps[role="tablist"] [role="tab"]')].map((e) => [e.querySelector('.bd-step-t').textContent, e.getAttribute('aria-selected')]),
+          subs: [1, 2].map((n) => document.querySelector(`[data-key="bd-step-${n}-sub"]`).textContent),
+          heads: ['.bd-left .bd-h', '.bd-right .bd-h'].map((sel) => document.querySelector(sel).firstChild.textContent),
+          filter: document.querySelector('[data-key="bd-filter"]').value, filters: [...document.querySelectorAll('[data-key="bd-filter"] option')].map((e) => e.textContent),
+          rows: rows.length, total: Number(document.querySelector('[data-key="bd-lscroll"]').dataset.total), more: Boolean(document.querySelector('[data-key="bd-more-list"]')),
+          sorted: imp.every((x, i) => i === 0 || imp[i - 1] >= x),
+          free: rows.every((id) => { const t = a.topicsById.get(a.postTopic.get(id)); return t && t.kind === 'single' && t.postIds.length === 1; }),
+          groups: [...document.querySelectorAll('.bd-card.is-group')].map((e) => [e.dataset.topic, e.querySelector('.bd-kind').textContent]),
+          gtotal: Number(document.querySelector('[data-key="bd-rscroll"]').dataset.total),
+          zone: document.querySelector('[data-key="zone-new"]').textContent, zoneH: document.querySelector('[data-key="zone-new"]').offsetHeight,
+          chk: Math.min(...[...document.querySelectorAll('.bd-chk')].slice(0, 5).map((e) => Math.min(e.offsetWidth, e.offsetHeight))),
+          stepH: Math.min(...[...document.querySelectorAll('.bd-step')].map((e) => e.offsetHeight)),
+          draft: Boolean(document.querySelector('[data-key="bd-draft"]')), sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight, ih: innerHeight,
+        };
+      });
+      assert(s1.step === '1' && JSON.stringify(s1.tabs) === JSON.stringify([['投稿からまとまりを作る', 'true'], ['まとまりを番組に並べる', 'false']]), JSON.stringify(s1.tabs));
+      assert(s1.subs[0] === `まだ入っていない投稿 ${s1.total}件` && s1.subs[1] === `まとまり ${s1.gtotal}・番組に 0本`, JSON.stringify(s1.subs));
+      assert(s1.heads.join() === '投稿,まとまり' && s1.filter === 'free' && s1.filters.join() === 'まだ入っていないものだけ,すべての投稿', JSON.stringify([s1.heads, s1.filters]));
+      assert(s1.rows === 40 && s1.total > 40 && s1.more && s1.sorted && s1.free, `投稿の一覧 ${JSON.stringify({ rows: s1.rows, total: s1.total, sorted: s1.sorted, free: s1.free })}`);
+      assert(s1.groups.length === 9 && s1.gtotal === 9 && s1.groups.every((g) => g[1] === '自動') && s1.groups[0][0] === HOST, `まとまり ${JSON.stringify(s1.groups)}`);
+      assert(s1.zone === '＋ 新しいまとまり（ここに投稿をドラッグ）' && s1.zoneH >= 52 && s1.chk >= 40 && s1.stepH >= 44 && !s1.draft, JSON.stringify([s1.zone, s1.zoneH, s1.chk, s1.stepH, s1.draft]));
+      assert(s1.sw <= 960 && s1.sh <= s1.ih, `横スクロールなし・画面に収まる ${s1.sw} ${s1.sh}/${s1.ih}`);
+      await page.screenshot({ path: path.join(SHOTS, 'board-s1-960.png') });
+      // ステップは覚える（リロード）。矢印キーでも切り替え
+      await page.focus('[data-key="bd-step-1"]');
+      await page.keyboard.press('ArrowRight');
+      await page.waitForSelector('.bd[data-step="2"]');
+      assert(await page.isVisible('[data-key="bd-draft"]') && await page.$('.bd-card.is-material') && (await page.getAttribute('[data-key="bd-step-2"]', 'aria-selected')) === 'true', '→ で②');
+      await page.reload();
+      await ready(page);
+      assert(await page.$('.bd[data-step="2"]'), '②を覚えている');
+      await page.focus('[data-key="bd-step-2"]');
+      await page.keyboard.press('ArrowLeft');
+      await page.waitForSelector('.bd[data-step="1"]');
+      await page.reload();
+      await ready(page);
+      assert(await page.$('.bd[data-step="1"]') && await page.$('.bd-post.is-list'), '①を覚えている');
+      // ホストの投稿だけに（チップは②と同じ）
+      await page.click('[data-key="bd-chip-host"]');
+      await page.waitForFunction(() => { const a = window.__show; const r = [...document.querySelectorAll('.bd-post.is-list')]; return r.length > 6 && r.every((e) => (a.postsById.get(e.dataset.post).categories || []).includes('ホスト')); });
+      let rows = await listIds();
+      // 投稿 → 「＋ 新しいまとまり」: 置ける所（新しいまとまり＋カード）が光る → できて、名前を聞かれる（自動の名前が入っている）
+      let d = await bd.drag(page, lp(rows[0]), '[data-key="zone-new"]', { shot: 'board-s1-drag-new-960.png' });
+      assert(d.lift && d.src === 1 && d.ok >= 10 && d.over.join() === 'newgroup' && d.tip === '新しいまとまりを作る' && !d.no, JSON.stringify(d));
+      await page.waitForSelector('dialog.name-dialog[open]');
+      const autoName = await page.inputValue('[data-key="name-input"]');
+      let cs = await cards();
+      assert(autoName.length > 0 && cs[0].name === autoName && cs[0].kind === '作った' && cs[0].id.startsWith('m:') && cs[0].meta.includes('投稿 1') && cs.length === 10, `できたカード ${JSON.stringify(cs[0])}`);
+      const G1 = cs[0].id;
+      await page.fill('[data-key="name-input"]', 'テストのまとまり');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction((sel) => { const e = document.querySelector(`${sel} .bd-name`); return e && e.textContent === 'テストのまとまり'; }, grp(G1));
+      assert(!(await page.$(lp(rows[0]))) && (await topicOf(rows[0])) === G1, '投稿は左の一覧から消えて、まとまりに入る');
+      assert((await page.textContent('[data-key="bd-step-2-sub"]')) === 'まとまり 10・番組に 0本', await page.textContent('[data-key="bd-step-2-sub"]'));
+      assert(await page.$(`${grp(G1)} .bd-kind.is-made`) && (await cards())[1].id === HOST, '作ったものが先・自動は今の並び');
+      // Ctrl+Z: 名前 → 作成 の順に戻る。やり直せる
+      await page.keyboard.press('Control+z');
+      assert((await page.textContent(`${grp(G1)} .bd-name`)) === autoName, '名前が戻る');
+      await page.keyboard.press('Control+z');
+      assert(!(await page.$(grp(G1))) && await page.$(lp(rows[0])) && (await cards()).length === 9, '作成が戻る');
+      await page.keyboard.press('Control+Shift+Z');
+      await page.keyboard.press('Control+Shift+Z');
+      assert((await page.textContent(`${grp(G1)} .bd-name`)) === 'テストのまとまり' && !(await page.$(lp(rows[0]))), 'やり直し');
+      // 投稿 → カード: そのまとまりに足す（数が 1 増える）
+      d = await bd.drag(page, lp(rows[1]), grp(G1), { shot: 'board-s1-drag-card-960.png' });
+      assert(d.lift && d.over.join() === `topic:${G1}` && d.tip === 'このまとまりに足す', JSON.stringify(d));
+      assert((await metaOf(G1)).includes('投稿 2') && !(await page.$(lp(rows[1]))) && (await bd.toast(page)).includes('「テストのまとまり」に足しました'), await metaOf(G1));
+      await page.keyboard.press('Control+z');
+      assert((await metaOf(G1)).includes('投稿 1') && await page.$(lp(rows[1])), 'Ctrl+Z で戻る');
+      await page.keyboard.press('Control+Shift+Z');
+      assert((await metaOf(G1)).includes('投稿 2'), 'やり直し');
+      // 自動のまとまりへも足せる
+      await bd.drag(page, lp(rows[2]), grp(HOST));
+      assert((await metaOf(HOST)).includes('投稿 9') && (await topicOf(rows[2])) === HOST, await metaOf(HOST));
+      // チェック 2 件 →「まとまりにする」（名前は自動の下書き・ジャンルは多数決）
+      rows = await listIds();
+      await page.click(`[data-key="chk-${rows[0]}"]`);
+      await page.click(`[data-key="chk-${rows[1]}"]`);
+      assert((await page.textContent('[data-key="bd-sel-count"]')) === '2件を選択中' && (await page.$$('.bd-post.is-checked')).length === 2 && (await page.textContent('[data-key="zone-new"]')) === '＋ 新しいまとまり（選んだ 2件で作る）', 'チェック 2 件');
+      const bar = await page.locator('[data-key="bd-selbar"]').boundingBox();
+      assert(bar.y + bar.height <= 1040 && bar.x >= 0, `選択中のバーは画面の中 ${JSON.stringify(bar)}`);
+      await page.screenshot({ path: path.join(SHOTS, 'board-s1-select-960.png') });
+      await page.click('[data-key="bd-make-group"]');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      assert((await page.inputValue('[data-key="name-input"]')).length > 0 && (await page.inputValue('[data-key="name-genre"]')) === 'host' && (await cards()).length === 10, '名前とジャンルの下書き（まだ作らない）');
+      await page.fill('[data-key="name-input"]', 'チェックで作った');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForSelector('dialog.name-dialog', { state: 'detached' });
+      cs = await cards();
+      const G2 = cs[0].id;
+      assert(cs[0].name === 'チェックで作った' && cs[0].kind === '作った' && cs[0].meta.startsWith('ホスト・投稿 2') && cs[1].id === G1 && cs.length === 11, `新しいものが先 ${JSON.stringify(cs.slice(0, 2))}`);
+      assert(!(await page.$('[data-key="bd-selbar"]')) && !(await page.$(lp(rows[0]))) && !(await page.$(lp(rows[1]))) && (await topicOf(rows[1])) === G2, 'チェックは外れて、投稿は左から消える');
+      // Shift+クリックで間をまとめて・Esc／解除で外す
+      rows = await listIds();
+      await page.click(`[data-key="chk-${rows[0]}"]`);
+      await page.click(`[data-key="chk-${rows[3]}"]`, { modifiers: ['Shift'] });
+      assert((await page.textContent('[data-key="bd-sel-count"]')) === '4件を選択中', await page.textContent('[data-key="bd-sel-count"]'));
+      await page.click('[data-key="bd-sel-clear"]');
+      assert(!(await page.$('[data-key="bd-selbar"]')) && !(await page.$('.bd-post.is-checked')), '解除');
+      // チェックした行をつかむと、チェックした全部が動く（写しに「2件」）
+      await page.click(`[data-key="chk-${rows[0]}"]`);
+      await page.click(`[data-key="chk-${rows[2]}"]`);
+      d = await bd.drag(page, lp(rows[2]), grp(G2));
+      assert(d.lift && d.n === '2件' && d.tip === 'このまとまりに足す（2件）', JSON.stringify(d));
+      assert((await metaOf(G2)).includes('投稿 4') && !(await page.$(lp(rows[0]))) && !(await page.$(lp(rows[2]))) && await page.$(lp(rows[1])) && !(await page.$('[data-key="bd-selbar"]')), `まとめて ${await metaOf(G2)}`);
+      assert((await bd.toast(page)).includes('「チェックで作った」に 2件足しました'), await bd.toast(page));
+      await page.keyboard.press('Control+z');
+      assert((await metaOf(G2)).includes('投稿 2') && await page.$(lp(rows[0])) && await page.$(lp(rows[2])), '1 回で 2 件とも戻る');
+      await page.keyboard.press('Control+Shift+Z');
+      // チェックしていない行をつかむと、その 1 件だけ
+      await page.click(`[data-key="chk-${rows[1]}"]`);
+      d = await bd.drag(page, lp(rows[3]), grp(G1));
+      assert(d.n === '' && d.tip === 'このまとまりに足す' && (await metaOf(G1)).includes('投稿 3') && await page.$(lp(rows[1])), JSON.stringify(d));
+      await page.keyboard.press('Escape');
+      assert(!(await page.$('[data-key="bd-selbar"]')), 'Esc でチェックを外す');
+      // すべての投稿: 入っている投稿は「◯◯に入っています」。同じまとまりへは置けない（理由）・ほかへ置くと移る
+      await page.selectOption('[data-key="bd-filter"]', 'all');
+      await page.waitForSelector(lp(rows[0]));
+      assert((await page.textContent(`[data-key="in-${rows[0]}"]`)) === '▸ チェックで作ったに入っています', await page.textContent(`[data-key="in-${rows[0]}"]`));
+      d = await bd.drag(page, lp(rows[0]), grp(G2));
+      assert(d.no && d.tip === '入れられません：もうこのまとまりに入っています' && d.denied === 1, JSON.stringify(d));
+      assert((await bd.toast(page)).includes('もうこのまとまりに入っています') && (await metaOf(G2)).includes('投稿 4'), '置けない理由');
+      d = await bd.drag(page, lp(rows[0]), grp(G1));
+      assert(d.tip === 'このまとまりに足す' && (await metaOf(G2)).includes('投稿 3') && (await metaOf(G1)).includes('投稿 4') && (await bd.toast(page)).includes('（「チェックで作った」から移しました）'), `移す ${await bd.toast(page)}`);
+      // Esc でドラッグをやめる
+      const before = await metaOf(G1);
+      d = await bd.drag(page, lp(rows[0]), '[data-key="zone-new"]', { drop: false });
+      assert(d.lift && d.over.join() === 'newgroup', JSON.stringify(d));
+      await page.keyboard.press('Escape');
+      await page.mouse.up();
+      assert(!(await page.$('.drag-lift')) && (await metaOf(G1)) === before && !(await page.$('dialog[open]')), 'Esc でやめる');
+      await page.selectOption('[data-key="bd-filter"]', 'free');
+      await page.waitForFunction((sel) => !document.querySelector(sel), lp(rows[0]));
+      await page.click('[data-key="bd-chip-rec"]');
+      await page.waitForFunction(() => document.querySelectorAll('.bd-post.is-list').length > 20);
+      // カードを押すとその場で開く（左は投稿の一覧のまま。行に「＋」が出る）
+      await page.click(grp(G1));
+      await page.waitForSelector('[data-key="bd-open"]');
+      const openRows = () => page.$$eval('.bd-post.is-in-open', (els) => els.map((e) => e.dataset.post));
+      let op = await openRows();
+      assert(op.length === 4 && (await page.textContent('[data-key="bd-open-count"]')).includes('4件') && await page.$('.bd-post.is-list') && (await page.textContent('.bd-left .bd-h')).startsWith('投稿'), `開く ${op.length}`);
+      assert((await page.textContent('[data-key="bd-post-note"]')).includes('開いたまとまりに足せます'), await page.textContent('[data-key="bd-post-note"]'));
+      rows = await listIds();
+      await page.click(`[data-key="addp-${rows[0]}"]`);
+      op = await openRows();
+      assert(op.length === 5 && op[4] === rows[0] && !(await page.$(lp(rows[0]))), `＋ で足す ${op}`);
+      // 並べ替え（先頭が代表）・入る位置へドラッグ・✕・左へ戻して外す
+      d = await bd.drag(page, `[data-key="post-${op[2]}"]`, `[data-key="post-${op[0]}"]`, { ta: [0.5, 0.2] });
+      assert(d.line && d.tip === '先頭へ（代表にする）', JSON.stringify(d));
+      assert((await openRows())[0] === op[2] && await page.$(`[data-key="post-${op[2]}"] [data-key="bd-rep"]`), '並べ替え');
+      op = await openRows();
+      d = await bd.drag(page, lp(rows[1]), `[data-key="post-${op[1]}"]`, { ta: [0.5, 0.2], shot: 'board-s1-open-drag-960.png' });
+      assert(d.line && d.tip === '「テストのまとまり」に足す', JSON.stringify(d));
+      assert((await openRows())[1] === rows[1], '入る位置へ');
+      await page.click(`[data-key="rm-${rows[1]}"]`);
+      await page.waitForSelector(lp(rows[1]));
+      assert((await openRows()).length === 5 && (await bd.toast(page)).includes('まとまりから外しました'), '✕ で外す');
+      d = await bd.drag(page, `[data-key="post-${rows[0]}"]`, '[data-key="bd-lscroll"]', { ta: [0.5, 0.6] });
+      assert(d.tip === 'このまとまりから外す' && d.over.join() === 'material', JSON.stringify(d));
+      assert((await openRows()).length === 4 && await page.$(lp(rows[0])), '左へ戻すと外れる');
+      await page.locator('[data-key="bd-open"]').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(SHOTS, 'board-s1-open-960.png') });
+      // 開いたまとまりの投稿をほかのカードへ → 移す。「＋ 新しいまとまり」へ → 新しく作る
+      op = await openRows();
+      d = await bd.drag(page, `[data-key="post-${op[3]}"]`, grp(G2));
+      assert(d.tip === '「チェックで作った」へ移す' && (await openRows()).length === 3 && (await metaOf(G2)).includes('投稿 4'), JSON.stringify(d));
+      // 右クリック: 開く・プレビュー・名前・ジャンル・片付け・削除（番組に入れる項目は②）
+      await page.click(grp(G2), { button: 'right' });
+      await page.waitForSelector('.ctx-menu');
+      for (const k of ['bd-ctx-open', 'bd-ctx-preview', 'bd-ctx-rename', 'bd-ctx-genre-kyaba', 'bd-ctx-shelf', 'bd-ctx-trash']) assert(await page.$(`[data-key="${k}"]`), `menu ${k}`);
+      assert(!(await page.$('[data-key="bd-ctx-to-slot:0"]')) && !(await page.$('[data-key="bd-ctx-unplace"]')), '番組の項目は出さない');
+      await page.click('[data-key="bd-ctx-rename"]');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', '名前を変えた');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction((sel) => { const e = document.querySelector(`${sel} .bd-name`); return e && e.textContent === '名前を変えた'; }, grp(G2));
+      // 行を押すとプレビュー（960 では左の列の上）。開いたまとまりに足すボタン
+      rows = await listIds();
+      await page.click(`${lp(rows[0])} .bd-pt`);
+      await page.waitForSelector('.bd.is-panel .bd-preview .pv-post');
+      assert(await page.isHidden('.bd-left') && await page.isVisible('[data-key="bd-pv-addpost"]'), 'プレビュー');
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('.bd-preview', { state: 'detached' });
+      // 検索（本文・@アカウント）。見つからないとき
+      await page.fill('[data-key="bd-search"]', 'どこにも無い言葉');
+      await page.waitForSelector('.bd-left .bd-empty');
+      assert((await page.textContent('.bd-left .bd-empty')) === '見つかりませんでした', 'empty');
+      await page.focus('[data-key="bd-search"]');
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('.bd-post.is-list');
+      assert((await sw(page)) <= 960, 'no h-scroll');
+      // ②へ: 作ったまとまりが左の一覧にある → メイン1 へドラッグ → 進行に出る
+      await page.click('[data-key="bd-go-2"]');
+      await page.waitForSelector('.bd[data-step="2"]');
+      await page.fill('[data-key="bd-search"]', 'テストのまとまり');
+      await page.waitForSelector('[data-key="bd-search-note"]');
+      await page.waitForSelector(bd.mat(G1));
+      d = await bd.drag(page, bd.mat(G1), '[data-key="slot-0"]');
+      assert(d.tip === 'メイン1 に入れる' && (await bd.state(page)).main[0] === G1, JSON.stringify(d));
+      assert((await page.textContent('[data-key="bd-step-2-sub"]')) === 'まとまり 11・番組に 1本', await page.textContent('[data-key="bd-step-2-sub"]'));
+      // ①に戻ると、番組に入っているまとまりに場所の印（薄くはしない）。①で開いていたまとまりは開いたまま
+      await page.click('[data-key="bd-step-1"]');
+      await page.waitForSelector('.bd[data-step="1"]');
+      assert((await page.textContent(`[data-key="place-${G1}"]`)) === 'メイン1' && await page.$('[data-key="bd-open"]') && !(await page.$('.bd-card.is-group.is-used')), '場所の印');
+      const first = (await openRows())[0];
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.waitForSelector(`.live-post[data-post="${first}"]`);
+      assert((await page.textContent('#view')).includes('テストのまとまり') && (await page.textContent(`.live-post[data-post="${first}"] .li-no`)) === '先頭（代表）', '進行に出る');
+      await c.close();
+    });
+
+    await check('かんたん編成 ステップ①: 375（ドラッグなし）— 投稿／まとまりの切り替え・チェックして「まとまりにする」・開いて「＋」で足す・空のまとまりを作る・横スクロールなし', async () => {
+      const c = await newCtx({ viewport: { width: 375, height: 812 }, hasTouch: true });
+      const { page: p } = await open(c, `${show}#plan`);
+      assert(await p.$('.bd.is-narrow[data-step="1"]') && await p.isVisible('.bd-left') && await p.isHidden('.bd-right'), 'narrow step 1');
+      assert((await p.textContent('[data-key="bd-tab-material"]')) === '投稿' && (await p.textContent('[data-key="bd-tab-flow"]')) === 'まとまり（9）', await p.textContent('[data-key="bd-tab-flow"]'));
+      const steps = await p.$$eval('.bd-step', (els) => els.map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.right), Math.round(r.height)]; }));
+      assert(steps.every((r) => r[0] >= 0 && r[1] <= 375 && r[2] >= 44), `ステップのボタン ${JSON.stringify(steps)}`);
+      assert((await sw(p)) <= 375, `scrollWidth ${await sw(p)}`);
+      const rows = await p.$$eval('.bd-post.is-list', (els) => els.slice(0, 4).map((e) => e.dataset.post));
+      await p.click(`[data-key="chk-${rows[0]}"]`);
+      await p.click(`[data-key="chk-${rows[1]}"]`);
+      const bar = await p.locator('[data-key="bd-selbar"]').boundingBox();
+      assert((await p.textContent('[data-key="bd-sel-count"]')) === '2件を選択中' && bar.x >= 0 && bar.x + bar.width <= 375 && bar.y + bar.height <= 812, `選択中のバー ${JSON.stringify(bar)}`);
+      await p.screenshot({ path: path.join(SHOTS, 'board-s1-375.png') });
+      await p.click('[data-key="bd-make-group"]');
+      await p.waitForSelector('dialog.name-dialog[open]');
+      await p.fill('[data-key="name-input"]', 'スマホで作った');
+      await p.click('[data-key="name-ok"]');
+      await p.waitForSelector('dialog.name-dialog', { state: 'detached' });
+      assert((await p.textContent('[data-key="bd-tab-flow"]')) === 'まとまり（10）' && !(await p.$(`[data-key="lp-${rows[0]}"]`)) && !(await p.$('[data-key="bd-selbar"]')), 'まとまりにした');
+      // まとまりのタブ: 作ったものが先。押して開く → 投稿のタブで「＋」
+      await p.click('[data-key="bd-tab-flow"]');
+      await p.waitForFunction(() => document.querySelector('.bd').dataset.tab === 'flow');
+      const g = await p.$eval('.bd-card.is-group', (e) => ({ id: e.dataset.topic, name: e.querySelector('.bd-name').textContent, kind: e.querySelector('.bd-kind').textContent }));
+      assert(g.name === 'スマホで作った' && g.kind === '作った' && await p.isVisible('.bd-right') && await p.isHidden('.bd-left'), JSON.stringify(g));
+      assert((await p.textContent('[data-key="zone-new"]')).includes('押すと空のまとまりを作ります'), await p.textContent('[data-key="zone-new"]'));
+      await p.click(`[data-key="grp-${g.id}"]`);
+      await p.waitForSelector('[data-key="bd-open"]');
+      assert((await p.$$('.bd-post.is-in-open')).length === 2 && (await p.textContent('[data-key="zone-open"]')).includes('上の「投稿」で「＋」'), await p.textContent('[data-key="zone-open"]'));
+      await p.screenshot({ path: path.join(SHOTS, 'board-s1-375-open.png') });
+      await p.click('[data-key="bd-tab-material"]');
+      await p.waitForSelector(`[data-key="addp-${rows[2]}"]`);
+      await p.click(`[data-key="addp-${rows[2]}"]`);
+      assert(await p.evaluate(([id, t]) => window.__show.postTopic.get(id) === t, [rows[2], g.id]) && !(await p.$(`[data-key="lp-${rows[2]}"]`)), '＋ で足す');
+      // 空のまとまりを作る（「＋ 新しいまとまり」を押す）→ 開いて、投稿のタブの「＋」で足せる
+      await p.click('[data-key="bd-tab-flow"]');
+      await p.click('[data-key="zone-new"]');
+      await p.waitForSelector('dialog.name-dialog[open]');
+      await p.fill('[data-key="name-input"]', '空から作る');
+      await p.click('[data-key="name-ok"]');
+      await p.waitForFunction(() => { const e = document.querySelector('[data-key="bd-open"] .bd-name'); return e && e.textContent === '空から作る'; });
+      assert((await p.textContent('[data-key="bd-tab-flow"]')) === 'まとまり（11）' && (await p.$$('.bd-post.is-in-open')).length === 0, '空のまとまり');
+      assert(await p.evaluate(() => { const w = window.__show.weekState(); return w.rundown.corners.every((c) => c.items.filter(Boolean).length === 0); }), '番組には入れない');
+      assert((await sw(p)) <= 375, `scrollWidth ${await sw(p)}`);
+      await c.close();
     });
 
     // ---- 5. 実データ（リポジトリの data/。読むだけ）。今週（約 960 件）の 10/31 配信の週で確認
@@ -3342,9 +3633,61 @@ async function main() {
         await c7.close();
         return `直近30日 ${t.d30.n}件: 描画 ${f(t.d30.render)}・選択 ${f(t.d30.select)}・編集 ${f(t.d30.edit)}・元に戻す ${f(t.d30.undo)}／今週 ${n}件（すべて表示 ${t.rows}行）: 描画 ${f(t.render)}・全件表示 ${f(t.allRows)}・検索 ${f(t.search)}・選択 ${f(t.select)}・編集 ${f(t.edit)}・元に戻す ${f(t.undo)}（画面操作込み: 右クリック移動 ${moveMs}ms・元に戻すボタン ${undoMs}ms）`;
       });
+      await check('実データ: かんたん編成 ステップ①（960）— 投稿とまとまりの一覧・速さ・投稿をカードへ／新しいまとまりへ・チェックの選択中のバー・開いたまとまり', async () => {
+        const c8 = await newCtx();
+        const { page: p } = await open(c8, `${show}#plan`, {});
+        assert(await p.isHidden('#sample-banner') && await p.$('.bd[data-step="1"]'), 'real step 1');
+        const n = await p.evaluate(() => ({
+          posts: window.__show.weekPosts.length, rows: document.querySelectorAll('.bd-post.is-list').length, free: Number(document.querySelector('[data-key="bd-lscroll"]').dataset.total),
+          cards: document.querySelectorAll('.bd-card.is-group').length, groups: Number(document.querySelector('[data-key="bd-rscroll"]').dataset.total),
+          subs: [1, 2].map((k) => document.querySelector(`[data-key="bd-step-${k}-sub"]`).textContent),
+        }));
+        assert(n.rows === 40 && n.free > 40 && n.cards === 40 && n.groups >= 40 && (await sw(p)) <= 960, JSON.stringify(n));
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-s1-960.png') });
+        const t = await p.evaluate(() => {
+          const a = window.__show;
+          const ms = (fn) => { const t0 = performance.now(); fn(); return performance.now() - t0; };
+          const out = {};
+          out.render = ms(() => a.render());
+          a.ui.board.filter = 'all';
+          out.all = ms(() => a.render());
+          a.ui.board.query1 = 'ホスト';
+          out.search = ms(() => a.render());
+          a.ui.board.query1 = '';
+          a.ui.board.filter = 'free';
+          a.render();
+          return out;
+        });
+        assert(t.render < 200 && t.all < 250 && t.search < 300, JSON.stringify(t));
+        const rows = await p.$$eval('.bd-post.is-list', (els) => els.slice(0, 6).map((e) => e.dataset.post));
+        const g0 = await p.$eval('.bd-card.is-group', (e) => ({ id: e.dataset.topic, meta: e.querySelector('.bd-meta').textContent }));
+        const num = (s) => Number(/投稿 (\d+)/.exec(s)[1]);
+        let d = await bd.drag(p, `[data-key="lp-${rows[0]}"]`, `[data-key="grp-${g0.id}"]`, { shot: 'real-board-s1-drag-960.png' });
+        assert(d.lift && d.tip === 'このまとまりに足す' && d.ok >= 41, JSON.stringify(d));
+        assert(num(await p.textContent(`[data-key="gmeta-${g0.id}"]`)) === num(g0.meta) + 1 && !(await p.$(`[data-key="lp-${rows[0]}"]`)), 'カードへ足す');
+        await p.evaluate(() => { const e = document.getElementById('toast'); if (e) e.hidden = true; });
+        await p.click(`[data-key="chk-${rows[1]}"]`);
+        await p.click(`[data-key="chk-${rows[2]}"]`);
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-s1-select-960.png') });
+        d = await bd.drag(p, `[data-key="lp-${rows[1]}"]`, '[data-key="zone-new"]');
+        assert(d.n === '2件' && d.tip === '新しいまとまりを作る（2件）', JSON.stringify(d));
+        await p.waitForSelector('dialog.name-dialog[open]');
+        await p.click('[data-key="name-ok"]');
+        await p.waitForSelector('dialog.name-dialog', { state: 'detached' });
+        const made = await p.$eval('.bd-card.is-group', (e) => ({ id: e.dataset.topic, kind: e.querySelector('.bd-kind').textContent, meta: e.querySelector('.bd-meta').textContent }));
+        assert(made.id.startsWith('m:') && made.kind === '作った' && num(made.meta) === 2, JSON.stringify(made));
+        await p.click(`[data-key="grp-${g0.id}"]`);
+        await p.waitForSelector('[data-key="bd-open"]');
+        await p.evaluate(() => { const e = document.getElementById('toast'); if (e) e.hidden = true; });
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-s1-open-960.png') });
+        assert((await sw(p)) <= 960, 'no h-scroll');
+        await c8.close();
+        return `投稿 ${n.posts}（まだ入っていない ${n.free}）・まとまり ${n.groups}: 描画 ${t.render.toFixed(1)}ms・すべての投稿 ${t.all.toFixed(1)}ms・検索 ${t.search.toFixed(1)}ms`;
+      });
       await check('実データ: かんたん編成（960）— 描画と 1 操作の速さ・ドラッグ・開いた話題・1920 のプレビュー・375', async () => {
         const c7 = await newCtx();
         const { page: p } = await open(c7, `${show}#plan`, {});
+        await bd.step2(p);
         assert(await p.isHidden('#sample-banner') && await p.$('.bd'), 'real board');
         const n = await p.evaluate(() => ({ topics: window.__show.visibleTopics.length, posts: window.__show.weekPosts.length, cards: document.querySelectorAll('.bd-card.is-material').length }));
         assert(n.cards <= 40 && (await sw(p)) <= 960, JSON.stringify(n));

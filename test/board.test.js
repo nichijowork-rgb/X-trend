@@ -1,9 +1,11 @@
 // かんたん編成（show/js/board.js）の単体テスト: 素材の一覧・番組の流れ・置いた先 → すること・おまかせで下書き・足せる投稿
+// ステップ①（投稿からまとまりを作る）: 投稿の一覧・まとまりの一覧・チェック・新しいまとまり／カードへ置く
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BOARD_CHIPS, boardChips, sanitizeChip, genreShort, materialList, flowSections, flowMinutes, formatHm, parseDropKey, resolveDrop, WHY_NOT,
   stepTarget, addTargets, autoDraftPlan, draftSummary, addablePosts, oldestFirst,
+  postList, groupList, placedCount, toggleSelect, dragIds, groupDraft,
 } from '../show/js/board.js';
 import { applyDrop, recommendGeneral, rankGeneral } from '../show/js/folders.js';
 import { defaultWeek, mainSlots } from '../show/js/logic.js';
@@ -356,4 +358,153 @@ test('古い順に並べる: 投稿日時の昇順（日時が無い投稿・デ
   const postsById = new Map([['1', { ts: 300 }], ['2', { ts: 100 }], ['3', { ts: 200 }], ['4', {}]]);
   assert.deepEqual(oldestFirst(['1', 'img:aaaa', '2', '999', '3', '4'], postsById), ['2', '3', '1', 'img:aaaa', '999', '4']);
   assert.deepEqual(oldestFirst([], postsById), []);
+});
+
+// ================================================================ ステップ①: 投稿からまとまりを作る
+
+/** ステップ①の世界: まとまり（2 件以上・手で作った）と 1 件だけの投稿 */
+function world1() {
+  const posts = [
+    P('a1', 'u1', 'コールの動画', 500), P('a2', 'u2', 'コール 2 本目', 100),            // ホストコール（自動のまとまり）
+    P('b1', 'u3', '担当との別れ話', 900), P('b2', 'u4', 'ホストの小ネタ', null),          // 1 件ずつ（まだ入っていない）
+    P('c1', 'u5', 'キャバの話 コール', 9999, ['キャバクラ']),                              // 手で作ったまとまり（1 件でもまとまり）
+    P('d1', 'u7', '一般のおすすめ', 7000, ['その他']), P('d2', 'u8', '一般のその他', 8000, ['その他']), // 一般のバズ（1 件ずつ）
+    P('e1', 'u9', '片付けた話', 6000), P('z9', 'u0', '削除した投稿', 99999),
+  ];
+  const topics = [
+    { ...T('h1', 'host', 2, 9, { name: 'ホストコール' }), postIds: ['a1', 'a2'] },
+    T('p:b1', 'host', 1, 8, { postIds: ['b1'] }), T('p:b2', 'host', 1, 7, { postIds: ['b2'] }),
+    { ...T('m:2', 'kyaba', 1, 6, { name: 'キャバの話', postIds: ['c1'] }), kind: 'manual' },
+    T('p:d1', 'general', 1, 5, { postIds: ['d1'] }), T('p:d2', 'general', 1, 4, { postIds: ['d2'] }),
+    { ...T('m:1', 'host', 0, null, { name: '空のまとまり', postIds: [] }), kind: 'manual' },
+    { ...T('d:x', 'night', 1, 3, { name: '辞書のまとまり', postIds: ['q1'] }), kind: 'dict' },
+  ];
+  const shelved = T('p:e1', 'host', 1, 2, { postIds: ['e1'] });
+  const topicsById = new Map([...topics, shelved].map((t) => [t.id, t]));
+  const postTopic = new Map([['a1', 'h1'], ['a2', 'h1'], ['b1', 'p:b1'], ['b2', 'p:b2'], ['c1', 'm:2'], ['d1', 'p:d1'], ['d2', 'p:d2'], ['e1', 'p:e1']]);
+  const week = defaultWeek();
+  week.overrides.manual = [{ id: 'm:1', name: '空のまとまり', genre: 'host' }, { id: 'm:2', name: 'キャバの話', genre: 'kyaba' }];
+  const ctx = { weekPosts: posts, postTopic, topicsById, visibleIds: new Set(topics.map((t) => t.id)), recommended: new Set(['p:d1']), bookmarkIds: new Set(['b2', 'c1']), newPosts: new Set(['a2', 'b1']), openId: null };
+  return { posts, topics, topicsById, postTopic, week, ctx };
+}
+
+test('①投稿の一覧: 表示の多い順・まだ入っていないものだけ／すべて（入っているまとまりつき）・おすすめ（一般はおすすめだけ）・チップ・検索・ページ分け・片付け／削除は出さない', () => {
+  const w = world1();
+  // 既定: まだまとまりに入っていない投稿だけ。夜職は全部・一般のバズはおすすめの話題の投稿だけ。表示が不明な投稿は後ろ
+  let r = postList(w.ctx);
+  assert.deepEqual(ids(r), ['d1', 'b1', 'b2'], '片付けた話題の投稿（e1）・削除した投稿（z9）・まとまりの中（a1 a2 c1）・おすすめ外の一般（d2）は出ない');
+  assert.deepEqual([r.total, r.more, r.ids], [3, 0, ['d1', 'b1', 'b2']]);
+  assert.ok(r.items.every((x) => x.group == null && !x.inOpen));
+  // すべての投稿: まとまりに入っている投稿は「◯◯に入っています」（group）。1 件でも手で作ったまとまりはまとまり
+  r = postList(w.ctx, { filter: 'all' });
+  assert.deepEqual(ids(r), ['c1', 'd1', 'b1', 'a1', 'a2', 'b2']);
+  assert.deepEqual(r.items.filter((x) => x.group).map((x) => [x.id, x.group]), [['c1', 'm:2'], ['a1', 'h1'], ['a2', 'h1']]);
+  // 開いているまとまりの中の投稿は inOpen（薄く「入っています」）
+  r = postList({ ...w.ctx, openId: 'h1' }, { filter: 'all' });
+  assert.deepEqual(r.items.filter((x) => x.inOpen).map((x) => x.id), ['a1', 'a2']);
+  // チップ: ジャンル（一般は全部出る）・★ブックマーク・NEW
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'general' })), ['d2', 'd1'], '一般のチップはおすすめ以外も');
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'host' })), ['b1', 'b2']);
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'kyaba' })), [], 'キャバクラの投稿はまとまりの中だけ');
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'kyaba', filter: 'all' })), ['c1']);
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'bookmarks' })), ['b2']);
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'bookmarks', filter: 'all' })), ['c1', 'b2']);
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'new' })), ['b1']);
+  assert.deepEqual(ids(postList(w.ctx, { chip: 'new', filter: 'all' })), ['b1', 'a2']);
+  // 検索（本文・@アカウント）。おすすめのチップは全部から探す（おすすめ外の一般も）
+  assert.deepEqual(ids(postList(w.ctx, { query: '一般' })), ['d2', 'd1']);
+  assert.deepEqual(ids(postList(w.ctx, { query: 'コール', filter: 'all' })), ['c1', 'a1', 'a2']);
+  assert.deepEqual(ids(postList(w.ctx, { query: 'コール' })), [], 'まだ入っていないものだけ');
+  assert.deepEqual(ids(postList(w.ctx, { query: '@U3' })), ['b1']);
+  assert.deepEqual(ids(postList(w.ctx, { query: '一般', chip: 'host' })), []);
+  // ページ分け（ids は全部）
+  r = postList(w.ctx, { filter: 'all', limit: 2 });
+  assert.deepEqual([ids(r), r.total, r.more, r.ids.length], [['c1', 'd1'], 6, 4, 6]);
+  assert.equal(postList(w.ctx, { limit: 0 }).total, 3, '件数だけ数える');
+  assert.deepEqual(postList({ weekPosts: [] }), { items: [], total: 0, more: 0, ids: [] });
+});
+
+test('①まとまりの一覧: 作ったもの（新しい順）→ 自動のもの（今の並び）・1 件だけの話題は出ない・番組に入っている場所の印・ページ分け・番組の本数', () => {
+  const w = world1();
+  let r = groupList({ week: w.week, topics: w.topics });
+  assert.deepEqual(ids(r), ['m:2', 'm:1', 'h1', 'd:x'], '作った（あとで作ったものが先）→ 自動（2 件以上・辞書など）');
+  assert.deepEqual(r.items.map((x) => x.made), [true, true, false, false]);
+  assert.ok(r.items.every((x) => x.place == null));
+  assert.equal(placedCount(w.week), 0);
+  // 番組に入っているまとまりは場所つき（薄くはしない）。メイン候補は本数に数えない
+  const drop1 = (id, target) => applyDrop(w.week, { trash: [], hiddenPosts: [] }, [{ key: `t:${id}`, type: 'topic', id }], target, { topicsById: w.topicsById, postTopic: w.postTopic, postsById: new Map(), weekKey: '2026-11-21', now: 1 });
+  drop1('h1', 'slot:0');
+  drop1('m:2', 'corner:category');
+  drop1('d:x', 'cand');
+  r = groupList({ week: w.week, topics: w.topics });
+  assert.deepEqual(r.items.map((x) => (x.place ? x.place.label : null)), ['カテゴリ別', null, 'メイン1', 'メイン候補']);
+  assert.equal(placedCount(w.week), 2);
+  r = groupList({ week: w.week, topics: w.topics }, { limit: 1 });
+  assert.deepEqual([ids(r), r.total, r.more], [['m:2'], 4, 3]);
+  assert.deepEqual(groupList({ week: defaultWeek(), topics: [T('p:1', 'host', 1)] }), { items: [], total: 0, more: 0 });
+});
+
+test('①チェック: 付け外し・Shift で前に押した行との間をまとめて・チェックした行をつかむと全部（一覧の順）・名前とジャンルの下書き', () => {
+  const list = ['a', 'b', 'c', 'd', 'e'];
+  let s = toggleSelect(new Set(), null, list, 'b');
+  assert.deepEqual([[...s.sel], s.anchor], [['b'], 'b']);
+  s = toggleSelect(s.sel, s.anchor, list, 'd', true);
+  assert.deepEqual([[...s.sel].sort(), s.anchor], [['b', 'c', 'd'], 'b'], 'Shift: b〜d');
+  s = toggleSelect(s.sel, s.anchor, list, 'a', true);
+  assert.deepEqual([...s.sel].sort(), ['a', 'b', 'c', 'd'], '上へも');
+  s = toggleSelect(s.sel, s.anchor, list, 'c');
+  assert.deepEqual([[...s.sel].sort(), s.anchor], [['a', 'b', 'd'], 'c'], 'もう一度押すと外れる');
+  s = toggleSelect(new Set(['a']), 'zzz', list, 'c', true);
+  assert.deepEqual([[...s.sel].sort(), s.anchor], [['a', 'c'], 'c'], '前に押した行が一覧に無ければ 1 件だけ');
+  // つかんだ行と一緒に動かす投稿
+  assert.deepEqual(dragIds(new Set(['d', 'b']), list, 'b'), ['b', 'd'], 'チェックした行をつかむ → チェックした全部（一覧の順）');
+  assert.deepEqual(dragIds(new Set(['d', 'b']), list, 'c'), ['c'], 'チェックしていない行はその 1 件');
+  assert.deepEqual(dragIds(new Set(), list, 'a'), ['a']);
+  // 名前（最初の投稿の言葉）とジャンル（多数決）の下書き
+  const d = groupDraft([P('1', 'u', '担当との別れ話がつらい', 1, ['キャバクラ']), P('2', 'u', '別の話', 1, ['キャバクラ']), P('3', 'u', 'さらに別', 1, ['ホスト'])]);
+  assert.equal(d.genre, 'kyaba');
+  assert.ok(d.name && d.name.length <= 20 && '担当との別れ話がつらい'.includes(d.name.slice(0, 2)), d.name);
+  assert.equal(groupDraft([P('1', 'u', '一般の話', 1, ['その他'])]).genre, 'general');
+  assert.deepEqual(groupDraft([]), { name: '新しいまとまり', genre: 'night' });
+});
+
+test('①投稿を置く: 新しいまとまり（まとめて・画像やデータに無い投稿は入れない）・まとまりのカードへ足す（入っているものは除く）・開いた並びの入る位置・置けない所は理由', () => {
+  const w = world1();
+  const postsById = new Map(w.posts.map((p) => [p.id, p]));
+  const ctx = { week: w.week, topicsById: w.topicsById, openId: null, openItems: [], postsById };
+  const res = (drag, key, c = ctx) => resolveDrop({ kind: 'post', source: 'list', ...drag }, key, c);
+  assert.deepEqual(parseDropKey('newgroup'), { zone: 'newgroup' });
+  // 新しいまとまり: 1 件・チェックした行をまとめて
+  let r = res({ id: 'b1' }, 'newgroup');
+  assert.deepEqual([r.action, r.hint], [{ type: 'newGroup', postIds: ['b1'] }, '新しいまとまりを作る']);
+  r = res({ id: 'b1', ids: ['b1', 'b2', 'd1'] }, 'newgroup');
+  assert.deepEqual([r.action, r.hint], [{ type: 'newGroup', postIds: ['b1', 'b2', 'd1'] }, '新しいまとまりを作る（3件）']);
+  // 開いたまとまりの中の投稿からも作れる（画像・データに無い投稿だけでは作れない）
+  assert.deepEqual(res({ id: 'a1', source: 'open' }, 'newgroup').action, { type: 'newGroup', postIds: ['a1'] });
+  assert.deepEqual(res({ id: 'img:abcd', source: 'open' }, 'newgroup'), { ok: false, reason: WHY_NOT.imageGroup });
+  assert.deepEqual(res({ id: '777', source: 'open' }, 'newgroup'), { ok: false, reason: WHY_NOT.missingGroup });
+  assert.deepEqual(resolveDrop({ kind: 'topic', id: 'h1' }, 'newgroup', ctx), { ok: false, reason: null }, 'まとまりのカードは置けない');
+  // まとまりのカードへ足す
+  r = res({ id: 'b1' }, 'topic:h1');
+  assert.deepEqual([r.action, r.hint], [{ type: 'addPosts', topicId: 'h1', postIds: ['b1'], index: null, order: false }, 'このまとまりに足す']);
+  r = res({ id: 'b1', ids: ['b1', 'a1', 'b2'] }, 'topic:h1');
+  assert.deepEqual([r.action.postIds, r.hint], [['b1', 'b2'], 'このまとまりに足す（2件）'], 'もう入っている投稿（a1）は除く');
+  assert.deepEqual(res({ id: 'a1' }, 'topic:h1'), { ok: false, reason: WHY_NOT.already }, '「すべての投稿」で、入っているまとまりへ');
+  assert.deepEqual(res({ id: 'a1', ids: ['a1', 'a2'] }, 'topic:h1'), { ok: false, reason: WHY_NOT.already });
+  assert.deepEqual(res({ id: 'a1' }, 'topic:m:2').action, { type: 'addPosts', topicId: 'm:2', postIds: ['a1'], index: null, order: false }, 'ほかのまとまりにある投稿は移る');
+  assert.deepEqual(res({ id: 'b1' }, 'topic:nope'), { ok: false, reason: null });
+  // 開いたまとまり: カードの頭へ（最後に足す）・並びの入る位置へ（まとめて）
+  const opened = { ...ctx, openId: 'h1', openItems: ['a1', 'a2'] };
+  assert.deepEqual(res({ id: 'b1' }, 'topic:h1', opened).action, { type: 'addPosts', topicId: 'h1', postIds: ['b1'], index: null, order: true });
+  r = res({ id: 'b1', ids: ['b1', 'b2'] }, 'open#1', opened);
+  assert.deepEqual([r.action, r.hint], [{ type: 'addPosts', topicId: 'h1', postIds: ['b1', 'b2'], index: 1, order: true }, '「ホストコール」に足す（2件）']);
+  assert.equal(res({ id: 'b1' }, 'open', opened).action.index, 2, '末尾の置き場所');
+  assert.deepEqual(res({ id: 'a2' }, 'open#0', opened), { ok: false, reason: WHY_NOT.already });
+  assert.deepEqual(res({ id: 'b1' }, 'open#0'), { ok: false, reason: null }, '開いていなければ並びには置けない');
+  // 一覧の投稿を左の列の上で離しても何もしない。開いたまとまりの投稿は左へ戻すと外れる・ほかのカードへは移る（②と同じ）
+  assert.deepEqual(res({ id: 'b1' }, 'material', opened), { ok: false, reason: null });
+  assert.deepEqual(res({ id: 'a1', source: 'open' }, 'material', opened).action, { type: 'removePost', topicId: 'h1', itemId: 'a1' });
+  assert.deepEqual(res({ id: 'a1', source: 'open' }, 'topic:m:2', opened).action, { type: 'movePost', postId: 'a1', to: 'm:2' });
+  // 番組の枠（②の置き場所）には置けない（理由）
+  assert.deepEqual(res({ id: 'b1' }, 'slot:0'), { ok: false, reason: WHY_NOT.postZone });
 });
