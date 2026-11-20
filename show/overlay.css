@@ -102,7 +102,7 @@ body { font-family: var(--font); color: #fff; }
 .fx-item.is-calm .fx-flame { bottom: 0; }
 
 /* ---------------- 流れるコメント（1920×1080 全面。YouTube ライブのコメント） */
-.cm { position: absolute; inset: 0; pointer-events: none; overflow: hidden; --cm-size: 34px; --cm-icon: 50px; --cm-name: max(13px, calc(var(--cm-size) * .43)); --cm-gap: 3px; }
+.cm { position: absolute; inset: 0; pointer-events: none; overflow: hidden; --cm-size: 34px; --cm-icon: 50px; --cm-name: 15px; --cm-gap: 3px; }
 /* 横だけ切る（右端から入って左端で消える）。縦は @ID が列から少しはみ出しても見えるように上下 24px までは切らない */
 .cm-flow { position: absolute; left: 0; top: 660px; width: 1920px; height: 248px; overflow: visible; clip-path: inset(-24px 0 -24px 0); z-index: 1; }
 /* アイコン（左）とコメントの高さの中心をそろえる。@ID はコメントの下に少し隙間をあけて小さく（並びの高さには入れない）。

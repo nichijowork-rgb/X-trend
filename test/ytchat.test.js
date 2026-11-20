@@ -177,7 +177,7 @@ test('ログ: 最初の応答はログだけ（流さない）・重複・NG・�
 
 test('設定: 範囲に丸める・取得間隔は選択肢だけ・古い形（top・laneH）は帯へ・1 列 24px 未満の列は減らす・固定は 3 時間まで復元', () => {
   const D = sanitizeChatCfg(null);
-  assert.deepEqual(D, { band: { x: 0, y: 660, w: 1920, h: 248 }, lanes: 4, size: 34, icon: 50, speed: 8, pin: { x: 655, y: 600, w: 1170, size: 34, lines: 2 }, flow: true });
+  assert.deepEqual(D, { band: { x: 0, y: 660, w: 1920, h: 248 }, lanes: 4, size: 34, icon: 50, name: 15, speed: 8, pin: { x: 655, y: 600, w: 1170, size: 34, lines: 2 }, flow: true });
   assert.deepEqual(D, sanitizeChatCfg(CHAT_CFG_DEFAULTS));
   // 古い形 → 帯 { x: 0, y: top, w: 1920, h: lanes × laneH }
   assert.deepEqual(sanitizeChatCfg({ top: 700, lanes: 3, laneH: 62 }).band, { x: 0, y: 700, w: 1920, h: 186 });
@@ -188,6 +188,9 @@ test('設定: 範囲に丸める・取得間隔は選択肢だけ・古い形（
   assert.deepEqual([big.size, big.speed, big.flow], [96, 3, false]);
   assert.equal(sanitizeChatCfg({ icon: 500 }).icon, 120, 'アイコンは 120px まで');
   assert.equal(sanitizeChatCfg({ icon: 'x' }).icon, 50, 'アイコンの既定は 50px');
+  assert.equal(sanitizeChatCfg({ name: 5 }).name, 10, '@ID は 10px から');
+  assert.equal(sanitizeChatCfg({ name: 22 }).name, 22);
+  assert.equal(applyChatOverrides(sanitizeChatCfg({}), { name: 20 }).name, 20, '&idsize= で上書き');
   assert.deepEqual(big.pin, { x: 1620, y: 0, w: 300, size: 16, lines: 3 });
   assert.equal(sanitizeChatCfg({ band: { x: 0, y: 0, w: 1920, h: 100 }, lanes: 12 }).lanes, 4);
   assert.equal(sanitizeChatCfg({ speed: 7.3 }).speed, 7.5);
@@ -195,7 +198,7 @@ test('設定: 範囲に丸める・取得間隔は選択肢だけ・古い形（
   assert.equal(sanitizeChatCfg({ pin: { lines: 'x' } }).pin.lines, 2);
   // 古い保存（top・lanes・laneH・size・speed が直下）→ layout へ
   const old = parseChatPrefs({ top: 700, lanes: 3, laneH: 50, size: 40, speed: 6, flow: false });
-  assert.deepEqual(old.layout, { band: { x: 0, y: 700, w: 1920, h: 150 }, lanes: 3, size: 40, icon: 50, speed: 6, pin: { x: 655, y: 600, w: 1170, size: 34, lines: 2 } });
+  assert.deepEqual(old.layout, { band: { x: 0, y: 700, w: 1920, h: 150 }, lanes: 3, size: 40, icon: 50, name: 15, speed: 6, pin: { x: 655, y: 600, w: 1170, size: 34, lines: 2 } });
   assert.equal(old.flow, false);
   assert.deepEqual(parseChatPrefs({ layout: { band: { x: 100, y: 500, w: 800, h: 200 }, lanes: 2, pin: { x: 10, y: 20, w: 400, size: 40, lines: 1 } } }).layout.pin, { x: 10, y: 20, w: 400, size: 40, lines: 1 });
   assert.equal(parseChatPrefs({ mode: 'poll' }).mode, 'poll');

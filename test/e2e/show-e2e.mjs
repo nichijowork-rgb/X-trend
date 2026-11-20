@@ -1392,6 +1392,12 @@ async function main() {
       st = await leState();
       assert(st.draft.band.w === 1200 && st.draft.lanes === 5, JSON.stringify(st.draft));
       await ov.waitForFunction((y) => { const f = document.querySelector('.cm-flow'); return f.offsetTop === y && f.offsetWidth === 1200 && window.__overlay.chat.cfg.lanes === 5; }, by, { timeout: 3000 });
+      // アイコン・@ID の大きさ（スライダー）→ OBS にすぐ出て、保存される
+      for (const [key, val] of [['le-icon', '64'], ['le-idsize', '22']]) {
+        await page.$eval(`[data-key="${key}"]`, (e, v) => { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); }, val);
+      }
+      await ov.waitForFunction(() => { const c = document.querySelector('.cm'); const cs = getComputedStyle(c); return cs.getPropertyValue('--cm-icon').trim() === '64px' && cs.getPropertyValue('--cm-name').trim() === '22px'; }, null, { timeout: 3000 });
+      await page.waitForFunction(() => { const l = JSON.parse(localStorage.getItem('xtrend-show-ytchat')).layout; return l.icon === 64 && l.name === 22; }, null, { timeout: 3000 });
       await page.check('[data-key="le-obs"]');
       await ov.waitForFunction(() => { const p = document.querySelector('.cm-pin'); return p && !p.hidden && p.dataset.id === 'demo-pin-0' && document.querySelector('.cm-flow .cm-item'); }, null, { timeout: 6000 });
       // 矢印キーで 1px・Shift で 10px

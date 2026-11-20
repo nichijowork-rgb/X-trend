@@ -1224,7 +1224,7 @@ let layoutSyncLast = 0;
 /** レイアウトを変える（このウィンドウの操作）。保存は 400ms あとにまとめて */
 app.chatLayoutSet = (cfg) => {
   const c = sanitizeChatCfg({ ...cfg, flow: app.chatPrefs.flow });
-  const layout = { band: c.band, lanes: c.lanes, size: c.size, icon: c.icon, speed: c.speed, pin: c.pin };
+  const layout = { band: c.band, lanes: c.lanes, size: c.size, icon: c.icon, name: c.name, speed: c.speed, pin: c.pin };
   app.chatPrefs = { ...app.chatPrefs, layout };
   clearTimeout(layoutSaveTimer);
   app.chatLayoutSaving = true;
@@ -1243,7 +1243,7 @@ app.chatLayoutSet = (cfg) => {
 function applyLayoutFromOther(layout) {
   if (!layout || typeof layout !== 'object') return;
   const c = sanitizeChatCfg({ ...layout, flow: app.chatPrefs.flow });
-  app.chatPrefs = { ...app.chatPrefs, layout: { band: c.band, lanes: c.lanes, size: c.size, icon: c.icon, speed: c.speed, pin: c.pin } };
+  app.chatPrefs = { ...app.chatPrefs, layout: { band: c.band, lanes: c.lanes, size: c.size, icon: c.icon, name: c.name, speed: c.speed, pin: c.pin } };
   if (app.refreshLayoutEditor) app.refreshLayoutEditor();
   sendChatSoon();
 }

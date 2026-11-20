@@ -388,7 +388,7 @@ function playSound(kind) {
 // 文字はすべて textContent。アイコンは YouTube の画像（ytchat.js の safeIcon が通したもの）か頭文字の丸。
 
 const chatOverride = {};
-for (const [q, k] of [['top', 'top'], ['lanes', 'lanes'], ['laneh', 'laneH'], ['size', 'size'], ['icon', 'icon'], ['speed', 'speed']]) {
+for (const [q, k] of [['top', 'top'], ['lanes', 'lanes'], ['laneh', 'laneH'], ['size', 'size'], ['icon', 'icon'], ['idsize', 'name'], ['speed', 'speed']]) {
   if (params.has(q) && params.get(q) !== '' && Number.isFinite(Number(params.get(q)))) chatOverride[k] = Number(params.get(q));
 }
 const previewMode = params.get('preview') === '1';
@@ -444,6 +444,7 @@ function applyChatCfg(cfg, force = false) {
   Object.assign(v.flow.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
   v.layer.style.setProperty('--cm-size', `${next.size}px`);
   v.layer.style.setProperty('--cm-icon', `${next.icon}px`);
+  v.layer.style.setProperty('--cm-name', `${next.name}px`);
   v.layer.dataset.flow = String(next.flow);
   const pb = next.pin;
   Object.assign(v.pin.style, { left: `${pb.x}px`, top: `${pb.y}px`, width: `${pb.w}px` });
