@@ -2767,6 +2767,527 @@ async function main() {
       await c.close();
     });
 
+    // ---- 4z. かんたん編成（#plan。左＝素材・右＝番組の流れ。マウスのドラッグは 960×1040）
+    const bd = {
+      mat: (id) => `[data-key="mat-${id}"]`,
+      flow: (id) => `[data-key="flow-${id}"]`,
+      state: (pg) => pg.evaluate(() => {
+        const w = window.__show.weekState();
+        const c = (k) => w.rundown.corners.find((x) => x.key === k).items;
+        return { main: [0, 1, 2].map((i) => c('main')[i] || null), cand: [...w.mainCand], category: [...c('category')], chat: [...c('chat')], order: w.postOrder };
+      }),
+      toast: (pg) => pg.evaluate(() => { const t = document.getElementById('toast'); return t && !t.hidden ? t.textContent : ''; }),
+      /** from を to までドラッグ（to はセレクタか { x, y, width, height }）。離す直前の見た目を返す */
+      drag: async (pg, from, to, o = {}) => {
+        const { fa = [0.4, 0.5], ta = [0.5, 0.5], drop = true, shot = null, wait = 0 } = o;
+        await pg.locator(from).first().scrollIntoViewIfNeeded();
+        if (typeof to === 'string') await pg.locator(to).first().scrollIntoViewIfNeeded();
+        await pg.locator(from).first().scrollIntoViewIfNeeded();
+        const a = await pg.locator(from).first().boundingBox();
+        const z = typeof to === 'string' ? await pg.locator(to).first().boundingBox() : to;
+        const sx = a.x + a.width * fa[0];
+        const sy = a.y + a.height * fa[1];
+        await pg.mouse.move(sx, sy);
+        await pg.mouse.down();
+        await pg.mouse.move(sx + 8, sy + 8, { steps: 3 });
+        await pg.mouse.move(z.x + z.width * ta[0], z.y + z.height * ta[1], { steps: 8 });
+        if (wait) await pg.waitForTimeout(wait);
+        const info = await pg.evaluate(() => ({
+          lift: Boolean(document.querySelector('.drag-lift')), tip: (document.querySelector('.drag-tip') || {}).textContent || '', no: Boolean(document.querySelector('.drag-tip.is-no')),
+          line: Boolean(document.querySelector('.drop-line') && !document.querySelector('.drop-line').hidden),
+          over: [...document.querySelectorAll('.is-drop-over')].map((e) => e.dataset.drop || ''), ok: document.querySelectorAll('.is-drop-ok').length,
+          src: document.querySelectorAll('.is-drag-src').length, denied: document.querySelectorAll('.is-drop-no').length,
+        }));
+        if (shot) await pg.screenshot({ path: path.join(SHOTS, shot) });
+        if (drop) { await pg.mouse.up(); await pg.waitForTimeout(80); }
+        return info;
+      },
+    };
+    const HOST = 'd:d-hostcall';
+    const TOWER = 'd:d-tower';
+    const OUJI = 't:サンプル王子さんの引退';
+    const BDAY = 'd:d-birthday';
+    const TOYOKO = 'd:d-toyoko';
+    const GAME = 'c:2110001791739706034';
+
+    await check('かんたん編成（#plan が既定）: 左右 2 列・素材→メインの枠（置ける所が光る・番号つきで入る・左は薄く）・一般はメインに入れない（理由）・カテゴリ別の選んだ位置・並べ替え・コーナーの間・枠の入れ替え・押し出し・✕ と左へ戻すで外す・Esc・外で離す', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      assert(await page.evaluate(() => window.__show.route === 'plan') && await page.$('.bd') && !(await page.$('.plan2')), '既定はかんたん編成');
+      assert((await page.getAttribute('.screen-tabs a[data-route="plan"]', 'aria-current')) === 'page', '編成タブ');
+      // 2 列が横に並び、それぞれの中でスクロール。横スクロールなし・押す所は 40px 以上・置き場所は 52px 以上
+      const lay = await page.evaluate(() => {
+        const r = (sel) => document.querySelector(sel).getBoundingClientRect();
+        const l = r('.bd-left');
+        const rt = r('.bd-right');
+        const oy = (sel) => getComputedStyle(document.querySelector(sel)).overflowY;
+        return {
+          side: Math.abs(l.top - rt.top) < 2 && l.right <= rt.left, ratio: l.width / (l.width + rt.width), scroll: [oy('[data-key="bd-lscroll"]'), oy('[data-key="bd-rscroll"]')],
+          sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight, ih: innerHeight,
+          add: Math.min(...[...document.querySelectorAll('.bd-add')].map((e) => Math.min(e.offsetWidth, e.offsetHeight))),
+          chip: Math.min(...[...document.querySelectorAll('.bd-chip')].map((e) => e.offsetHeight)),
+          zone: Math.min(...[...document.querySelectorAll('.bd-zone')].map((e) => e.offsetHeight)),
+          zones: [...document.querySelectorAll('.bd-zone')].map((e) => e.textContent),
+        };
+      });
+      assert(lay.side && lay.ratio > 0.4 && lay.ratio < 0.48 && lay.scroll.every((x) => x === 'auto'), `2 列 ${JSON.stringify(lay)}`);
+      assert(lay.sw <= 960 && lay.sh <= lay.ih && lay.add >= 40 && lay.chip >= 40 && lay.zone >= 52, `大きさ ${JSON.stringify(lay)}`);
+      assert(lay.zones.join('|') === 'メイン1　ここに入れる|メイン2　ここに入れる|メイン3　ここに入れる|＋ ここにドラッグでキープ|＋ ここにドラッグ|＋ ここにドラッグ', lay.zones.join('|'));
+      assert((await page.textContent('[data-key="bd-total"]')) === '合計 0:00 / 予定 1:30', 'total');
+      // 素材 → メイン2（ドラッグ中: 写しが浮く・元は薄く・置ける所が光る・指のそばに文）
+      let d = await bd.drag(page, bd.mat(HOST), '[data-key="slot-1"]', { shot: 'board-drag-960.png' });
+      assert(d.lift && d.src === 1 && d.ok >= 6 && d.over.join() === 'slot:1' && d.tip === 'メイン2 に入れる' && !d.no, JSON.stringify(d));
+      let st = await bd.state(page);
+      assert(st.main[1] === HOST && !st.main[0], JSON.stringify(st));
+      assert((await page.textContent(`${bd.flow(HOST)} .bd-slotn`)) === '2', '枠の番号');
+      assert(await page.$(`${bd.mat(HOST)}.is-used`) && (await page.textContent(`${bd.mat(HOST)} .bd-used`)) === '番組に入っています' && !(await page.$(`${bd.mat(HOST)} .bd-add`)), '左は薄く');
+      assert((await bd.toast(page)).includes('メイン2に入れました') && await page.isVisible('[data-key="toast-undo"]'), await bd.toast(page));
+      assert((await page.textContent('[data-key="bd-total"]')) === '合計 0:15 / 予定 1:30', 'total 15');
+      assert((await page.inputValue('[data-key="title"]')).includes('ホストコール'), 'title');
+      // 番組に入っているカードはつかめない（押すと右で光る）
+      d = await bd.drag(page, bd.mat(HOST), '[data-key="slot-0"]');
+      assert(!d.lift && (await bd.state(page)).main[0] == null, '入っているカードはドラッグ不可');
+      // 一般のバズ → メインは断る（理由）
+      await page.click('[data-key="bd-chip-general"]');
+      await page.waitForSelector(bd.mat(GAME));
+      d = await bd.drag(page, bd.mat(GAME), '[data-key="slot-0"]');
+      assert(d.no && d.tip.includes('入れられません') && d.tip.includes('一般のバズはメインに入れられません') && d.denied === 1 && !d.over.length, JSON.stringify(d));
+      assert((await bd.state(page)).main[0] == null && (await bd.toast(page)).includes('一般のバズはメインに入れられません'), '断る');
+      d = await bd.drag(page, bd.mat(GAME), '[data-key="zone-cand"]');
+      assert(d.no && d.tip.includes('メイン候補に入れられません'), JSON.stringify(d));
+      // 一般のバズ → 雑談
+      d = await bd.drag(page, bd.mat(GAME), '[data-key="zone-chat"]');
+      assert(d.tip === '雑談（一般のバズ）に入れる' && (await bd.state(page)).chat.join() === GAME, JSON.stringify(d));
+      await page.click('[data-key="bd-chip-rec"]');
+      // カテゴリ別: 末尾の置き場所 → 選んだ位置（カードの上半分＝その前。入る位置に線）
+      await bd.drag(page, bd.mat(BDAY), '[data-key="zone-category"]');
+      await bd.drag(page, bd.mat(TOYOKO), '[data-key="zone-category"]');
+      d = await bd.drag(page, bd.mat(TOWER), bd.flow(TOYOKO), { ta: [0.5, 0.2] });
+      assert(d.line && d.tip === 'カテゴリ別ニュースに入れる', JSON.stringify(d));
+      assert((await bd.state(page)).category.join() === [BDAY, TOWER, TOYOKO].join(), JSON.stringify(await bd.state(page)));
+      // 並べ替え（下半分＝その後ろ）
+      d = await bd.drag(page, bd.flow(BDAY), bd.flow(TOYOKO), { ta: [0.5, 0.8] });
+      assert(d.line && d.tip === '並べ替える', JSON.stringify(d));
+      assert((await bd.state(page)).category.join() === [TOWER, TOYOKO, BDAY].join(), '並べ替え');
+      // コーナーの間（カテゴリ別 → メイン候補 → メイン1）
+      await bd.drag(page, bd.flow(TOWER), '[data-key="zone-cand"]');
+      st = await bd.state(page);
+      assert(st.cand.join() === TOWER && st.category.join() === [TOYOKO, BDAY].join(), JSON.stringify(st));
+      await bd.drag(page, bd.flow(TOWER), '[data-key="slot-0"]');
+      st = await bd.state(page);
+      assert(st.main[0] === TOWER && st.main[1] === HOST && !st.cand.length, JSON.stringify(st));
+      // メインの枠どうしは入れ替え
+      d = await bd.drag(page, bd.flow(TOWER), bd.flow(HOST));
+      assert(d.tip === 'メイン2 と入れ替える', d.tip);
+      st = await bd.state(page);
+      assert(st.main[0] === HOST && st.main[1] === TOWER, JSON.stringify(st));
+      // 入っている枠へ素材から → 前の話題はメイン候補へ
+      d = await bd.drag(page, bd.mat(OUJI), bd.flow(HOST));
+      assert(d.tip === 'メイン1 に入れる（「ホストコール」はメイン候補へ）', d.tip);
+      st = await bd.state(page);
+      assert(st.main[0] === OUJI && st.cand.join() === HOST, JSON.stringify(st));
+      await page.screenshot({ path: path.join(SHOTS, 'board-960.png') });
+      // ✕ で外す → 左のカードが戻る
+      await page.click(`[data-key="unplace-${OUJI}"]`);
+      st = await bd.state(page);
+      assert(st.main[0] == null && await page.$(`${bd.mat(OUJI)}:not(.is-used) .bd-add`) && (await bd.toast(page)).includes('番組から外しました'), JSON.stringify(st));
+      // 左の列へ戻す → 外れる
+      d = await bd.drag(page, bd.flow(TOYOKO), '[data-key="bd-lscroll"]', { ta: [0.5, 0.6] });
+      assert(d.tip === '番組から外す（素材に戻す）' && d.over.join() === 'material', JSON.stringify(d));
+      assert((await bd.state(page)).category.join() === BDAY, '左へ戻すと外れる');
+      // Esc でやめる・外（ヘッダー）で離すと何もしない・ドラッグのあとに「押した」ことにならない
+      const before = JSON.stringify(await bd.state(page));
+      d = await bd.drag(page, bd.mat(OUJI), '[data-key="slot-0"]', { drop: false });
+      assert(d.lift && d.over.join() === 'slot:0', JSON.stringify(d));
+      await page.keyboard.press('Escape');
+      assert(!(await page.$('.drag-lift')) && !(await page.$('.is-drop-ok')) && !(await page.$('.is-drag-src')), 'Esc で片付く');
+      await page.mouse.up();
+      d = await bd.drag(page, bd.mat(OUJI), { x: 300, y: 40, width: 10, height: 10 });
+      assert(d.lift && !d.over.length && !d.tip, JSON.stringify(d));
+      await page.waitForTimeout(100);
+      assert(JSON.stringify(await bd.state(page)) === before && !(await page.$('.bd.is-panel')), 'Esc・外で離すは何もしない');
+      // Ctrl+Z / Ctrl+Shift+Z
+      await page.keyboard.press('Control+z');
+      assert((await bd.state(page)).category.join() === [TOYOKO, BDAY].join(), 'undo');
+      await page.keyboard.press('Control+Shift+Z');
+      assert((await bd.state(page)).category.join() === BDAY, 'redo');
+      assert((await sw(page)) <= 960, 'no h-scroll');
+      await c.close();
+    });
+
+    await check('かんたん編成: 「＋」のメニュー（押せない理由・キーボード）・おまかせで下書き（空いている所だけ・元に戻す）・チップ・検索・リロードで戻る・自動スクロール・フォルダで整理 ⇄ かんたん編成', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, `${show}#plan`);
+      // ＋ → 入れ先のメニュー
+      await page.click(`[data-key="add-${HOST}"]`);
+      await page.waitForSelector('.ctx-menu');
+      const labels = await page.$$eval('.ctx-menu .ctx-item', (els) => els.map((e) => e.textContent));
+      assert(labels.length === 6 && labels[0].startsWith('メイン1') && labels[0].includes('空き') && labels[3].startsWith('メイン候補') && labels[4] === 'カテゴリ別ニュース' && labels[5] === '雑談（一般のバズ）', labels.join('|'));
+      await page.click('[data-key="bd-to-cand"]');
+      assert((await bd.state(page)).cand.join() === HOST, '＋ → メイン候補');
+      // キーボード: ＋ にフォーカス → Enter → ↓ → Enter（メイン2）
+      await page.focus(`[data-key="add-${TOWER}"]`);
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(() => document.activeElement && document.activeElement.dataset.key === 'bd-to-slot:0');
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+      assert((await bd.state(page)).main[1] === TOWER, 'キーボードで ＋');
+      // 一般のバズ: メイン・メイン候補は押せない（理由つき）
+      await page.click('[data-key="bd-chip-general"]');
+      await page.click(`[data-key="add-${GAME}"]`);
+      await page.waitForSelector('.ctx-menu');
+      const dis = await page.$$eval('.ctx-menu .ctx-item', (els) => els.map((e) => [e.disabled, e.textContent]));
+      assert(dis.slice(0, 4).every((x) => x[0]) && dis[0][1].includes('一般のバズはメインに入れられません') && !dis[4][0] && !dis[5][0], JSON.stringify(dis));
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('.ctx-menu', { state: 'detached' });
+      await page.click('[data-key="bd-chip-rec"]');
+      // おまかせで下書き: 空いている所だけ（メイン 1・3、カテゴリ別、雑談）。入っているもの（メイン2・メイン候補）はそのまま
+      await page.click('[data-key="bd-draft"]');
+      let st = await bd.state(page);
+      const t1 = await bd.toast(page);
+      assert(/^メイン 2・カテゴリ別 \d・雑談 3 を入れました/.test(t1), t1);
+      assert(st.main[1] === TOWER && st.main[0] && st.main[2] && st.cand.join() === HOST && st.category.length >= 4 && st.chat.length === 3, JSON.stringify(st));
+      assert(new Set([...st.main, ...st.cand, ...st.category, ...st.chat]).size === 4 + st.category.length + 3, '重複なし');
+      const genres = await page.evaluate((ids) => ids.map((id) => window.__show.topicsById.get(id).genre), [...st.main, ...st.category, ...st.chat]);
+      assert(genres.slice(0, 3).every((g) => g !== 'general') && new Set(genres.slice(3, 3 + st.category.length)).size >= 3 && genres.slice(-3).every((g) => g === 'general'), `ジャンル ${genres}`);
+      const filled = JSON.stringify(st);
+      await page.click('[data-key="bd-draft"]');
+      assert((await bd.toast(page)).includes('空いている所がありません') && JSON.stringify(await bd.state(page)) === filled, '2 回目は何もしない');
+      // 自動スクロール: 右の列の下の端に近づけたままにすると送られる
+      const rb = await page.locator('[data-key="bd-rscroll"]').boundingBox();
+      await page.evaluate(() => { document.querySelector('[data-key="bd-rscroll"]').scrollTop = 0; });
+      const top0 = await page.$eval('[data-key="bd-rscroll"]', (e) => e.scrollTop);
+      const free = await page.$eval('.bd-card.is-material:not(.is-used)', (e) => e.dataset.key);
+      const dd = await bd.drag(page, `[data-key="${free}"]`, { x: rb.x + 100, y: rb.y + rb.height - 20, width: 10, height: 10 }, { drop: false, wait: 700 });
+      const top1 = await page.$eval('[data-key="bd-rscroll"]', (e) => e.scrollTop);
+      assert(dd.lift && top1 > top0 + 40, `自動スクロール ${top0} → ${top1}`);
+      await page.keyboard.press('Escape');
+      await page.mouse.up();
+      // 元に戻す（1 回で下書きの前へ）
+      await page.keyboard.press('Control+z');
+      st = await bd.state(page);
+      assert(st.main[0] == null && st.main[1] === TOWER && st.cand.join() === HOST && !st.category.length && !st.chat.length, `undo ${JSON.stringify(st)}`);
+      // チップ: ジャンルでしぼる（覚える）
+      await page.click('[data-key="bd-chip-kyaba"]');
+      const stripes = await page.$$eval('.bd-card.is-material .bd-stripe', (els) => [...new Set(els.map((e) => e.className))]);
+      assert(stripes.join() === 'bd-stripe g-kyaba' && (await page.getAttribute('[data-key="bd-chip-kyaba"]', 'aria-pressed')) === 'true', stripes.join());
+      await page.click('[data-key="bd-chip-bookmarks"]');
+      assert((await page.$$('.bd-card.is-material')).length >= 1 && (await page.$$('.bd-card.is-material .bd-mark.is-star')).length === (await page.$$('.bd-card.is-material')).length, '★ブックマーク');
+      // おすすめ: 夜職は全部・一般のバズはおすすめだけ。40 件ずつ（もっと見る）
+      await page.click('[data-key="bd-chip-rec"]');
+      const rec = await page.evaluate(() => ({ n: document.querySelectorAll('.bd-card.is-material').length, total: Number(document.querySelector('[data-key="bd-lscroll"]').dataset.total), more: Boolean(document.querySelector('[data-key="bd-more-list"]')) }));
+      assert(rec.n === 40 && rec.total > 40 && rec.more, JSON.stringify(rec));
+      await page.click('[data-key="bd-more-list"]');
+      assert((await page.$$('.bd-card.is-material')).length === rec.total, 'もっと見る');
+      // 検索: 話題名が合う話題 → 中の投稿が合う話題。Esc で消す
+      await page.fill('[data-key="bd-search"]', 'トー横');
+      await page.waitForFunction((k) => { const f = document.querySelector('.bd-card.is-material'); return f && f.dataset.key === k; }, `mat-${TOYOKO}`);
+      await page.fill('[data-key="bd-search"]', 'ゴジラロード');
+      await page.waitForFunction((k) => { const f = document.querySelector('.bd-card.is-material'); return f && f.dataset.key === k && f.querySelector('.bd-meta').textContent.startsWith('一致：'); }, `mat-${TOYOKO}`);
+      assert((await page.textContent('[data-key="bd-search-note"]')).includes('ゴジラロード'), 'search note');
+      await page.fill('[data-key="bd-search"]', 'どこにも無い言葉');
+      await page.waitForSelector('.bd-empty');
+      await page.focus('[data-key="bd-search"]');
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => document.querySelectorAll('.bd-card.is-material').length === 40);
+      // リロードしても編成とチップが戻る
+      await page.click('[data-key="bd-chip-host"]');
+      await page.waitForTimeout(500);
+      await page.reload();
+      await ready(page);
+      st = await bd.state(page);
+      assert(st.main[1] === TOWER && st.cand.join() === HOST && (await page.getAttribute('[data-key="bd-chip-host"]', 'aria-pressed')) === 'true', `reload ${JSON.stringify(st)}`);
+      assert(await page.$(bd.flow(TOWER)) && await page.$(bd.flow(HOST)), 'cards after reload');
+      // 「…」→ フォルダで整理（くわしい画面）⇄ かんたん編成に戻る（内容は同じ）
+      await page.click('[data-key="bd-more"]');
+      await page.click('[data-key="bd-folders"]');
+      await page.waitForSelector('.plan2');
+      assert(await page.evaluate(() => window.__show.route === 'plan-folders') && (await page.getAttribute('.screen-tabs a[data-route="plan"]', 'aria-current')) === 'page', 'folders route');
+      assert((await page.textContent('[data-key="folder-slot:1"]')).includes('シャンパンタワー') && await page.isVisible('#range-box'), '同じ保存データ・対象期間も出る');
+      await page.click('[data-key="back-board"]');
+      await page.waitForSelector('.bd');
+      assert(await page.evaluate(() => window.__show.route === 'plan') && await page.$(bd.flow(TOWER)), 'back to board');
+      // チェックを記録 → NEW のチップ（新しい話題があるときだけ）は出ない・ツールが開く
+      await page.click('[data-key="bd-more"]');
+      await page.click('[data-key="cp-preview"]');
+      assert((await bd.toast(page)).includes('チェックを記録しました') && !(await page.$('[data-key="bd-chip-new"]')), 'checkpoint');
+      await page.click('[data-key="bd-more"]');
+      await page.click('[data-key="tools-open"]');
+      await page.waitForSelector('dialog.tools-dialog[open]');
+      await page.click('[data-key="tools-close"]');
+      await c.close();
+    });
+
+    await check('かんたん編成: 話題を開く → 投稿の並べ替え（先頭が代表・進行に反映）・✕・左の「足せる投稿」から ＋ とドラッグ（ほかの話題からは移す）・左へ戻して外す・ほかの話題へ移す・古い順・プレビュー・URL・名前・新しい話題・キーボード', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, `${show}#plan`);
+      await page.evaluate(([a, b, d]) => window.__show.edit('準備', (w) => { w.rundown.corners[0].items = [a]; w.rundown.corners[1].items = [b, d]; }), [HOST, BDAY, TOYOKO]);
+      await page.waitForSelector(bd.flow(HOST));
+      // 押すとその場で開く（1 つだけ）。左は「足せる投稿」に
+      await page.click(bd.flow(HOST));
+      await page.waitForSelector('[data-key="bd-open"]');
+      const rows = () => page.$$eval('.bd-post.is-in-open', (els) => els.map((e) => e.dataset.post));
+      const items = () => page.evaluate((id) => window.__show.itemsFor(window.__show.topicsById.get(id)), HOST);
+      let r = await rows();
+      assert(r.length === 8 && (await page.textContent('[data-key="bd-left-sub"]')) === '「ホストコール」に足せる投稿' && (await page.textContent('[data-key="bd-open-count"]')).includes('8件'), `open ${r.length}`);
+      assert((await page.$$('[data-key="bd-rep"]')).length === 1 && await page.$(`[data-key="post-${r[0]}"] [data-key="bd-rep"]`), '先頭が代表');
+      assert((await page.textContent(`[data-key="post-${r[0]}"] .bd-pm`)).startsWith('@') && (await page.textContent(`[data-key="post-${r[0]}"] .bd-pm`)).includes('表示'), 'row meta');
+      await page.click(bd.flow(BDAY));
+      assert((await page.$$('[data-key="bd-open"]')).length === 1 && (await page.textContent('[data-key="bd-left-sub"]')).includes('生誕祭'), '開くのは 1 つ');
+      await page.click(bd.flow(HOST));
+      // 並べ替え: 3 件目を先頭へ（代表になる）
+      let d = await bd.drag(page, `[data-key="post-${r[2]}"]`, `[data-key="post-${r[0]}"]`, { ta: [0.5, 0.2] });
+      assert(d.line && d.tip === '先頭へ（代表にする）', JSON.stringify(d));
+      let it = await items();
+      assert(it[0] === r[2] && it.length === 8 && await page.$(`[data-key="post-${r[2]}"] [data-key="bd-rep"]`), `reorder ${it.slice(0, 3)}`);
+      assert(await page.$('[data-key="bd-order-reset"]'), '手動順');
+      // ✕ で話題から外す → 左の「足せる投稿」に戻る（薄くない）
+      await page.click(`[data-key="rm-${r[1]}"]`);
+      it = await items();
+      assert(it.length === 7 && !it.includes(r[1]) && (await bd.toast(page)).includes('話題から外しました'), `rm ${it.length}`);
+      await page.waitForSelector(`[data-key="addable-${r[1]}"]:not(.is-in)`);
+      assert(await page.$(`[data-key="addable-${r[0]}"].is-in`), '入っている投稿は薄く');
+      // 左から ＋（最後に足す）
+      await page.click(`[data-key="addp-${r[1]}"]`);
+      it = await items();
+      assert(it.length === 8 && it[7] === r[1] && (await bd.toast(page)).includes('「ホストコール」に足しました'), `add + ${it.slice(-2)}`);
+      // 左からドラッグ（入る位置へ）。ほかの話題にある投稿は移す（「▸ 話題名」の印）
+      const fromOther = await page.$eval('.bd-post.is-addable:not(.is-in) .bd-from', (e) => e.closest('.bd-post').dataset.post);
+      const srcTopic = await page.evaluate((id) => window.__show.postTopic.get(id), fromOther);
+      d = await bd.drag(page, `[data-key="addable-${fromOther}"]`, `[data-key="post-${it[1]}"]`, { ta: [0.5, 0.8], shot: 'board-add-drag-960.png' });
+      assert(d.line && d.tip === '「ホストコール」に足す', JSON.stringify(d));
+      it = await items();
+      assert(it.length === 9 && it[2] === fromOther && (await bd.toast(page)).includes('から移しました'), `add drag ${it.slice(0, 4)}`);
+      assert(await page.evaluate(([id, t]) => window.__show.postTopic.get(id) === t, [fromOther, HOST]) && srcTopic !== HOST, '移った');
+      await page.locator('[data-key="bd-open"]').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: path.join(SHOTS, 'board-open-960.png') });
+      // 開いた話題の投稿を左の列へ → 外れる
+      d = await bd.drag(page, `[data-key="post-${fromOther}"]`, '[data-key="bd-lscroll"]', { ta: [0.5, 0.6] });
+      assert(d.tip === 'この話題から外す' && d.over.join() === 'material', JSON.stringify(d));
+      assert((await items()).length === 8, '左へ戻すと外れる');
+      // 投稿をほかの話題のカードへ → 移す。枠の置き場所には置けない（理由）
+      it = await items();
+      d = await bd.drag(page, `[data-key="post-${it[7]}"]`, '[data-key="slot-1"]', { drop: false });
+      assert(d.no && d.tip.includes('投稿は、開いた話題の中かほかの話題のカードに'), JSON.stringify(d));
+      await page.keyboard.press('Escape');
+      await page.mouse.up();
+      d = await bd.drag(page, `[data-key="post-${it[7]}"]`, bd.flow(TOYOKO));
+      assert(d.tip === '「トー横」へ移す', d.tip);
+      assert(await page.evaluate(([id, t]) => window.__show.postTopic.get(id) === t, [it[7], TOYOKO]) && (await items()).length === 7, 'ほかの話題へ');
+      // 古い順に並べる（この話題だけ）・並びを元に戻す
+      await page.click('[data-key="bd-order-old"]');
+      const ts = await page.evaluate((id) => window.__show.itemsFor(window.__show.topicsById.get(id)).map((x) => window.__show.postsById.get(x).ts), HOST);
+      assert(ts.every((x, i) => i === 0 || ts[i - 1] <= x), `古い順 ${ts}`);
+      // 進行にも同じ順（先頭が代表）
+      it = await items();
+      await page.goto(`${show}#live`);
+      await ready(page);
+      await page.waitForSelector(`.live-post[data-post="${it[0]}"]`);
+      assert((await page.textContent(`.live-post[data-post="${it[0]}"] .li-no`)) === '先頭（代表）', '進行に反映');
+      await page.goto(`${show}#plan`);
+      await ready(page);
+      // 編成に戻っても開いたまま
+      await page.waitForSelector('[data-key="bd-open"]');
+      await page.click('[data-key="bd-order-reset"]');
+      assert(await page.evaluate((id) => !window.__show.weekState().postOrder[id], HOST), '並びを元に戻す');
+      // プレビュー: 960 では左の列の上に出る。前へ／次へ。閉じると戻る
+      await page.click('[data-key="bd-preview"]');
+      await page.waitForSelector('.bd.is-panel .bd-preview');
+      assert(await page.isHidden('.bd-left') && (await page.textContent('[data-key="bd-pv-title"]')) === 'ホストコール' && await page.$('.bd-preview .pv-post'), 'preview panel');
+      const pb = await page.locator('.bd-preview').boundingBox();
+      const rb = await page.locator('.bd-right').boundingBox();
+      assert(pb.x < rb.x && pb.x + pb.width <= rb.x + 1, 'プレビューは左の列の場所に');
+      assert((await page.textContent('[data-key="bd-pv-pos"]')).startsWith('1 / 7'), await page.textContent('[data-key="bd-pv-pos"]'));
+      await page.click('[data-key="bd-pv-next"]');
+      assert((await page.textContent('[data-key="bd-pv-pos"]')).startsWith('2 / 7'), 'next');
+      await page.screenshot({ path: path.join(SHOTS, 'board-preview-960.png') });
+      await page.click('[data-key="bd-preview-close"]');
+      assert(await page.isVisible('.bd-left') && !(await page.$('.bd-preview')), 'close preview');
+      // 行を押すとその投稿のプレビュー（Esc で閉じる）
+      it = await items();
+      await page.click(`[data-key="post-${it[2]}"] .bd-pt`);
+      await page.waitForSelector('.bd-preview');
+      assert((await page.textContent('[data-key="bd-pv-pos"]')).startsWith('3 / 7'), 'row → preview');
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('.bd-preview', { state: 'detached' });
+      // URL から投稿を追加（既存のダイアログ）。左の一覧の下にも同じ入口がいつも見える
+      assert(await page.isVisible('[data-key="bd-left-url"]') && await page.isVisible('[data-key="bd-left-img"]'), '左の入口');
+      const fb = await page.locator('.bd-foot').boundingBox();
+      assert(fb.y + fb.height <= 1040, `左の入口は画面の中 ${JSON.stringify(fb)}`);
+      await page.click('[data-key="bd-left-url"]');
+      await page.waitForSelector('dialog.url-dialog[open]');
+      await page.click('[data-key="url-cancel"]');
+      await page.waitForSelector('dialog.url-dialog', { state: 'detached' });
+      await page.click('[data-key="bd-url-add"]');
+      await page.waitForSelector('dialog.url-dialog[open]');
+      await page.fill('[data-key="url-input"]', 'https://x.com/a/status/2110000000000099901');
+      await page.click('[data-key="url-ok"]');
+      await page.waitForSelector('dialog.url-dialog', { state: 'detached' });
+      assert((await items()).includes('2110000000000099901') && await page.$('[data-key="post-2110000000000099901"]'), 'URL で追加');
+      // 名前を変える
+      await page.click('[data-key="bd-rename"]');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', 'コール特集');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForFunction((sel) => { const e = document.querySelector(`${sel} .bd-name`); return e && e.textContent === 'コール特集'; }, bd.flow(HOST));
+      // ← 素材に戻る（開いたまま）⇄ 足せる投稿を見る
+      await page.click('[data-key="bd-back-material"]');
+      assert(await page.$('.bd-card.is-material') && await page.$('[data-key="bd-open"]') && (await page.textContent('[data-key="bd-left-sub"]')).includes('今週の話題'), '素材に戻る');
+      await page.click('[data-key="bd-show-addable"]');
+      assert(await page.$('.bd-post.is-addable') && (await page.textContent('[data-key="bd-left-sub"]')).includes('に足せる投稿'), '足せる投稿を見る');
+      // 足せる投稿の検索（全投稿から）とジャンルのチップ
+      await page.fill('[data-key="bd-search"]', 'ゴジラロード');
+      await page.waitForFunction(() => { const n = Number(document.querySelector('[data-key="bd-lscroll"]').dataset.total); return n >= 1 && n < 10; });
+      assert((await page.$$eval('.bd-post.is-addable .bd-pt', (els) => els.every((e) => e.textContent.includes('ゴジラロード')))), 'addable search');
+      await page.fill('[data-key="bd-search"]', '');
+      await page.click('[data-key="bd-chip-kyaba"]');
+      await page.waitForFunction(() => document.querySelectorAll('.bd-post.is-addable').length > 0);
+      assert(await page.evaluate(() => [...document.querySelectorAll('.bd-post.is-addable')].every((e) => (window.__show.postsById.get(e.dataset.post).categories || []).includes('キャバクラ'))), 'addable chip');
+      // 閉じる
+      await page.click('[data-key="bd-close"]');
+      assert(!(await page.$('[data-key="bd-open"]')) && await page.$('.bd-card.is-material'), '閉じる');
+      // キーボード: Enter で開く・Alt+↓ で動かす・Delete で外す
+      await page.focus(bd.flow(BDAY));
+      await page.keyboard.press('Alt+ArrowDown');
+      assert((await bd.state(page)).category.join() === [TOYOKO, BDAY].join() && await page.evaluate((k) => document.activeElement.dataset.key === k, `flow-${BDAY}`), 'Alt+↓');
+      await page.keyboard.press('Alt+ArrowUp');
+      assert((await bd.state(page)).category.join() === [BDAY, TOYOKO].join(), 'Alt+↑');
+      await page.keyboard.press('Enter');
+      await page.waitForSelector('[data-key="bd-open"]');
+      const pr = await rows();
+      await page.focus(`[data-key="post-${pr[0]}"]`);
+      await page.keyboard.press('Alt+ArrowDown');
+      assert((await rows())[1] === pr[0], '投稿も Alt+↓');
+      await page.keyboard.press('Delete');
+      assert((await rows()).length === pr.length - 1, '投稿を Delete');
+      await page.focus(bd.flow(BDAY));
+      await page.keyboard.press('Enter');
+      await page.waitForSelector('[data-key="bd-open"]', { state: 'detached' });
+      await page.focus(bd.flow(TOYOKO));
+      await page.keyboard.press('Delete');
+      assert((await bd.state(page)).category.join() === BDAY, 'Delete で番組から外す');
+      // 右クリック: 名前・ジャンル・片付け・削除など
+      await page.click(bd.mat(TOWER), { button: 'right' });
+      await page.waitForSelector('.ctx-menu');
+      for (const k of ['bd-ctx-to-slot:0', 'bd-ctx-rename', 'bd-ctx-genre-kyaba', 'bd-ctx-shelf', 'bd-ctx-trash']) assert(await page.$(`[data-key="${k}"]`), `menu ${k}`);
+      await page.click('[data-key="bd-ctx-genre-kyaba"]');
+      assert(await page.evaluate((id) => window.__show.topicsById.get(id).genre === 'kyaba', TOWER), 'ジャンル');
+      await page.click(bd.mat(TOWER), { button: 'right' });
+      await page.click('[data-key="bd-ctx-shelf"]');
+      assert(!(await page.$(bd.mat(TOWER))) && (await bd.toast(page)).includes('片付けました'), '片付ける');
+      await page.click('[data-key="toast-undo"]');
+      await page.waitForSelector(bd.mat(TOWER));
+      // 新しい話題を作る → 雑談に入って開く（左が足せる投稿）
+      await page.click('[data-key="bd-more"]');
+      await page.click('[data-key="bd-new-topic"]');
+      await page.waitForSelector('dialog.name-dialog[open]');
+      await page.fill('[data-key="name-input"]', 'テストの話題');
+      await page.selectOption('[data-key="name-genre"]', 'general');
+      await page.click('[data-key="name-ok"]');
+      await page.waitForSelector('[data-key="bd-open"]');
+      const st = await bd.state(page);
+      assert(st.chat.length === 1 && st.chat[0].startsWith('m:') && (await page.textContent('[data-key="bd-open"] .bd-name')) === 'テストの話題' && (await page.textContent('[data-key="bd-left-sub"]')).includes('テストの話題'), JSON.stringify(st));
+      await page.click('.bd-post.is-addable .bd-add');
+      assert((await page.$$('.bd-post.is-in-open')).length === 1, '新しい話題に足す');
+      // タッチ: カードの上からは始まらない（一覧をスクロールできる）・⋮⋮ からは始まる。長押しでメニュー
+      await page.click('[data-key="bd-close"]');
+      const touch = await page.evaluate(async (sel) => {
+        const card = document.querySelector(sel);
+        const grip = card.querySelector('.bd-grip');
+        const r = card.getBoundingClientRect();
+        const fire = (el, type, x, y) => el.dispatchEvent(new PointerEvent(type, { pointerType: 'touch', pointerId: 77, isPrimary: true, bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0, buttons: type === 'pointerup' ? 0 : 1 }));
+        const out = {};
+        const name = card.querySelector('.bd-name');
+        fire(name, 'pointerdown', r.left + 120, r.top + 20);
+        fire(name, 'pointermove', r.left + 160, r.top + 60);
+        out.body = Boolean(document.querySelector('.drag-lift'));
+        fire(name, 'pointerup', r.left + 160, r.top + 60);
+        fire(grip, 'pointerdown', r.left + 20, r.top + 20);
+        fire(grip, 'pointermove', r.left + 40, r.top + 40);
+        out.grip = Boolean(document.querySelector('.drag-lift'));
+        out.touchAction = [getComputedStyle(grip).touchAction, getComputedStyle(card).touchAction];
+        fire(grip, 'pointerup', r.left + 40, r.top + 40);
+        out.after = Boolean(document.querySelector('.drag-lift'));
+        fire(name, 'pointerdown', r.left + 120, r.top + 20);
+        await new Promise((res) => setTimeout(res, 700));
+        out.menu = Boolean(document.querySelector('.ctx-menu'));
+        fire(name, 'pointerup', r.left + 120, r.top + 20);
+        return out;
+      }, bd.mat(OUJI));
+      assert(!touch.body && touch.grip && !touch.after && touch.touchAction[0] === 'none' && touch.touchAction[1] !== 'none' && touch.menu, `touch ${JSON.stringify(touch)}`);
+      await page.keyboard.press('Escape');
+      assert((await sw(page)) <= 960, 'no h-scroll');
+      await c.close();
+    });
+
+    await check('かんたん編成の幅: 1920 はプレビューの列（3 列）・1200 は 2 列・760 と 375 は 1 列（素材／番組の切り替え・＋で入れる）・横スクロールなし', async () => {
+      // 1920: 3 列。カードを押すと右の列にプレビュー
+      const c = await newCtx({ viewport: { width: 1920, height: 1080 } });
+      const { page } = await open(c, `${show}#plan`);
+      assert(await page.$('.bd.is-wide') && await page.isVisible('.bd-preview') && await page.$('[data-key="bd-pv-empty"]'), 'wide');
+      const cols = await page.evaluate(() => ['.bd-left', '.bd-right', '.bd-preview'].map((s) => { const r = document.querySelector(s).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.width), Math.round(r.top)]; }));
+      assert(cols[0][0] < cols[1][0] && cols[1][0] < cols[2][0] && cols[0][2] === cols[2][2] && cols[2][1] >= 440, `3 列 ${JSON.stringify(cols)}`);
+      await page.click(bd.mat(HOST));
+      await page.waitForFunction(() => { const e = document.querySelector('[data-key="bd-pv-title"]'); return e && e.textContent === 'ホストコール'; });
+      assert(await page.isVisible('.bd-left') && await page.$(`${bd.mat(HOST)}.is-sel`) && await page.$('.bd-preview .pv-post'), 'preview col');
+      await bd.drag(page, bd.mat(HOST), '[data-key="slot-0"]');
+      await bd.drag(page, bd.mat(TOYOKO), '[data-key="zone-category"]');
+      await page.click(bd.flow(TOYOKO));
+      await page.waitForFunction(() => { const e = document.querySelector('[data-key="bd-pv-title"]'); return e && e.textContent === 'トー横'; });
+      const emb = await page.evaluate(() => { const h = document.querySelector('.bd-preview .embed-host'); return h ? h.dataset.embedId : null; });
+      // 並べ替えても埋め込みは作り直さない（同じ要素のまま）
+      await page.evaluate(() => { window.__keepEl = document.querySelector('.bd-preview .embed-host'); });
+      const r0 = await page.$$eval('.bd-post.is-in-open', (els) => els.map((e) => e.dataset.post));
+      await bd.drag(page, `[data-key="post-${r0[2]}"]`, `[data-key="post-${r0[1]}"]`, { ta: [0.5, 0.2] });
+      assert(emb && await page.evaluate(() => window.__keepEl === document.querySelector('.bd-preview .embed-host') && window.__keepEl.isConnected), '埋め込みはそのまま');
+      assert((await sw(page)) <= 1920, 'no h-scroll 1920');
+      await page.screenshot({ path: path.join(SHOTS, 'board-1920.png') });
+      // 1200: 2 列（プレビューは押したときだけ左の上に）
+      await page.setViewportSize({ width: 1200, height: 900 });
+      await page.waitForFunction(() => !document.querySelector('.bd.is-wide'));
+      assert(await page.$('.bd.is-panel .bd-preview') && (await sw(page)) <= 1200, '1200');
+      await page.click('[data-key="bd-preview-close"]');
+      assert(await page.isVisible('.bd-left') && await page.isVisible('.bd-right'), '1200 2 列');
+      await page.screenshot({ path: path.join(SHOTS, 'board-1200.png') });
+      // 760: 1 列
+      await page.setViewportSize({ width: 760, height: 900 });
+      await page.waitForSelector('.bd.is-narrow');
+      assert((await sw(page)) <= 760, '760');
+      await page.screenshot({ path: path.join(SHOTS, 'board-760.png') });
+      await c.close();
+      // 375: 素材／番組の切り替え。＋ で入れる・押して開く・足せる投稿のタブ
+      const c2 = await newCtx({ viewport: { width: 375, height: 812 }, hasTouch: true });
+      const { page: p } = await open(c2, `${show}#plan`);
+      assert(await p.$('.bd.is-narrow') && await p.isVisible('.bd-left') && await p.isHidden('.bd-right') && (await p.textContent('[data-key="bd-tab-flow"]')) === '番組の流れ（0）', 'narrow');
+      await p.click(`[data-key="add-${HOST}"]`);
+      await p.waitForSelector('.ctx-menu');
+      const mr = await p.locator('.ctx-menu').boundingBox();
+      assert(mr.x >= 0 && mr.x + mr.width <= 375, `menu in view ${JSON.stringify(mr)}`);
+      await p.click('[data-key="bd-to-slot:0"]');
+      await p.click(`[data-key="add-${BDAY}"]`);
+      await p.click('[data-key="bd-to-corner:category"]');
+      assert((await p.textContent('[data-key="bd-tab-flow"]')) === '番組の流れ（2）' && await p.$(`${bd.mat(HOST)}.is-used`), 'added by +');
+      await p.screenshot({ path: path.join(SHOTS, 'board-375.png') });
+      // 入っているカードを押す → 番組の流れのタブでそのカードが光る
+      await p.click(bd.mat(HOST));
+      await p.waitForFunction(() => document.querySelector('.bd').dataset.tab === 'flow');
+      assert(await p.isVisible('.bd-right') && await p.isHidden('.bd-left') && await p.isVisible(bd.flow(HOST)), 'flow tab');
+      await p.click(bd.flow(HOST));
+      await p.waitForSelector('[data-key="bd-open"]');
+      assert((await p.textContent('[data-key="bd-tab-material"]')) === '足せる投稿' && (await p.textContent('[data-key="zone-open"]')).includes('足せる投稿'), 'narrow open');
+      await p.screenshot({ path: path.join(SHOTS, 'board-375-open.png') });
+      await p.click('[data-key="bd-tab-material"]');
+      await p.waitForSelector('.bd-post.is-addable');
+      const n0 = await p.evaluate((id) => window.__show.itemsFor(window.__show.topicsById.get(id)).length, HOST);
+      await p.click('.bd-post.is-addable:not(.is-in) .bd-add');
+      assert(await p.evaluate(([id, n]) => window.__show.itemsFor(window.__show.topicsById.get(id)).length === n + 1, [HOST, n0]), 'narrow add post');
+      await p.click('[data-key="bd-tab-flow"]');
+      await p.click(`[data-key="unplace-${BDAY}"]`);
+      assert((await p.textContent('[data-key="bd-tab-flow"]')) === '番組の流れ（1）', 'narrow remove');
+      assert((await sw(p)) <= 375, `scrollWidth ${await sw(p)}`);
+      await c2.close();
+    });
+
     // ---- 5. 実データ（リポジトリの data/。読むだけ）。今週（約 960 件）の 10/31 配信の週で確認
     if (existsSync(path.join(ROOT, 'data', 'posts.json'))) {
       await check('実データ: 1 操作の速さ（受信箱の表示・選択・移動・元に戻す・検索）', async () => {
@@ -2820,6 +3341,62 @@ async function main() {
         t.d30 = t30;
         await c7.close();
         return `直近30日 ${t.d30.n}件: 描画 ${f(t.d30.render)}・選択 ${f(t.d30.select)}・編集 ${f(t.d30.edit)}・元に戻す ${f(t.d30.undo)}／今週 ${n}件（すべて表示 ${t.rows}行）: 描画 ${f(t.render)}・全件表示 ${f(t.allRows)}・検索 ${f(t.search)}・選択 ${f(t.select)}・編集 ${f(t.edit)}・元に戻す ${f(t.undo)}（画面操作込み: 右クリック移動 ${moveMs}ms・元に戻すボタン ${undoMs}ms）`;
+      });
+      await check('実データ: かんたん編成（960）— 描画と 1 操作の速さ・ドラッグ・開いた話題・1920 のプレビュー・375', async () => {
+        const c7 = await newCtx();
+        const { page: p } = await open(c7, `${show}#plan`, {});
+        assert(await p.isHidden('#sample-banner') && await p.$('.bd'), 'real board');
+        const n = await p.evaluate(() => ({ topics: window.__show.visibleTopics.length, posts: window.__show.weekPosts.length, cards: document.querySelectorAll('.bd-card.is-material').length }));
+        assert(n.cards <= 40 && (await sw(p)) <= 960, JSON.stringify(n));
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-960.png') });
+        const ids = await p.$$eval('.bd-card.is-material:not(.is-used)', (els) => els.slice(0, 6).map((e) => e.dataset.topic));
+        const d = await bd.drag(p, bd.mat(ids[2]), '[data-key="slot-1"]', { shot: 'real-board-drag-960.png' });
+        assert(d.lift && d.ok >= 5 && (await bd.state(p)).main[1] === ids[2], JSON.stringify(d));
+        await bd.drag(p, bd.mat(ids[0]), '[data-key="slot-0"]');
+        await bd.drag(p, bd.mat(ids[1]), '[data-key="zone-category"]');
+        await bd.drag(p, bd.mat(ids[3]), '[data-key="zone-category"]');
+        const t = await p.evaluate(async () => {
+          const a = window.__show;
+          const ms = (fn) => { const t0 = performance.now(); fn(); return performance.now() - t0; };
+          const out = {};
+          out.render = ms(() => a.render());
+          out.edit = ms(() => a.edit('計測', (w) => { w.mainCand = [...w.mainCand]; }));
+          out.undo = ms(() => a.undo());
+          a.ui.board.query = 'ホスト';
+          out.search = ms(() => a.render());
+          a.ui.board.query = '';
+          a.ui.board.pages = 40;
+          out.all = ms(() => a.render());
+          out.allCards = document.querySelectorAll('.bd-card.is-material').length;
+          a.ui.board.pages = 1;
+          a.render();
+          return out;
+        });
+        assert(t.render < 150 && t.search < 250 && t.edit < 400, JSON.stringify(t));
+        await p.click(bd.flow(ids[0]));
+        await p.waitForSelector('[data-key="bd-open"]');
+        const o = await p.evaluate(async () => { const a = window.__show; const t0 = performance.now(); a.render(); return { render: performance.now() - t0, addable: document.querySelectorAll('.bd-post.is-addable').length, rows: document.querySelectorAll('.bd-post.is-in-open').length }; });
+        assert(o.render < 200 && o.addable <= 40 && o.rows >= 1, JSON.stringify(o));
+        await p.locator('[data-key="bd-rscroll"]').evaluate((e) => { e.scrollTop = 0; });
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-open-960.png') });
+        assert((await sw(p)) <= 960, 'no h-scroll');
+        // 1920: プレビューの列
+        await p.setViewportSize({ width: 1920, height: 1080 });
+        await p.waitForSelector('.bd.is-wide');
+        await p.click('[data-key="bd-preview"]');
+        await p.waitForSelector('.bd-preview .pv-post');
+        await p.waitForTimeout(600);
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-1920.png') });
+        // 375
+        await p.setViewportSize({ width: 375, height: 812 });
+        await p.waitForSelector('.bd.is-narrow');
+        await p.click('[data-key="bd-preview-close"]').catch(() => {});
+        await p.click('[data-key="bd-tab-flow"]');
+        await p.evaluate(() => window.scrollTo(0, 0));
+        assert((await sw(p)) <= 375, `scrollWidth ${await sw(p)}`);
+        await p.screenshot({ path: path.join(SHOTS, 'real-board-375.png'), fullPage: false });
+        await c7.close();
+        return `話題 ${n.topics}・投稿 ${n.posts}: 描画 ${t.render.toFixed(1)}ms・編集 ${t.edit.toFixed(1)}ms・元に戻す ${t.undo.toFixed(1)}ms・検索 ${t.search.toFixed(1)}ms・全件（${t.allCards}枚）${t.all.toFixed(1)}ms・開いた話題 ${o.render.toFixed(1)}ms`;
       });
       for (const [w, hh, route] of [[960, 1040, 'plan-folders'], [1280, 1400, 'plan-folders'], [1920, 1080, 'plan-folders'], [375, 812, 'plan-folders'], [960, 1040, 'plan'], [1920, 1080, 'plan'], [375, 812, 'plan'], [960, 1040, 'live'], [375, 812, 'live'], [1920, 1080, 'onair']]) {
         await check(`実データ data/ ${route} ${w}×${hh}`, async () => {

@@ -1,4 +1,4 @@
-// 配信番組サイト（/show/）のエントリ。データ読み込み・状態・保存・画面切替（#plan / #live / #onair / #review）。
+// 配信番組サイト（/show/）のエントリ。データ読み込み・状態・保存・画面切替（#plan かんたん編成 / #plan-folders フォルダで整理 / #live / #comments / #onair / #review / #obs-setup）。
 import { normalizeDataset, parseTimestamp, formatDateTime } from '../assets/js/core.js';
 import { createEmbedder } from '../assets/js/embed.js';
 import { TEXT, VIEW_PREF_KEY, SIDE_PREF_KEY, RANGE_PRESETS } from './js/config.js';
@@ -37,11 +37,15 @@ import { loadSaved, saveState, openSync } from './js/store.js';
 import { h, clear, isEditable, startEmbeds } from './js/dom.js';
 import { patchView } from './js/patch.js';
 import { renderPlan, planKeydown, planPointerDown } from './js/views/plan.js';
+import { renderBoard, boardKeydown, boardPointerDown, boardPasteTopic } from './js/views/boardview.js';
+import { isDragging } from './js/views/dnd.js';
 import { renderLive, tickLive, liveKeydown } from './js/views/live.js';
 import { renderOnair, tickOnair } from './js/views/onair.js';
 import { renderReview } from './js/views/review.js';
 
-const ROUTES = ['plan', 'live', 'comments', 'onair', 'review', 'obs-setup'];
+// plan＝かんたん編成（左右 2 列のドラッグ＆ドロップ）、plan-folders＝フォルダで整理（くわしい画面）。どちらも「編成」
+const ROUTES = ['plan', 'plan-folders', 'live', 'comments', 'onair', 'review', 'obs-setup'];
+const isPlanRoute = (r) => r === 'plan' || r === 'plan-folders';
 const $ = (id) => document.getElementById(id);
 
 const app = {
@@ -327,7 +331,7 @@ function updateBotPill() {
   const pill = $('bot-pill');
   if (!pill) return;
   const st = app.autoSendState;
-  const show = (app.route === 'plan' || app.route === 'live') && Boolean(app.ghPrefs && app.ghPrefs.token) && st;
+  const show = (isPlanRoute(app.route) || app.route === 'live') && Boolean(app.ghPrefs && app.ghPrefs.token) && st;
   pill.hidden = !show;
   if (!show) return;
   const label = !st.enabled ? 'ボット送信：自動オフ'
@@ -391,7 +395,7 @@ app.setLiveOrder = (topicId, order) => {
   else app.liveAction('order', { order });
 };
 /** 話題から外す（投稿は 1 件の話題へ、データに無い投稿は外す、画像は消す） */
-app.removeItem = (topic, id) => {
+app.removeItem = (topic, id, toastText = null) => {
   app.edit('話題から外す', (w) => {
     if (isImageItem(id)) w.images = w.images.filter((x) => `img:${x.id}` !== id);
     else if ((topic.missingIds || []).includes(id)) {
@@ -400,7 +404,7 @@ app.removeItem = (topic, id) => {
     }
     else w.overrides.moves = { ...w.overrides.moves, [id]: `p:${id}` };
     if (w.postOrder[topic.id]) w.postOrder = { ...w.postOrder, [topic.id]: w.postOrder[topic.id].filter((x) => x !== id) };
-  }, { toastText: isImageItem(id) ? '画像を外しました' : '話題から外しました（受信箱に戻りました）' });
+  }, { toastText: toastText || (isImageItem(id) ? '画像を外しました' : '話題から外しました（受信箱に戻りました）') });
 };
 /** この投稿を削除（非表示。画像は外す） */
 app.hideItem = (topic, id) => {
@@ -624,7 +628,8 @@ app.pasteTopicId = () => {
     const cue = app.cues[app.weekState().live.index];
     return cue && cue.kind === 'topic' ? cue.topicId : null;
   }
-  if (app.route === 'plan') {
+  if (app.route === 'plan') return boardPasteTopic(app);
+  if (app.route === 'plan-folders') {
     const u = app.ui;
     const row = (u.rows || []).find((r) => r.key === u.focus);
     if (row && row.type === 'topic') return row.id;
@@ -1493,7 +1498,7 @@ function setWeek(key, save = true) {
 function renderRangePicker() {
   const box = $('range-box');
   if (!box) return;
-  box.hidden = !(app.route === 'plan' || app.route === 'review');
+  box.hidden = !(isPlanRoute(app.route) || app.route === 'review');
   const sel = $('range-select');
   const wk = app.weekState();
   const r = sanitizeRange(wk.range);
@@ -1535,12 +1540,17 @@ function currentRoute() {
 
 let lastFocusKey = null;
 
+// ドラッグ中は描き直さない（つかんでいるカードや置き場所が消えないように）。離したあとでまとめて描く
+let renderAfterDrag = false;
+document.addEventListener('xt-drag-end', () => { if (renderAfterDrag) { renderAfterDrag = false; renderRoute(); } });
+
 function renderRoute() {
   if (!app.ready) return;
+  if (isDragging()) { renderAfterDrag = true; return; }
   app.route = currentRoute();
   document.body.dataset.route = app.route;
   for (const a of document.querySelectorAll('.screen-tabs a')) {
-    if (a.dataset.route === app.route) a.setAttribute('aria-current', 'page');
+    if (a.dataset.route === app.route || (a.dataset.route === 'plan' && isPlanRoute(app.route))) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
   $('week-range').textContent = app.range && !app.range.isWeek ? `（番組週 ${weekLabel(app.week)}）` : weekLabel(app.week);
@@ -1550,7 +1560,7 @@ function renderRoute() {
   // 再描画してもフォーカスを失わないよう、data-key でたどる
   const active = document.activeElement;
   lastFocusKey = active && root.contains(active) && active.dataset ? active.dataset.key || null : null;
-  const view = { plan: renderPlan, live: renderLive, comments: renderComments, onair: renderOnair, review: renderReview, 'obs-setup': renderObsSetup }[app.route];
+  const view = { plan: renderBoard, 'plan-folders': renderPlan, live: renderLive, comments: renderComments, onair: renderOnair, review: renderReview, 'obs-setup': renderObsSetup }[app.route];
   // 同じ画面・同じ週の再描画は差し替え（patch.js）で、表示済みの X 埋め込みを作り直さない
   const old = root.firstElementChild;
   const sameScreen = old && old.dataset.keep && old.dataset.keep === `${app.route}:${app.weekKey}`;
@@ -1570,7 +1580,7 @@ function renderRoute() {
     const el = root.querySelector(`[data-key="${CSS.escape(lastFocusKey)}"]`);
     if (el && !el.disabled) el.focus({ preventScroll: true });
   }
-  document.title = `${{ plan: '編成', live: '進行', comments: 'コメント', onair: '映す用', review: '振り返り', 'obs-setup': 'OBS セットアップ' }[app.route]}｜${app.saved.showName}`;
+  document.title = `${{ plan: '編成', 'plan-folders': '編成（フォルダで整理）', live: '進行', comments: 'コメント', onair: '映す用', review: '振り返り', 'obs-setup': 'OBS セットアップ' }[app.route]}｜${app.saved.showName}`;
   // 進行画面に来たら（前に接続していれば）OBS へつなぐ。状態ピル
   if ((app.route === 'live' || app.route === 'obs-setup' || app.route === 'comments') && app.obsPrefs.enabled && app.obsPrefs.auto && !app.obs) ensureObs().connect(app.obsPrefs);
   updateObsPill();
@@ -1652,7 +1662,7 @@ async function main() {
   document.addEventListener('click', (e) => {
     if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     const a = e.target.closest && e.target.closest('a[href]');
-    if (!a || !isXUrl(a.href) || !(app.route === 'live' || app.route === 'plan' || app.route === 'review')) return;
+    if (!a || !isXUrl(a.href) || !(app.route === 'live' || isPlanRoute(app.route) || app.route === 'review')) return;
     e.preventDefault();
     app.openViewer(a.href);
   });
@@ -1668,9 +1678,10 @@ async function main() {
   document.addEventListener('keydown', (e) => {
     if (app.route === 'live') liveKeydown(app, e);
     else if (app.route === 'comments') commentsKeydown(app, e);
-    else if (app.route === 'plan') planKeydown(app, e);
+    else if (app.route === 'plan') boardKeydown(app, e);
+    else if (app.route === 'plan-folders') planKeydown(app, e);
   });
-  document.addEventListener('pointerdown', (e) => { if (app.route === 'plan') planPointerDown(app, e); }, true);
+  document.addEventListener('pointerdown', (e) => { if (app.route === 'plan') boardPointerDown(app, e); else if (app.route === 'plan-folders') planPointerDown(app, e); }, true);
   // 開いたメニュー（番組に入れる ▾ / …）は外側をクリックしたら閉じる
   document.addEventListener('click', (e) => {
     for (const d of document.querySelectorAll('details.menu[open]')) if (!d.contains(e.target)) d.open = false;
@@ -1710,7 +1721,7 @@ async function main() {
   if (typeof matchMedia === 'function') {
     for (const q of ['(min-width: 1400px)', '(max-width: 760px)']) {
       const mq = matchMedia(q);
-      const onChange = () => { if (app.route === 'plan' && app.ready) renderRoute(); };
+      const onChange = () => { if (isPlanRoute(app.route) && app.ready) renderRoute(); };
       if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange); else if (typeof mq.addListener === 'function') mq.addListener(onChange);
     }
   }

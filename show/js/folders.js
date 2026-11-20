@@ -39,9 +39,14 @@ export function postTopicMap(topics) {
  * 返り値: おすすめの話題 id の Set
  */
 export function recommendGeneral(topics, n = PLAN_V2.generalRecommendN, pickIds = new Set()) {
+  return new Set(rankGeneral(topics, pickIds).slice(0, Math.max(0, n)).map((t) => t.id));
+}
+
+/** 一般のバズを「おすすめ」の順に並べる（show_pick を含む話題が先、次に話題性スコア順。同点は元の並び） */
+export function rankGeneral(topics, pickIds = new Set()) {
   const general = topics.filter((t) => !isNightGenre(t.genre));
   const pick = (t) => t.postIds.some((id) => pickIds.has(id)) || (t.linkId && pickIds.has(t.linkId));
-  const sorted = general.map((t, i) => ({ t, i, p: pick(t) ? 1 : 0 })).sort((a, b) => {
+  return general.map((t, i) => ({ t, i, p: pick(t) ? 1 : 0 })).sort((a, b) => {
     if (a.p !== b.p) return b.p - a.p;
     const sa = a.t.score;
     const sb = b.t.score;
@@ -49,8 +54,7 @@ export function recommendGeneral(topics, n = PLAN_V2.generalRecommendN, pickIds 
     if (sb == null && sa != null) return -1;
     if (sa != null && sb != null && sa !== sb) return sb - sa;
     return a.i - b.i;
-  });
-  return new Set(sorted.slice(0, Math.max(0, n)).map((x) => x.t.id));
+  }).map((x) => x.t);
 }
 
 /** 番組構成（メイン1〜3・メイン候補・カテゴリ別・雑談）に入っている話題 id */

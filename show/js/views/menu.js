@@ -2,7 +2,7 @@
 import { h, btn } from '../dom.js';
 
 /**
- * 右クリック／「…」のメニュー。items: [{ label, run, key?, danger?, disabled?, heading? }]
+ * 右クリック／「…」のメニュー。items: [{ label, run, key?, danger?, disabled?, heading?, note?（ラベルの下の小さな説明。押せない理由など） }]
  * x, y: 画面上の位置。onClose: 閉じたとき
  */
 export function contextMenu(items, x, y, onClose) {
@@ -15,7 +15,7 @@ export function contextMenu(items, x, y, onClose) {
       type: 'button', class: `ctx-item${it.danger ? ' is-danger' : ''}`, disabled: Boolean(it.disabled), dataset: { key: it.key || '' },
       attrs: { role: 'menuitem', title: it.title || null },
       on: { click: (e) => { e.stopPropagation(); onClose(); it.run(); } },
-    }, it.label, it.hint ? h('kbd', {}, it.hint) : null));
+    }, it.note ? h('span', { class: 'ctx-label' }, it.label, h('small', { class: 'ctx-note' }, it.note)) : it.label, it.hint ? h('kbd', {}, it.hint) : null));
   }
   menu.addEventListener('keydown', (e) => {
     const list = [...menu.querySelectorAll('.ctx-item:not(:disabled)')];

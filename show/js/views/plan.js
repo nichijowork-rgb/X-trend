@@ -1,4 +1,5 @@
-// ① 編成（準備）画面 — フォルダ型（v2 段階1）。
+// ① 編成（準備）画面 — フォルダで整理（くわしい画面。#plan-folders）。ふだんの編成は「かんたん編成」（#plan。views/boardview.js）で、保存データは同じ。
+// フォルダ型（v2 段階1）。
 // 左: フォルダの木（番組構成・まとまり・受信箱・★ブックマーク・NEW・片付け・ゴミ箱）
 // 右: 選んだフォルダの中身（行リスト・仮想スクロール）＋プレビュー（X 埋め込み。960px では一覧⇄プレビュー切替、1400px 以上は 3 列）
 // 上: 常設の検索・元に戻す/やり直す・仕分けモード・チェックポイント・ツール
@@ -146,7 +147,7 @@ export function renderPlan(app) {
   computeRows(app);
   const isWide = wide();
   const showPreview = isWide || u.pane === 'preview';
-  const root = h('div', { class: `plan2${isWide ? ' is-wide' : ''}${u.pane === 'preview' && !isWide ? ' is-preview' : ''}${u.treeDrawer ? ' is-drawer' : ''}`, dataset: { keep: `plan:${app.weekKey}` } });
+  const root = h('div', { class: `plan2${isWide ? ' is-wide' : ''}${u.pane === 'preview' && !isWide ? ' is-preview' : ''}${u.treeDrawer ? ' is-drawer' : ''}`, dataset: { keep: `plan-folders:${app.weekKey}` } });
   root.append(topBar(app, wk));
   const body = h('div', { class: 'plan2-body', dataset: { keep: 'body' } });
   body.append(treePane(app, wk));
@@ -198,6 +199,7 @@ function topBar(app, wk) {
       last ? h('p', { class: 'menu-note' }, `前回：データ ${last.dataAt ? formatDateTime(last.dataAt, null) : '不明'} 時点・その後の新しい投稿 ${app.newInfo ? app.newInfo.posts.size : 0}件`) : null));
   return h('header', { class: 'plan-top' },
     h('div', { class: 'pt-row' },
+      h('a', { class: 'btn btn-small pt-back', href: '#plan', dataset: { key: 'back-board' }, attrs: { title: 'ドラッグで入れる「かんたん編成」に戻ります（内容は同じです）' } }, '← かんたん編成に戻る'),
       btn('≡ フォルダ', () => { u.treeDrawer = !u.treeDrawer; app.render(); }, 'btn btn-small btn-ghost tree-drawer-btn', { 'data-key': 'tree-drawer', 'aria-expanded': String(Boolean(u.treeDrawer)) }),
       h('h2', { class: 'pt-title' }, `${app.weekKey.slice(5).replace('-', '/')}(土) の編成`),
       h('span', { class: 'pt-sub', dataset: { key: 'pt-count' } }, `投稿 ${app.rangePostCount ?? app.weekPostIds.length}件・まとまり ${app.visibleTopics.filter(isFolderTopic).length}${app.range && !app.range.isWeek ? `（対象：${app.range.label}）` : ''}`),

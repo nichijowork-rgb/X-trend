@@ -150,6 +150,21 @@ export const PLAN_V2 = Object.freeze({
   dragThreshold: 6,
 });
 
+/** かんたん編成（左＝素材・右＝番組の流れ。#plan）の設定 */
+export const BOARD = Object.freeze({
+  /** 素材の一覧は 1 回に描く件数（「もっと見る」で足す。ドラッグのために仮想スクロールは使わない） */
+  pageSize: 40,
+  /** 開いた話題の投稿を 1 回に描く件数 */
+  itemPageSize: 30,
+  /** 「おまかせで下書き」: カテゴリ別ニュースが空のときに入れる本数（ジャンルを順に回す）・雑談が空のときに入れる本数 */
+  draftCategory: 6,
+  draftChat: 3,
+  /** 選んだチップを覚えておく localStorage キー */
+  prefKey: 'xtrend-show-board',
+  /** タッチの長押しでメニューを出すまで（ms） */
+  longPressMs: 550,
+});
+
 /** 段階3: Grok ボット連携（data/show/topics.json の読み込みと、修正の書き戻し feedback/show-feedback.json） */
 export const BOT = Object.freeze({
   /** confidence がこれ未満のボットの話題は「要確認」 */
