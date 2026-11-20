@@ -180,6 +180,8 @@ async function main() {
   const server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', ROOT], { stdio: 'ignore' });
   const base = `http://127.0.0.1:${port}/`;
   const show = `${base}show/`;
+  // 編成のフォルダの画面（くわしい整理）。既定の #plan は「かんたん編成」（左右 2 列のドラッグ＆ドロップ）
+  const folders = `${show}#plan-folders`;
   const tmp = mkdtempSync(path.join(os.tmpdir(), 'xshow-'));
   const errors = [];
   let browser = null;
@@ -203,7 +205,7 @@ async function main() {
     // ---- 1. サンプル表示・フォルダの木
     await check('サンプル表示（data/ が無い）＋帯・フォルダの木（番組構成・まとまり・受信箱・★ブクマ・NEW・片付け・ゴミ箱）', async () => {
       const c = await newCtx();
-      const { page, external } = await open(c, show);
+      const { page, external } = await open(c, folders);
       assert(await page.isVisible('#sample-banner'), 'banner');
       assert((await page.getAttribute('.page-tabs a[aria-current="page"]', 'href')) === './', 'show tab current');
       for (const k of ['slot:0', 'slot:1', 'slot:2', 'cand', 'corner:category', 'corner:chat', 'group:night', 'group:general', 'inbox', 'bookmarks', 'new', 'shelf', 'trash']) {
@@ -242,7 +244,7 @@ async function main() {
 
     // ---- 2. 編成（フォルダ型）。1 つのページで続けて操作する
     const cx = await newCtx();
-    const { page } = await open(cx, `${show}#plan`);
+    const { page } = await open(cx, folders);
     let mainId = null;
     await check('ドラッグ＆ドロップ（マウス）: 投稿→メイン候補・まとまり→メイン1・投稿→まとまり・Esc でキャンセル', async () => {
       // 受信箱の夜職の投稿 → メイン候補
@@ -558,7 +560,7 @@ async function main() {
     await check('来週に回した話題が翌週の「まとまり」に出る', async () => {
       const carried = await page.evaluate(() => window.__show.weekState().carriedOut.map((c) => c.topicId));
       assert(carried.length >= 1, 'carried');
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
       const next = await page.evaluate(() => window.__show.nextWeekKey());
       await page.selectOption('#week-select', next);
@@ -576,7 +578,7 @@ async function main() {
       await ready(page);
       const pub = await page.inputValue('[data-key="export-public"]');
       assert(pub.includes('00:00 メイン3トピック') && pub.includes('ホストコール'), pub.slice(0, 200));
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
     });
 
@@ -648,7 +650,7 @@ async function main() {
     await check('BroadcastChannel なしでも storage イベントで追従', async () => {
       const c2 = await newCtx();
       await c2.addInitScript(() => { delete window.BroadcastChannel; });
-      const { page: p1 } = await open(c2, `${show}#plan`);
+      const { page: p1 } = await open(c2, folders);
       await folder(p1, 'group:night');
       await ctx(p1, `${rowSel('t:d:d-hostcall')} .row-main`, 'ctx-slot-0');
       const { page: p2 } = await open(c2, `${show}#onair`);
@@ -671,7 +673,7 @@ async function main() {
     };
     await check('XSS: 本文・まとまり名・アカウント名のタグは文字のまま（編成・進行・映す用）', async () => {
       const c3 = await newCtx();
-      const { page: p } = await open(c3, `${show}#plan`, { data: { posts: xssPosts, bookmarks: { bookmarks: 'bad' } } });
+      const { page: p } = await open(c3, folders, { data: { posts: xssPosts, bookmarks: { bookmarks: 'bad' } } });
       assert(!(await p.$('[data-key="folder-bookmarks"]')), '壊れた bookmarks.json はフォルダを出さない');
       await folder(p, 'group:night');
       const name = await p.textContent('.row-title.is-topic');
@@ -698,7 +700,7 @@ async function main() {
 
     await check('空データ（posts が 0 件）・bookmarks なし: 各画面が動く', async () => {
       const c4 = await newCtx();
-      const { page: p } = await open(c4, `${show}#plan`, { data: { posts: { generated_at: '2026-10-16T00:09:00+09:00', posts: [] } } });
+      const { page: p } = await open(c4, folders, { data: { posts: { generated_at: '2026-10-16T00:09:00+09:00', posts: [] } } });
       assert((await p.textContent('.list-pane')).includes('該当なし'), 'empty');
       assert(!(await p.$('[data-key="folder-bookmarks"]')), 'no bookmark folder');
       await p.click('[data-key="sort-start"]');
@@ -715,7 +717,7 @@ async function main() {
     await check('壊れた保存値（localStorage）でも起動し、注意を出す', async () => {
       const c5 = await newCtx();
       await c5.addInitScript(() => { try { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('xtrend-show', '{"broken'); sessionStorage.setItem('seeded', '1'); } } catch { /* */ } });
-      const { page: p } = await open(c5, `${show}#plan`);
+      const { page: p } = await open(c5, folders);
       const st = await p.textContent('#save-status');
       assert(st.includes('保存データを読めなかった'), st);
       assert(await p.$('.row-item'), 'rows shown');
@@ -731,7 +733,7 @@ async function main() {
           sessionStorage.setItem('seeded', '1');
         } catch { /* */ }
       });
-      const { page: p } = await open(c9, `${show}#plan`);
+      const { page: p } = await open(c9, folders);
       assert((await p.textContent('[data-key="folder-slot:0"]')).includes('ホストコール'), 'main1');
       assert((await p.textContent('[data-key="folder-corner:category"] .tree-count')) === '1', 'category');
       await c9.close();
@@ -750,7 +752,7 @@ async function main() {
         if (url.pathname.startsWith('/data/')) return route.fulfill({ status: 404, body: '' });
         return route.continue();
       });
-      await p.goto(`${show}#plan`);
+      await p.goto(folders);
       await ready(p);
       assert((await p.textContent('[data-key="folder-new"] .tree-count')) === '0', 'no NEW');
       await p.click('[data-key="cp-menu"]');
@@ -812,7 +814,7 @@ async function main() {
           }
         });
       });
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
       assert(await page.isHidden('#obs-pill'), '編成画面ではピルを出さない');
       // メイン 1・2 に話題を入れておく
@@ -1684,7 +1686,7 @@ async function main() {
       const E = mk('2110000000000099905', '高須さんとホストの対談（テスト）', ['ホスト']);
       const posts = { ...sample, posts: [...sample.posts, A, B, C1, C2, E] };
       const c = await newCtx();
-      const { page } = await open(c, show, { data: { posts, bookmarks: sampleBm, topics: null } });
+      const { page } = await open(c, folders, { data: { posts, bookmarks: sampleBm, topics: null } });
       const count = () => page.$eval('[data-key="folder-hold"] .tree-count', (e) => Number(e.textContent));
       assert(await count() === 4, `保留 ${await count()}（A・B・E の投稿＋C の話題）`);
       const visibleIds = () => page.evaluate(() => ({ posts: window.__show.weekPosts.map((p) => p.id), topics: window.__show.visibleTopics.map((t) => t.id), inbox: null }));
@@ -1751,7 +1753,7 @@ async function main() {
 
     await check('優先ジャンル: 既定はホストのまとまりが上・ツールで変えられる（保存）', async () => {
       const c = await newCtx();
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       const firstNight = () => page.evaluate(() => {
         const t = window.__show.visibleTopics.filter((x) => ['host', 'kyaba', 'kabuki', 'night'].includes(x.genre) && x.postIds.length >= 2);
         return t.slice(0, 3).map((x) => x.genre);
@@ -1779,7 +1781,7 @@ async function main() {
     // ---- 4f. 対象期間（台本づくりのデータ収集期間）
     await check('対象期間: プリセットで件数が変わる・カスタム日時・編成は消えず期間外は印つきで残る・リロードで復元・書き出しと振り返りに記載', async () => {
       const c = await newCtx();
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       const st = () => page.evaluate(() => ({ n: window.__show.rangePostCount, mode: window.__show.weekState().range.mode, label: window.__show.range.label, rec: window.__show.recommendN }));
       const s0 = await st();
       assert(s0.mode === 'week' && s0.n > 0 && s0.rec === 30, JSON.stringify(s0));
@@ -1846,7 +1848,7 @@ async function main() {
       assert((await page.textContent('[data-key="review-range"]')).includes('10/12(月) 0:00'), 'review');
       assert((await page.inputValue('[data-key="export-public"]')).includes('対象：10/12(月) 0:00 〜 10/14(水) 0:00 の投稿'), 'script');
       // 番組週に戻す
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
       await page.selectOption('#range-select', 'week');
       await page.waitForFunction(() => window.__show.weekState().range.mode === 'week');
@@ -1865,7 +1867,7 @@ async function main() {
     // ---- 4g. 台本ファイル（xtrend-script v1）の取り込み
     await check('台本ファイルの取り込み: 不正は日本語エラー・確認一覧（置き換え）→ 番組週の切替・期間・タイトル・まとまり・配置・リード文・保留 → Ctrl+Z → 2 回目も重複しない・XSS', async () => {
       const c = await newCtx();
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       const inWeek = sample.posts.filter((p) => p.ts >= Date.parse('2026-10-10T01:00:00+09:00') / 1000);
       const pick = (re) => inWeek.filter((p) => re.test(p.text)).map((p) => p.id);
       const evil = '<img src=x onerror="window.__xss=1">雑談';
@@ -1992,7 +1994,7 @@ async function main() {
           }
         });
       });
-      await page.goto(show);
+      await page.goto(folders);
       await ready(page);
       await page.evaluate(() => { window.__show.setView('card'); window.__show.edit('メイン', (w) => { w.rundown.corners[0].items = ['d:d-hostcall', 'd:d-tower']; }); });
       await page.goto(`${show}#live`);
@@ -2099,7 +2101,7 @@ async function main() {
       await page.keyboard.press('Control+z');
       await page.waitForFunction((id) => !window.__show.saved.hiddenPosts.some((x) => x.id === id), it[4]);
       // 編成にも反映（まとまりの中の並び・プレビューの代表投稿）
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
       await folder(page, 'topic:d:d-hostcall');
       assert((await rowKeys(page))[0] === `p:${last}`, '編成のまとまりの中も手動順');
@@ -2177,7 +2179,7 @@ async function main() {
       await page.waitForSelector(`.li-item[data-post="${imgItem}"] img.li-img`, { timeout: 5000 });
       assert(await page.inputValue(`[data-key="cap-${meta[0].id}"]`) === '<b>現地の写真</b>', 'caption');
       // 編成のプレビュー
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
       await folder(page, 'group:night');
       await page.click(`${rowSel('t:d:d-hostcall')} .row-main`);
@@ -2261,6 +2263,12 @@ async function main() {
       // 専用ウィンドウの設定（ダイアログ）
       await page.click('[data-key="viewer-open"]');
       await page.waitForSelector('dialog.viewer-dialog[open]');
+      // 左半分: 既定は 70% の大きさで、その範囲の真ん中
+      await page.click('[data-key="viewer-preset-left"]');
+      await page.waitForSelector('[data-key="viewer-scale"]');
+      assert((await page.inputValue('[data-key="viewer-scale"]')) === '70', 'scale 70');
+      await page.selectOption('[data-key="viewer-scale"]', '80');
+      assert(await page.evaluate(() => JSON.parse(localStorage.getItem('xtrend-show-viewer')).scale === 80), 'scale saved');
       for (const [k, v] of [['left', '100'], ['top', '50'], ['width', '700'], ['height', '800']]) { await page.fill(`[data-key="viewer-${k}"]`, v); await page.press(`[data-key="viewer-${k}"]`, 'Tab'); }
       await page.check('[data-key="viewer-onclick"]');
       assert((await page.textContent('[data-key="viewer-rect"]')).includes('幅 700・高さ 800'), 'rect');
@@ -2305,7 +2313,7 @@ async function main() {
       assert(await page.evaluate(() => document.querySelector('.live-lead-box').open), 'リロード後もリード文は開いたまま');
       await page.screenshot({ path: path.join(SHOTS, 'live-grid-960.png') });
       // 編成の「X で開く」も専用ウィンドウ
-      await page.goto(`${show}#plan`);
+      await page.goto(folders);
       await ready(page);
       await folder(page, 'topic:d:d-hostcall');
       const k = (await rowKeys(page))[0];
@@ -2319,7 +2327,7 @@ async function main() {
 
     await check('編成: まとまりの中身を全部（代表・並び順・ドラッグで並べ替え・×→Ctrl+Z）・別の投稿をプレビュー（前へ／次へ・[ ]）・URL で追加（データあり・無し・fxtwitter・不正・別のまとまりから移動の確認）', async () => {
       const c = await newCtx({ viewport: { width: 1400, height: 1000 } });
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       await folder(page, 'topic:d:d-hostcall');
       const t = await page.evaluate(() => { const a = window.__show; const x = a.topicsById.get('d:d-hostcall'); return { ids: a.itemsFor(x), rep: x.stats.topPostId }; });
       const keys = await rowKeys(page);
@@ -2404,7 +2412,7 @@ async function main() {
 
     await check('編成: 左の木のまとまりをドラッグで番組構成へ（メイン1・入れ替え）・一般のバズはメインに入らず理由・木の右クリック／…から番組構成へ', async () => {
       const c = await newCtx({ viewport: { width: 960, height: 1600 } });
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       await folder(page, 'group:night');
       await page.waitForSelector('[data-key="folder-topic:d:d-hostcall"]');
       await page.evaluate(() => document.querySelector('.tree').scrollTop = 0);
@@ -2454,7 +2462,7 @@ async function main() {
       };
       for (const w of [960, 1200]) {
         const c = await newCtx({ viewport: { width: w, height: 1040 } });
-        const { page } = await open(c, show);
+        const { page } = await open(c, folders);
         await folder(page, 'topic:d:d-hostcall');
         const k = (await rowKeys(page))[1];
         await page.click(`${rowSel(k)} .row-main`);
@@ -2470,7 +2478,7 @@ async function main() {
       }
       // 幅を変えても（1400 の 3 列 → 960 → 1200 → 1400）
       const c = await newCtx({ viewport: { width: 1400, height: 1000 } });
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       await folder(page, 'topic:d:d-hostcall');
       await page.click(`${rowSel((await rowKeys(page))[2])} .row-main`);
       await page.waitForSelector('.preview-pane .pv-body');
@@ -2525,7 +2533,7 @@ async function main() {
           html: `<blockquote class="twitter-tweet"><p lang="ja">キャバの同伴でラウンジへ &lt;b&gt;太字&lt;/b&gt;</p>&mdash; みお (@mio_cabajo) <a href="https://twitter.com/mio_cabajo/status/${A}">2026年11月7日</a></blockquote>`,
         }) });
       });
-      await page.goto(show);
+      await page.goto(folders);
       await ready(page);
       assert(await page.isVisible('#bot-pill'), 'ボット送信のピル');
       await folder(page, 'topic:d:d-hostcall');
@@ -2582,7 +2590,7 @@ async function main() {
     const SAKURA = 'g:sample-sakura-2026w42';
     await check('Grok: ボットの話題が並ぶ（印・要確認・リード文）・show_pick の理由・手作業が優先（名前・メイン・リロード後も）・進行のリード文', async () => {
       const c = await newCtx();
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       const botIds = await page.evaluate(() => window.__show.topics.filter((t) => t.kind === 'bot').map((t) => t.id).sort());
       assert(JSON.stringify(botIds) === JSON.stringify([RAMEN, SAKURA]), JSON.stringify(botIds));
       const sakura = await page.evaluate((id) => { const t = window.__show.topicsById.get(id); return { n: t.postIds.length, genre: t.genre, low: t.bot.low }; }, SAKURA);
@@ -2637,7 +2645,7 @@ async function main() {
     await check('Grok: topics.json が無い・壊れていても従来どおり', async () => {
       for (const topics of [null, '{壊れた', JSON.stringify({ topics: 'x' })]) {
         const c = await newCtx();
-        const { page } = await open(c, show, { data: { posts: sample, bookmarks: sampleBm, topics } });
+        const { page } = await open(c, folders, { data: { posts: sample, bookmarks: sampleBm, topics } });
         assert(await page.isHidden('#sample-banner'), 'data');
         const n = await page.evaluate(() => [window.__show.bot, window.__show.topics.filter((t) => t.kind === 'bot').length]);
         assert(n[0] === null && n[1] === 0, JSON.stringify(n));
@@ -2647,7 +2655,7 @@ async function main() {
       // data/ 側の topics.json も読む
       const c = await newCtx();
       const ids = sample.posts.filter((p) => p.text.includes('シャンパンタワー')).map((p) => p.id);
-      const { page } = await open(c, show, { data: { posts: sample, bookmarks: sampleBm, topics: { topics: [{ id: 'tower-w42', name: 'タワーの話（Grok）', genre: 'ホスト', post_ids: ids, confidence: 0.9 }] } } });
+      const { page } = await open(c, folders, { data: { posts: sample, bookmarks: sampleBm, topics: { topics: [{ id: 'tower-w42', name: 'タワーの話（Grok）', genre: 'ホスト', post_ids: ids, confidence: 0.9 }] } } });
       const t = await page.evaluate(() => { const x = window.__show.topicsById.get('g:tower-w42'); return x && [x.name, x.postIds.length]; });
       assert(t && t[0] === 'タワーの話（Grok）' && t[1] === ids.length, JSON.stringify(t));
       await c.close();
@@ -2655,7 +2663,7 @@ async function main() {
 
     await check('ボットに修正を送る: ファイル保存（今の全修正・何度でも同じ）と最後に送った日時', async () => {
       const c = await newCtx();
-      const { page } = await open(c, show);
+      const { page } = await open(c, folders);
       // 修正: ボットの話題の名前・投稿のジャンル・話題の削除
       await page.evaluate((id) => window.__show.edit('名前', (w) => { w.overrides.renames[id] = '直した名前'; }), RAMEN);
       await search(page, '猫が布団');
@@ -2716,7 +2724,7 @@ async function main() {
         if (r.method() === 'PUT' && n < 3) return route.fulfill({ status: 409, headers: cors, contentType: 'application/json', body: '{"message":"conflict"}' });
         return route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify({ commit: { html_url: 'https://github.com/nichijowork-rgb/X-trend/commit/abc' } }) });
       });
-      await page.goto(show);
+      await page.goto(folders);
       await ready(page);
       await page.click('[data-key="tools-open"]');
       await page.waitForSelector('dialog.tools-dialog[open]');
@@ -2763,7 +2771,7 @@ async function main() {
     if (existsSync(path.join(ROOT, 'data', 'posts.json'))) {
       await check('実データ: 1 操作の速さ（受信箱の表示・選択・移動・元に戻す・検索）', async () => {
         const c7 = await newCtx();
-        const { page: p } = await open(c7, `${show}#plan`, {});
+        const { page: p } = await open(c7, folders, {});
         const wkKey = await p.evaluate(() => (window.__show.weeks.find((w) => w.key === '2026-10-31') || window.__show.weeks[1] || window.__show.weeks[0]).key);
         await p.selectOption('#week-select', wkKey);
         await p.waitForFunction((k) => window.__show.weekKey === k, wkKey);
@@ -2813,7 +2821,7 @@ async function main() {
         await c7.close();
         return `直近30日 ${t.d30.n}件: 描画 ${f(t.d30.render)}・選択 ${f(t.d30.select)}・編集 ${f(t.d30.edit)}・元に戻す ${f(t.d30.undo)}／今週 ${n}件（すべて表示 ${t.rows}行）: 描画 ${f(t.render)}・全件表示 ${f(t.allRows)}・検索 ${f(t.search)}・選択 ${f(t.select)}・編集 ${f(t.edit)}・元に戻す ${f(t.undo)}（画面操作込み: 右クリック移動 ${moveMs}ms・元に戻すボタン ${undoMs}ms）`;
       });
-      for (const [w, hh, route] of [[960, 1040, 'plan'], [1280, 1400, 'plan'], [1920, 1080, 'plan'], [375, 812, 'plan'], [960, 1040, 'live'], [375, 812, 'live'], [1920, 1080, 'onair']]) {
+      for (const [w, hh, route] of [[960, 1040, 'plan-folders'], [1280, 1400, 'plan-folders'], [1920, 1080, 'plan-folders'], [375, 812, 'plan-folders'], [960, 1040, 'plan'], [1920, 1080, 'plan'], [375, 812, 'plan'], [960, 1040, 'live'], [375, 812, 'live'], [1920, 1080, 'onair']]) {
         await check(`実データ data/ ${route} ${w}×${hh}`, async () => {
           const c7 = await newCtx({ viewport: { width: w, height: hh } });
           const { page: p } = await open(c7, `${show}#${route}`, {});
@@ -2823,7 +2831,7 @@ async function main() {
             await p.selectOption('#week-select', wkKey);
             await p.waitForFunction((k) => window.__show.weekKey === k, wkKey);
           }
-          if (route === 'plan' && w >= 1280) {
+          if (route === 'plan-folders' && w >= 1280) {
             const k = (await rowKeys(p))[0];
             if (k) await p.click(`${rowSel(k)} .row-main`);
             await p.waitForTimeout(300);

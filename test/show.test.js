@@ -2166,12 +2166,19 @@ test('投稿を開くウィンドウ: 位置のプリセット（中央・右半
   const scr = { availLeft: 1920, availTop: 0, availWidth: 1600, availHeight: 900, label: 'サブ', isPrimary: false };
   const s = screenSnapshot(scr, 1);
   assert.deepEqual(s, { label: 'サブ', left: 1920, top: 0, width: 1600, height: 900, primary: false });
-  assert.deepEqual(viewerRect({ preset: 'right', screen: s }), { left: 2720, top: 0, width: 800, height: 900 });
-  assert.deepEqual(viewerRect({ preset: 'left', screen: s }), { left: 1920, top: 0, width: 800, height: 900 });
-  assert.deepEqual(viewerRect({ preset: 'full', screen: s }), { left: 1920, top: 0, width: 1600, height: 900 });
+  // 100%＝範囲にぴったり
+  assert.deepEqual(viewerRect({ preset: 'right', screen: s, scale: 100 }), { left: 2720, top: 0, width: 800, height: 900 });
+  assert.deepEqual(viewerRect({ preset: 'left', screen: s, scale: 100 }), { left: 1920, top: 0, width: 800, height: 900 });
+  assert.deepEqual(viewerRect({ preset: 'full', screen: s, scale: 100 }), { left: 1920, top: 0, width: 1600, height: 900 });
+  // 既定 70%: 範囲（左半分＝1920〜2720）の真ん中に 560×630
+  assert.deepEqual(viewerRect({ preset: 'left', screen: s }), { left: 1920 + 120, top: 135, width: 560, height: 630 });
+  assert.deepEqual(viewerRect({ preset: 'right', screen: s }), { left: 2720 + 120, top: 135, width: 560, height: 630 });
+  assert.deepEqual(viewerRect({ preset: 'full', screen: s, scale: 50 }), { left: 1920 + 400, top: 225, width: 800, height: 450 });
+  assert.equal(parseViewerPrefs({}).scale, 70, '大きさの既定は 70%');
+  assert.equal(parseViewerPrefs({ scale: 5 }).scale, 30, '30% より小さくしない');
   assert.deepEqual(viewerRect({ preset: 'center', screen: s }), { left: 1920 + 480, top: 45, width: 640, height: 810 });
   assert.deepEqual(viewerRect({ preset: 'custom', left: 10, top: 20, width: 500, height: 700 }), { left: 10, top: 20, width: 500, height: 700 });
-  assert.deepEqual(viewerRect({ preset: 'right' }, { availLeft: 0, availTop: 0, availWidth: 1280, availHeight: 800 }), { left: 640, top: 0, width: 640, height: 800 }, '画面を選んでいなければこのウィンドウの画面');
+  assert.deepEqual(viewerRect({ preset: 'right', scale: 100 }, { availLeft: 0, availTop: 0, availWidth: 1280, availHeight: 800 }), { left: 640, top: 0, width: 640, height: 800 }, '画面を選んでいなければこのウィンドウの画面');
   assert.equal(viewerFeatures({ left: 1, top: 2, width: 3, height: 4 }), 'popup,left=1,top=2,width=3,height=4');
   assert.deepEqual(parseViewerPrefs(null), defaultViewerPrefs());
   assert.deepEqual(parseViewerPrefs('{壊れ'), defaultViewerPrefs());

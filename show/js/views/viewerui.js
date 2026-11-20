@@ -1,6 +1,6 @@
 // 「投稿を開くウィンドウ」の設定（進行の［開く窓］ダイアログと、編成の［ツール…］の中）。
 import { h, btn, field } from '../dom.js';
-import { VIEWER_PRESETS, viewerRect } from '../viewer.js';
+import { VIEWER_PRESETS, VIEWER_SCALES, viewerRect } from '../viewer.js';
 
 /** 設定の中身（ダイアログとツールで共通） */
 export function viewerSettings(app) {
@@ -23,6 +23,13 @@ export function viewerSettings(app) {
   const preset = h('div', { class: 'row viewer-presets', attrs: { role: 'group', 'aria-label': '位置' } },
     VIEWER_PRESETS.map((x) => btn(x.label, () => save({ preset: x.key }), `btn btn-small${p.preset === x.key ? ' btn-dark is-on' : ' btn-ghost'}`, { 'data-key': `viewer-preset-${x.key}`, 'aria-pressed': String(p.preset === x.key) })));
   box.append(preset);
+  // 右半分・左半分・全体: その範囲の何 % の大きさで、範囲の真ん中に出すか
+  if (['left', 'right', 'full'].includes(p.preset)) {
+    const scale = h('select', { class: 'input input-sm', dataset: { key: 'viewer-scale' }, attrs: { 'aria-label': '大きさ' } },
+      VIEWER_SCALES.map((n) => h('option', { value: String(n), selected: p.scale === n }, n === 100 ? '100%（ぴったり）' : `${n}%`)));
+    scale.addEventListener('change', () => save({ scale: Number(scale.value) }));
+    box.append(h('div', { class: 'row' }, field(`大きさ（${p.preset === 'full' ? '画面' : '画面の半分'}の中で真ん中に）`, scale)));
+  }
   const numIn = (k, label) => {
     const i = h('input', { class: 'input input-sm', type: 'number', value: String(p[k]), dataset: { key: `viewer-${k}` }, attrs: { 'aria-label': label } });
     i.addEventListener('change', () => save({ [k]: Number(i.value), preset: 'custom' }));
