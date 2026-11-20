@@ -94,7 +94,7 @@ export function renderObsSetup(app) {
         h('a', { class: 'btn btn-small btn-ghost', href: urlOf(`part=${p.key}&demo=1`), target: '_blank', rel: 'noopener' }, '見本を開く'))));
   }
   root.append(h('h3', { class: 'sub-title' }, 'パーツ（ブラウザソースに 1 つずつ）'), table);
-  root.append(h('p', { class: 'muted' }, 'オプション（URL の後ろに付ける）: ', h('code', {}, '&scale=1.2'), '（拡大）・', h('code', {}, '&motion=off'), '（動きを止める。演出はフェードだけ）・', h('code', {}, '&demo=1'), '（見本を表示。配置の確認用。演出は ', h('code', {}, '&demo=1&fx=confetti'), ' など）・', h('code', {}, '&sound=on'), '（演出の効果音を鳴らす。演出パーツだけ）・', h('code', {}, '&top=660&lanes=4&laneh=62&size=34&speed=8'), '（流れるコメントの位置・列の数・列の高さ・文字の大きさ・速さ。ふだんは進行画面の「コメント」の設定で変えます）。全部入りの確認用: ', h('code', {}, 'part=all')));
+  root.append(h('p', { class: 'muted' }, 'オプション（URL の後ろに付ける）: ', h('code', {}, '&scale=1.2'), '（拡大）・', h('code', {}, '&motion=off'), '（動きを止める。演出はフェードだけ）・', h('code', {}, '&demo=1'), '（見本を表示。配置の確認用。演出は ', h('code', {}, '&demo=1&fx=confetti'), ' など）・', h('code', {}, '&sound=on'), '（演出の効果音を鳴らす。演出パーツだけ）・', h('code', {}, '&top=660&lanes=4&laneh=62&size=34&icon=50&speed=8'), '（流れるコメントの位置・列の数・列の高さ・文字の大きさ・アイコンの大きさ・速さ。ふだんは［コメント］のページのレイアウトで変えます）。全部入りの確認用: ', h('code', {}, 'part=all')));
   if (FEATURES.effects) {
   root.append(h('h3', { class: 'sub-title' }, '演出（拍手・紙吹雪・神回！・えぇっ！？・炎上・感謝バナー）'));
   root.append(h('ul', { class: 'setup-steps setup-fx' },

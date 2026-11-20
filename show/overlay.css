@@ -102,16 +102,20 @@ body { font-family: var(--font); color: #fff; }
 .fx-item.is-calm .fx-flame { bottom: 0; }
 
 /* ---------------- 流れるコメント（1920×1080 全面。YouTube ライブのコメント） */
-.cm { position: absolute; inset: 0; pointer-events: none; overflow: hidden; --cm-size: 34px; }
-.cm-flow { position: absolute; left: 0; top: 660px; width: 1920px; height: 248px; overflow: hidden; z-index: 1; }
-.cm-item { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: flex-start; white-space: nowrap; will-change: transform; }
+.cm { position: absolute; inset: 0; pointer-events: none; overflow: hidden; --cm-size: 34px; --cm-icon: 50px; --cm-name: max(13px, calc(var(--cm-size) * .43)); --cm-gap: 3px; }
+/* 横だけ切る（右端から入って左端で消える）。縦は @ID が列から少しはみ出しても見えるように上下 24px までは切らない */
+.cm-flow { position: absolute; left: 0; top: 660px; width: 1920px; height: 248px; overflow: visible; clip-path: inset(-24px 0 -24px 0); z-index: 1; }
+/* アイコン（左）とコメントの高さの中心をそろえる。@ID はコメントの下に少し隙間をあけて小さく（並びの高さには入れない）。
+   下の余白は「隙間 + @ID の高さ − (アイコン − コメントの行の高さ)/2」。列の高さ 62px・文字 34px・アイコン 50px でほぼ収まる（2026-11-21 オーナー確定） */
+.cm-item { position: absolute; left: 0; top: 0; display: flex; flex-direction: row; align-items: center; gap: calc(var(--cm-icon) * .24); white-space: nowrap; will-change: transform;
+  padding-bottom: max(0px, calc(var(--cm-gap) + var(--cm-name) * 1.15 - (var(--cm-icon) - var(--cm-size) * 1.12) / 2)); }
+.cm-main { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
 .cm-text { display: inline-flex; align-items: center; gap: 10px; font-size: var(--cm-size); font-weight: 800; line-height: 1.12; color: #fff;
   paint-order: stroke fill; -webkit-text-stroke: 6px rgba(0, 0, 0, .88); text-shadow: 0 2px 6px rgba(0, 0, 0, .55); }
-.cm-meta { display: flex; align-items: center; gap: 6px; margin-top: 1px; padding-left: 2px; font-size: 17px; font-weight: 700; line-height: 22px; color: #e2e2e8;
-  text-shadow: 0 1px 2px #000, 0 0 4px #000, 0 0 2px #000; }
-.cm-icon { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex: none; box-shadow: 0 0 0 2px rgba(0, 0, 0, .6); }
-.cm-initial { display: inline-grid; place-items: center; color: #fff; font-size: 12px; font-weight: 800; text-shadow: none; }
-.cm-name { white-space: nowrap; }
+.cm-icon { width: var(--cm-icon); height: var(--cm-icon); border-radius: 50%; object-fit: cover; flex: none; box-shadow: 0 0 0 3px #fff, 0 2px 6px rgba(0, 0, 0, .6); }
+.cm-initial { display: inline-grid; place-items: center; color: #fff; font-size: calc(var(--cm-icon) * .46); font-weight: 900; text-shadow: none; }
+.cm-name { position: absolute; left: 2px; top: 100%; margin-top: var(--cm-gap); font-size: var(--cm-name); font-weight: 700; line-height: 1.15; color: #e6e6ee; white-space: nowrap;
+  paint-order: stroke fill; -webkit-text-stroke: 4px rgba(0, 0, 0, .8); }
 /* スーパーチャット・ステッカー: 色つきの帯と金額 */
 .is-super .cm-text, .is-sticker .cm-text { padding: 0 16px 0 6px; border-radius: 14px; -webkit-text-stroke: 0; text-shadow: none; box-shadow: 0 3px 0 rgba(0, 0, 0, .45); }
 .cm-amount { font-size: .78em; font-weight: 900; padding: 0 12px; border-radius: 999px; background: rgba(0, 0, 0, .28); }

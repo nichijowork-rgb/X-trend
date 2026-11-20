@@ -81,6 +81,8 @@ export function layoutEditor(app) {
   const lanesOut = h('output', { class: 'le-out', dataset: { key: 'le-lanes' } });
   const size = h('input', { type: 'range', min: CHAT_CFG_LIMITS.size[0], max: CHAT_CFG_LIMITS.size[1], step: 1, dataset: { key: 'le-size' }, attrs: { 'aria-label': '流れる文字の大きさ' } });
   const sizeOut = h('output', { class: 'le-out' });
+  const icon = h('input', { type: 'range', min: CHAT_CFG_LIMITS.icon[0], max: CHAT_CFG_LIMITS.icon[1], step: 1, dataset: { key: 'le-icon' }, attrs: { 'aria-label': '流れるコメントのアイコンの大きさ' } });
+  const iconOut = h('output', { class: 'le-out' });
   const speed = h('input', { type: 'range', min: CHAT_CFG_LIMITS.speed[0], max: CHAT_CFG_LIMITS.speed[1], step: 0.5, dataset: { key: 'le-speed' }, attrs: { 'aria-label': '速さ（帯を横切る秒数）' } });
   const speedOut = h('output', { class: 'le-out' });
   const [pxF, px] = numIn('le-pin-x', 'x', 0, 1920);
@@ -134,6 +136,7 @@ export function layoutEditor(app) {
     setVal(bx, b.x); setVal(by, b.y); setVal(bw, b.w); setVal(bh, b.h);
     lanesOut.textContent = `${c.lanes} 列（1 列 ${Math.round(lh)}px）`;
     setVal(size, c.size); sizeOut.textContent = `${c.size}px`;
+    setVal(icon, c.icon); iconOut.textContent = `${c.icon}px`;
     setVal(speed, c.speed); speedOut.textContent = `${c.speed} 秒`;
     setVal(px, p.x); setVal(py, p.y); setVal(pw, p.w);
     setVal(psize, p.size); psizeOut.textContent = `${p.size}px`;
@@ -240,6 +243,7 @@ export function layoutEditor(app) {
   onNum(py, (v) => commit({ pin: { ...d().pin, y: v } }));
   onNum(pw, (v) => commit({ pin: { ...d().pin, w: v } }));
   size.addEventListener('input', () => { record(); commit({ size: Number(size.value) }); });
+  icon.addEventListener('input', () => { record(); commit({ icon: Number(icon.value) }); });
   speed.addEventListener('input', () => { record(); commit({ speed: Number(speed.value) }); });
   psize.addEventListener('input', () => { record(); commit({ pin: { ...d().pin, size: Number(psize.value) } }); });
   plines.addEventListener('change', () => { record(true); commit({ pin: { ...d().pin, lines: Number(plines.value) } }); });
@@ -310,7 +314,9 @@ export function layoutEditor(app) {
       h('fieldset', { class: 'le-box' }, h('legend', {}, '流れる範囲'),
         h('div', { class: 'le-row' }, bxF, byF, bwF, bhF),
         h('div', { class: 'le-row' }, h('span', { class: 'le-field' }, h('span', {}, '列'), lanesBtn(-1, '−', 'le-lanes-minus'), lanesOut, lanesBtn(1, '＋', 'le-lanes-plus'))),
-        h('div', { class: 'le-row' }, h('label', { class: 'le-field le-slider' }, h('span', {}, '文字'), size, sizeOut), h('label', { class: 'le-field le-slider' }, h('span', {}, '速さ'), speed, speedOut))),
+        h('div', { class: 'le-row' }, h('label', { class: 'le-field le-slider' }, h('span', {}, '文字'), size, sizeOut), h('label', { class: 'le-field le-slider' }, h('span', {}, 'アイコン'), icon, iconOut)),
+        h('div', { class: 'le-row' }, h('label', { class: 'le-field le-slider' }, h('span', {}, '速さ'), speed, speedOut)),
+        h('p', { class: 'muted le-note' }, 'アイコンとコメントは高さの中心をそろえ、@ID はコメントの下に小さく出ます。アイコンや文字を大きくしたら、列の高さ（範囲の高さ÷列）も足りているか見てください。')),
       h('fieldset', { class: 'le-box' }, h('legend', {}, '固定コメント'),
         h('div', { class: 'le-row' }, pxF, pyF, pwF),
         h('div', { class: 'le-row' }, h('label', { class: 'le-field le-slider' }, h('span', {}, '文字'), psize, psizeOut), h('label', { class: 'le-field' }, h('span', {}, '行数'), plines)),

@@ -29,10 +29,10 @@ export const CHAT_PIN_DEFAULT = Object.freeze({ x: 655, y: 600, w: 1170, size: 3
 /** 互換用（固定コメントの箱の既定の位置） */
 export const CHAT_PIN_BOX = Object.freeze({ x: CHAT_PIN_DEFAULT.x, y: CHAT_PIN_DEFAULT.y, w: CHAT_PIN_DEFAULT.w });
 /** 流れ方の既定値（レイアウト調整で変えられる）: 帯・列の数・文字の大きさ・速さ（帯を横切る秒数）・固定コメント・流すか */
-export const CHAT_CFG_DEFAULTS = Object.freeze({ band: CHAT_BAND_DEFAULT, lanes: 4, size: 34, speed: 8, pin: CHAT_PIN_DEFAULT, flow: true });
+export const CHAT_CFG_DEFAULTS = Object.freeze({ band: CHAT_BAND_DEFAULT, lanes: 4, size: 34, icon: 50, speed: 8, pin: CHAT_PIN_DEFAULT, flow: true });
 /** 設定の範囲 [最小, 最大] と最小の大きさ */
 export const CHAT_CFG_LIMITS = Object.freeze({
-  lanes: [1, 12], size: [16, 96], speed: [3, 30], pinSize: [16, 96], pinLines: [1, 3],
+  lanes: [1, 12], size: [16, 96], icon: [20, 120], speed: [3, 30], pinSize: [16, 96], pinLines: [1, 3],
   bandMinW: 200, bandMinH: 30, laneMinH: 24, pinMinW: 300, pinMaxY: 1020,
 });
 export const CHAT_DEFAULTS = Object.freeze({ key: '', url: '', channel: '', channelInfo: null, mode: 'auto', interval: 6000, ng: '', pin: null, pinnedAt: null, autoStart: true });
@@ -408,7 +408,7 @@ export function sanitizeChatCfg(o) {
   } else band = { ...D.band };
   lanes = Math.max(1, Math.min(lanes, Math.floor(band.h / L.laneMinH)));
   return {
-    band, lanes, size: clampNum(src.size, L.size, D.size), speed: clampNum(src.speed, L.speed, D.speed, 0.5),
+    band, lanes, size: clampNum(src.size, L.size, D.size), icon: clampNum(src.icon, L.icon, D.icon), speed: clampNum(src.speed, L.speed, D.speed, 0.5),
     pin: clampPinBox(src.pin), flow: src.flow !== false,
   };
 }
@@ -422,6 +422,7 @@ export function applyChatOverrides(cfg, ov) {
   if (ov.lanes != null || ov.laneH != null) c.band.h = Math.round(c.lanes * laneH);
   if (ov.top != null) c.band.y = ov.top;
   if (ov.size != null) c.size = ov.size;
+  if (ov.icon != null) c.icon = ov.icon;
   if (ov.speed != null) c.speed = ov.speed;
   return sanitizeChatCfg(c);
 }
@@ -457,7 +458,7 @@ export function parseChatPrefs(raw) {
     interval,
     autoStart: o.autoStart !== false,
     ng: typeof o.ng === 'string' ? o.ng.slice(0, 5000) : '',
-    layout: { band: cfg.band, lanes: cfg.lanes, size: cfg.size, speed: cfg.speed, pin: cfg.pin },
+    layout: { band: cfg.band, lanes: cfg.lanes, size: cfg.size, icon: cfg.icon, speed: cfg.speed, pin: cfg.pin },
     flow: cfg.flow,
     pin,
     pinnedAt: pin && Number.isFinite(o.pinnedAt) ? o.pinnedAt : null,
