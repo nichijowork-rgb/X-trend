@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21T03:32:07+09:00",
+  "generated_at": "2026-11-21T03:46:09+09:00",
   "week": "2026-11-21",
   "genre_overrides": [
     {
@@ -398,6 +398,20 @@
       "week": "2026-11-14"
     },
     {
+      "topic_id": "c:2119568397235323287",
+      "source": "site",
+      "name": "@Wafm60z の話題",
+      "genre": "ホスト",
+      "post_ids": [
+        "2119568397235323287",
+        "2121788022882709965"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
       "topic_id": "c:2119744172865274093",
       "source": "site",
       "name": "@orihara_bakuro の話題",
@@ -408,23 +422,40 @@
       ],
       "deleted": false,
       "edits": [
-        "posts"
+        "posts",
+        "shelve"
       ]
     },
     {
-      "topic_id": "c:2121467128054452294",
+      "topic_id": "c:2120909961832349848",
       "source": "site",
-      "name": "@super_sachico の話題",
-      "genre": "キャバクラ",
+      "name": "@LASTCALLkirinuk の話題",
+      "genre": "ホスト",
       "post_ids": [
-        "2121467128054452294",
-        "2122604759031189645",
-        "2122657438365339830",
-        "2123709884663480762"
+        "2120909961832349848",
+        "2121943944384970807",
+        "2122653182874865832",
+        "2122971040313905591"
       ],
       "deleted": false,
       "edits": [
-        "posts"
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "c:2120916836003066037",
+      "source": "site",
+      "name": "@rinne_channel の話題",
+      "genre": "キャバクラ",
+      "post_ids": [
+        "2120916836003066037",
+        "2121920606878777837",
+        "2123187732033982574",
+        "2123411563243782307"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
       ]
     },
     {
@@ -469,7 +500,8 @@
       ],
       "deleted": false,
       "edits": [
-        "posts"
+        "posts",
+        "shelve"
       ]
     },
     {
@@ -524,7 +556,8 @@
       ],
       "deleted": false,
       "edits": [
-        "posts"
+        "posts",
+        "shelve"
       ]
     },
     {
@@ -583,6 +616,19 @@
       "week": "2026-11-21"
     },
     {
+      "topic_id": "c:2121960960693019094",
+      "source": "site",
+      "name": "@cabayoru の話題",
+      "genre": "キャバクラ",
+      "post_ids": [
+        "2123049796500132154"
+      ],
+      "deleted": false,
+      "edits": [
+        "posts"
+      ]
+    },
+    {
       "topic_id": "c:2121964734589374786",
       "source": "site",
       "name": "@mizoguchi_yuji の話題",
@@ -613,17 +659,32 @@
       "week": "2026-11-21"
     },
     {
+      "topic_id": "c:2122106941614993483",
+      "source": "site",
+      "name": "@meo_hiro の話題",
+      "genre": "キャバクラ",
+      "post_ids": [
+        "2122106941614993483",
+        "2123570184216793422"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
       "topic_id": "c:2122152844753289247",
       "source": "site",
-      "name": "@ciel_rru の話題",
+      "name": "真のイケメンホストが存在する",
       "genre": "ホスト",
       "post_ids": [
+        "2122152844753289247",
         "2122720054693470433",
         "2122893480456589817"
       ],
       "deleted": false,
       "edits": [
-        "posts"
+        "rename"
       ]
     },
     {
@@ -653,6 +714,19 @@
         "delete"
       ],
       "week": "2026-11-21"
+    },
+    {
+      "topic_id": "c:2122687601908048267",
+      "source": "site",
+      "name": "@uip3p の話題",
+      "genre": "キャバクラ",
+      "post_ids": [
+        "2122687601908048267"
+      ],
+      "deleted": false,
+      "edits": [
+        "posts"
+      ]
     },
     {
       "topic_id": "c:2123350801380958566",
@@ -763,12 +837,25 @@
       "week": "2026-10-17"
     },
     {
+      "topic_id": "d:d-tower",
+      "source": "site",
+      "name": "シャンパンタワー",
+      "genre": "ホスト",
+      "post_ids": [
+        "2121888016432296096"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
       "topic_id": "m:mwp6t3gf6ly",
       "source": "site",
       "name": "ゆぐどら！ライブが賛否両論！？ホストのアイドル活動？",
       "genre": "ホスト",
       "post_ids": [
-        "2122152844753289247"
+        "2121960960693019094"
       ],
       "deleted": false,
       "edits": [
@@ -840,10 +927,12 @@
     {
       "topic_id": "m:mwpb6lsa21z",
       "source": "site",
-      "name": "天使ニア",
+      "name": "天使ニアと黒崎みさ匂わせ超えてる！？",
       "genre": "夜職その他",
       "post_ids": [
-        "2123063279786582248"
+        "2122647442168713293",
+        "2122795958618738723",
+        "2123006151269011464"
       ],
       "deleted": false,
       "edits": [
@@ -854,10 +943,12 @@
     {
       "topic_id": "m:mwpb81ig5eb",
       "source": "site",
-      "name": "DVホスト 動画リーク",
+      "name": "DVホスト 動画リーク / 病み系ホストのトーク流出",
       "genre": "ホスト",
       "post_ids": [
-        "2121797181266972712"
+        "2121795503390183620",
+        "2121797181266972712",
+        "2122336389358321816"
       ],
       "deleted": false,
       "edits": [
@@ -873,6 +964,35 @@
       "genre": "その他",
       "post_ids": [
         "2122474294710301080"
+      ],
+      "deleted": false,
+      "edits": [
+        "posts",
+        "new"
+      ]
+    },
+    {
+      "topic_id": "m:mwpbgfor41m",
+      "source": "site",
+      "name": "複数の晒し系アカウントの運用者捕まる",
+      "genre": "夜職その他",
+      "post_ids": [
+        "2122293353006145897"
+      ],
+      "deleted": false,
+      "edits": [
+        "posts",
+        "new"
+      ]
+    },
+    {
+      "topic_id": "m:mwpbn4br3g8",
+      "source": "site",
+      "name": "やらせ釣り投稿",
+      "genre": "夜職その他",
+      "post_ids": [
+        "2119765247338942920",
+        "2123703033867759786"
       ],
       "deleted": false,
       "edits": [
@@ -908,7 +1028,8 @@
         "2122082870911226356",
         "2122147168475824552",
         "2122201401426379187",
-        "2122801892875178420"
+        "2122801892875178420",
+        "2123377742880338015"
       ],
       "deleted": false,
       "edits": [
@@ -1055,7 +1176,8 @@
       "deleted": false,
       "edits": [
         "posts",
-        "new"
+        "new",
+        "shelve"
       ]
     },
     {
@@ -2355,16 +2477,133 @@
       "week": "2026-11-07"
     },
     {
-      "topic_id": "t:平良翔太さんの退店・引退",
+      "topic_id": "p:2120010933594636353",
       "source": "site",
-      "name": "平良翔太さんの退店・引退",
+      "name": "バロンのかりんちゃんまじで令和の北川景子",
       "genre": "ホスト",
       "post_ids": [
-        "2121795503390183620"
+        "2120010933594636353"
       ],
       "deleted": false,
       "edits": [
-        "posts"
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2120426302671126671",
+      "source": "site",
+      "name": "藤井流星、冷酷なホスト役に決定",
+      "genre": "ホスト",
+      "post_ids": [
+        "2120426302671126671"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2121016220199841940",
+      "source": "site",
+      "name": "事実なら、それぞれの担当ホストが冷や汗か…",
+      "genre": "ホスト",
+      "post_ids": [
+        "2121016220199841940"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2121105646879916191",
+      "source": "site",
+      "name": "モゥここタﾝ",
+      "genre": "ホスト",
+      "post_ids": [
+        "2121105646879916191"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2121254264203010385",
+      "source": "site",
+      "name": "ACE CENTURIONとHOST O…",
+      "genre": "ホスト",
+      "post_ids": [
+        "2121254264203010385"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2121473508374925463",
+      "source": "site",
+      "name": "令和の野獣先輩 Matt",
+      "genre": "ホスト",
+      "post_ids": [
+        "2121473508374925463"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2122169900244623682",
+      "source": "site",
+      "name": "夜職が羨ましいとか嫉妬してる人がいるけど…",
+      "genre": "ホスト",
+      "post_ids": [
+        "2122169900244623682"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2122553242563530801",
+      "source": "site",
+      "name": "黒崎みさちゃん、天使ニアとラブラブすぎな…",
+      "genre": "ホスト",
+      "post_ids": [
+        "2122553242563530801"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2122655283998753170",
+      "source": "site",
+      "name": "黒崎みさ「事件が起きた」「弁護士を挟んで…",
+      "genre": "ホスト",
+      "post_ids": [
+        "2122655283998753170"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
+      ]
+    },
+    {
+      "topic_id": "p:2122685083698241600",
+      "source": "site",
+      "name": "黒崎みさちゃん、双子のママとは思えないく…",
+      "genre": "ホスト",
+      "post_ids": [
+        "2122685083698241600"
+      ],
+      "deleted": false,
+      "edits": [
+        "shelve"
       ]
     }
   ],
