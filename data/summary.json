@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-11-21T00:35:04+09:00",
+ "generated_at": "2026-11-21T06:42:06+09:00",
  "min_impressions": 300000,
- "total_posts": 7306,
- "total_accounts": 3103,
- "below_threshold_posts": 107,
+ "total_posts": 7403,
+ "total_accounts": 3112,
+ "below_threshold_posts": 106,
  "report_missing_ids": [],
  "unknown_user_posts": 0,
  "period": {
-  "oldest_jst": "2022-12-26T17:03:25+09:00",
-  "newest_jst": "2026-11-20T23:16:34+09:00"
+  "oldest_jst": "2022-12-23T21:25:44+09:00",
+  "newest_jst": "2026-11-21T05:41:21+09:00"
  },
  "categories": [
   "ホスト",
@@ -138,33 +138,33 @@
  "by_category": {
   "ホスト": {
    "posts": 418,
-   "impressions": 790616675,
-   "likes": 2193653
+   "impressions": 792545632,
+   "likes": 2199125
   },
   "キャバクラ": {
-   "posts": 1228,
-   "impressions": 2883548572,
-   "likes": 6639528
+   "posts": 1227,
+   "impressions": 2889442030,
+   "likes": 6646028
   },
   "歌舞伎町": {
    "posts": 114,
-   "impressions": 191596496,
-   "likes": 727280
+   "impressions": 192079988,
+   "likes": 729080
   },
   "夜職その他": {
    "posts": 492,
-   "impressions": 1099238787,
-   "likes": 3310779
+   "impressions": 1098257930,
+   "likes": 3308088
   },
   "監視アカウント": {
    "posts": 730,
-   "impressions": 2060018627,
-   "likes": 5046574
+   "impressions": 2066604331,
+   "likes": 5062726
   },
   "その他": {
-   "posts": 5357,
-   "impressions": 14490299852,
-   "likes": 93644770
+   "posts": 5454,
+   "impressions": 14676156066,
+   "likes": 95350626
   }
  },
  "by_account": [
@@ -172,36 +172,36 @@
    "user": "tkzwgrs",
    "is_watched": true,
    "posts": 222,
-   "impressions": 956425881,
-   "likes": 3121630
+   "impressions": 958781699,
+   "likes": 3131969
   },
   {
    "user": "YahooNewsTopics",
    "is_watched": false,
-   "posts": 207,
-   "impressions": 727338607,
-   "likes": 1258051
+   "posts": 211,
+   "impressions": 742795272,
+   "likes": 1290404
   },
   {
    "user": "super_sachico",
    "is_watched": true,
    "posts": 131,
-   "impressions": 202561462,
-   "likes": 205601
+   "impressions": 203920070,
+   "likes": 207337
   },
   {
    "user": "livedoornews",
    "is_watched": false,
-   "posts": 129,
-   "impressions": 332637922,
-   "likes": 1854160
+   "posts": 130,
+   "impressions": 334859619,
+   "likes": 1869841
   },
   {
    "user": "epichan77",
    "is_watched": false,
-   "posts": 81,
-   "impressions": 136703925,
-   "likes": 390772
+   "posts": 82,
+   "impressions": 137319655,
+   "likes": 399256
   },
   {
    "user": "fuyuyasumiminai",
@@ -209,6 +209,13 @@
    "posts": 72,
    "impressions": 134009260,
    "likes": 506078
+  },
+  {
+   "user": "FabrizioRomano",
+   "is_watched": false,
+   "posts": 58,
+   "impressions": 66991143,
+   "likes": 1245560
   },
   {
    "user": "canyong_1000000",
@@ -228,8 +235,8 @@
    "user": "noi__73",
    "is_watched": true,
    "posts": 49,
-   "impressions": 176512936,
-   "likes": 332366
+   "impressions": 178343657,
+   "likes": 335480
   },
   {
    "user": "alchemy42x42",
@@ -239,25 +246,32 @@
    "likes": 139821
   },
   {
+   "user": "oricon",
+   "is_watched": false,
+   "posts": 48,
+   "impressions": 252606605,
+   "likes": 1242301
+  },
+  {
    "user": "MARUN0UCHI_MAN",
    "is_watched": true,
    "posts": 47,
-   "impressions": 120359804,
+   "impressions": 120360662,
    "likes": 198202
   },
   {
    "user": "satukihakawaii",
    "is_watched": true,
    "posts": 47,
-   "impressions": 85542967,
-   "likes": 106749
+   "impressions": 85890703,
+   "likes": 107202
   },
   {
-   "user": "oricon",
+   "user": "WatcherGuru",
    "is_watched": false,
-   "posts": 46,
-   "impressions": 249945927,
-   "likes": 1216321
+   "posts": 47,
+   "impressions": 31013616,
+   "likes": 388348
   },
   {
    "user": "rinne_channel",
@@ -270,8 +284,8 @@
    "user": "mietokyo",
    "is_watched": false,
    "posts": 45,
-   "impressions": 80998876,
-   "likes": 142922
+   "impressions": 82303491,
+   "likes": 145157
   },
   {
    "user": "ori_newsroom2",
@@ -281,46 +295,32 @@
    "likes": 89454
   },
   {
+   "user": "kamimae_hiroki",
+   "is_watched": false,
+   "posts": 42,
+   "impressions": 122678985,
+   "likes": 114285
+  },
+  {
    "user": "___mobko____",
    "is_watched": false,
    "posts": 42,
-   "impressions": 40469648,
-   "likes": 102925
-  },
-  {
-   "user": "FabrizioRomano",
-   "is_watched": false,
-   "posts": 41,
-   "impressions": 47101437,
-   "likes": 906715
-  },
-  {
-   "user": "kamimae_hiroki",
-   "is_watched": false,
-   "posts": 40,
-   "impressions": 121503160,
-   "likes": 113641
-  },
-  {
-   "user": "WatcherGuru",
-   "is_watched": false,
-   "posts": 38,
-   "impressions": 25563471,
-   "likes": 328023
+   "impressions": 40614877,
+   "likes": 103051
   },
   {
    "user": "ytranking",
    "is_watched": false,
-   "posts": 37,
-   "impressions": 110588370,
-   "likes": 185741
+   "posts": 38,
+   "impressions": 112324160,
+   "likes": 188483
   },
   {
    "user": "47news_official",
    "is_watched": false,
    "posts": 36,
-   "impressions": 87576214,
-   "likes": 262322
+   "impressions": 90981432,
+   "likes": 275713
   },
   {
    "user": "0ari_11",
@@ -333,8 +333,8 @@
    "user": "Meowth_BTC",
    "is_watched": false,
    "posts": 34,
-   "impressions": 66396862,
-   "likes": 90640
+   "impressions": 66578138,
+   "likes": 91009
   },
   {
    "user": "0ari_01",
@@ -347,8 +347,15 @@
    "user": "valentine_hoso",
    "is_watched": false,
    "posts": 32,
-   "impressions": 35593437,
-   "likes": 204050
+   "impressions": 36313675,
+   "likes": 204354
+  },
+  {
+   "user": "ShinjukuSokai",
+   "is_watched": false,
+   "posts": 30,
+   "impressions": 51350841,
+   "likes": 102640
   },
   {
    "user": "V7Vz38828",
@@ -358,18 +365,11 @@
    "likes": 67537
   },
   {
-   "user": "ShinjukuSokai",
-   "is_watched": false,
-   "posts": 29,
-   "impressions": 44574891,
-   "likes": 98291
-  },
-  {
    "user": "bakusokuhochan",
    "is_watched": false,
    "posts": 29,
-   "impressions": 43870420,
-   "likes": 33195
+   "impressions": 43896375,
+   "likes": 33241
   },
   {
    "user": "spana883709",
@@ -389,22 +389,22 @@
    "user": "yorunohuku",
    "is_watched": false,
    "posts": 27,
-   "impressions": 55800780,
-   "likes": 135438
+   "impressions": 56075781,
+   "likes": 135730
   },
   {
    "user": "nigeyama369",
    "is_watched": false,
    "posts": 27,
-   "impressions": 55300194,
-   "likes": 40670
+   "impressions": 55399823,
+   "likes": 40784
   },
   {
    "user": "japan_miyu_",
    "is_watched": false,
    "posts": 26,
-   "impressions": 95054809,
-   "likes": 160866
+   "impressions": 95117134,
+   "likes": 161036
   },
   {
    "user": "nyakochama",
@@ -438,8 +438,8 @@
    "user": "PIYOyes",
    "is_watched": false,
    "posts": 25,
-   "impressions": 34257964,
-   "likes": 44166
+   "impressions": 36846995,
+   "likes": 47813
   },
   {
    "user": "orihara_bakuro",
@@ -458,30 +458,30 @@
   {
    "user": "modelpress",
    "is_watched": false,
-   "posts": 22,
-   "impressions": 111726197,
-   "likes": 333777
+   "posts": 23,
+   "impressions": 112400954,
+   "likes": 339639
   },
   {
    "user": "TBS_VIVANT",
    "is_watched": false,
-   "posts": 22,
-   "impressions": 60308132,
-   "likes": 939515
+   "posts": 23,
+   "impressions": 60763444,
+   "likes": 950306
+  },
+  {
+   "user": "nikkei",
+   "is_watched": false,
+   "posts": 23,
+   "impressions": 42610138,
+   "likes": 127912
   },
   {
    "user": "mtgjdpa",
    "is_watched": true,
    "posts": 22,
-   "impressions": 52465234,
-   "likes": 85986
-  },
-  {
-   "user": "nikkei",
-   "is_watched": false,
-   "posts": 22,
-   "impressions": 41843281,
-   "likes": 123256
+   "impressions": 53157186,
+   "likes": 86495
   },
   {
    "user": "Tigers_140609",
@@ -494,8 +494,8 @@
    "user": "bakausapipi2",
    "is_watched": true,
    "posts": 21,
-   "impressions": 42392541,
-   "likes": 122861
+   "impressions": 42392552,
+   "likes": 122862
   },
   {
    "user": "minami_yuzuzu",
@@ -522,29 +522,29 @@
    "user": "ootoya_1930",
    "is_watched": false,
    "posts": 21,
-   "impressions": 22577425,
-   "likes": 48945
+   "impressions": 22684413,
+   "likes": 49179
   },
   {
    "user": "sxzBST",
    "is_watched": false,
    "posts": 20,
-   "impressions": 29536341,
-   "likes": 144136
+   "impressions": 31243840,
+   "likes": 155332
+  },
+  {
+   "user": "nenemapp",
+   "is_watched": false,
+   "posts": 20,
+   "impressions": 30932516,
+   "likes": 135600
   },
   {
    "user": "zlrbee",
    "is_watched": false,
    "posts": 19,
-   "impressions": 44520244,
-   "likes": 176720
-  },
-  {
-   "user": "nenemapp",
-   "is_watched": false,
-   "posts": 19,
-   "impressions": 30295317,
-   "likes": 133348
+   "impressions": 44787266,
+   "likes": 176903
   },
   {
    "user": "cabayoru",
@@ -552,6 +552,13 @@
    "posts": 19,
    "impressions": 27461578,
    "likes": 76205
+  },
+  {
+   "user": "lightsource1234",
+   "is_watched": false,
+   "posts": 18,
+   "impressions": 64689771,
+   "likes": 51475
   },
   {
    "user": "yuipis18",
@@ -564,8 +571,8 @@
    "user": "D8L5d",
    "is_watched": false,
    "posts": 18,
-   "impressions": 54070281,
-   "likes": 58010
+   "impressions": 54129256,
+   "likes": 58098
   },
   {
    "user": "Alchemy_19",
@@ -573,13 +580,6 @@
    "posts": 18,
    "impressions": 37343293,
    "likes": 175541
-  },
-  {
-   "user": "lightsource1234",
-   "is_watched": false,
-   "posts": 17,
-   "impressions": 63775966,
-   "likes": 50699
   },
   {
    "user": "8u07wx",
@@ -592,8 +592,8 @@
    "user": "toramaru39391",
    "is_watched": false,
    "posts": 17,
-   "impressions": 24117216,
-   "likes": 29956
+   "impressions": 25169378,
+   "likes": 30881
   },
   {
    "user": "nijisanji_app",
@@ -601,6 +601,13 @@
    "posts": 17,
    "impressions": 19951298,
    "likes": 508400
+  },
+  {
+   "user": "nhk_news",
+   "is_watched": false,
+   "posts": 17,
+   "impressions": 18891323,
+   "likes": 101652
   },
   {
    "user": "iroha_omnibus",
@@ -617,11 +624,18 @@
    "likes": 23012
   },
   {
+   "user": "elonmusk",
+   "is_watched": false,
+   "posts": 16,
+   "impressions": 34892058,
+   "likes": 252954
+  },
+  {
    "user": "mizoguchi_yuji",
    "is_watched": false,
    "posts": 16,
-   "impressions": 34824690,
-   "likes": 50064
+   "impressions": 34827410,
+   "likes": 50065
   },
   {
    "user": "AshleyJ62727",
@@ -634,8 +648,15 @@
    "user": "Sankei_news",
    "is_watched": false,
    "posts": 16,
-   "impressions": 23709420,
-   "likes": 64292
+   "impressions": 24063683,
+   "likes": 65020
+  },
+  {
+   "user": "realmadrid",
+   "is_watched": false,
+   "posts": 16,
+   "impressions": 12909469,
+   "likes": 396079
   },
   {
    "user": "no1dayoooo",
@@ -659,11 +680,11 @@
    "likes": 27053
   },
   {
-   "user": "nhk_news",
+   "user": "sorehatigauy",
    "is_watched": false,
-   "posts": 15,
-   "impressions": 17983967,
-   "likes": 96144
+   "posts": 14,
+   "impressions": 96084139,
+   "likes": 568380
   },
   {
    "user": "hirox246",
@@ -676,8 +697,8 @@
    "user": "HarukiKai0628",
    "is_watched": false,
    "posts": 14,
-   "impressions": 21264736,
-   "likes": 41670
+   "impressions": 21454861,
+   "likes": 41704
   },
   {
    "user": "lastcallch",
@@ -690,15 +711,15 @@
    "user": "tgrouptax",
    "is_watched": false,
    "posts": 14,
-   "impressions": 6168454,
-   "likes": 9424
+   "impressions": 6495232,
+   "likes": 10430
   },
   {
    "user": "DEATHDOL_NOTE",
    "is_watched": false,
    "posts": 13,
-   "impressions": 182175776,
-   "likes": 440053
+   "impressions": 183827267,
+   "likes": 442519
   },
   {
    "user": "love_supple_",
@@ -708,32 +729,25 @@
    "likes": 30697
   },
   {
-   "user": "realmadrid",
+   "user": "Wafm60z",
    "is_watched": false,
    "posts": 13,
-   "impressions": 11296566,
-   "likes": 343086
+   "impressions": 12554777,
+   "likes": 38968
   },
   {
    "user": "hostcallch",
    "is_watched": false,
    "posts": 13,
-   "impressions": 5184700,
-   "likes": 21450
+   "impressions": 5212477,
+   "likes": 21814
   },
   {
    "user": "ngnchiikawa",
    "is_watched": false,
    "posts": 12,
-   "impressions": 156863975,
-   "likes": 5037298
-  },
-  {
-   "user": "sorehatigauy",
-   "is_watched": false,
-   "posts": 12,
-   "impressions": 93835931,
-   "likes": 551343
+   "impressions": 162233400,
+   "likes": 5313966
   },
   {
    "user": "ichijyo_hibiki",
@@ -764,13 +778,6 @@
    "likes": 11148
   },
   {
-   "user": "Wafm60z",
-   "is_watched": false,
-   "posts": 12,
-   "impressions": 11684264,
-   "likes": 36692
-  },
-  {
    "user": "Vamp_Kuzu",
    "is_watched": false,
    "posts": 12,
@@ -799,6 +806,13 @@
    "likes": 30565
   },
   {
+   "user": "bakusai_x",
+   "is_watched": false,
+   "posts": 11,
+   "impressions": 14231502,
+   "likes": 24780
+  },
+  {
    "user": "chuzaiina",
    "is_watched": false,
    "posts": 11,
@@ -813,6 +827,13 @@
    "likes": 21274
   },
   {
+   "user": "nomura_x_lab",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 35821467,
+   "likes": 16866
+  },
+  {
    "user": "kunino_takara",
    "is_watched": false,
    "posts": 10,
@@ -823,15 +844,15 @@
    "user": "ksp0cy",
    "is_watched": false,
    "posts": 10,
-   "impressions": 23856849,
-   "likes": 26193
+   "impressions": 24001801,
+   "likes": 26268
   },
   {
    "user": "sigure1216",
    "is_watched": false,
    "posts": 10,
-   "impressions": 23616542,
-   "likes": 32070
+   "impressions": 23638697,
+   "likes": 32088
   },
   {
    "user": "KxeSHkstW453827",
@@ -851,8 +872,8 @@
    "user": "biisikichan",
    "is_watched": false,
    "posts": 10,
-   "impressions": 16672098,
-   "likes": 43356
+   "impressions": 17255954,
+   "likes": 43988
   },
   {
    "user": "R_son0130",
@@ -865,15 +886,22 @@
    "user": "omegudayon",
    "is_watched": false,
    "posts": 10,
-   "impressions": 15625488,
-   "likes": 48697
+   "impressions": 15636913,
+   "likes": 48721
+  },
+  {
+   "user": "goethe_kyodai",
+   "is_watched": false,
+   "posts": 10,
+   "impressions": 15159308,
+   "likes": 49144
   },
   {
    "user": "_maru_oo00",
    "is_watched": false,
    "posts": 10,
-   "impressions": 14560791,
-   "likes": 56448
+   "impressions": 14997441,
+   "likes": 60822
   },
   {
    "user": "711SEJ",
@@ -883,11 +911,11 @@
    "likes": 60300
   },
   {
-   "user": "bakusai_x",
+   "user": "Tigers_Atsuya69",
    "is_watched": false,
    "posts": 10,
-   "impressions": 12809790,
-   "likes": 22645
+   "impressions": 8306227,
+   "likes": 40308
   },
   {
    "user": "k42wKKihKBGTvXv",
@@ -902,13 +930,6 @@
    "posts": 9,
    "impressions": 46038766,
    "likes": 68434
-  },
-  {
-   "user": "nomura_x_lab",
-   "is_watched": false,
-   "posts": 9,
-   "impressions": 33493232,
-   "likes": 16759
   },
   {
    "user": "m_kumagai",
@@ -928,8 +949,8 @@
    "user": "oenmanplusnews",
    "is_watched": false,
    "posts": 9,
-   "impressions": 30050852,
-   "likes": 21124
+   "impressions": 30587818,
+   "likes": 21148
   },
   {
    "user": "deathdolnote",
@@ -942,8 +963,22 @@
    "user": "tsuisoku777",
    "is_watched": false,
    "posts": 9,
-   "impressions": 9830213,
-   "likes": 79979
+   "impressions": 9892134,
+   "likes": 80157
+  },
+  {
+   "user": "jfa_samuraiblue",
+   "is_watched": false,
+   "posts": 9,
+   "impressions": 9389466,
+   "likes": 186979
+  },
+  {
+   "user": "IkawaMototaka",
+   "is_watched": false,
+   "posts": 9,
+   "impressions": 6914297,
+   "likes": 97416
   },
   {
    "user": "milk_info",
@@ -951,13 +986,6 @@
    "posts": 9,
    "impressions": 6852236,
    "likes": 344426
-  },
-  {
-   "user": "IkawaMototaka",
-   "is_watched": false,
-   "posts": 9,
-   "impressions": 6845965,
-   "likes": 95687
   },
   {
    "user": "snsmonchiii",
@@ -984,36 +1012,29 @@
    "user": "denfaminicogame",
    "is_watched": false,
    "posts": 8,
-   "impressions": 26672557,
-   "likes": 351679
+   "impressions": 26832971,
+   "likes": 355784
   },
   {
    "user": "soratsullu",
    "is_watched": false,
    "posts": 8,
-   "impressions": 24453294,
-   "likes": 45943
+   "impressions": 25573442,
+   "likes": 47239
   },
   {
    "user": "aigare01",
    "is_watched": false,
    "posts": 8,
-   "impressions": 19818416,
-   "likes": 40408
+   "impressions": 20912781,
+   "likes": 41659
   },
   {
    "user": "yominokuni140",
    "is_watched": false,
    "posts": 8,
-   "impressions": 19407007,
-   "likes": 121108
-  },
-  {
-   "user": "elonmusk",
-   "is_watched": false,
-   "posts": 8,
-   "impressions": 18872689,
-   "likes": 137312
+   "impressions": 19454453,
+   "likes": 121814
   },
   {
    "user": "corosuke_kite",
@@ -1026,15 +1047,8 @@
    "user": "recta_erabi",
    "is_watched": false,
    "posts": 8,
-   "impressions": 15258349,
+   "impressions": 15258807,
    "likes": 42791
-  },
-  {
-   "user": "goethe_kyodai",
-   "is_watched": false,
-   "posts": 8,
-   "impressions": 13976654,
-   "likes": 45739
   },
   {
    "user": "lastcall_krnk",
@@ -1042,13 +1056,6 @@
    "posts": 8,
    "impressions": 9674231,
    "likes": 13327
-  },
-  {
-   "user": "jfa_samuraiblue",
-   "is_watched": false,
-   "posts": 8,
-   "impressions": 9087210,
-   "likes": 163115
   },
   {
    "user": "NikiCharit82627",
@@ -1093,6 +1100,13 @@
    "likes": 55271
   },
   {
+   "user": "daitai_shitteru",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 32846439,
+   "likes": 46221
+  },
+  {
    "user": "katsuyatakasu",
    "is_watched": false,
    "posts": 7,
@@ -1114,6 +1128,13 @@
    "likes": 172491
   },
   {
+   "user": "yaruuuoooo",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 21080657,
+   "likes": 157989
+  },
+  {
    "user": "CEO_dad_K_sub",
    "is_watched": false,
    "posts": 7,
@@ -1128,6 +1149,20 @@
    "likes": 39545
   },
   {
+   "user": "sari_des1",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 18095673,
+   "likes": 24904
+  },
+  {
+   "user": "YumeNume",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 17508300,
+   "likes": 13193
+  },
+  {
    "user": "heartful_space",
    "is_watched": false,
    "posts": 7,
@@ -1140,6 +1175,13 @@
    "posts": 7,
    "impressions": 17096180,
    "likes": 120609
+  },
+  {
+   "user": "tokyowalk513638",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 13690744,
+   "likes": 10057
   },
   {
    "user": "matchingmomonga",
@@ -1173,15 +1215,15 @@
    "user": "minatoku_benjo",
    "is_watched": false,
    "posts": 7,
-   "impressions": 9804543,
-   "likes": 21567
+   "impressions": 9910985,
+   "likes": 21692
   },
   {
    "user": "MSGA_project",
    "is_watched": false,
    "posts": 7,
-   "impressions": 8381081,
-   "likes": 13096
+   "impressions": 8388351,
+   "likes": 13098
   },
   {
    "user": "shota201907",
@@ -1198,6 +1240,13 @@
    "likes": 33449
   },
   {
+   "user": "ihararyotaro",
+   "is_watched": false,
+   "posts": 7,
+   "impressions": 6763243,
+   "likes": 5958
+  },
+  {
    "user": "LASTCALLkirinuk",
    "is_watched": false,
    "posts": 7,
@@ -1205,11 +1254,11 @@
    "likes": 13426
   },
   {
-   "user": "Tigers_Atsuya69",
+   "user": "nowyeosi",
    "is_watched": false,
    "posts": 7,
-   "impressions": 6031298,
-   "likes": 27712
+   "impressions": 5816470,
+   "likes": 39567
   },
   {
    "user": "SAK_SAK_SAKUMA",
@@ -1250,8 +1299,8 @@
    "user": "edamaru666",
    "is_watched": false,
    "posts": 6,
-   "impressions": 49590809,
-   "likes": 74518
+   "impressions": 52638950,
+   "likes": 75799
   },
   {
    "user": "i_am_kawa_chan",
@@ -1259,13 +1308,6 @@
    "posts": 6,
    "impressions": 34103097,
    "likes": 16593
-  },
-  {
-   "user": "daitai_shitteru",
-   "is_watched": false,
-   "posts": 6,
-   "impressions": 31831344,
-   "likes": 44457
   },
   {
    "user": "toubu_yakenoh",
@@ -1282,18 +1324,11 @@
    "likes": 61678
   },
   {
-   "user": "yaruuuoooo",
+   "user": "negi20260208",
    "is_watched": false,
    "posts": 6,
-   "impressions": 19997326,
-   "likes": 157033
-  },
-  {
-   "user": "YumeNume",
-   "is_watched": false,
-   "posts": 6,
-   "impressions": 17122637,
-   "likes": 12565
+   "impressions": 18080105,
+   "likes": 22880
   },
   {
    "user": "kyodo_official",
@@ -1301,13 +1336,6 @@
    "posts": 6,
    "impressions": 14481361,
    "likes": 12913
-  },
-  {
-   "user": "sari_des1",
-   "is_watched": false,
-   "posts": 6,
-   "impressions": 14470176,
-   "likes": 16949
   },
   {
    "user": "oricon_anime_",
@@ -1324,11 +1352,11 @@
    "likes": 16247
   },
   {
-   "user": "tokyowalk513638",
+   "user": "RunawayUoi",
    "is_watched": false,
    "posts": 6,
-   "impressions": 13336891,
-   "likes": 9865
+   "impressions": 11586219,
+   "likes": 43799
   },
   {
    "user": "hex6u",
@@ -1348,29 +1376,22 @@
    "user": "babutandayo_1",
    "is_watched": false,
    "posts": 6,
-   "impressions": 8694399,
-   "likes": 54011
-  },
-  {
-   "user": "ihararyotaro",
-   "is_watched": false,
-   "posts": 6,
-   "impressions": 6400742,
-   "likes": 4956
+   "impressions": 8721543,
+   "likes": 54015
   },
   {
    "user": "masawo_deathdol",
    "is_watched": false,
    "posts": 6,
-   "impressions": 6181857,
-   "likes": 45138
+   "impressions": 6262536,
+   "likes": 45356
   },
   {
    "user": "ZZZ_JP",
    "is_watched": false,
    "posts": 6,
-   "impressions": 5226978,
-   "likes": 109642
+   "impressions": 5690739,
+   "likes": 120384
   },
   {
    "user": "reina_ol_2",
@@ -1425,8 +1446,8 @@
    "user": "mainichi",
    "is_watched": false,
    "posts": 5,
-   "impressions": 16467637,
-   "likes": 36877
+   "impressions": 16699394,
+   "likes": 38250
   },
   {
    "user": "0_BossS",
@@ -1441,13 +1462,6 @@
    "posts": 5,
    "impressions": 15901520,
    "likes": 94404
-  },
-  {
-   "user": "negi20260208",
-   "is_watched": false,
-   "posts": 5,
-   "impressions": 15637304,
-   "likes": 19160
   },
   {
    "user": "Shiramine_yuika",
@@ -1467,8 +1481,8 @@
    "user": "motiva55",
    "is_watched": false,
    "posts": 5,
-   "impressions": 12685919,
-   "likes": 17633
+   "impressions": 12779855,
+   "likes": 17875
   },
   {
    "user": "sakurafubuki_88",
@@ -1523,8 +1537,8 @@
    "user": "123456789god71",
    "is_watched": false,
    "posts": 5,
-   "impressions": 7881598,
-   "likes": 4240
+   "impressions": 8039104,
+   "likes": 4339
   },
   {
    "user": "3j2c9q",
@@ -1562,13 +1576,6 @@
    "likes": 14460
   },
   {
-   "user": "nowyeosi",
-   "is_watched": false,
-   "posts": 5,
-   "impressions": 5109218,
-   "likes": 33535
-  },
-  {
    "user": "Mst_com",
    "is_watched": false,
    "posts": 5,
@@ -1600,8 +1607,15 @@
    "user": "yushi_0fficial2",
    "is_watched": false,
    "posts": 5,
-   "impressions": 3867096,
-   "likes": 18545
+   "impressions": 3877719,
+   "likes": 18549
+  },
+  {
+   "user": "Equal_LOVE_12",
+   "is_watched": false,
+   "posts": 5,
+   "impressions": 3615577,
+   "likes": 150256
   },
   {
    "user": "hostcall_world",
@@ -1705,8 +1719,8 @@
    "user": "yamatsullu",
    "is_watched": false,
    "posts": 4,
-   "impressions": 16972854,
-   "likes": 14862
+   "impressions": 17111518,
+   "likes": 15448
   },
   {
    "user": "purotanyahhoo",
@@ -1751,11 +1765,11 @@
    "likes": 21112
   },
   {
-   "user": "RunawayUoi",
+   "user": "x7010x",
    "is_watched": false,
    "posts": 4,
-   "impressions": 10373717,
-   "likes": 42425
+   "impressions": 10185586,
+   "likes": 13302
   },
   {
    "user": "gsc_goodsmile",
@@ -1775,8 +1789,8 @@
    "user": "rizin_PR",
    "is_watched": false,
    "posts": 4,
-   "impressions": 8784671,
-   "likes": 21910
+   "impressions": 8910577,
+   "likes": 22059
   },
   {
    "user": "nikutaberuru",
@@ -1856,6 +1870,13 @@
    "likes": 79799
   },
   {
+   "user": "thsottiaux",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 5393402,
+   "likes": 33940
+  },
+  {
    "user": "TBSCDTV",
    "is_watched": false,
    "posts": 4,
@@ -1868,13 +1889,6 @@
    "posts": 4,
    "impressions": 4836699,
    "likes": 34221
-  },
-  {
-   "user": "thsottiaux",
-   "is_watched": false,
-   "posts": 4,
-   "impressions": 4811887,
-   "likes": 32215
   },
   {
    "user": "shiro_site",
@@ -1898,6 +1912,13 @@
    "likes": 81679
   },
   {
+   "user": "Izumi_Sunagawa",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 4509613,
+   "likes": 72993
+  },
+  {
    "user": "0ari_9",
    "is_watched": false,
    "posts": 4,
@@ -1919,11 +1940,11 @@
    "likes": 10824
   },
   {
-   "user": "Izumi_Sunagawa",
+   "user": "otaki_00",
    "is_watched": false,
    "posts": 4,
-   "impressions": 4087181,
-   "likes": 68872
+   "impressions": 4229702,
+   "likes": 4073
   },
   {
    "user": "zzz___0003",
@@ -1947,6 +1968,13 @@
    "likes": 190987
   },
   {
+   "user": "yena_jang_",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 3946633,
+   "likes": 9140
+  },
+  {
    "user": "OEzpq5CE4NrCSun",
    "is_watched": false,
    "posts": 4,
@@ -1961,25 +1989,11 @@
    "likes": 4296
   },
   {
-   "user": "otaki_00",
-   "is_watched": false,
-   "posts": 4,
-   "impressions": 3653215,
-   "likes": 3397
-  },
-  {
    "user": "tentenchan2525",
    "is_watched": false,
    "posts": 4,
    "impressions": 3292831,
    "likes": 135700
-  },
-  {
-   "user": "Equal_LOVE_12",
-   "is_watched": false,
-   "posts": 4,
-   "impressions": 3212843,
-   "likes": 125039
   },
   {
    "user": "fuakawa_",
@@ -1996,13 +2010,6 @@
    "likes": 5660
   },
   {
-   "user": "yena_jang_",
-   "is_watched": false,
-   "posts": 4,
-   "impressions": 3044862,
-   "likes": 6570
-  },
-  {
    "user": "nino_honmono",
    "is_watched": false,
    "posts": 4,
@@ -2013,8 +2020,15 @@
    "user": "attk_sub",
    "is_watched": false,
    "posts": 4,
-   "impressions": 2681462,
-   "likes": 17809
+   "impressions": 2791589,
+   "likes": 18425
+  },
+  {
+   "user": "Stray_Kids_JP",
+   "is_watched": false,
+   "posts": 4,
+   "impressions": 1983094,
+   "likes": 104014
   },
   {
    "user": "BRICSinfo",
@@ -2034,8 +2048,8 @@
    "user": "hukugyou_maniaa",
    "is_watched": false,
    "posts": 3,
-   "impressions": 72315642,
-   "likes": 76325
+   "impressions": 72484126,
+   "likes": 76403
   },
   {
    "user": "hst_tvasahi",
@@ -2048,8 +2062,8 @@
    "user": "JREast_News",
    "is_watched": false,
    "posts": 3,
-   "impressions": 35137520,
-   "likes": 310183
+   "impressions": 35179422,
+   "likes": 310374
   },
   {
    "user": "cherry68051641",
@@ -2174,8 +2188,15 @@
    "user": "CotomiAsobina",
    "is_watched": false,
    "posts": 3,
-   "impressions": 12557996,
-   "likes": 43334
+   "impressions": 12780162,
+   "likes": 44288
+  },
+  {
+   "user": "Mike5260",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 11885341,
+   "likes": 6190
   },
   {
    "user": "inu_wanwan_inu",
@@ -2192,11 +2213,11 @@
    "likes": 11326
   },
   {
-   "user": "Mike5260",
+   "user": "QvAmi10446",
    "is_watched": false,
    "posts": 3,
-   "impressions": 10934299,
-   "likes": 5626
+   "impressions": 10612186,
+   "likes": 6405
   },
   {
    "user": "pink_sukisuki",
@@ -2204,13 +2225,6 @@
    "posts": 3,
    "impressions": 10513259,
    "likes": 9508
-  },
-  {
-   "user": "QvAmi10446",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 10498819,
-   "likes": 6247
   },
   {
    "user": "kb_dn_",
@@ -2262,6 +2276,13 @@
    "likes": 8751
   },
   {
+   "user": "yu_____r__3o",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 8748310,
+   "likes": 63359
+  },
+  {
    "user": "yamato_gori",
    "is_watched": false,
    "posts": 3,
@@ -2286,15 +2307,15 @@
    "user": "meo_hiro",
    "is_watched": false,
    "posts": 3,
-   "impressions": 8010981,
-   "likes": 31328
+   "impressions": 8114259,
+   "likes": 31510
   },
   {
    "user": "RB_JK97",
    "is_watched": false,
    "posts": 3,
-   "impressions": 7881927,
-   "likes": 29540
+   "impressions": 7965922,
+   "likes": 29781
   },
   {
    "user": "ykishoota",
@@ -2318,18 +2339,18 @@
    "likes": 11
   },
   {
+   "user": "gadzhagadzha",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 7138216,
+   "likes": 33217
+  },
+  {
    "user": "horidaisukelove",
    "is_watched": false,
    "posts": 3,
    "impressions": 6696659,
    "likes": 56795
-  },
-  {
-   "user": "gadzhagadzha",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 6525669,
-   "likes": 30666
   },
   {
    "user": "gyangyan_100",
@@ -2365,6 +2386,13 @@
    "posts": 3,
    "impressions": 5775085,
    "likes": 9343
+  },
+  {
+   "user": "junjun_zz_",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 5632343,
+   "likes": 3429
   },
   {
    "user": "G_Style_rika",
@@ -2423,13 +2451,6 @@
    "likes": 28897
   },
   {
-   "user": "junjun_zz_",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 4744307,
-   "likes": 2843
-  },
-  {
    "user": "Rkun_pixiv",
    "is_watched": false,
    "posts": 3,
@@ -2456,6 +2477,13 @@
    "posts": 3,
    "impressions": 4536502,
    "likes": 16124
+  },
+  {
+   "user": "so_utuchann",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 4384429,
+   "likes": 8026
   },
   {
    "user": "sakurai7715",
@@ -2514,6 +2542,20 @@
    "likes": 1860
   },
   {
+   "user": "hikakin",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 3913354,
+   "likes": 100135
+  },
+  {
+   "user": "jijicom",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 3813344,
+   "likes": 44015
+  },
+  {
    "user": "tenshi_aidoru",
    "is_watched": false,
    "posts": 3,
@@ -2521,25 +2563,18 @@
    "likes": 8485
   },
   {
+   "user": "May_Roma",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 3540471,
+   "likes": 28985
+  },
+  {
    "user": "J_League",
    "is_watched": false,
    "posts": 3,
    "impressions": 3533673,
    "likes": 146195
-  },
-  {
-   "user": "jijicom",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 3511761,
-   "likes": 35467
-  },
-  {
-   "user": "hikakin",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 3473669,
-   "likes": 94427
   },
   {
    "user": "bluena_boss",
@@ -2682,6 +2717,20 @@
    "likes": 15255
   },
   {
+   "user": "728_Storm",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 2050315,
+   "likes": 87762
+  },
+  {
+   "user": "sakibon69",
+   "is_watched": false,
+   "posts": 3,
+   "impressions": 2022752,
+   "likes": 45061
+  },
+  {
    "user": "beautykirinuki",
    "is_watched": false,
    "posts": 3,
@@ -2694,13 +2743,6 @@
    "posts": 3,
    "impressions": 1947802,
    "likes": 20812
-  },
-  {
-   "user": "sakibon69",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 1941347,
-   "likes": 42975
   },
   {
    "user": "yatoukanshi",
@@ -2724,13 +2766,6 @@
    "likes": 62043
   },
   {
-   "user": "728_Storm",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 1696839,
-   "likes": 82187
-  },
-  {
    "user": "June_lotus",
    "is_watched": false,
    "posts": 3,
@@ -2743,13 +2778,6 @@
    "posts": 3,
    "impressions": 1621840,
    "likes": 17075
-  },
-  {
-   "user": "Stray_Kids_JP",
-   "is_watched": false,
-   "posts": 3,
-   "impressions": 1591269,
-   "likes": 85638
   },
   {
    "user": "sake893corp",
@@ -2874,8 +2902,8 @@
    "user": "chunichi_denhen",
    "is_watched": false,
    "posts": 2,
-   "impressions": 24597099,
-   "likes": 60416
+   "impressions": 24613849,
+   "likes": 60426
   },
   {
    "user": "yjmnsub3",
@@ -3021,8 +3049,8 @@
    "user": "pKs6eaZaXn52866",
    "is_watched": false,
    "posts": 2,
-   "impressions": 10844507,
-   "likes": 8233
+   "impressions": 11053929,
+   "likes": 8976
   },
   {
    "user": "ieyasu919",
@@ -3037,6 +3065,13 @@
    "posts": 2,
    "impressions": 10665466,
    "likes": 8188
+  },
+  {
+   "user": "minaduki_esola",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 10554930,
+   "likes": 25453
   },
   {
    "user": "garigobu",
@@ -3137,6 +3172,13 @@
    "likes": 9428
   },
   {
+   "user": "PayPayOfficial",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 8605485,
+   "likes": 57244
+  },
+  {
    "user": "zara_falco",
    "is_watched": false,
    "posts": 2,
@@ -3158,27 +3200,6 @@
    "likes": 80794
   },
   {
-   "user": "PayPayOfficial",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 8507911,
-   "likes": 55732
-  },
-  {
-   "user": "yu_____r__3o",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 8440986,
-   "likes": 60181
-  },
-  {
-   "user": "x7010x",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 8355508,
-   "likes": 11451
-  },
-  {
    "user": "yumero0109_",
    "is_watched": false,
    "posts": 2,
@@ -3191,13 +3212,6 @@
    "posts": 2,
    "impressions": 8229249,
    "likes": 122222
-  },
-  {
-   "user": "minaduki_esola",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 8155899,
-   "likes": 18038
   },
   {
    "user": "heihach23204272",
@@ -3375,6 +3389,13 @@
    "likes": 69736
   },
   {
+   "user": "okzdm_",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 6201462,
+   "likes": 6651
+  },
+  {
    "user": "l1jqea",
    "is_watched": false,
    "posts": 2,
@@ -3394,13 +3415,6 @@
    "posts": 2,
    "impressions": 5987206,
    "likes": 102213
-  },
-  {
-   "user": "okzdm_",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 5836664,
-   "likes": 6058
   },
   {
    "user": "miniminikawatin",
@@ -3462,8 +3476,8 @@
    "user": "youcankill",
    "is_watched": false,
    "posts": 2,
-   "impressions": 5199350,
-   "likes": 18684
+   "impressions": 5318993,
+   "likes": 19783
   },
   {
    "user": "bplhcn",
@@ -3543,6 +3557,20 @@
    "likes": 12675
   },
   {
+   "user": "pipitarou0000",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 4855353,
+   "likes": 7585
+  },
+  {
+   "user": "yu_kaizyu",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 4804846,
+   "likes": 12206
+  },
+  {
    "user": "s12ly",
    "is_watched": false,
    "posts": 2,
@@ -3562,13 +3590,6 @@
    "posts": 2,
    "impressions": 4701883,
    "likes": 29550
-  },
-  {
-   "user": "yu_kaizyu",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 4672048,
-   "likes": 11576
   },
   {
    "user": "irislady_husky",
@@ -3634,11 +3655,11 @@
    "likes": 3608
   },
   {
-   "user": "pipitarou0000",
+   "user": "jutingstar9999",
    "is_watched": false,
    "posts": 2,
-   "impressions": 4354509,
-   "likes": 7036
+   "impressions": 4302808,
+   "likes": 19245
   },
   {
    "user": "Wwmajidesorena",
@@ -3662,11 +3683,25 @@
    "likes": 8141
   },
   {
+   "user": "ore825",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 4039673,
+   "likes": 19595
+  },
+  {
    "user": "ldk111bt",
    "is_watched": false,
    "posts": 2,
    "impressions": 4031874,
    "likes": 15458
+  },
+  {
+   "user": "asahicom",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 3968736,
+   "likes": 17183
   },
   {
    "user": "Dodgers",
@@ -3709,13 +3744,6 @@
    "posts": 2,
    "impressions": 3795297,
    "likes": 833
-  },
-  {
-   "user": "so_utuchann",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 3762675,
-   "likes": 4966
   },
   {
    "user": "workouteating",
@@ -3865,13 +3893,6 @@
    "likes": 83103
   },
   {
-   "user": "ore825",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 3303500,
-   "likes": 17854
-  },
-  {
    "user": "takesan67694478",
    "is_watched": false,
    "posts": 2,
@@ -3893,20 +3914,6 @@
    "likes": 14198
   },
   {
-   "user": "asahicom",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 3262361,
-   "likes": 13025
-  },
-  {
-   "user": "jutingstar9999",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 3242846,
-   "likes": 12928
-  },
-  {
    "user": "karasawa_nanae",
    "is_watched": false,
    "posts": 2,
@@ -3919,6 +3926,13 @@
    "posts": 2,
    "impressions": 3221403,
    "likes": 67695
+  },
+  {
+   "user": "XFreeze",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 3210347,
+   "likes": 10187
   },
   {
    "user": "JoelLotion",
@@ -3935,18 +3949,18 @@
    "likes": 27952
   },
   {
+   "user": "poongkawaii",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 3157616,
+   "likes": 12453
+  },
+  {
    "user": "30_adhd_",
    "is_watched": false,
    "posts": 2,
    "impressions": 3128771,
    "likes": 4896
-  },
-  {
-   "user": "May_Roma",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 3098666,
-   "likes": 24081
   },
   {
    "user": "hochi_npb",
@@ -3961,13 +3975,6 @@
    "posts": 2,
    "impressions": 3074779,
    "likes": 44101
-  },
-  {
-   "user": "poongkawaii",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 3067983,
-   "likes": 11551
   },
   {
    "user": "merurun_o0o",
@@ -3998,6 +4005,13 @@
    "likes": 7027
   },
   {
+   "user": "tv_asahi_news",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 2967942,
+   "likes": 7312
+  },
+  {
    "user": "wkpszp",
    "is_watched": false,
    "posts": 2,
@@ -4017,13 +4031,6 @@
    "posts": 2,
    "impressions": 2929603,
    "likes": 10218
-  },
-  {
-   "user": "tv_asahi_news",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 2913202,
-   "likes": 7107
   },
   {
    "user": "nihonpatriot",
@@ -4166,6 +4173,13 @@
    "likes": 49945
   },
   {
+   "user": "yuuka_yuuka_01",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 2402369,
+   "likes": 9928
+  },
+  {
    "user": "hostcall_tv",
    "is_watched": false,
    "posts": 2,
@@ -4215,18 +4229,18 @@
    "likes": 32
   },
   {
+   "user": "hikaryukirinuki",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 2293585,
+   "likes": 1108
+  },
+  {
    "user": "kana_xiao",
    "is_watched": false,
    "posts": 2,
    "impressions": 2281106,
    "likes": 7490
-  },
-  {
-   "user": "hikaryukirinuki",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 2269205,
-   "likes": 1068
   },
   {
    "user": "jkw20kr",
@@ -4262,6 +4276,13 @@
    "posts": 2,
    "impressions": 2202419,
    "likes": 9547
+  },
+  {
+   "user": "kanchan1818",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 2177348,
+   "likes": 4225
   },
   {
    "user": "sonota_ab",
@@ -4353,13 +4374,6 @@
    "posts": 2,
    "impressions": 1995252,
    "likes": 1890
-  },
-  {
-   "user": "kanchan1818",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 1984688,
-   "likes": 4191
   },
   {
    "user": "JS5JWeAmAe91078",
@@ -4621,6 +4635,13 @@
    "likes": 6435
   },
   {
+   "user": "roppongi6969",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1536580,
+   "likes": 2161
+  },
+  {
    "user": "nannet_manga",
    "is_watched": false,
    "posts": 2,
@@ -4691,13 +4712,6 @@
    "likes": 16730
   },
   {
-   "user": "roppongi6969",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 1407185,
-   "likes": 2102
-  },
-  {
    "user": "hikarine3",
    "is_watched": false,
    "posts": 2,
@@ -4717,6 +4731,13 @@
    "posts": 2,
    "impressions": 1363680,
    "likes": 28128
+  },
+  {
+   "user": "108takapi_new",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1361410,
+   "likes": 5943
   },
   {
    "user": "majima318majima",
@@ -4824,6 +4845,13 @@
    "likes": 77262
   },
   {
+   "user": "Oda_world6",
+   "is_watched": false,
+   "posts": 2,
+   "impressions": 1074676,
+   "likes": 1990
+  },
+  {
    "user": "eccentricbambi",
    "is_watched": false,
    "posts": 2,
@@ -4857,13 +4885,6 @@
    "posts": 2,
    "impressions": 1012647,
    "likes": 1037
-  },
-  {
-   "user": "108takapi_new",
-   "is_watched": false,
-   "posts": 2,
-   "impressions": 1006471,
-   "likes": 3952
   },
   {
    "user": "diamondsky369",
@@ -5755,6 +5776,13 @@
    "likes": 100154
   },
   {
+   "user": "kurokawa_hibari",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 10697108,
+   "likes": 5715
+  },
+  {
    "user": "ib_kiri",
    "is_watched": false,
    "posts": 1,
@@ -5830,13 +5858,6 @@
    "posts": 1,
    "impressions": 9967067,
    "likes": 101196
-  },
-  {
-   "user": "kurokawa_hibari",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 9859734,
-   "likes": 5638
   },
   {
    "user": "ee_ee_3",
@@ -6511,6 +6532,13 @@
    "likes": 68332
   },
   {
+   "user": "xuanhai_fami",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 6496764,
+   "likes": 37147
+  },
+  {
    "user": "m8286214920654",
    "is_watched": false,
    "posts": 1,
@@ -7120,6 +7148,13 @@
    "likes": 10503
   },
   {
+   "user": "biZOPotRlF22983",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 4893635,
+   "likes": 18776
+  },
+  {
    "user": "CzmIvEnjLfvIquB",
    "is_watched": false,
    "posts": 1,
@@ -7316,6 +7351,13 @@
    "likes": 71437
   },
   {
+   "user": "masakin199307",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 4522108,
+   "likes": 16167
+  },
+  {
    "user": "choyocoreito",
    "is_watched": false,
    "posts": 1,
@@ -7470,6 +7512,13 @@
    "likes": 345
   },
   {
+   "user": "Dexerto",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 4301808,
+   "likes": 6125
+  },
+  {
    "user": "ayu_littlewing",
    "is_watched": false,
    "posts": 1,
@@ -7561,11 +7610,25 @@
    "likes": 40352
   },
   {
+   "user": "RyuichiYoneyama",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 4180532,
+   "likes": 9087
+  },
+  {
    "user": "momobuta07",
    "is_watched": false,
    "posts": 1,
    "impressions": 4178808,
    "likes": 33529
+  },
+  {
+   "user": "kazawara",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 4149128,
+   "likes": 7049
   },
   {
    "user": "enoly_gay",
@@ -7645,11 +7708,11 @@
    "likes": 24789
   },
   {
-   "user": "biZOPotRlF22983",
+   "user": "wanghanxu1",
    "is_watched": false,
    "posts": 1,
-   "impressions": 4067379,
-   "likes": 15457
+   "impressions": 4067653,
+   "likes": 19484
   },
   {
    "user": "tottoto_0",
@@ -7692,13 +7755,6 @@
    "posts": 1,
    "impressions": 4028617,
    "likes": 7863
-  },
-  {
-   "user": "RyuichiYoneyama",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 4021955,
-   "likes": 8679
   },
   {
    "user": "mizutanimidori",
@@ -7834,13 +7890,6 @@
    "likes": 32696
   },
   {
-   "user": "kazawara",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 3849116,
-   "likes": 6418
-  },
-  {
    "user": "Yumetsuru",
    "is_watched": false,
    "posts": 1,
@@ -7953,6 +8002,13 @@
    "likes": 19834
   },
   {
+   "user": "dvesf_yt",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 3701089,
+   "likes": 18188
+  },
+  {
    "user": "PWzyQ1LDQ4X6mFA",
    "is_watched": false,
    "posts": 1,
@@ -8021,13 +8077,6 @@
    "posts": 1,
    "impressions": 3624462,
    "likes": 19955
-  },
-  {
-   "user": "masakin199307",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 3624289,
-   "likes": 12260
   },
   {
    "user": "874maji874",
@@ -8184,6 +8233,13 @@
    "likes": 9109
   },
   {
+   "user": "c14english",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 3461856,
+   "likes": 13172
+  },
+  {
    "user": "sushi_zamurai_",
    "is_watched": false,
    "posts": 1,
@@ -8196,13 +8252,6 @@
    "posts": 1,
    "impressions": 3453288,
    "likes": 13343
-  },
-  {
-   "user": "wanghanxu1",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 3450023,
-   "likes": 16704
   },
   {
    "user": "karasu_pua",
@@ -8331,11 +8380,11 @@
    "likes": 5362
   },
   {
-   "user": "xuanhai_fami",
+   "user": "hasenkuniyama",
    "is_watched": false,
    "posts": 1,
-   "impressions": 3268124,
-   "likes": 20132
+   "impressions": 3278549,
+   "likes": 13182
   },
   {
    "user": "dharmveerSu4ld",
@@ -8427,6 +8476,13 @@
    "posts": 1,
    "impressions": 3207365,
    "likes": 5
+  },
+  {
+   "user": "OhyoPancake",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 3203894,
+   "likes": 270763
   },
   {
    "user": "ChibaZoo",
@@ -9185,6 +9241,13 @@
    "likes": 42835
   },
   {
+   "user": "cinematoday",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2683863,
+   "likes": 3016
+  },
+  {
    "user": "EQ121212",
    "is_watched": false,
    "posts": 1,
@@ -9437,6 +9500,13 @@
    "likes": 7631
   },
   {
+   "user": "qqOoUmYgbI80868",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2550922,
+   "likes": 4896
+  },
+  {
    "user": "B4xMx",
    "is_watched": false,
    "posts": 1,
@@ -9521,6 +9591,13 @@
    "likes": 39138
   },
   {
+   "user": "curumit9",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2518179,
+   "likes": 2079
+  },
+  {
    "user": "CNN",
    "is_watched": false,
    "posts": 1,
@@ -9540,6 +9617,13 @@
    "posts": 1,
    "impressions": 2510351,
    "likes": 10933
+  },
+  {
+   "user": "RealJarTaylor",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2503006,
+   "likes": 30367
   },
   {
    "user": "d4IQioWtOE15165",
@@ -9638,13 +9722,6 @@
    "posts": 1,
    "impressions": 2422369,
    "likes": 1063
-  },
-  {
-   "user": "cinematoday",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 2420543,
-   "likes": 2748
   },
   {
    "user": "campanola0dB",
@@ -9785,13 +9862,6 @@
    "posts": 1,
    "impressions": 2354975,
    "likes": 38951
-  },
-  {
-   "user": "qqOoUmYgbI80868",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 2351599,
-   "likes": 4462
   },
   {
    "user": "davidluiz_cule",
@@ -10032,6 +10102,13 @@
    "likes": 7070
   },
   {
+   "user": "0xzt2z",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2223183,
+   "likes": 7234
+  },
+  {
    "user": "Sleepy_comrade",
    "is_watched": false,
    "posts": 1,
@@ -10044,6 +10121,13 @@
    "posts": 1,
    "impressions": 2208484,
    "likes": 49678
+  },
+  {
+   "user": "i_have_a_pun",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2205976,
+   "likes": 3999
   },
   {
    "user": "fusbow",
@@ -10072,13 +10156,6 @@
    "posts": 1,
    "impressions": 2198933,
    "likes": 529
-  },
-  {
-   "user": "hasenkuniyama",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 2191673,
-   "likes": 10557
   },
   {
    "user": "nikkei_local",
@@ -10291,6 +10368,13 @@
    "likes": 757
   },
   {
+   "user": "himitu_nako",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 2084326,
+   "likes": 6169
+  },
+  {
    "user": "sana_s1014",
    "is_watched": false,
    "posts": 1,
@@ -10359,13 +10443,6 @@
    "posts": 1,
    "impressions": 2056034,
    "likes": 4014
-  },
-  {
-   "user": "yuuka_yuuka_01",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 2051956,
-   "likes": 5560
   },
   {
    "user": "jyoshikokanri",
@@ -10494,6 +10571,13 @@
    "likes": 2352
   },
   {
+   "user": "Embassy_of_SR",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1999498,
+   "likes": 26544
+  },
+  {
    "user": "Pagq9QdQh9SbMQ8",
    "is_watched": false,
    "posts": 1,
@@ -10513,6 +10597,13 @@
    "posts": 1,
    "impressions": 1982516,
    "likes": 19761
+  },
+  {
+   "user": "gongcha_japan",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1970213,
+   "likes": 17181
   },
   {
    "user": "patch_bucho",
@@ -10571,11 +10662,11 @@
    "likes": 25901
   },
   {
-   "user": "RealJarTaylor",
+   "user": "ariyoshihiroiki",
    "is_watched": false,
    "posts": 1,
-   "impressions": 1953567,
-   "likes": 27959
+   "impressions": 1951313,
+   "likes": 15950
   },
   {
    "user": "theyell0wcat",
@@ -10683,6 +10774,13 @@
    "likes": 18223
   },
   {
+   "user": "softlethal",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1905752,
+   "likes": 3896
+  },
+  {
    "user": "istp_hoi",
    "is_watched": false,
    "posts": 1,
@@ -10767,13 +10865,6 @@
    "likes": 4
   },
   {
-   "user": "gongcha_japan",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1873151,
-   "likes": 16709
-  },
-  {
    "user": "t4um7",
    "is_watched": false,
    "posts": 1,
@@ -10814,13 +10905,6 @@
    "posts": 1,
    "impressions": 1859979,
    "likes": 8339
-  },
-  {
-   "user": "XFreeze",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1857311,
-   "likes": 5969
   },
   {
    "user": "game7400",
@@ -10968,6 +11052,13 @@
    "posts": 1,
    "impressions": 1796279,
    "likes": 10999
+  },
+  {
+   "user": "houkaistarrail",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1795317,
+   "likes": 57583
   },
   {
    "user": "AMAZlNGNATURE",
@@ -11138,13 +11229,6 @@
    "likes": 802
   },
   {
-   "user": "0xzt2z",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1703469,
-   "likes": 4805
-  },
-  {
    "user": "1f_yui",
    "is_watched": false,
    "posts": 1,
@@ -11178,6 +11262,13 @@
    "posts": 1,
    "impressions": 1694860,
    "likes": 30500
+  },
+  {
+   "user": "kawananikasann",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1692875,
+   "likes": 20229
   },
   {
    "user": "sudanalytics_",
@@ -11236,6 +11327,13 @@
    "likes": 10121
   },
   {
+   "user": "S_Kochirui",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1675581,
+   "likes": 2965
+  },
+  {
    "user": "_tone_tone_tone",
    "is_watched": false,
    "posts": 1,
@@ -11292,6 +11390,13 @@
    "likes": 27128
   },
   {
+   "user": "moca_sweetdiary",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1662222,
+   "likes": 11116
+  },
+  {
    "user": "error404_erro_r",
    "is_watched": false,
    "posts": 1,
@@ -11299,18 +11404,18 @@
    "likes": 12656
   },
   {
+   "user": "AsianDawn4",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1657126,
+   "likes": 6639
+  },
+  {
    "user": "linneaabyrd",
    "is_watched": false,
    "posts": 1,
    "impressions": 1655111,
    "likes": 6926
-  },
-  {
-   "user": "himitu_nako",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1654281,
-   "likes": 4628
   },
   {
    "user": "DQRPG_JP",
@@ -11453,13 +11558,6 @@
    "likes": 7251
   },
   {
-   "user": "S_Kochirui",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1603087,
-   "likes": 2861
-  },
-  {
    "user": "77654321a",
    "is_watched": false,
    "posts": 1,
@@ -11528,13 +11626,6 @@
    "posts": 1,
    "impressions": 1573820,
    "likes": 3963
-  },
-  {
-   "user": "Embassy_of_SR",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1570899,
-   "likes": 21869
   },
   {
    "user": "amidouyrc",
@@ -11649,13 +11740,6 @@
    "likes": 39746
   },
   {
-   "user": "kawananikasann",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1538752,
-   "likes": 18786
-  },
-  {
    "user": "otearai_1234",
    "is_watched": false,
    "posts": 1,
@@ -11682,6 +11766,13 @@
    "posts": 1,
    "impressions": 1533293,
    "likes": 3053
+  },
+  {
+   "user": "g9uwqf",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1527152,
+   "likes": 62712
   },
   {
    "user": "Chutohanpa1234",
@@ -11880,13 +11971,6 @@
    "likes": 23115
   },
   {
-   "user": "dvesf_yt",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1469083,
-   "likes": 13257
-  },
-  {
    "user": "faaosuruyo",
    "is_watched": false,
    "posts": 1,
@@ -12027,13 +12111,6 @@
    "likes": 13272
   },
   {
-   "user": "houkaistarrail",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1424571,
-   "likes": 49060
-  },
-  {
    "user": "nanaseumai",
    "is_watched": false,
    "posts": 1,
@@ -12146,6 +12223,13 @@
    "likes": 8630
   },
   {
+   "user": "FishInTheNews",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1389201,
+   "likes": 18932
+  },
+  {
    "user": "misatonakayama",
    "is_watched": false,
    "posts": 1,
@@ -12200,13 +12284,6 @@
    "posts": 1,
    "impressions": 1371469,
    "likes": 9891
-  },
-  {
-   "user": "moca_sweetdiary",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1369942,
-   "likes": 8330
   },
   {
    "user": "s_ss_123_",
@@ -12671,11 +12748,25 @@
    "likes": 65859
   },
   {
+   "user": "32nzh",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1264214,
+   "likes": 5373
+  },
+  {
    "user": "Kanzakii_yume",
    "is_watched": false,
    "posts": 1,
    "impressions": 1261637,
    "likes": 9251
+  },
+  {
+   "user": "haniashen",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1261334,
+   "likes": 22964
   },
   {
    "user": "MaverickMuoqxu",
@@ -12846,6 +12937,13 @@
    "likes": 1998
   },
   {
+   "user": "Srsc_a",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1228408,
+   "likes": 12599
+  },
+  {
    "user": "maiashinok48171",
    "is_watched": false,
    "posts": 1,
@@ -12867,13 +12965,6 @@
    "likes": 5901
   },
   {
-   "user": "32nzh",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1226344,
-   "likes": 5130
-  },
-  {
    "user": "H3nsRri",
    "is_watched": false,
    "posts": 1,
@@ -12893,13 +12984,6 @@
    "posts": 1,
    "impressions": 1223156,
    "likes": 42427
-  },
-  {
-   "user": "FishInTheNews",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1222857,
-   "likes": 18010
   },
   {
    "user": "HASU_xz",
@@ -13063,6 +13147,13 @@
    "likes": 13483
   },
   {
+   "user": "HaiwieXX",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1194645,
+   "likes": 10953
+  },
+  {
    "user": "ask9",
    "is_watched": false,
    "posts": 1,
@@ -13173,6 +13264,13 @@
    "posts": 1,
    "impressions": 1176772,
    "likes": 19714
+  },
+  {
+   "user": "charlieINTEL",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1176195,
+   "likes": 5932
   },
   {
    "user": "royal_1jp",
@@ -13595,6 +13693,13 @@
    "likes": 51461
   },
   {
+   "user": "hitadakimasu",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1103675,
+   "likes": 29734
+  },
+  {
    "user": "SmartNotHard1",
    "is_watched": false,
    "posts": 1,
@@ -13777,11 +13882,11 @@
    "likes": 13172
   },
   {
-   "user": "g9uwqf",
+   "user": "RENRENspzo",
    "is_watched": false,
    "posts": 1,
-   "impressions": 1065514,
-   "likes": 48494
+   "impressions": 1064625,
+   "likes": 2230
   },
   {
    "user": "Konn69052919",
@@ -13829,7 +13934,7 @@
    "user": "clubLeo_Lcolle",
    "is_watched": false,
    "posts": 1,
-   "impressions": 1058532,
+   "impressions": 1058544,
    "likes": 912
   },
   {
@@ -13987,6 +14092,13 @@
    "likes": 21070
   },
   {
+   "user": "IterIntellectus",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 1031031,
+   "likes": 3508
+  },
+  {
    "user": "garigariman",
    "is_watched": false,
    "posts": 1,
@@ -14041,13 +14153,6 @@
    "posts": 1,
    "impressions": 1025787,
    "likes": 5291
-  },
-  {
-   "user": "c14english",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 1024724,
-   "likes": 4720
   },
   {
    "user": "vvv060",
@@ -14547,13 +14652,6 @@
    "likes": 2741
   },
   {
-   "user": "hitadakimasu",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 934755,
-   "likes": 25772
-  },
-  {
    "user": "EwigerReichtum",
    "is_watched": false,
    "posts": 1,
@@ -14687,6 +14785,13 @@
    "likes": 11292
   },
   {
+   "user": "Okay_Wasabi",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 916308,
+   "likes": 33464
+  },
+  {
    "user": "namakuri_muoic",
    "is_watched": false,
    "posts": 1,
@@ -14701,18 +14806,18 @@
    "likes": 6830
   },
   {
-   "user": "ariyoshihiroiki",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 913586,
-   "likes": 8651
-  },
-  {
    "user": "wanwangomigomi",
    "is_watched": false,
    "posts": 1,
    "impressions": 912844,
    "likes": 35453
+  },
+  {
+   "user": "MINKEI_NEWS_HK",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 912745,
+   "likes": 5484
   },
   {
    "user": "zaibatsukinmu",
@@ -14785,13 +14890,6 @@
    "likes": 16327
   },
   {
-   "user": "Srsc_a",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 899535,
-   "likes": 9314
-  },
-  {
    "user": "tapple_official",
    "is_watched": false,
    "posts": 1,
@@ -14804,6 +14902,13 @@
    "posts": 1,
    "impressions": 899221,
    "likes": 2845
+  },
+  {
+   "user": "kusogasya",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 899037,
+   "likes": 599
   },
   {
    "user": "rqNy6n",
@@ -15716,25 +15821,11 @@
    "likes": 6078
   },
   {
-   "user": "kusogasya",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 787630,
-   "likes": 514
-  },
-  {
    "user": "3zG4ELuBHFccihO",
    "is_watched": false,
    "posts": 1,
    "impressions": 785388,
    "likes": 25873
-  },
-  {
-   "user": "MINKEI_NEWS_HK",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 785011,
-   "likes": 4693
   },
   {
    "user": "goto_finance",
@@ -15889,13 +15980,6 @@
    "posts": 1,
    "impressions": 765146,
    "likes": 297
-  },
-  {
-   "user": "softlethal",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 765109,
-   "likes": 2263
   },
   {
    "user": "roro_dqx",
@@ -16206,6 +16290,13 @@
    "likes": 571
   },
   {
+   "user": "Chiemama19",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 734667,
+   "likes": 801
+  },
+  {
    "user": "MToriofficial",
    "is_watched": false,
    "posts": 1,
@@ -16346,11 +16437,11 @@
    "likes": 2654
   },
   {
-   "user": "haniashen",
+   "user": "itmedia_news",
    "is_watched": false,
    "posts": 1,
-   "impressions": 710243,
-   "likes": 13253
+   "impressions": 710533,
+   "likes": 1746
   },
   {
    "user": "kagura_kunni",
@@ -16640,13 +16731,6 @@
    "likes": 28039
   },
   {
-   "user": "Chiemama19",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 681622,
-   "likes": 714
-  },
-  {
    "user": "gukko123",
    "is_watched": false,
    "posts": 1,
@@ -16743,13 +16827,6 @@
    "posts": 1,
    "impressions": 669219,
    "likes": 15423
-  },
-  {
-   "user": "itmedia_news",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 668000,
-   "likes": 1650
   },
   {
    "user": "FCBayern",
@@ -16878,6 +16955,20 @@
    "likes": 691
   },
   {
+   "user": "_ryuseiboy",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 650248,
+   "likes": 1830
+  },
+  {
+   "user": "MZvjFVmu2BO1Ch6",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 649107,
+   "likes": 5204
+  },
+  {
    "user": "HigumaMovie",
    "is_watched": false,
    "posts": 1,
@@ -16960,13 +17051,6 @@
    "posts": 1,
    "impressions": 640493,
    "likes": 76
-  },
-  {
-   "user": "IterIntellectus",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 638386,
-   "likes": 3209
   },
   {
    "user": "kyakyakya_amihs",
@@ -17319,25 +17403,11 @@
    "likes": 25667
   },
   {
-   "user": "curumit9",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 600096,
-   "likes": 446
-  },
-  {
    "user": "tkn_0w0",
    "is_watched": false,
    "posts": 1,
    "impressions": 599546,
    "likes": 26006
-  },
-  {
-   "user": "RENRENspzo",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 598399,
-   "likes": 1222
   },
   {
    "user": "0929_kage",
@@ -17401,13 +17471,6 @@
    "posts": 1,
    "impressions": 591402,
    "likes": 3969
-  },
-  {
-   "user": "Oda_world6",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 590738,
-   "likes": 1617
   },
   {
    "user": "gaiotakujyo",
@@ -17480,6 +17543,13 @@
    "likes": 1434
   },
   {
+   "user": "tyawan_tanka",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 583578,
+   "likes": 2148
+  },
+  {
    "user": "McGregorRousey2",
    "is_watched": false,
    "posts": 1,
@@ -17492,13 +17562,6 @@
    "posts": 1,
    "impressions": 582844,
    "likes": 77032
-  },
-  {
-   "user": "tyawan_tanka",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 582026,
-   "likes": 2148
   },
   {
    "user": "KIADu3PPDF68708",
@@ -17767,6 +17830,13 @@
    "likes": 5373
   },
   {
+   "user": "higuchi_takaaki",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 563425,
+   "likes": 1750
+  },
+  {
    "user": "jyu_ta_ro",
    "is_watched": false,
    "posts": 1,
@@ -17942,13 +18012,6 @@
    "likes": 1286
   },
   {
-   "user": "_ryuseiboy",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 547739,
-   "likes": 1585
-  },
-  {
    "user": "narisumashi100",
    "is_watched": false,
    "posts": 1,
@@ -18045,6 +18108,13 @@
    "posts": 1,
    "impressions": 540961,
    "likes": 6037
+  },
+  {
+   "user": "Aviation_Wire",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 539131,
+   "likes": 1230
   },
   {
    "user": "nobutaro_mane",
@@ -18150,13 +18220,6 @@
    "posts": 1,
    "impressions": 524171,
    "likes": 13610
-  },
-  {
-   "user": "Aviation_Wire",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 524031,
-   "likes": 1179
   },
   {
    "user": "IeIx5h",
@@ -18318,6 +18381,13 @@
    "posts": 1,
    "impressions": 514187,
    "likes": 3602
+  },
+  {
+   "user": "asachan4v",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 514160,
+   "likes": 3046
   },
   {
    "user": "nemuaiueo",
@@ -18572,13 +18642,6 @@
    "likes": 285
   },
   {
-   "user": "MZvjFVmu2BO1Ch6",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 493403,
-   "likes": 3843
-  },
-  {
    "user": "getters_iida",
    "is_watched": false,
    "posts": 1,
@@ -18642,13 +18705,6 @@
    "likes": 29044
   },
   {
-   "user": "higuchi_takaaki",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 487165,
-   "likes": 1614
-  },
-  {
    "user": "pancotoday",
    "is_watched": false,
    "posts": 1,
@@ -18689,6 +18745,13 @@
    "posts": 1,
    "impressions": 483396,
    "likes": 1220
+  },
+  {
+   "user": "Tendiemonger",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 483062,
+   "likes": 41039
   },
   {
    "user": "wakeupmornin",
@@ -18822,13 +18885,6 @@
    "posts": 1,
    "impressions": 472627,
    "likes": 608
-  },
-  {
-   "user": "Tendiemonger",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 472581,
-   "likes": 40127
   },
   {
    "user": "DAZN_JPN",
@@ -19706,13 +19762,6 @@
    "likes": 31
   },
   {
-   "user": "asachan4v",
-   "is_watched": false,
-   "posts": 1,
-   "impressions": 404252,
-   "likes": 2320
-  },
-  {
    "user": "roland_0fficial",
    "is_watched": false,
    "posts": 1,
@@ -20588,6 +20637,13 @@
    "likes": 7796
   },
   {
+   "user": "giguwaku",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 353328,
+   "likes": 584
+  },
+  {
    "user": "brian_pak",
    "is_watched": false,
    "posts": 1,
@@ -20642,6 +20698,13 @@
    "posts": 1,
    "impressions": 350915,
    "likes": 3866
+  },
+  {
+   "user": "ricooo_00",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 350186,
+   "likes": 497
   },
   {
    "user": "Mkeekes",
@@ -21892,6 +21955,20 @@
  ],
  "by_day": [
   {
+   "date": "2022-12-23",
+   "posts": 1,
+   "impressions": 407163,
+   "likes": 1514,
+   "categories": {
+    "ホスト": 0,
+    "キャバクラ": 0,
+    "歌舞伎町": 0,
+    "夜職その他": 0,
+    "監視アカウント": 0,
+    "その他": 1
+   }
+  },
+  {
    "date": "2022-12-26",
    "posts": 1,
    "impressions": 798591,
@@ -21964,7 +22041,7 @@
   {
    "date": "2023-05-06",
    "posts": 1,
-   "impressions": 5408071,
+   "impressions": 5409498,
    "likes": 8456,
    "categories": {
     "ホスト": 0,
@@ -22160,7 +22237,7 @@
   {
    "date": "2024-03-12",
    "posts": 1,
-   "impressions": 2947437,
+   "impressions": 2948529,
    "likes": 2995,
    "categories": {
     "ホスト": 0,
@@ -22314,7 +22391,7 @@
   {
    "date": "2024-09-24",
    "posts": 1,
-   "impressions": 9755333,
+   "impressions": 9755812,
    "likes": 8624,
    "categories": {
     "ホスト": 0,
@@ -22508,6 +22585,20 @@
    }
   },
   {
+   "date": "2025-10-12",
+   "posts": 1,
+   "impressions": 5967785,
+   "likes": 3340,
+   "categories": {
+    "ホスト": 0,
+    "キャバクラ": 0,
+    "歌舞伎町": 0,
+    "夜職その他": 0,
+    "監視アカウント": 0,
+    "その他": 1
+   }
+  },
+  {
    "date": "2025-10-17",
    "posts": 1,
    "impressions": 3696132,
@@ -22638,6 +22729,20 @@
    "posts": 1,
    "impressions": 1835911,
    "likes": 37694,
+   "categories": {
+    "ホスト": 0,
+    "キャバクラ": 0,
+    "歌舞伎町": 0,
+    "夜職その他": 0,
+    "監視アカウント": 0,
+    "その他": 1
+   }
+  },
+  {
+   "date": "2025-12-06",
+   "posts": 1,
+   "impressions": 1420396,
+   "likes": 337,
    "categories": {
     "ホスト": 0,
     "キャバクラ": 0,
@@ -23392,8 +23497,8 @@
   {
    "date": "2026-06-30",
    "posts": 3,
-   "impressions": 8176641,
-   "likes": 3635,
+   "impressions": 8329909,
+   "likes": 3682,
    "categories": {
     "ホスト": 2,
     "キャバクラ": 1,
@@ -23742,8 +23847,8 @@
   {
    "date": "2026-08-09",
    "posts": 4,
-   "impressions": 6864393,
-   "likes": 38419,
+   "impressions": 7300995,
+   "likes": 38427,
    "categories": {
     "ホスト": 0,
     "キャバクラ": 1,
@@ -23840,8 +23945,8 @@
   {
    "date": "2026-08-18",
    "posts": 3,
-   "impressions": 8673879,
-   "likes": 7815,
+   "impressions": 8893368,
+   "likes": 7853,
    "categories": {
     "ホスト": 0,
     "キャバクラ": 2,
@@ -24301,16 +24406,16 @@
   },
   {
    "date": "2026-09-30",
-   "posts": 5,
-   "impressions": 31218294,
-   "likes": 10487,
+   "posts": 6,
+   "impressions": 33546529,
+   "likes": 10594,
    "categories": {
     "ホスト": 2,
     "キャバクラ": 0,
     "歌舞伎町": 0,
     "夜職その他": 1,
     "監視アカウント": 3,
-    "その他": 2
+    "その他": 3
    }
   },
   {
@@ -24456,8 +24561,8 @@
   {
    "date": "2026-10-11",
    "posts": 134,
-   "impressions": 315868922,
-   "likes": 2535347,
+   "impressions": 315868946,
+   "likes": 2535348,
    "categories": {
     "ホスト": 6,
     "キャバクラ": 21,
@@ -24470,8 +24575,8 @@
   {
    "date": "2026-10-12",
    "posts": 148,
-   "impressions": 526724920,
-   "likes": 2849285,
+   "impressions": 527065179,
+   "likes": 2849361,
    "categories": {
     "ホスト": 14,
     "キャバクラ": 21,
@@ -24721,16 +24826,16 @@
   },
   {
    "date": "2026-10-30",
-   "posts": 237,
-   "impressions": 431856952,
-   "likes": 1751815,
+   "posts": 238,
+   "impressions": 432209591,
+   "likes": 1752563,
    "categories": {
     "ホスト": 7,
     "キャバクラ": 46,
     "歌舞伎町": 1,
     "夜職その他": 20,
     "監視アカウント": 25,
-    "その他": 175
+    "その他": 176
    }
   },
   {
@@ -24764,8 +24869,8 @@
   {
    "date": "2026-11-02",
    "posts": 117,
-   "impressions": 241530227,
-   "likes": 611873,
+   "impressions": 242367601,
+   "likes": 611950,
    "categories": {
     "ホスト": 14,
     "キャバクラ": 29,
@@ -24862,8 +24967,8 @@
   {
    "date": "2026-11-09",
    "posts": 128,
-   "impressions": 307388832,
-   "likes": 1863409,
+   "impressions": 307715610,
+   "likes": 1864415,
    "categories": {
     "ホスト": 12,
     "キャバクラ": 19,
@@ -24890,8 +24995,8 @@
   {
    "date": "2026-11-11",
    "posts": 131,
-   "impressions": 315439155,
-   "likes": 1492538,
+   "impressions": 316101108,
+   "likes": 1493492,
    "categories": {
     "ホスト": 5,
     "キャバクラ": 18,
@@ -24932,7 +25037,7 @@
   {
    "date": "2026-11-14",
    "posts": 103,
-   "impressions": 207136454,
+   "impressions": 207139690,
    "likes": 998804,
    "categories": {
     "ホスト": 5,
@@ -24946,8 +25051,8 @@
   {
    "date": "2026-11-15",
    "posts": 145,
-   "impressions": 692674116,
-   "likes": 2368802,
+   "impressions": 692693743,
+   "likes": 2368808,
    "categories": {
     "ホスト": 7,
     "キャバクラ": 64,
@@ -24960,8 +25065,8 @@
   {
    "date": "2026-11-16",
    "posts": 257,
-   "impressions": 666618866,
-   "likes": 2658446,
+   "impressions": 666661117,
+   "likes": 2658453,
    "categories": {
     "ホスト": 5,
     "キャバクラ": 40,
@@ -24988,8 +25093,8 @@
   {
    "date": "2026-11-18",
    "posts": 337,
-   "impressions": 659395875,
-   "likes": 5283107,
+   "impressions": 661821918,
+   "likes": 5284094,
    "categories": {
     "ホスト": 9,
     "キャバクラ": 32,
@@ -25001,30 +25106,44 @@
   },
   {
    "date": "2026-11-19",
-   "posts": 216,
-   "impressions": 401811778,
-   "likes": 1639747,
+   "posts": 218,
+   "impressions": 409947307,
+   "likes": 1659430,
    "categories": {
     "ホスト": 15,
     "キャバクラ": 24,
     "歌舞伎町": 4,
     "夜職その他": 12,
     "監視アカウント": 7,
-    "その他": 172
+    "その他": 174
    }
   },
   {
    "date": "2026-11-20",
-   "posts": 282,
-   "impressions": 364263417,
-   "likes": 2304082,
+   "posts": 334,
+   "impressions": 504289142,
+   "likes": 3626712,
    "categories": {
     "ホスト": 5,
-    "キャバクラ": 23,
+    "キャバクラ": 22,
     "歌舞伎町": 3,
     "夜職その他": 9,
     "監視アカウント": 6,
-    "その他": 248
+    "その他": 300
+   }
+  },
+  {
+   "date": "2026-11-21",
+   "posts": 38,
+   "impressions": 30130295,
+   "likes": 368896,
+   "categories": {
+    "ホスト": 0,
+    "キャバクラ": 0,
+    "歌舞伎町": 0,
+    "夜職その他": 0,
+    "監視アカウント": 0,
+    "その他": 38
    }
   }
  ],
@@ -25236,12 +25355,12 @@
     "user": "hukugyou_maniaa",
     "created_jst": "2026-11-16T06:05:42+09:00",
     "metrics": {
-     "impression_count": 51789744,
-     "like_count": 49278,
+     "impression_count": 51831995,
+     "like_count": 49285,
      "retweet_count": null,
      "reply_count": 703,
      "quote_count": 802,
-     "bookmark_count": 4983
+     "bookmark_count": 4980
     },
     "categories": [
      "その他"
@@ -25737,22 +25856,22 @@
     "text": "♡┈┈┈┈┈♡┈┈┈┈┈♡\n🏥ちいかわクリニック💉\n　　  　 動画公開\n♡┈┈┈┈┈♡┈┈┈┈┈♡\n\n▽YouTubeにて告知動画を公開中💓\nhttps://t.co/4McvoI68pv\n\n『ちいかわクリニック』 11月27日(金)より開催🩺\n\n🔍詳細はこちら\nhttps:/"
    },
    {
-    "id": "2109970645203460251",
-    "url": "https://x.com/tu__u_/status/2109970645203460251",
-    "user": "tu__u_",
-    "created_jst": "2026-10-13T20:32:57+09:00",
+    "id": "2123782556789416229",
+    "url": "https://x.com/ngnchiikawa/status/2123782556789416229",
+    "user": "ngnchiikawa",
+    "created_jst": "2026-11-20T23:16:34+09:00",
     "metrics": {
-     "impression_count": 11838432,
-     "like_count": 310119,
-     "retweet_count": 20250,
-     "reply_count": 94,
-     "quote_count": 3777,
-     "bookmark_count": 28682
+     "impression_count": 5741874,
+     "like_count": 313468,
+     "retweet_count": 44467,
+     "reply_count": 985,
+     "quote_count": 6194,
+     "bookmark_count": 8857
     },
     "categories": [
      "その他"
     ],
-    "text": "私こんな煽りLINE送ってしまい顔ない https://t.co/BzC0XZwxhi https://t.co/zfFxFRZ6Pk"
+    "text": "🙌 https://t.co/oGbmNrFJD8"
    }
   ]
  }
