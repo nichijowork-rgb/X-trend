@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21T01:15:21+09:00",
+  "generated_at": "2026-11-21T01:24:09+09:00",
   "week": "2026-11-21",
   "genre_overrides": [
     {
@@ -666,6 +666,17 @@
         "delete"
       ],
       "week": "2026-10-17"
+    },
+    {
+      "topic_id": "m:mwp6t3gf6ly",
+      "source": "site",
+      "name": "ゆぐどら！ライブが賛否両論！？ホストのアイドル活動？",
+      "genre": "夜職その他",
+      "post_ids": [],
+      "deleted": false,
+      "edits": [
+        "new"
+      ]
     },
     {
       "topic_id": "m:s-12zrs701epn1aj",
