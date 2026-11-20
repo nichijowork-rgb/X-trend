@@ -3325,7 +3325,8 @@ async function main() {
           heads: ['.bd-left .bd-h', '.bd-right .bd-h'].map((sel) => document.querySelector(sel).firstChild.textContent),
           filter: document.querySelector('[data-key="bd-filter"]').value, filters: [...document.querySelectorAll('[data-key="bd-filter"] option')].map((e) => e.textContent),
           rows: rows.length, total: Number(document.querySelector('[data-key="bd-lscroll"]').dataset.total), more: Boolean(document.querySelector('[data-key="bd-more-list"]')),
-          sorted: imp.every((x, i) => i === 0 || imp[i - 1] >= x),
+          // おすすめ: 夜職の投稿が先（表示の多い順）→ 一般のバズ（表示の多い順）。＝多い順の並びが 2 つまで（上がるのは境目の 1 回まで）
+          sorted: imp.filter((x, i) => i > 0 && imp[i - 1] < x).length <= 1,
           free: rows.every((id) => { const t = a.topicsById.get(a.postTopic.get(id)); return t && t.kind === 'single' && t.postIds.length === 1; }),
           groups: [...document.querySelectorAll('.bd-card.is-group')].map((e) => [e.dataset.topic, e.querySelector('.bd-kind').textContent]),
           gtotal: Number(document.querySelector('[data-key="bd-rscroll"]').dataset.total),

@@ -391,13 +391,14 @@ function world1() {
 test('①投稿の一覧: 表示の多い順・まだ入っていないものだけ／すべて（入っているまとまりつき）・おすすめ（一般はおすすめだけ）・チップ・検索・ページ分け・片付け／削除は出さない', () => {
   const w = world1();
   // 既定: まだまとまりに入っていない投稿だけ。夜職は全部・一般のバズはおすすめの話題の投稿だけ。表示が不明な投稿は後ろ
+  // おすすめは夜職の投稿が先（表示の多い順）、一般のバズ（d1）はそのあと
   let r = postList(w.ctx);
-  assert.deepEqual(ids(r), ['d1', 'b1', 'b2'], '片付けた話題の投稿（e1）・削除した投稿（z9）・まとまりの中（a1 a2 c1）・おすすめ外の一般（d2）は出ない');
-  assert.deepEqual([r.total, r.more, r.ids], [3, 0, ['d1', 'b1', 'b2']]);
+  assert.deepEqual(ids(r), ['b1', 'b2', 'd1'], '片付けた話題の投稿（e1）・削除した投稿（z9）・まとまりの中（a1 a2 c1）・おすすめ外の一般（d2）は出ない');
+  assert.deepEqual([r.total, r.more, r.ids], [3, 0, ['b1', 'b2', 'd1']]);
   assert.ok(r.items.every((x) => x.group == null && !x.inOpen));
   // すべての投稿: まとまりに入っている投稿は「◯◯に入っています」（group）。1 件でも手で作ったまとまりはまとまり
   r = postList(w.ctx, { filter: 'all' });
-  assert.deepEqual(ids(r), ['c1', 'd1', 'b1', 'a1', 'a2', 'b2']);
+  assert.deepEqual(ids(r), ['c1', 'b1', 'a1', 'a2', 'b2', 'd1'], '夜職（表示の多い順）→ 一般');
   assert.deepEqual(r.items.filter((x) => x.group).map((x) => [x.id, x.group]), [['c1', 'm:2'], ['a1', 'h1'], ['a2', 'h1']]);
   // 開いているまとまりの中の投稿は inOpen（薄く「入っています」）
   r = postList({ ...w.ctx, openId: 'h1' }, { filter: 'all' });
@@ -419,7 +420,7 @@ test('①投稿の一覧: 表示の多い順・まだ入っていないものだ
   assert.deepEqual(ids(postList(w.ctx, { query: '一般', chip: 'host' })), []);
   // ページ分け（ids は全部）
   r = postList(w.ctx, { filter: 'all', limit: 2 });
-  assert.deepEqual([ids(r), r.total, r.more, r.ids.length], [['c1', 'd1'], 6, 4, 6]);
+  assert.deepEqual([ids(r), r.total, r.more, r.ids.length], [['c1', 'b1'], 6, 4, 6]);
   assert.equal(postList(w.ctx, { limit: 0 }).total, 3, '件数だけ数える');
   assert.deepEqual(postList({ weekPosts: [] }), { items: [], total: 0, more: 0, ids: [] });
 });

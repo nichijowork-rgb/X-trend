@@ -449,7 +449,11 @@ export function postList(ctx, opts = {}) {
     list = list.filter((p) => hit.has(p.id));
   }
   const imp = (p) => (p.metrics && Number.isFinite(p.metrics.impression_count) ? p.metrics.impression_count : -1);
-  list = [...list].sort((a, b) => imp(b) - imp(a) || compareIds(a.id, b.id));
+  // 表示の多い順。「おすすめ」（ジャンルを選んでいない・検索していない）では夜職の投稿を先に、一般のバズはそのあと
+  // （一般は表示の桁が大きく、そのままだと先頭を埋めてしまうため。2026-11-21）
+  const nightFirst = c.key === 'rec' && !searching;
+  const night = (p) => (isNightGenre(postGenre(p)) ? 0 : 1);
+  list = [...list].sort((a, b) => (nightFirst ? night(a) - night(b) : 0) || imp(b) - imp(a) || compareIds(a.id, b.id));
   const shown = list.slice(0, Math.max(0, limit));
   return {
     items: shown.map((p) => { const t = topicOf(p); const g = isFolderTopic(t) ? t.id : null; return { id: p.id, group: g, inOpen: Boolean(openId) && t.id === openId }; }),
