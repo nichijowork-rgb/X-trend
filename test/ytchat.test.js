@@ -8,7 +8,7 @@ import {
   CHAT_CFG_DEFAULTS, CHAT_INTERVALS, CHAT_STALE_MS, CHAT_PIN_BOX, CHAT_PIN_RESTORE_MS, YT_API,
   createJsonArrayParser, createStreamBodyReader, streamErrorDecision, streamUrl, createChatClient, STREAM_BACKOFF_MS, applyChatOverrides,
   parseChannelInput, channelsUrl, channelInfoOf, playlistItemsUrl, videosDetailUrl, searchLiveUrl, videoIdsOf, pickActiveLive, createLiveFinder, FINDER_WAIT_TEXT,
-  pinBoxHeight, autoStartPlan,
+  pinBoxHeight, autoStartPlan, stripEmojiCodes,
 } from '../show/js/ytchat.js';
 import { createLaneScheduler, lanesOverlapping, laneY, laneH, laneTop, travelMs, laneBusyMs, pxPerMs, LANE_GAP, QUEUE_MAX } from '../show/js/lanes.js';
 
@@ -833,4 +833,15 @@ test('cleanText: 合体した絵文字（ゼロ幅接合子）は残し、表示
   assert.equal(cleanText(`家族${family}と${rainbow}`), `家族${family}と${rainbow}`);
   assert.equal(cleanText('a​b‮c﻿d⁦e'), 'abcde');
   assert.equal(screenText(`${'あ'.repeat(3)}😂🔥`, 10), 'あああ😂🔥');
+});
+
+test('stripEmojiCodes: YouTube 独自の絵文字の文字（:名前:）を外す。時刻などは残す', () => {
+  assert.equal(stripEmojiCodes(':face-blue-smiling:すごい:hand-pink-waving:'), 'すごい');
+  assert.equal(stripEmojiCodes('メンバー:_kawaiiStamp: です'), 'メンバー です');
+  assert.equal(stripEmojiCodes(':face-blue-smiling::_memberStamp:'), '');
+  assert.equal(stripEmojiCodes('開始は 12:30:00 から'), '開始は 12:30:00 から');
+  assert.equal(stripEmojiCodes('URL: https://example.com'), 'URL: https://example.com');
+  assert.equal(stripEmojiCodes('😂🔥'), '😂🔥');
+  assert.equal(parseChatPrefs({}).hideEmojiCodes, true);
+  assert.equal(parseChatPrefs({ hideEmojiCodes: false }).hideEmojiCodes, false);
 });

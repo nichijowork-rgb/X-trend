@@ -1049,10 +1049,10 @@ async function main() {
       assert(await page.evaluate((k) => !JSON.stringify(window.__show.saved).includes(k), KEY), 'キーは番組の保存データ（書き出し）に入らない');
       // 開始前のコメント（最初の応答）と、そのあとの新しいコメント
       yt.queue.push([T('old-1', '開始前のコメント'), T('old-2', 'これも前')]);
-      yt.queue.push([T('b1', 'こんばんは！'), SC('sc1'), ST('st1'), T('ng1', 'これはＮＧワード入り'), T('b5', 'これは固定するための長いコメントです。'.repeat(4))]);
+      yt.queue.push([T('b1', 'こんばんは！'), SC('sc1'), ST('st1'), T('ng1', 'これはＮＧワード入り'), T('em1', ':yt:すごい:oops:'), T('em2', ':oops::_memberStamp:'), T('b5', 'これは固定するための長いコメントです。'.repeat(4))]);
       await page.fill('[data-key="yc-url"]', 'https://www.youtube.com/live/dQw4w9WgXcQ?si=share');
       await page.click('[data-key="yc-toggle-run"]');
-      await page.waitForFunction(() => document.querySelectorAll('.yc-row').length >= 7, null, { timeout: 8000 });
+      await page.waitForFunction(() => document.querySelectorAll('.yc-row').length >= 9, null, { timeout: 8000 });
       assert((await page.textContent('[data-key="yc-status"]')).includes('取得中'), await page.textContent('[data-key="yc-status"]'));
       assert((await page.textContent('[data-key="yc-toggle-run"]')) === '停止', 'stop label');
       const firstRow = await page.getAttribute('.yc-log > li:first-child', 'data-id');
@@ -1073,6 +1073,13 @@ async function main() {
       await ov.screenshot({ path: path.join(SHOTS, 'comments-flow-1920.png') });
       let launched = await ov.evaluate(() => window.__overlay.chat.launched.map((x) => x.id));
       assert(!launched.includes('old-1') && !launched.includes('old-2') && !launched.includes('ng1'), `開始前・NG は流さない ${launched}`);
+      // 「:face-blue-smiling:」のような絵文字の文字は画面に出さない（既定オン）。絵文字だけのコメントは流さない。一覧にはそのまま
+      await ov.waitForFunction(() => document.querySelector('.cm-item[data-id="em1"]') || window.__overlay.chat.launched.some((x) => x.id === 'em1'), null, { timeout: 8000 });
+      const em1 = await ov.evaluate(() => { const e = document.querySelector('.cm-item[data-id="em1"] .cm-text'); return e ? e.textContent : null; });
+      assert(em1 === null || em1 === 'すごい', `em1 ${em1}`);
+      assert((await page.textContent('.yc-row[data-id="em1"]')).includes(':yt:'), '一覧はそのまま');
+      launched = await ov.evaluate(() => window.__overlay.chat.launched.map((x) => x.id));
+      assert(!launched.includes('em2'), `絵文字だけは流さない ${launched}`);
       // Referer は origin だけ（キーの制限＝ウェブサイトのため）・キーは URL だけ
       const origin = new URL(base).origin;
       assert(yt.referers.length >= 3 && yt.referers.every((r) => r === `${origin}/`), `referer ${[...new Set(yt.referers)]}`);

@@ -206,7 +206,7 @@ export function commentsLogColumn(app) {
 export function chatSettingsDialog(app) {
   const p = app.chatPrefs;
   const u = app.ui;
-  if (!u.ycDraft) u.ycDraft = { key: p.key, interval: p.interval, mode: p.mode, channel: p.channel, ng: p.ng, autoStart: p.autoStart !== false };
+  if (!u.ycDraft) u.ycDraft = { key: p.key, interval: p.interval, mode: p.mode, channel: p.channel, ng: p.ng, autoStart: p.autoStart !== false, hideEmojiCodes: p.hideEmojiCodes !== false };
   const d = u.ycDraft;
   const close = () => { u.ycDlg = false; u.ycDraft = null; u.ycKeyMsg = ''; app.render(); };
   const dlg = h('dialog', { class: 'obs-dialog yc-dialog', attrs: { 'data-modal': '', 'aria-labelledby': 'yc-title' }, dataset: { keep: 'yc-dialog' } });
@@ -222,6 +222,8 @@ export function chatSettingsDialog(app) {
     ...CHAT_INTERVALS.map((ms) => h('option', { value: String(ms), selected: ms === Number(d.interval) }, `${ms / 1000} 秒${ms === 6000 ? '（おすすめ）' : ''}`)));
   interval.addEventListener('change', () => { d.interval = Number(interval.value); });
   const autoStart = h('input', { type: 'checkbox', checked: d.autoStart !== false, dataset: { key: 'yc-autostart' } });
+  const hideCodes = h('input', { type: 'checkbox', checked: d.hideEmojiCodes !== false, dataset: { key: 'yc-hide-codes' } });
+  hideCodes.addEventListener('change', () => { d.hideEmojiCodes = hideCodes.checked; });
   autoStart.addEventListener('change', () => { d.autoStart = autoStart.checked; });
   const mode = h('select', { class: 'input', dataset: { key: 'yc-mode' } },
     h('option', { value: 'auto', selected: d.mode !== 'poll' }, '自動（プッシュ→だめなら数秒ごと）'),
@@ -249,7 +251,7 @@ export function chatSettingsDialog(app) {
       channel.focus();
       return;
     }
-    app.chatSavePrefs({ key: k, interval: d.interval, mode: d.mode, channel: chIn, ng: d.ng, autoStart: d.autoStart !== false });
+    app.chatSavePrefs({ key: k, interval: d.interval, mode: d.mode, channel: chIn, ng: d.ng, autoStart: d.autoStart !== false, hideEmojiCodes: d.hideEmojiCodes !== false });
     u.ycDraft = null;
     u.ycDlg = false;
     app.toast('コメントの設定を保存しました');
@@ -266,6 +268,7 @@ export function chatSettingsDialog(app) {
       field('チャンネル', channel, '（登録すると、配信の URL を空にして「開始」したとき、このチャンネルの今の配信を自動で探します）'),
       chMsg,
       h('label', { class: 'check-line' }, autoStart, h('span', {}, '進行の「▶ 配信開始」でコメントの取得も始める（URL が入っていればその配信、無ければチャンネルから探します）')),
+      h('label', { class: 'check-line' }, hideCodes, h('span', {}, 'YouTube 独自の絵文字・メンバースタンプ（「:face-blue-smiling:」のような文字）を画面に出さない（絵文字だけのコメントは流しません。一覧にはそのまま残ります）')),
       field('取得方式', mode, '（プッシュはコメントがすぐ届きます。使えないときは自動で数秒ごとに切り替わります）'),
       field('取得間隔（数秒ごとのとき）', interval, '（短いほど早く出ますが、1 日の上限を早く使います）'),
       h('p', { class: 'muted yc-quota', dataset: { key: 'yc-quota' } }, quotaText(app)),

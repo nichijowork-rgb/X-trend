@@ -35,7 +35,7 @@ export const CHAT_CFG_LIMITS = Object.freeze({
   lanes: [1, 12], size: [16, 96], icon: [20, 120], name: [10, 48], speed: [3, 30], pinSize: [16, 96], pinLines: [1, 3],
   bandMinW: 200, bandMinH: 30, laneMinH: 24, pinMinW: 300, pinMaxY: 1020,
 });
-export const CHAT_DEFAULTS = Object.freeze({ key: '', url: '', channel: '', channelInfo: null, mode: 'auto', interval: 6000, ng: '', pin: null, pinnedAt: null, autoStart: true });
+export const CHAT_DEFAULTS = Object.freeze({ key: '', url: '', channel: '', channelInfo: null, mode: 'auto', interval: 6000, ng: '', pin: null, pinnedAt: null, autoStart: true, hideEmojiCodes: true });
 /** アイコンとして使ってよい画像の置き場所（YouTube のプロフィール画像） */
 export const YT_IMAGE_HOSTS = Object.freeze(['yt3.ggpht.com', 'yt4.ggpht.com', 'yt3.googleusercontent.com', 'lh3.googleusercontent.com']);
 /** スーパーチャットの色（tier 1〜7。YouTube の色に近い値） */
@@ -53,6 +53,15 @@ export function cleanText(s, max = 500) {
   const t = String(s ?? '').replace(/[\r\n\t]+/g, ' ').replace(BAD_CHARS, '').replace(/ {2,}/g, ' ').trim();
   const cp = Array.from(t);
   return cp.length > max ? cp.slice(0, max).join('') : t;
+}
+
+/**
+ * YouTube 独自の絵文字・メンバーのスタンプは、API では「:face-blue-smiling:」「:_name:」のような文字で届く（画像は来ない）。
+ * 画面に出すときに外す（設定「:名前: の絵文字を画面に出さない」。既定オン）。英字を 1 つ以上含む :…: だけ（「12:30:00」は外さない）
+ */
+const EMOJI_CODE = /:(?=[A-Za-z0-9_-]*[A-Za-z])[A-Za-z0-9_-]{1,80}:/g;
+export function stripEmojiCodes(s) {
+  return String(s ?? '').replace(EMOJI_CODE, ' ').replace(/ {2,}/g, ' ').trim();
 }
 
 /** 画面用の短い本文（max 文字を超えたら最後を … に） */
@@ -458,6 +467,7 @@ export function parseChatPrefs(raw) {
     mode: CHAT_MODES.includes(o.mode) ? o.mode : 'auto',
     interval,
     autoStart: o.autoStart !== false,
+    hideEmojiCodes: o.hideEmojiCodes !== false,
     ng: typeof o.ng === 'string' ? o.ng.slice(0, 5000) : '',
     layout: { band: cfg.band, lanes: cfg.lanes, size: cfg.size, icon: cfg.icon, name: cfg.name, speed: cfg.speed, pin: cfg.pin },
     flow: cfg.flow,

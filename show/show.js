@@ -26,7 +26,7 @@ import { createObsClient, parseObsPrefs, OBS_PREF_KEY } from './js/obs.js';
 import {
   YT_CHAT_PREF_KEY, CHAT_LOG_MAX, parseChatPrefs, parseVideoId, validKey, looksLikeGoogleKey, createChatClient, applyChatBatch, ngMatcher, parseNgWords,
   buildChatMessage, sanitizeChatCfg, restorePin, demoChatItem, demoChatPin, quotaUnits, parseChannelInput, createLiveFinder,
-  autoStartPlan, videosUrl, liveChatIdOf,
+  autoStartPlan, videosUrl, liveChatIdOf, stripEmojiCodes,
 } from './js/ytchat.js';
 import { refreshChatPanel } from './js/views/chatui.js';
 import { createLeaderLock, createSyncFilter, envelope, chatSnapshot, applySnapshot, isCollecting, SYNC_CHANNEL, SYNC_COMMANDS, LOCK_KEY, HEARTBEAT_MS } from './js/chatsync.js';
@@ -962,9 +962,15 @@ window.addEventListener('storage', (e) => {
 function sendChat({ add = [], remove = [] } = {}) {
   if (!isLeader()) return;
   const pv = chatPreview && chatPreview.obs;
+  // 「:face-blue-smiling:」のような絵文字の文字は画面に出さない（設定。既定オン）。外して空になった普通のコメントは流さない
+  if (app.chatPrefs.hideEmojiCodes !== false) {
+    add = add.map((it) => (it && typeof it.text === 'string' ? { ...it, text: stripEmojiCodes(it.text) } : it)).filter((it) => it && (it.text || it.kind !== 'text'));
+  }
+  let pin = pv ? demoChatPin(0) : app.chat.pin;
+  if (pin && !pv && app.chatPrefs.hideEmojiCodes !== false && typeof pin.text === 'string') pin = { ...pin, text: stripEmojiCodes(pin.text) || pin.text };
   const msg = buildChatMessage({
     sid: chatWire.sid, seq: ++chatWire.seq, at: Date.now(), add, remove,
-    pin: pv ? demoChatPin(0) : app.chat.pin, cfg: pv ? { ...chatCfg(), flow: true } : chatCfg(),
+    pin, cfg: pv ? { ...chatCfg(), flow: true } : chatCfg(),
   });
   app.lastChatSent = msg;
   if (overlay.bc) { try { overlay.bc.postMessage(msg); } catch { /* 無視 */ } }
