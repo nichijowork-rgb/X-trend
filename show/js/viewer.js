@@ -15,6 +15,8 @@ const PRESET_KEYS = VIEWER_PRESETS.map((x) => x.key);
 /** 右半分・左半分・全体のときの大きさ（その範囲に対する %。範囲の真ん中に置く）。2026-11-21 オーナー: 70% くらいで真ん中に */
 export const VIEWER_SCALES = Object.freeze([50, 60, 70, 80, 90, 100]);
 export const VIEWER_SCALE_DEFAULT = 70;
+/** 設定の版。2: 「進行で投稿をクリックしたら開く」を既定オンに（それより前に保存した設定もオンにする。2026-11-21 オーナー） */
+export const VIEWER_PREFS_VERSION = 2;
 
 const num = (v, lo, hi, d) => (Number.isFinite(Number(v)) && v !== '' && v != null ? Math.max(lo, Math.min(hi, Math.round(Number(v)))) : d);
 
@@ -28,7 +30,7 @@ export function screenSnapshot(s, i = 0) {
 }
 
 export function defaultViewerPrefs() {
-  return { preset: 'right', left: 960, top: 0, width: 640, height: 900, scale: VIEWER_SCALE_DEFAULT, screen: null, catcher: true, openOnClick: false };
+  return { preset: 'right', left: 960, top: 0, width: 640, height: 900, scale: VIEWER_SCALE_DEFAULT, screen: null, catcher: true, openOnClick: true, v: VIEWER_PREFS_VERSION };
 }
 
 /** 保存した設定を読む（壊れていれば既定） */
@@ -46,7 +48,9 @@ export function parseViewerPrefs(raw) {
     scale: num(o.scale, 30, 100, d.scale),
     screen: o.screen ? screenSnapshot({ ...o.screen, availLeft: o.screen.left, availTop: o.screen.top, availWidth: o.screen.width, availHeight: o.screen.height, isPrimary: o.screen.primary }) : null,
     catcher: o.catcher !== false,
-    openOnClick: o.openOnClick === true,
+    // 版 2 より前の保存（既定オフだったころ）はオンにする
+    openOnClick: Number(o.v) >= VIEWER_PREFS_VERSION ? o.openOnClick === true : true,
+    v: VIEWER_PREFS_VERSION,
   };
 }
 

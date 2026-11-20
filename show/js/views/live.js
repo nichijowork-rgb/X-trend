@@ -286,6 +286,8 @@ function itemEl(app, t, id, index, shownId, items) {
   el.addEventListener('click', (e) => {
     if (e.target.closest('button, summary, details, input, textarea, a, .li-bar')) return;
     if (id !== shownId) app.liveAction('show', { postId: id });
+    // 「進行で投稿をクリックしたら開く」（既定オン）: カードの余白を押しても専用ウィンドウで開く
+    if (!isImg && app.viewerPrefs.openOnClick) app.openViewer(statusUrl(id));
   });
   if (isImg) el.append(bar, imageBody(app, id));
   else {

@@ -2190,7 +2190,10 @@ test('投稿を開くウィンドウ: 位置のプリセット（中央・右半
   assert.equal(p.catcher, false);
   assert.equal(p.openOnClick, true);
   assert.equal(parseViewerPrefs({ preset: 'x' }).preset, 'right');
-  assert.ok(defaultViewerPrefs().catcher && !defaultViewerPrefs().openOnClick, 'クリック受けは既定オン・クリックで開くは既定オフ');
+  assert.ok(defaultViewerPrefs().catcher && defaultViewerPrefs().openOnClick, 'クリック受け・クリックで開くは既定オン');
+  assert.equal(parseViewerPrefs({ preset: 'left', openOnClick: false }).openOnClick, true, '版 2 より前の保存（既定オフのころ）はオンにする');
+  assert.equal(parseViewerPrefs({ preset: 'left', openOnClick: false, v: 2 }).openOnClick, false, '版 2 からはオフにした選択を残す');
+  assert.equal(parseViewerPrefs(parseViewerPrefs({ openOnClick: false, v: 2 })).openOnClick, false, '保存し直してもオフのまま');
   assert.ok(isXUrl('https://x.com/a/status/1') && isXUrl('https://twitter.com/a') && !isXUrl('https://example.com/') && !isXUrl('javascript:alert(1)'));
   // 開き方: 名前付き・指定サイズ・使い回すウィンドウも位置を合わせ直す／ブロックされたら false
   const calls = [];
