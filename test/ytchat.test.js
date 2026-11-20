@@ -826,3 +826,11 @@ test('autoStartPlan: 配信開始でコメントも始める段取り', () => {
   assert.equal(parseChatPrefs({}).autoStart, true);
   assert.equal(parseChatPrefs({ autoStart: false }).autoStart, false);
 });
+
+test('cleanText: 合体した絵文字（ゼロ幅接合子）は残し、表示を崩す文字は外す', () => {
+  const family = '\u{1F468}‍\u{1F469}‍\u{1F467}';
+  const rainbow = '\u{1F3F3}️‍\u{1F308}';
+  assert.equal(cleanText(`家族${family}と${rainbow}`), `家族${family}と${rainbow}`);
+  assert.equal(cleanText('a​b‮c﻿d⁦e'), 'abcde');
+  assert.equal(screenText(`${'あ'.repeat(3)}😂🔥`, 10), 'あああ😂🔥');
+});
