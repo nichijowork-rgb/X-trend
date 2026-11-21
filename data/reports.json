@@ -1,6 +1,62 @@
 {
- "generated_at": "2026-11-21T00:35:04+09:00",
+ "generated_at": "2026-11-22T00:04:33+09:00",
  "daily": [
+  {
+   "date": "2026-11-21",
+   "rising": [],
+   "rising_watch": [
+    {
+     "id": "2124106303031369844",
+     "views": 120560,
+     "hours_since_post": 2.79,
+     "views_per_hour": 43142,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "あっすんさん・林社長関連の話題が続いている"
+    }
+   ],
+   "review": [
+    {
+     "id": "2123734431764775316",
+     "before_views": 368831,
+     "after_views": 1273389,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2123709884663480762",
+     "before_views": 386962,
+     "after_views": 1292962,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2123706700926787858",
+     "before_views": 257453,
+     "after_views": 663286,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2123724391725121561",
+     "before_views": 155966,
+     "after_views": 359280,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-20",
    "rising": [
