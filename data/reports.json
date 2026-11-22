@@ -1,6 +1,107 @@
 {
- "generated_at": "2026-11-22T00:04:33+09:00",
+ "generated_at": "2026-11-23T00:02:10+09:00",
  "daily": [
+  {
+   "date": "2026-11-22",
+   "rising": [
+    {
+     "id": "2124469530844090421",
+     "views": 301921,
+     "hours_since_post": 2.65,
+     "views_per_hour": 113817,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2124386665531924562",
+     "views": 470999,
+     "hours_since_post": 8.14,
+     "views_per_hour": 57857,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2124476392536678544",
+     "views": 297617,
+     "hours_since_post": 2.2,
+     "views_per_hour": 135388,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコールの痛客回（社美緒さん）の切り抜き"
+    },
+    {
+     "id": "2124471783965266182",
+     "views": 238570,
+     "hours_since_post": 2.5,
+     "views_per_hour": 95293,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ソープの「壺洗い」を解説"
+    },
+    {
+     "id": "2124475555433312316",
+     "views": 200770,
+     "hours_since_post": 2.25,
+     "views_per_hour": 89080,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール公式の志願者回の切り抜き"
+    },
+    {
+     "id": "2124478790986510613",
+     "views": 146009,
+     "hours_since_post": 2.04,
+     "views_per_hour": 71595,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール痛客回（社美緒さん）"
+    },
+    {
+     "id": "2124462383234154968",
+     "views": 217015,
+     "hours_since_post": 3.13,
+     "views_per_hour": 69422,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "六本木バロンのキャストの暴露"
+    },
+    {
+     "id": "2124476428783890598",
+     "views": 136503,
+     "hours_since_post": 2.2,
+     "views_per_hour": 62167,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "あっすんさん獄中結婚の話題"
+    },
+    {
+     "id": "2124477226414641271",
+     "views": 128772,
+     "hours_since_post": 2.14,
+     "views_per_hour": 60090,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ラストコール公式の志願者回の切り抜き（2本目）"
+    },
+    {
+     "id": "2124451196882546877",
+     "views": 197306,
+     "hours_since_post": 3.87,
+     "views_per_hour": 51025,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウント。ラヴ上等の話題"
+    }
+   ],
+   "review": [
+    {
+     "id": "2124106303031369844",
+     "before_views": 120560,
+     "after_views": 416321,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 1,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-21",
    "rising": [],
