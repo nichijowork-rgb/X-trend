@@ -1,6 +1,144 @@
 {
- "generated_at": "2026-11-23T00:02:10+09:00",
+ "generated_at": "2026-11-24T00:01:39+09:00",
  "daily": [
+  {
+   "date": "2026-11-23",
+   "rising": [
+    {
+     "id": "2124806003091030368",
+     "views": 477565,
+     "hours_since_post": 4.42,
+     "views_per_hour": 107926,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2124816409213743519",
+     "views": 336046,
+     "hours_since_post": 3.74,
+     "views_per_hour": 89953,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2124789109571096617",
+     "views": 412427,
+     "hours_since_post": 5.54,
+     "views_per_hour": 74398,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2124835564163879187",
+     "views": 281926,
+     "hours_since_post": 2.47,
+     "views_per_hour": 114271,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "けんきさんの件の続報（被害女性は会社員らしい）"
+    },
+    {
+     "id": "2124831324167131154",
+     "views": 170536,
+     "hours_since_post": 2.75,
+     "views_per_hour": 62058,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "桜伊みやこさんの3年前と現在の比較"
+    }
+   ],
+   "review": [
+    {
+     "id": "2124469530844090421",
+     "before_views": 301921,
+     "after_views": 2358107,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2124386665531924562",
+     "before_views": 470999,
+     "after_views": 1038973,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2124476392536678544",
+     "before_views": 297617,
+     "after_views": 851078,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124471783965266182",
+     "before_views": 238570,
+     "after_views": 3105514,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124475555433312316",
+     "before_views": 200770,
+     "after_views": 1176354,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124478790986510613",
+     "before_views": 146009,
+     "after_views": 1467342,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124462383234154968",
+     "before_views": 217015,
+     "after_views": 616917,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124476428783890598",
+     "before_views": 136503,
+     "after_views": 1400827,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124477226414641271",
+     "before_views": 128772,
+     "after_views": 474291,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124451196882546877",
+     "before_views": 197306,
+     "after_views": 476153,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 6,
+     "crossed": 5
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-22",
    "rising": [
