@@ -1,6 +1,106 @@
 {
- "generated_at": "2026-11-24T00:01:39+09:00",
+ "generated_at": "2026-11-25T00:03:32+09:00",
  "daily": [
+  {
+   "date": "2026-11-24",
+   "rising": [
+    {
+     "id": "2125209834836611242",
+     "views": 255573,
+     "hours_since_post": 1.62,
+     "views_per_hour": 157712,
+     "condition_label": "投稿から2時間以内で15万表示以上"
+    },
+    {
+     "id": "2125177850479390736",
+     "views": 436366,
+     "hours_since_post": 3.74,
+     "views_per_hour": 116720,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2125169063831998878",
+     "views": 475230,
+     "hours_since_post": 4.32,
+     "views_per_hour": 109994,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2125053110892814580",
+     "views": 403429,
+     "hours_since_post": 12.0,
+     "views_per_hour": 33619,
+     "condition_label": "投稿から12時間以内で40万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2125157726808375388",
+     "views": 210885,
+     "hours_since_post": 5.07,
+     "views_per_hour": 41584,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "六本木バロン荻野目ちゃんの話題の続き"
+    },
+    {
+     "id": "2125161440244076746",
+     "views": 171585,
+     "hours_since_post": 4.83,
+     "views_per_hour": 35558,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "元CLUB Zoo一條りおなさんと元エースファクトリーみゆうさんの対談の話題"
+    }
+   ],
+   "review": [
+    {
+     "id": "2124806003091030368",
+     "before_views": 477565,
+     "after_views": 909478,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2124816409213743519",
+     "before_views": 336046,
+     "after_views": 1111396,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2124789109571096617",
+     "before_views": 412427,
+     "after_views": 670662,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2124835564163879187",
+     "before_views": 281926,
+     "after_views": 2035850,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2124831324167131154",
+     "before_views": 170536,
+     "after_views": 597390,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-11-23",
    "rising": [
