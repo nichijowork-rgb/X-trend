@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-11-25T00:03:32+09:00",
+ "generated_at": "2026-11-25T00:24:58+09:00",
  "min_impressions": 300000,
- "total_posts": 8626,
- "total_accounts": 3607,
+ "total_posts": 8627,
+ "total_accounts": 3608,
  "below_threshold_posts": 108,
  "report_missing_ids": [],
  "unknown_user_posts": 0,
@@ -143,8 +143,8 @@
   },
   "キャバクラ": {
    "posts": 1322,
-   "impressions": 3046743846,
-   "likes": 6868133
+   "impressions": 3046744721,
+   "likes": 6868129
   },
   "歌舞伎町": {
    "posts": 129,
@@ -162,9 +162,9 @@
    "likes": 5137523
   },
   "その他": {
-   "posts": 6508,
-   "impressions": 16939465536,
-   "likes": 110909323
+   "posts": 6509,
+   "impressions": 16940145289,
+   "likes": 110912698
   }
  },
  "by_account": [
@@ -1348,8 +1348,8 @@
    "user": "IoBsoIll2IAKlRA",
    "is_watched": false,
    "posts": 7,
-   "impressions": 11221298,
-   "likes": 16102
+   "impressions": 11221409,
+   "likes": 16101
   },
   {
    "user": "minatoku_benjo",
@@ -2370,7 +2370,7 @@
    "user": "hst_tvasahi",
    "is_watched": false,
    "posts": 3,
-   "impressions": 44173053,
+   "impressions": 44173353,
    "likes": 22435
   },
   {
@@ -11022,8 +11022,8 @@
    "user": "w67cn",
    "is_watched": false,
    "posts": 1,
-   "impressions": 2480507,
-   "likes": 9195
+   "impressions": 2480971,
+   "likes": 9192
   },
   {
    "user": "karageru_0213",
@@ -19186,6 +19186,13 @@
    "posts": 1,
    "impressions": 680441,
    "likes": 1308
+  },
+  {
+   "user": "daisuchiT_T",
+   "is_watched": false,
+   "posts": 1,
+   "impressions": 679753,
+   "likes": 3375
   },
   {
    "user": "nanami2942",
@@ -28600,8 +28607,8 @@
   {
    "date": "2026-11-15",
    "posts": 151,
-   "impressions": 703739356,
-   "likes": 2374272,
+   "impressions": 703739931,
+   "likes": 2374268,
    "categories": {
     "ホスト": 7,
     "キャバクラ": 67,
@@ -28614,7 +28621,7 @@
   {
    "date": "2026-11-16",
    "posts": 258,
-   "impressions": 668792001,
+   "impressions": 668792301,
    "likes": 2662027,
    "categories": {
     "ホスト": 5,
@@ -28725,16 +28732,16 @@
   },
   {
    "date": "2026-11-24",
-   "posts": 255,
-   "impressions": 347657736,
-   "likes": 2307658,
+   "posts": 256,
+   "impressions": 348337489,
+   "likes": 2311033,
    "categories": {
     "ホスト": 2,
     "キャバクラ": 13,
     "歌舞伎町": 3,
     "夜職その他": 5,
     "監視アカウント": 2,
-    "その他": 237
+    "その他": 238
    }
   }
  ],

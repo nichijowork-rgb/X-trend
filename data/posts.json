@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-25T00:03:32+09:00",
+ "generated_at": "2026-11-25T00:24:58+09:00",
  "min_impressions": 300000,
  "categories": [
   "ホスト",
@@ -4912,6 +4912,85 @@
      "height": 3840
     }
    ]
+  },
+  {
+   "id": "2124925570937176232",
+   "url": "https://x.com/daisuchiT_T/status/2124925570937176232",
+   "user": "daisuchiT_T",
+   "created_utc": "2026-11-23T17:58:29Z",
+   "created_jst": "2026-11-24T02:58:29+09:00",
+   "ts": 1795456709,
+   "metrics": {
+    "impression_count": 679753,
+    "like_count": 3375,
+    "retweet_count": null,
+    "reply_count": 1,
+    "quote_count": 605,
+    "bookmark_count": 1587
+   },
+   "text": "https://t.co/PMr909vIBi",
+   "categories": [
+    "その他"
+   ],
+   "matched_terms": [],
+   "is_watched": false,
+   "media": [
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1Aix2bcAAQ5kC.jpg",
+     "width": 942,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1AiyBakAA00Nh.jpg",
+     "width": 942,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1AiyBbYAArJ7e.jpg",
+     "width": 942,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1Aix5bcAA0dkf.jpg",
+     "width": 942,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1AiyDbkAAhuGI.jpg",
+     "width": 942,
+     "height": 2048
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1AiyHbIAAK0r0.jpg",
+     "width": 1108,
+     "height": 1477
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1AiyBbAAAMKIk.jpg",
+     "width": 1103,
+     "height": 1483
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1Aix5aMAAN1Mf.jpg",
+     "width": 1108,
+     "height": 1477
+    },
+    {
+     "type": "photo",
+     "url": "https://pbs.twimg.com/media/HX1Aix7aEAA9swK.jpg",
+     "width": 1058,
+     "height": 1477
+    }
+   ],
+   "in_bookmarks": true
   },
   {
    "id": "2124924349710741798",
@@ -69318,7 +69397,7 @@
    "created_jst": "2026-11-16T23:14:27+09:00",
    "ts": 1794838467,
    "metrics": {
-    "impression_count": 80727,
+    "impression_count": 81027,
     "like_count": 100,
     "retweet_count": null,
     "reply_count": 16,
@@ -79970,12 +80049,12 @@
    "created_jst": "2026-11-15T12:34:24+09:00",
    "ts": 1794713664,
    "metrics": {
-    "impression_count": 909470,
-    "like_count": 1107,
+    "impression_count": 909581,
+    "like_count": 1106,
     "retweet_count": null,
     "reply_count": 11,
     "quote_count": 8,
-    "bookmark_count": 260
+    "bookmark_count": 259
    },
    "text": "【衝撃】\n「あっすん」こと小栗彩朱佳容疑者（31）、\n逮捕の瞬間がやばかった… https://t.co/FCKSIzKBY9 https://t.co/pNUg4FCMsp",
    "categories": [
@@ -81509,12 +81588,12 @@
    "created_jst": "2026-11-15T05:02:20+09:00",
    "ts": 1794686540,
    "metrics": {
-    "impression_count": 2480507,
-    "like_count": 9195,
+    "impression_count": 2480971,
+    "like_count": 9192,
     "retweet_count": null,
     "reply_count": 39,
     "quote_count": 86,
-    "bookmark_count": 972
+    "bookmark_count": 970
    },
    "text": "早めにあっすん捕まってるww https://t.co/IGfZQmJw2l https://t.co/1JPPRFcwpR",
    "categories": [
