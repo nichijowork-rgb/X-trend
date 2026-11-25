@@ -1,6 +1,110 @@
 {
- "generated_at": "2026-11-25T00:03:32+09:00",
+ "generated_at": "2026-11-26T00:05:17+09:00",
  "daily": [
+  {
+   "date": "2026-11-25",
+   "rising": [],
+   "rising_watch": [
+    {
+     "id": "2125565259155206509",
+     "views": 155928,
+     "hours_since_post": 2.1,
+     "views_per_hour": 74157,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "元メン地下の男性（現在は歌舞伎町のBAR勤務）への告発投稿"
+    },
+    {
+     "id": "2125522381204771009",
+     "views": 271684,
+     "hours_since_post": 4.94,
+     "views_per_hour": 54970,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "コンカフェ嬢の「もらい物のアイコス」動画"
+    },
+    {
+     "id": "2125554485443678263",
+     "views": 129486,
+     "hours_since_post": 2.82,
+     "views_per_hour": 45978,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "風俗嬢ネタの動画投稿"
+    },
+    {
+     "id": "2125514848297435615",
+     "views": 234923,
+     "hours_since_post": 5.44,
+     "views_per_hour": 43174,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "「副業で夜職してる看護師」のひとこと投稿"
+    }
+   ],
+   "review": [
+    {
+     "id": "2125209834836611242",
+     "before_views": 255573,
+     "after_views": 1644011,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2125177850479390736",
+     "before_views": 436366,
+     "after_views": 655530,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2125169063831998878",
+     "before_views": 475230,
+     "after_views": 3649031,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2125053110892814580",
+     "before_views": 403429,
+     "after_views": 519825,
+     "crossed_500k": true,
+     "source": "rising"
+    },
+    {
+     "id": "2125157726808375388",
+     "before_views": 210885,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125161440244076746",
+     "before_views": 171585,
+     "after_views": 273754,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から2時間以内で15万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で30万表示以上",
+     "total": 2,
+     "crossed": 2
+    },
+    {
+     "condition_label": "投稿から12時間以内で40万表示以上",
+     "total": 1,
+     "crossed": 1
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 0
+    }
+   ]
+  },
   {
    "date": "2026-11-24",
    "rising": [
