@@ -1,6 +1,86 @@
 {
- "generated_at": "2026-11-26T00:05:17+09:00",
+ "generated_at": "2026-11-27T00:09:22+09:00",
  "daily": [
+  {
+   "date": "2026-11-26",
+   "rising": [],
+   "rising_watch": [
+    {
+     "id": "2125919189282283616",
+     "views": 237563,
+     "hours_since_post": 2.55,
+     "views_per_hour": 93107,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "見張るアカウントの星乃リアさんバースデー装飾の投稿"
+    },
+    {
+     "id": "2125915514484797539",
+     "views": 210762,
+     "hours_since_post": 2.8,
+     "views_per_hour": 75404,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "ホストと太客を題材にしたBL漫画の告知"
+    },
+    {
+     "id": "2125913708249375063",
+     "views": 124148,
+     "hours_since_post": 2.91,
+     "views_per_hour": 42596,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "歌舞伎町の詐欺グループの注意喚起"
+    },
+    {
+     "id": "2125870674791031100",
+     "views": 188753,
+     "hours_since_post": 5.76,
+     "views_per_hour": 32744,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "見張るアカウントの星乃リアさん「集客足りない」続報"
+    }
+   ],
+   "review": [
+    {
+     "id": "2125565259155206509",
+     "before_views": 155928,
+     "after_views": null,
+     "crossed_500k": null,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125522381204771009",
+     "before_views": 271684,
+     "after_views": 1514888,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125554485443678263",
+     "before_views": 129486,
+     "after_views": 232080,
+     "crossed_500k": false,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125514848297435615",
+     "before_views": 234923,
+     "after_views": 2033522,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 2,
+     "crossed": 0
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 2,
+     "crossed": 2
+    }
+   ]
+  },
   {
    "date": "2026-11-25",
    "rising": [],
