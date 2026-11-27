@@ -1,6 +1,100 @@
 {
- "generated_at": "2026-11-27T00:09:22+09:00",
+ "generated_at": "2026-11-28T00:09:53+09:00",
  "daily": [
+  {
+   "date": "2026-11-27",
+   "rising": [
+    {
+     "id": "2126267325951410424",
+     "views": 345978,
+     "hours_since_post": 3.66,
+     "views_per_hour": 94534,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2126249671882661935",
+     "views": 376949,
+     "hours_since_post": 4.83,
+     "views_per_hour": 78060,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    },
+    {
+     "id": "2126260437469859988",
+     "views": 305118,
+     "hours_since_post": 4.12,
+     "views_per_hour": 74126,
+     "condition_label": "投稿から6時間以内で30万表示以上"
+    }
+   ],
+   "rising_watch": [
+    {
+     "id": "2126284270222323769",
+     "views": 184874,
+     "hours_since_post": 2.54,
+     "views_per_hour": 72854,
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "reason": "「嬢と客が結婚」の動画付き投稿（6時間15万・1時間3万の条件も満たす）"
+    },
+    {
+     "id": "2126265038466122092",
+     "views": 215005,
+     "hours_since_post": 3.81,
+     "views_per_hour": 56410,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "マンジャロ転売・ホスト課金事件の続報"
+    },
+    {
+     "id": "2126233643001745553",
+     "views": 224489,
+     "hours_since_post": 5.89,
+     "views_per_hour": 38109,
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "reason": "七崎由紀乃容疑者の続報（同じアカウントの別投稿が326万表示）"
+    }
+   ],
+   "review": [
+    {
+     "id": "2125919189282283616",
+     "before_views": 237563,
+     "after_views": 3239908,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125915514484797539",
+     "before_views": 210762,
+     "after_views": 679180,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125913708249375063",
+     "before_views": 124148,
+     "after_views": 714833,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    },
+    {
+     "id": "2125870674791031100",
+     "before_views": 188753,
+     "after_views": 636821,
+     "crossed_500k": true,
+     "source": "rising_watch"
+    }
+   ],
+   "hit_rate": [
+    {
+     "condition_label": "投稿から3時間以内で10万表示以上",
+     "total": 3,
+     "crossed": 3
+    },
+    {
+     "condition_label": "投稿から6時間以内で15万表示以上、かつ1時間あたり3万表示以上",
+     "total": 1,
+     "crossed": 1
+    }
+   ]
+  },
   {
    "date": "2026-11-26",
    "rising": [],
