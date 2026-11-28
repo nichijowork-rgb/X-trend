@@ -3580,6 +3580,272 @@ async function main() {
       await c.close();
     });
 
+    // ---- 4z-2. 「整理開始」（ボットへのお願いは GitHub のファイル。GitHub の API は page.route でにせもの）
+    const seiri = {
+      /** 終わるまで（または止まるまで）待って、パネルの文を返す */
+      read: (pg) => pg.evaluate(() => {
+        const t = (k) => (document.querySelector(`[data-key="${k}"]`) || {}).textContent || '';
+        const p = document.querySelector('[data-key="seiri-panel"]');
+        return { data: t('seiri-data-text'), bot: t('seiri-bot-text'), botState: (document.querySelector('[data-key="seiri-bot"]') || {}).dataset?.state, draft: t('seiri-draft-text'), sum: t('seiri-summary-text'), from: t('seiri-from'), status: t('seiri-status'), ended: p ? p.dataset.ended : null, chip: t('seiri-chip') };
+      }),
+      run: async (pg) => {
+        await pg.click('[data-key="bd-seiri"]');
+        await pg.waitForSelector('[data-key="seiri-panel"]');
+        await pg.waitForFunction(() => { const e = document.querySelector('[data-key="seiri-panel"]'); return e && e.dataset.ended; }, null, { timeout: 20000 });
+        return seiri.read(pg);
+      },
+      ended: (pg, v = null) => pg.waitForFunction((x) => { const e = document.querySelector('[data-key="seiri-panel"]'); return e && (x ? e.dataset.ended === x : e.dataset.ended); }, v, { timeout: 20000 }),
+      post: (id, text, imp, cats = ['ホスト']) => ({ id, url: `https://x.com/e2e/status/${id}`, user: 'e2e_bot_user', created_jst: '2026-10-16T05:00:00+09:00', metrics: { impression_count: imp, like_count: 10 }, text, categories: cats, matched_terms: [] }),
+      /** にせの GitHub（feedback/ への書き込みを記録・status.json・commit ごとのデータ）。token を入れてから読み直す */
+      github: async (pg, { delays = { first: 300, later: 300, noReply: 60000, idle: 3600000 } } = {}) => {
+        const gh = { puts: [], status: null, files: {}, gets: [] };
+        await pg.route('https://api.github.com/**', async (route) => {
+          const req = route.request();
+          const u = new URL(req.url());
+          const m = /^\/repos\/e2e\/repo\/contents\/(.+)$/.exec(u.pathname);
+          if (!m) return route.fulfill({ status: 404, body: '{}' });
+          const file = decodeURIComponent(m[1]);
+          const ref = u.searchParams.get('ref');
+          if (req.method() === 'PUT') {
+            const body = JSON.parse(req.postData());
+            gh.puts.push({ file, message: body.message, branch: body.branch, json: JSON.parse(Buffer.from(body.content, 'base64').toString('utf8')) });
+            return route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ commit: { html_url: 'https://github.com/e2e/repo/commit/1' } }) });
+          }
+          gh.gets.push({ file, ref, accept: req.headers().accept, auth: req.headers().authorization });
+          if (file.startsWith('feedback/')) return route.fulfill({ status: 404, body: '{}' });
+          const v = file === 'data/show/status.json' ? gh.status : (gh.files[ref] || {})[file];
+          if (v == null) return route.fulfill({ status: 404, body: '{}' });
+          return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(v) });
+        });
+        await pg.evaluate((d) => {
+          localStorage.setItem('xtrend-show-github', JSON.stringify({ repo: 'e2e/repo', branch: 'claude/e2e-branch', token: 'gh-e2e-token', auto: false }));
+          localStorage.setItem('xtrend-show-prepare-delays', JSON.stringify(d));
+        }, delays);
+        await pg.reload();
+        await ready(pg);
+        return gh;
+      },
+      st: (id, extra = {}) => ({ app: 'xtrend-prepare-status', v: 1, request_id: id, state: 'running', stage: 'collect', message: '', started_at: '2026-10-16T07:00:00+09:00', updated_at: '2026-10-16T07:30:00+09:00', finished_at: null, eta_min: null, result: null, error: null, ...extra }),
+      lastReq: (gh) => gh.puts.filter((x) => x.file === 'feedback/prepare-request.json').at(-1),
+    };
+    const samplePosts = JSON.parse(readFileSync(new URL('../../sample/show/posts.json', import.meta.url), 'utf8'));
+    const NEWP = ['2110009990000000001', '2110009990000000002', '2110009990000000003', '2110009990000000004', '2110009990000000005'];
+    const botFiles = {
+      'data/posts.json': { ...samplePosts, generated_at: '2026-10-16T08:00:00+09:00', posts: [...samplePosts.posts,
+        seiri.post(NEWP[0], 'E2E ふつうの出来事 A1', 900000), seiri.post(NEWP[1], 'E2E ふつうの出来事 A2', 800000), seiri.post(NEWP[2], 'E2E 一般の話 1', 700000, ['その他']),
+        seiri.post(NEWP[3], 'E2E 一般の話 2', 600000, ['その他']), seiri.post(NEWP[4], 'E2E まだどこにも入っていない新しい投稿', 5000000)] },
+      'data/show/topics.json': { generated_at: '2026-10-16T08:00:00+09:00', topics: [
+        { id: 'e2e-call', name: 'E2E の出来事', genre: 'ホスト', post_ids: [NEWP[0], NEWP[1]], summary: 'E2E のリード文', confidence: 0.9 },
+        { id: 'e2e-gen', name: 'E2E の一般', genre: 'その他', post_ids: [NEWP[2], NEWP[3]], confidence: 0.8 },
+      ] },
+    };
+    const botDraft = (rid) => ({ generated_at: '2026-10-16T08:00:00+09:00', week: '2026-10-17', request_id: rid, main: [{ topic_id: 'e2e-call', reason: '今週の話題' }, { topic_id: 'e2e-gen' }], category: [{ topic_id: 'nope' }], chat: [{ topic_id: 'e2e-gen' }] });
+
+    await check('整理開始: GitHub 未設定 → 最新のデータを読み直す（ページは読み直さない）・空いている所だけおまかせ・まとめ・1 回で元に戻す・新しい下書きファイルは使う（古い・違う週は使わない）・ボタンは両方のステップに・960 に収まる', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      await page.evaluate(() => { window.__noReload = true; });
+      const b1 = await page.locator('[data-key="bd-seiri"]').boundingBox();
+      assert(b1 && b1.x + b1.width <= 960 && (await page.textContent('[data-key="bd-seiri"]')) === '整理開始' && (await page.getAttribute('[data-key="bd-seiri"]', 'title')).includes('GitHub 未設定'), `button ${JSON.stringify(b1)}`);
+      await bd.step2(page);
+      const tb = await page.evaluate(() => { const r = (k) => document.querySelector(`[data-key="${k}"]`).getBoundingClientRect(); return { s: r('bd-seiri'), u: r('undo'), t: r('title'), sw: document.documentElement.scrollWidth }; });
+      assert(tb.sw <= 960 && Math.abs(tb.s.top - tb.u.top) < 2 && tb.s.right <= tb.u.left && tb.t.width >= 200 && tb.s.height >= 36, `上の帯 ${JSON.stringify(tb)}`);
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-button-960.png') });
+      // 番組オーナーが入れたもの（メイン2・カテゴリ別のトー横）は動かさない
+      await page.evaluate(([a, b]) => window.__show.edit('準備', (w) => { w.rundown.corners[0].items = [null, a, null]; w.rundown.corners[1].items = [b]; }), [HOST, TOYOKO]);
+      const r = await seiri.run(page);
+      assert(r.ended === 'done' && /^データ .+ 時点（前回から＋0件/.test(r.data) && r.botState === 'skip' && r.bot.includes('［ツール…］→「GitHub に直接保存」'), JSON.stringify(r));
+      let st = await bd.state(page);
+      assert(st.main[1] === HOST && st.main[0] && st.main[2] && st.category.join() === TOYOKO && st.chat.length === 3, `空いている所だけ ${JSON.stringify(st)}`);
+      assert(r.draft.startsWith('メイン 2・雑談 3 を入れました（サイトのおまかせ') && r.from === '下書きのもと：サイトのおまかせ' && /^データ .+新着 0件・まとまり \d+（Grok 2）・下書き：メイン 2・カテゴリ別 0・雑談 3$/.test(r.sum), JSON.stringify(r));
+      assert(await page.evaluate(() => window.__noReload === true), 'ページは読み直さない');
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-local-960.png') });
+      await page.click('[data-key="seiri-go-2"]');
+      assert(!(await page.$('[data-key="seiri-panel"]')) && await page.$('.bd[data-step="2"]'), 'go 2');
+      await page.keyboard.press('Control+z');
+      st = await bd.state(page);
+      assert(st.main[1] === HOST && !st.main[0] && !st.main[2] && st.category.join() === TOYOKO && !st.chat.length, `undo ${JSON.stringify(st)}`);
+      // 新しい下書きファイル（同じ番組週・12 時間以内）はトークンが無くても使う
+      let fileDraft = { generated_at: new Date(Date.now() - 3600 * 1000).toISOString(), week: '2026-10-17', request_id: 'auto-20261016-1800', main: [{ topic_id: 'sample-ramen-2026w42' }], category: [], chat: [] };
+      await page.route(/\/sample\/show\/draft\.json/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fileDraft) }));
+      let r2 = await seiri.run(page);
+      assert(r2.from === '下書きのもと：ボットの下書きファイル' && (await bd.state(page)).main[0] === 'g:sample-ramen-2026w42', JSON.stringify(r2));
+      await page.click('[data-key="seiri-close"]');
+      for (const bad of [{ generated_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString() }, { week: '2026-10-24' }]) {
+        await page.keyboard.press('Control+z');
+        fileDraft = { ...fileDraft, generated_at: new Date().toISOString(), ...bad };
+        r2 = await seiri.run(page);
+        assert(r2.from === '下書きのもと：サイトのおまかせ', `${JSON.stringify(bad)} ${JSON.stringify(r2)}`);
+        await page.click('[data-key="seiri-close"]');
+      }
+      assert((await sw(page)) <= 960, 'no h-scroll');
+      await c.close();
+    });
+
+    await check('整理開始: GitHub あり → 修正を最新に → お願いを書く（週・期間・決まり・決めたもの）→ status.json を見に行く（queued → running → done）・板の上の知らせ・リロードしても続く → その commit の投稿・Grok のまとまり・下書きを空いている所だけ・1 回で元に戻す・10 分以内は聞く・キャンセル', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      const gh = await seiri.github(page);
+      assert((await page.getAttribute('[data-key="bd-seiri"]', 'title')).includes('GitHub を通して'), 'title');
+      assert(await page.evaluate(() => ![...document.querySelector('.bd').childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())), '板の直下に文字が混ざらない');
+      // 番組オーナーが入れたもの: メイン1（ホストコール）と手で作ったまとまり（メイン候補）
+      await page.evaluate(([a]) => window.__show.edit('準備', (w) => { w.rundown.corners[0].items = [a, null, null]; w.overrides.manual = [...w.overrides.manual, { id: 'm:e2eown', name: '手で作った', genre: 'host' }]; w.overrides.moves['2110001792007450003'] = 'm:e2eown'; w.mainCand = ['m:e2eown']; }), [HOST]);
+      await page.click('[data-key="bd-seiri"]');
+      await page.waitForFunction(() => (document.querySelector('[data-key="seiri-status"]') || {}).textContent === 'ボットを待っています');
+      // 書いたもの: 修正 → お願い（feedback/ だけ）
+      assert(gh.puts.map((x) => x.file).join() === 'feedback/show-feedback.json,feedback/prepare-request.json' && gh.puts.every((x) => x.branch === 'claude/e2e-branch'), JSON.stringify(gh.puts.map((x) => x.file)));
+      const req = gh.puts[1].json;
+      const want = await page.evaluate(() => { const a = window.__show; const iso = (t) => { const d = new Date((t + 9 * 3600) * 1000); const p = (n) => String(n).padStart(2, '0'); return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}+09:00`; }; return { key: a.week.key, from: iso(a.week.start), to: iso(a.week.end), rfrom: iso(a.range.start) }; });
+      assert(req.app === 'xtrend-prepare' && req.v === 1 && /^p-\d{8}-\d{4}-[0-9a-z]{4}$/.test(req.id) && req.force === false && req.cancel === false && /\+09:00$/.test(req.requested_at), JSON.stringify(req).slice(0, 300));
+      assert(JSON.stringify(req.week) === JSON.stringify({ key: want.key, from: want.from, to: want.to }) && req.week.key === '2026-10-17' && req.range.from === want.rfrom, JSON.stringify([req.week, want]));
+      assert(req.rules.main_slots === 3 && req.rules.main_night_only === true && req.rules.genre_priority[0] === 'ホスト' && req.rules.category_count === 6 && req.rules.chat_count === 3 && req.rules.min_posts_for_main === 2, JSON.stringify(req.rules));
+      assert(req.keep.placed_topic_ids.includes(HOST) && req.keep.placed_topic_ids.includes('m:e2eown') && req.keep.manual_topics.some((t) => t.id === 'm:e2eown' && t.name === '手で作った' && t.post_ids.includes('2110001792007450003')), JSON.stringify(req.keep));
+      assert(req.feedback_generated_at && req.feedback_generated_at === gh.puts[0].json.generated_at && gh.puts[1].message === `prepare: request ${req.id}`, 'feedback_generated_at');
+      assert(!JSON.stringify(req).includes('gh-e2e-token'), 'トークンは書かない');
+      // status.json を GitHub の API（raw・ブランチ）で見に行く。ほかの id の知らせは自分のことにしない
+      gh.status = seiri.st('auto-20261016-0600', { state: 'running', stage: 'push', message: 'ほかの整理' });
+      await page.waitForFunction(() => /ほかの整理/.test((document.querySelector('[data-key="seiri-other"]') || {}).textContent || ''));
+      const sget = gh.gets.filter((x) => x.file === 'data/show/status.json').at(-1);
+      assert(sget.ref === 'claude/e2e-branch' && sget.accept === 'application/vnd.github.raw+json' && sget.auth === 'Bearer gh-e2e-token', JSON.stringify(sget));
+      assert((await page.textContent('[data-key="seiri-chip"]')) === 'ボットにお願いしました（受け付けを待っています）', await page.textContent('[data-key="seiri-chip"]'));
+      gh.status = seiri.st(req.id, { state: 'queued', stage: null });
+      await page.waitForFunction(() => /^ボットが受け付けました/.test((document.querySelector('[data-key="seiri-chip"]') || {}).textContent || ''));
+      gh.status = seiri.st(req.id, { state: 'running', stage: 'group', message: 'Grok がまとまりを作っています（412 件）', updated_at: '2026-10-16T07:42:00+09:00', eta_min: 15 });
+      await page.waitForFunction(() => (document.querySelector('[data-key="seiri-chip"]') || {}).textContent === 'ボットが整理中：Grok がまとまりを作っています（412 件）（07:42 更新・あと 15分ほど）');
+      const stages = await page.$$eval('.sr-stages li', (els) => els.map((e) => e.className));
+      assert(stages.join() === 'is-done,is-done,is-done,is-now,,' && (await page.textContent('[data-key="bd-seiri"]')) === 'ボット整理中…', stages.join());
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-progress-960.png') });
+      // 閉じても待つ（板の上の知らせ）。作業も続けられる
+      await page.click('[data-key="seiri-close"]');
+      assert(!(await page.$('[data-key="seiri-panel"]')) && await page.isVisible('[data-key="seiri-chip"]'), 'chip');
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-chip-960.png') });
+      // リロードしても続く
+      await page.reload();
+      await ready(page);
+      await page.waitForFunction(() => /^ボットが整理中/.test((document.querySelector('[data-key="seiri-chip"]') || {}).textContent || ''));
+      assert(!(await page.$('[data-key="seiri-panel"]')), 'リロード後はパネルを閉じたまま');
+      // done → その commit のデータを読む → 空いている所だけ下書き
+      gh.files.abc1234 = { ...botFiles, 'data/show/draft.json': botDraft(req.id) };
+      gh.status = seiri.st(req.id, { state: 'done', stage: 'push', finished_at: '2026-10-16T08:01:00+09:00', result: { commit: 'abc1234', data_generated_at: '2026-10-16T08:00:00+09:00', new_posts: 5, topics: 2 } });
+      await seiri.ended(page, 'done');
+      const r = await seiri.read(page);
+      const dataGets = gh.gets.filter((x) => x.ref === 'abc1234').map((x) => x.file).sort();
+      assert(dataGets.join() === 'data/posts.json,data/show/draft.json,data/show/topics.json', dataGets.join());
+      assert(r.bot === 'ボットの整理が終わりました（新しい投稿 5件・まとまり 2）' && r.from === '下書きのもと：ボット' && /^データ 10\/16 08:00 時点・新着 5件・まとまり \d+（Grok 2）・下書き：メイン 1・カテゴリ別 0・雑談 1$/.test(r.sum) && !r.chip, JSON.stringify(r));
+      let st = await bd.state(page);
+      assert(st.main[0] === HOST && st.main[1] === 'g:e2e-call' && !st.main[2] && st.cand.join() === 'm:e2eown' && st.category.length === 0 && st.chat.join() === 'g:e2e-gen', `ボットの下書き ${JSON.stringify(st)}`);
+      assert(r.draft.includes('使えないもの 2件は飛ばしました'), r.draft);
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-done-960.png') });
+      await page.click('[data-key="seiri-go-1"]');
+      await page.waitForSelector('.bd[data-step="1"]');
+      assert(await page.$(`[data-key="lp-${NEWP[4]}"]`) && !(await page.$(`[data-key="lp-${NEWP[0]}"]`)) && await page.$('[data-key="grp-g:e2e-call"] .bd-mark.is-bot'), '①に出る');
+      await page.keyboard.press('Control+z');
+      st = await bd.state(page);
+      assert(st.main[0] === HOST && !st.main[1] && st.cand.join() === 'm:e2eown' && !st.chat.length, `undo ${JSON.stringify(st)}`);
+      // 10 分以内はまず聞く（お願いは書かない）→ 今あるデータで進める
+      const n0 = gh.puts.length;
+      await page.click('[data-key="bd-seiri"]');
+      await page.waitForSelector('[data-key="seiri-local"]');
+      assert((await page.textContent('[data-key="seiri-bot-text"]')).startsWith('少し前にボットにお願いしました（あと'), 'ask');
+      await page.click('[data-key="seiri-local"]');
+      await seiri.ended(page, 'done');
+      assert(gh.puts.length === n0 && (await seiri.read(page)).from === '下書きのもと：サイトのおまかせ', 'お願いは書かない');
+      await page.click('[data-key="seiri-close"]');
+      await page.keyboard.press('Control+z');
+      // それでも実行 → force: true → キャンセル（同じ id で cancel: true）
+      await page.click('[data-key="bd-seiri"]');
+      await page.click('[data-key="seiri-force"]');
+      await page.waitForFunction(() => (document.querySelector('[data-key="seiri-status"]') || {}).textContent === 'ボットを待っています');
+      const req2 = seiri.lastReq(gh).json;
+      assert(req2.force === true && req2.id !== req.id, 'force');
+      await page.click('[data-key="seiri-cancel"]');
+      await page.waitForFunction(() => (document.querySelector('[data-key="seiri-bot-text"]') || {}).textContent === 'ボットに取り消しを送りました');
+      const cancel = seiri.lastReq(gh);
+      assert(cancel.json.id === req2.id && cancel.json.cancel === true && cancel.message === `prepare: cancel ${req2.id}` && (await seiri.read(page)).status === 'やめました' && !(await page.$('[data-key="seiri-chip"]')), JSON.stringify(cancel.json).slice(0, 200));
+      assert(await page.evaluate(() => !localStorage.getItem('xtrend-show-prepare')), '待っているお願いは消す');
+      st = await bd.state(page);
+      assert(st.main[0] === HOST && !st.main[1] && !st.chat.length, 'キャンセルしたら下書きは入れない');
+      assert((await sw(page)) <= 960, 'no h-scroll');
+      await c.close();
+    });
+
+    await check('整理開始: ボットが busy（too_soon）・error・返事がない（10 分）→ 理由と「今あるデータで下書き」・「待ち続ける」・自動整理（auto-…）が終わったら「反映する」', async () => {
+      const c = await newCtx();
+      const { page } = await open(c, show);
+      const gh = await seiri.github(page, { delays: { first: 300, later: 300, noReply: 2500, idle: 3600000 } });
+      const press = async () => {
+        await page.evaluate(() => localStorage.removeItem('xtrend-show-prepare-last'));
+        const n = gh.puts.length;
+        await page.click('[data-key="bd-seiri"]');
+        await page.waitForFunction((k) => document.querySelector('[data-key="seiri-status"]') && document.querySelector('[data-key="seiri-status"]').textContent === 'ボットを待っています', null);
+        assert(gh.puts.length === n + 2, 'お願いを書いた');
+        return seiri.lastReq(gh).json.id;
+      };
+      // busy（too_soon）
+      let id = await press();
+      gh.status = seiri.st(id, { state: 'busy', error: { code: 'too_soon', message: '少し前に実行しました', retry_after_min: 7 } });
+      await seiri.ended(page, 'error');
+      let r = await seiri.read(page);
+      assert(r.bot === '少し前に実行しました（あと7分）' && r.status === '止まりました' && await page.isVisible('[data-key="seiri-local-draft"]'), JSON.stringify(r));
+      await page.click('[data-key="seiri-local-draft"]');
+      await seiri.ended(page, 'done');
+      assert((await seiri.read(page)).from === '下書きのもと：サイトのおまかせ', 'local');
+      await page.click('[data-key="seiri-close"]');
+      await page.keyboard.press('Control+z');
+      // error
+      id = await press();
+      gh.status = seiri.st(id, { state: 'error', stage: 'collect', error: { code: 'x_rate_limited', message: 'X の上限に達しました', retry_after_min: 15 } });
+      await seiri.ended(page, 'error');
+      r = await seiri.read(page);
+      assert(r.bot === 'X の上限に達しました（15分後にもう一度できます）' && r.botState === 'ng', JSON.stringify(r));
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-error-960.png') });
+      await page.click('[data-key="seiri-close"]');
+      // 返事がない（自分の id の知らせが来ない）→ 聞く → 待ち続ける → done
+      id = await press();
+      gh.status = seiri.st('auto-20261016-0600', { state: 'done', result: { commit: 'def5678' } });
+      await page.waitForSelector('[data-key="seiri-keep-waiting"]', { timeout: 15000 });
+      r = await seiri.read(page);
+      assert(r.bot === 'ボットから返事がありません（起動していない可能性があります）' && r.botState === 'ask' && await page.isVisible('[data-key="seiri-local-draft"]'), JSON.stringify(r));
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-noreply-960.png') });
+      await page.click('[data-key="seiri-keep-waiting"]');
+      await page.waitForTimeout(3500);
+      assert(!(await page.$('[data-key="seiri-keep-waiting"]')) && (await seiri.read(page)).status === 'ボットを待っています', 'もう聞かない');
+      gh.files.fed9876 = { ...botFiles, 'data/show/draft.json': botDraft(id) };
+      gh.status = seiri.st(id, { state: 'done', result: { commit: 'fed9876', new_posts: 5, topics: 2 } });
+      await seiri.ended(page, 'done');
+      assert((await seiri.read(page)).from === '下書きのもと：ボット' && (await bd.state(page)).main.includes('g:e2e-call'), 'done after waiting');
+      await page.click('[data-key="seiri-close"]');
+      await page.keyboard.press('Control+z');
+      // 返事がない → 今あるデータで下書き（待つのをやめる）
+      id = await press();
+      gh.status = null;
+      await page.waitForSelector('[data-key="seiri-keep-waiting"]', { timeout: 15000 });
+      await page.click('[data-key="seiri-local-draft"]');
+      await seiri.ended(page, 'done');
+      r = await seiri.read(page);
+      assert(r.bot === 'ボットから返事がありませんでした。今あるデータで進めます' && r.from === '下書きのもと：サイトのおまかせ' && await page.evaluate(() => !localStorage.getItem('xtrend-show-prepare')), JSON.stringify(r));
+      await page.click('[data-key="seiri-close"]');
+      await page.keyboard.press('Control+z');
+      // ボットの自動整理（auto-…）が終わっている（お願いはしていない）→「反映する」→ 空いている所だけ
+      gh.files.aaa1111 = { ...botFiles, 'data/show/draft.json': botDraft('auto-20261016-1800') };
+      gh.status = seiri.st('auto-20261016-1800', { state: 'done', finished_at: '2026-10-16T18:40:00+09:00', result: { commit: 'aaa1111', new_posts: 5, topics: 2 } });
+      await page.reload();
+      await ready(page);
+      await page.waitForSelector('[data-key="seiri-auto"]');
+      assert((await page.textContent('[data-key="seiri-auto"]')).startsWith('ボットの自動整理が終わりました（18:40）'), await page.textContent('[data-key="seiri-auto"]'));
+      await page.screenshot({ path: path.join(SHOTS, 'seiri-auto-960.png') });
+      await page.click('[data-key="seiri-auto-apply"]');
+      await seiri.ended(page, 'done');
+      assert((await seiri.read(page)).from === '下書きのもと：ボット' && (await bd.state(page)).main.includes('g:e2e-call') && !(await page.$('[data-key="seiri-auto"]')), 'auto applied');
+      // 反映したものは、読み直してももう出さない
+      await page.reload();
+      await ready(page);
+      await page.waitForTimeout(800);
+      assert(!(await page.$('[data-key="seiri-auto"]')), 'seen');
+      assert((await sw(page)) <= 960, 'no h-scroll');
+      await c.close();
+    });
+
     // ---- 5. 実データ（リポジトリの data/。読むだけ）。今週（約 960 件）の 10/31 配信の週で確認
     if (existsSync(path.join(ROOT, 'data', 'posts.json'))) {
       await check('実データ: 1 操作の速さ（受信箱の表示・選択・移動・元に戻す・検索）', async () => {

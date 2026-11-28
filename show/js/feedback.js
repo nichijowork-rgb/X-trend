@@ -168,11 +168,19 @@ export function githubErrorText(status, { rateLimited = false, phase = 'put' } =
  * 返り値: { ok: true, commitUrl, created } ／ 失敗は { ok: false, status, message }
  */
 export async function saveFeedbackToGitHub({ fetchImpl = globalThis.fetch, repo, branch, token, content, nowMs = Date.now() }) {
+  return putGitHubFile({ fetchImpl, repo, branch, token, content, path: BOT.feedbackPath, message: `feedback: show edits ${jstIso(nowMs)}` });
+}
+
+/**
+ * feedback/ の下のファイルを GitHub に保存（Contents API。サイトが書くのは feedback/ だけ）。
+ * GET で今の sha を取り（無ければ新規）、PUT で更新。409/422（ぶつかった）は sha を取り直して 1 回だけやり直す。
+ * 返り値: { ok: true, commitUrl, created } ／ 失敗は { ok: false, status, message }
+ */
+export async function putGitHubFile({ fetchImpl = globalThis.fetch, repo, branch, token, content, path, message }) {
   if (!validRepo(repo)) return { ok: false, status: null, message: 'リポジトリは「持ち主/名前」の形で入れてください' };
   if (!validBranch(branch)) return { ok: false, status: null, message: 'ブランチ名が正しくありません' };
   if (!token) return { ok: false, status: null, message: 'トークンを入れてください' };
-  const path = BOT.feedbackPath;
-  if (!/^feedback\//.test(path)) return { ok: false, status: null, message: '書き込み先が正しくありません' };
+  if (typeof path !== 'string' || !/^feedback\/[A-Za-z0-9._-]+\.json$/.test(path)) return { ok: false, status: null, message: '書き込み先が正しくありません' };
   const url = `${API}/repos/${repo}/contents/${path}`;
   const headers = { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' };
   const call = async (method, u, body) => {
@@ -193,7 +201,7 @@ export async function saveFeedbackToGitHub({ fetchImpl = globalThis.fetch, repo,
     const j = await res.json().catch(() => ({}));
     return typeof j.sha === 'string' ? j.sha : null;
   };
-  const body = (sha) => ({ message: `feedback: show edits ${jstIso(nowMs)}`, content: b64utf8(content), branch, ...(sha ? { sha } : {}) });
+  const body = (sha) => ({ message, content: b64utf8(content), branch, ...(sha ? { sha } : {}) });
   try {
     let sha = await getSha();
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -209,4 +217,22 @@ export async function saveFeedbackToGitHub({ fetchImpl = globalThis.fetch, repo,
   } catch (err) {
     return { ok: false, status: err instanceof GhError ? err.status : null, message: err instanceof GhError ? err.message : githubErrorText(null) };
   }
+}
+
+/**
+ * リポジトリのファイルを GitHub の API で読む（raw。Pages の反映待ちをしない。ref はブランチか commit）。
+ * 返り値: { ok: true, json } ／ { ok: false, status（404 は無い）, message }
+ */
+export async function getGitHubFile({ fetchImpl = globalThis.fetch, repo, ref, token, path }) {
+  if (!validRepo(repo)) return { ok: false, status: null, message: 'リポジトリが正しくありません' };
+  if (typeof ref !== 'string' || !(validBranch(ref) || /^[0-9a-f]{7,40}$/i.test(ref))) return { ok: false, status: null, message: 'ブランチか commit が正しくありません' };
+  if (typeof path !== 'string' || !/^(data|feedback)\/[A-Za-z0-9._\/-]+\.json$/.test(path) || path.includes('..')) return { ok: false, status: null, message: '読む場所が正しくありません' };
+  const headers = { Accept: 'application/vnd.github.raw+json', 'X-GitHub-Api-Version': '2022-11-28', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  let res;
+  try { res = await fetchImpl(`${API}/repos/${repo}/contents/${path}?ref=${encodeURIComponent(ref)}`, { method: 'GET', headers, cache: 'no-store' }); } catch { return { ok: false, status: null, message: githubErrorText(null) }; }
+  if (!res.ok) {
+    const rl = res.headers && typeof res.headers.get === 'function' && res.headers.get('x-ratelimit-remaining') === '0';
+    return { ok: false, status: res.status, message: res.status === 404 ? 'まだありません' : githubErrorText(res.status, { rateLimited: rl, phase: 'get' }) };
+  }
+  try { return { ok: true, json: await res.json() }; } catch { return { ok: false, status: res.status, message: `${path} の形が正しくありません` }; }
 }

@@ -20,6 +20,7 @@ import { beginPointer, isDragging } from './dnd.js';
 import { contextMenu, nameDialog } from './menu.js';
 import { toolsDialog } from './tools.js';
 import { urlAddDialog } from './urladd.js';
+import { seiriButton, seiriPanel, seiriChip } from './seiri.js';
 
 const wide = () => typeof matchMedia === 'function' && matchMedia('(min-width: 1400px)').matches;
 const narrow = () => typeof matchMedia === 'function' && matchMedia('(max-width: 760px)').matches;
@@ -54,7 +55,7 @@ const REMOVED_TEXT = 'まとまりから外しました（まだ入っていな�
 
 function setStep(app, n) {
   const b = ui(app);
-  if (b.step === n) return;
+  if (b.step === n) { app.render(); return; }
   b.step = n;
   b.preview = null;
   b.tab = 'material';
@@ -492,7 +493,7 @@ export function renderBoard(app) {
   const isNarrow = narrow();
   const panel = !isWide && Boolean(b.preview);
   const root = h('div', { class: `bd${isWide ? ' is-wide' : ''}${isNarrow ? ' is-narrow' : ''}${panel ? ' is-panel' : ''}`, dataset: { keep: `plan:${app.weekKey}`, tab: b.tab, step: String(b.step) } });
-  root.append(topBar(app, wk), stepSwitch(app, wk));
+  root.append(...[topBar(app, wk), seiriChip(app), stepSwitch(app, wk)].filter(Boolean));
   if (isNarrow) root.append(tabSwitch(app));
   const cols = h('div', { class: 'bd-cols', dataset: { keep: 'cols' } });
   if (b.step === 1) cols.append(postsCol(app, wk, panel), groupsCol(app, wk));
@@ -501,6 +502,8 @@ export function renderBoard(app) {
   root.append(cols);
   root.append(h('p', { id: 'drag-status', class: 'sr-only', attrs: { role: 'status', 'aria-live': 'polite' } }));
   const u = app.ui;
+  const panelEl = seiriPanel(app, { setStep: (n) => setStep(app, n) });
+  if (panelEl) root.append(panelEl);
   if (u.nameDlg) root.append(nameDlg(app));
   else if (u.tools) root.append(toolsDialog(app));
   else if (u.urlDlg) root.append(urlAddDialog(app));
@@ -567,6 +570,7 @@ function topBar(app, wk) {
     isAuto ? null : btn('自動に戻す', () => app.update((w) => { w.title = null; }), 'btn btn-small btn-ghost', { 'data-key': 'title-auto', title: 'タイトルをメインのまとまりから自動で作る形に戻します' }),
     // 「おまかせで下書き」は番組に並べるステップ（②）だけ
     ui(app).step === 2 ? btn('おまかせで下書き', () => autoDraft(app), 'btn btn-small btn-red', { 'data-key': 'bd-draft', title: '空いている所（メインの空き枠・空のカテゴリ別・空の雑談）だけ、おすすめのまとまりで埋めます。入っているものは動かしません' }) : null,
+    seiriButton(app),
     btn('↶ 元に戻す', () => app.undo(), 'btn btn-small', { 'data-key': 'undo', disabled: !app.history.past.length }),
     btn('↷ やり直す', () => app.redo(), 'btn btn-small bd-redo', { 'data-key': 'redo', disabled: !app.history.future.length }),
     more);

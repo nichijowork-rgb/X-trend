@@ -12,6 +12,8 @@ import {
 import { postTopicMap, recommendGeneral, createHistory, recordHistory, undoHistory, redoHistory, addPostsToTopic } from './js/folders.js';
 import { publishLiveState } from './js/events.js';
 import { normalizeBotTopics } from './js/bot.js';
+import { mergePosts } from './js/prepare.js';
+import { resumeSeiri } from './js/views/seiri.js';
 import { createAutoSender } from './js/autosend.js';
 import { fetchOembed, estimateGenre, sanitizeLinkMeta, OEMBED_GAP_MS } from './js/oembed.js';
 import { parseViewerPrefs, openViewer, isXUrl, screenSnapshot, VIEWER_PREF_KEY } from './js/viewer.js';
@@ -108,40 +110,131 @@ async function fetchJson(url) {
   try { return await res.json(); } catch { throw new Error(`${url} の形式が正しくありません`); }
 }
 
-async function loadData() {
-  const tryLoad = async (base, botUrl) => {
-    const [posts, bookmarks, botRaw] = await Promise.allSettled([fetchJson(`${base}posts.json`), fetchJson(`${base}bookmarks.json`), fetchJson(botUrl)]);
-    if (posts.status !== 'fulfilled') throw posts.reason;
-    const ds = normalizeDataset(posts.value); // 形式不正は例外
-    // ブックマークで取り込まれた投稿の印（normalizeDataset は未知のフィールドを落とすので別に持つ）
-    const bmFlags = new Map();
-    const pickIds = new Set();
-    const pickReasons = new Map();
-    for (const p of posts.value.posts) {
-      if (p && p.in_bookmarks === true) bmFlags.set(String(p.id), { below: p.below_threshold === true });
-      if (p && p.show_pick === true) { // 段階3: ボットの雑談おすすめ（理由は任意）
-        pickIds.add(String(p.id));
-        if (typeof p.show_pick_reason === 'string' && p.show_pick_reason.trim()) pickReasons.set(String(p.id), p.show_pick_reason.trim().slice(0, 200));
-      }
+/**
+ * 読み込んだままの posts.json・bookmarks.json・show/topics.json から、画面で使う形を作る（起動時と「整理開始」の読み直しで同じ）。
+ * rawBookmarks・rawBot は無ければ null。posts.json の形が違えば例外。
+ */
+function ingest(rawPosts, rawBookmarks, rawBot) {
+  const ds = normalizeDataset(rawPosts); // 形式不正は例外
+  // ブックマークで取り込まれた投稿の印（normalizeDataset は未知のフィールドを落とすので別に持つ）
+  const bmFlags = new Map();
+  const pickIds = new Set();
+  const pickReasons = new Map();
+  for (const p of rawPosts.posts) {
+    if (p && p.in_bookmarks === true) bmFlags.set(String(p.id), { below: p.below_threshold === true });
+    if (p && p.show_pick === true) { // 段階3: ボットの雑談おすすめ（理由は任意）
+      pickIds.add(String(p.id));
+      if (typeof p.show_pick_reason === 'string' && p.show_pick_reason.trim()) pickReasons.set(String(p.id), p.show_pick_reason.trim().slice(0, 200));
     }
-    // 段階3: ボットの話題まとめ（任意。無い・壊れているときは使わない）
-    const bot = botRaw.status === 'fulfilled' ? normalizeBotTopics(botRaw.value) : null;
-    return {
-      ds,
-      bmFlags,
-      pickIds,
-      pickReasons,
-      bot,
-      bookmarks: bookmarks.status === 'fulfilled' ? normalizeBookmarks(bookmarks.value) : null,
-    };
+  }
+  // 段階3: ボットの話題まとめ（任意。無い・壊れているときは使わない）
+  const bot = rawBot ? normalizeBotTopics(rawBot) : null;
+  return {
+    ds,
+    bmFlags,
+    pickIds,
+    pickReasons,
+    bot,
+    bookmarks: rawBookmarks ? normalizeBookmarks(rawBookmarks) : null,
+    raw: { posts: rawPosts, bookmarks: rawBookmarks || null, bot: bot ? rawBot : null },
   };
+}
+
+/** データの置き場所（本物の data/ か、無いときの見本） */
+const DATA_BASES = Object.freeze({ data: Object.freeze({ posts: '../data/', show: '../data/show/' }), sample: Object.freeze({ posts: '../sample/show/', show: '../sample/show/' }) });
+
+/** base（DATA_BASES のどちらか）から読む。withDraft: show/draft.json（番組の流れの下書き。任意）も読む */
+async function fetchData(base, withDraft = false) {
+  const val = (r) => (r.status === 'fulfilled' ? r.value : null);
+  const [posts, bookmarks, botRaw, draft] = await Promise.allSettled([
+    fetchJson(`${base.posts}posts.json`), fetchJson(`${base.posts}bookmarks.json`), fetchJson(`${base.show}topics.json`),
+    withDraft ? fetchJson(`${base.show}draft.json`) : Promise.resolve(null),
+  ]);
+  if (posts.status !== 'fulfilled') throw posts.reason;
+  return { ...ingest(posts.value, val(bookmarks), val(botRaw)), base, draftRaw: val(draft) };
+}
+
+async function loadData() {
   try {
-    return { ...(await tryLoad('../data/', '../data/show/topics.json')), isSample: false };
+    return { ...(await fetchData(DATA_BASES.data)), isSample: false };
   } catch (err) {
-    const r = await tryLoad('../sample/show/', '../sample/show/topics.json');
+    const r = await fetchData(DATA_BASES.sample);
     return { ...r, isSample: true, sampleReason: err && err.message ? err.message : '' };
   }
 }
+
+/** 読み込んだデータを app に入れる（起動時・読み直し・ボットの結果） */
+function setData(d) {
+  app.ds = d.ds;
+  app.bookmarks = d.bookmarks;
+  app.bmFlags = d.bmFlags;
+  app.pickIds = d.pickIds || new Set();
+  app.pickReasons = d.pickReasons || new Map();
+  app.bot = d.bot || null;
+  app.basePostsById = new Map(d.ds.posts.map((p) => [p.id, p]));
+  app.postsById = app.basePostsById;
+  app.raw = d.raw;
+  if (d.base) app.dataBase = d.base;
+}
+
+/** データの基準時刻から番組週の一覧を作る（今の番組週は、一覧にあればそのまま） */
+function setupWeeks(keepKey = null) {
+  const refTs = app.ds.refTs ?? Math.floor(Date.now() / 1000);
+  const cur = showWeekOf(refTs);
+  app.weeks = listWeeks(refTs, app.ds.minTs, 8);
+  const next = weekByKey(shiftWeekKey(cur.key, 1));
+  app.nextOfCurrent = next.key;
+  app.weeks = [next, ...app.weeks].sort((a, b) => (a.key < b.key ? 1 : -1));
+  // 保存された週（範囲内）か、データの週
+  const want = keepKey && app.weeks.some((w) => w.key === keepKey) ? keepKey : cur.key;
+  setWeek(want, false);
+  $('data-time').textContent = app.ds.refTs ? `データ ${formatDateTime(app.ds.generated_at, app.ds.refTs)} 時点` : 'データの時刻 不明';
+}
+
+// ---------------------------------------------------------------- 「整理開始」: ページを読み直さずにデータを読み直す・ボットの結果を入れる
+
+/** ボットが届けた結果（このページを開いている間だけ覚えておく。リロードしたらボットが保存したファイルを読む） */
+let botMem = null;
+
+/**
+ * 最新の posts.json・bookmarks.json・show/topics.json・show/draft.json を読み直す（ページは読み直さない。編集はそのまま）。
+ * 返り値: { ok, added（前回から増えた投稿）, generatedAt, refTs, draftRaw, reason }
+ */
+app.refreshData = async () => {
+  const before = new Set(app.basePostsById.keys());
+  let d;
+  try { d = await fetchData(app.dataBase || DATA_BASES.data, true); } catch (err) { return { ok: false, reason: err && err.message ? err.message : String(err) }; }
+  // このページでボットから受け取った投稿のほうが新しければ、それも足したまま
+  if (botMem && botMem.posts && (parseTimestamp(d.raw.posts.generated_at) ?? 0) < (parseTimestamp(botMem.generatedAt) ?? 0)) {
+    const m = mergePosts(d.raw.posts, botMem.posts, botMem.generatedAt, parseTimestamp);
+    try { d = { ...ingest(m.raw, d.raw.bookmarks, botMem.topics || d.raw.bot), base: d.base, draftRaw: d.draftRaw }; } catch { /* 読み直した分だけ使う */ }
+  }
+  setData(d);
+  setupWeeks(app.weekKey);
+  recompute();
+  const added = [...app.basePostsById.keys()].filter((id) => !before.has(id)).length;
+  return { ok: true, added, generatedAt: app.ds.generated_at, refTs: app.ds.refTs, draftRaw: d.draftRaw };
+};
+
+/**
+ * ボットの結果（GitHub の commit から読んだ posts.json・show/topics.json）を入れる: 投稿を id で足す（新しいほうに置きかえ）・
+ * まとまりを topics.json と同じ道で読む・作り直す。編集はそのまま。
+ * 返り値: { added（新しく増えた投稿）, topics（ボットのまとまりの数。無ければ null）, error }
+ */
+app.applyBotData = ({ postsRaw = null, topicsRaw = null } = {}) => {
+  const raw = app.raw || { posts: { posts: [] }, bookmarks: null, bot: null };
+  const before = new Set(app.basePostsById.keys());
+  const ok = postsRaw && Array.isArray(postsRaw.posts);
+  const merged = ok ? mergePosts(raw.posts, postsRaw.posts, typeof postsRaw.generated_at === 'string' ? postsRaw.generated_at : null, parseTimestamp) : { raw: raw.posts };
+  const topicsOk = topicsRaw && normalizeBotTopics(topicsRaw);
+  let d;
+  try { d = ingest(merged.raw, raw.bookmarks, topicsOk ? topicsRaw : raw.bot); } catch { return { added: 0, topics: null, error: 'ボットの投稿の形が正しくありません' }; }
+  botMem = { posts: ok ? postsRaw.posts : null, topics: topicsOk ? topicsRaw : null, generatedAt: merged.raw.generated_at || null };
+  setData(d);
+  setupWeeks(app.weekKey);
+  recompute();
+  return { added: [...app.basePostsById.keys()].filter((id) => !before.has(id)).length, topics: topicsOk ? app.bot.topics.length : null, error: ok || !postsRaw ? null : 'ボットの投稿の形が正しくありません' };
+};
 
 /** bookmarks.json: { generated_at, bookmarks: [{ id, url, bookmarked_at }] }。不正なら null（機能非表示） */
 function normalizeBookmarks(raw) {
@@ -1611,15 +1704,8 @@ async function main() {
   $('reload').addEventListener('click', () => location.reload());
   try {
     const d = await loadData();
-    app.ds = d.ds;
-    app.bookmarks = d.bookmarks;
-    app.bmFlags = d.bmFlags;
-    app.pickIds = d.pickIds || new Set();
-    app.pickReasons = d.pickReasons || new Map();
-    app.bot = d.bot || null;
+    setData(d);
     app.isSample = d.isSample;
-    app.basePostsById = new Map(d.ds.posts.map((p) => [p.id, p]));
-    app.postsById = app.basePostsById;
     if (d.isSample) {
       $('sample-banner').hidden = false;
       $('sample-banner').querySelector('strong').textContent = TEXT.sampleBanner;
@@ -1636,16 +1722,7 @@ async function main() {
   app.saved = loaded.state;
   if (loaded.note) setSaveStatus(loaded.note, 'warn');
 
-  const refTs = app.ds.refTs ?? Math.floor(Date.now() / 1000);
-  const cur = showWeekOf(refTs);
-  app.weeks = listWeeks(refTs, app.ds.minTs, 8);
-  const next = weekByKey(shiftWeekKey(cur.key, 1));
-  app.nextOfCurrent = next.key;
-  app.weeks = [next, ...app.weeks].sort((a, b) => (a.key < b.key ? 1 : -1));
-  // 保存された週（範囲内）か、データの週
-  const want = app.saved.activeWeek && app.weeks.some((w) => w.key === app.saved.activeWeek) ? app.saved.activeWeek : cur.key;
-  setWeek(want, false);
-  $('data-time').textContent = app.ds.refTs ? `データ ${formatDateTime(app.ds.generated_at, app.ds.refTs)} 時点` : 'データの時刻 不明';
+  setupWeeks(app.saved.activeWeek);
 
   app.embedder = createEmbedder({ getTheme: () => 'dark' });
   recompute();
@@ -1734,6 +1811,8 @@ async function main() {
   if (syncTick() !== 'leader' && !isLeader()) syncPost('hello');
   setTimeout(cleanupImages, 3000);
   initAutoSend();
+  // 「整理開始」でボットにお願いしたまま閉じていたら、続けて待つ（ボットの自動整理が終わっていれば知らせる）
+  resumeSeiri(app);
   setTimeout(enqueueMissingMeta, 1500);
   renderRoute();
 }

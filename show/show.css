@@ -1301,6 +1301,49 @@ body.is-dragging .li-end { border-color: var(--line); }
 .bd-more > summary { min-width: 44px; justify-content: center; }
 .bd-more .menu-list { min-width: 290px; }
 .bd-more a.menu-item { text-decoration: none; }
+/* 「整理開始」ボタンと進み具合のパネル（閉じても裏で進む） */
+.bd-seiri { background: var(--yellow); color: var(--ink); border-color: var(--yellow); font-weight: 900; gap: 6px; }
+.bd-seiri:hover { filter: brightness(1.08); }
+.bd-seiri.is-running { background: #3a3520; color: var(--yellow); border-color: var(--yellow); }
+.bd-seiri-dot { width: 8px; height: 8px; border-radius: 50%; background: #77776a; flex: none; }
+.bd-seiri-dot.is-on { background: #1e9e4a; box-shadow: 0 0 0 2px rgba(255, 255, 255, .7); }
+.seiri-panel { position: fixed; right: 16px; top: max(16px, calc(var(--hdr, 120px) + 112px)); z-index: 60; width: min(460px, calc(100vw - 32px)); max-height: calc(100dvh - var(--hdr, 120px) - 130px); min-height: 200px; overflow-y: auto; background: #1d1d23; border: 2px solid var(--yellow); border-radius: 18px; padding: 12px 14px 14px; box-shadow: 0 16px 40px rgba(0, 0, 0, .6); display: grid; gap: 10px; }
+.sr-head { display: flex; align-items: center; gap: 8px; }
+.sr-head h2 { flex: 1; margin: 0; font-size: 17px; display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.sr-head h2 small { font-size: 12px; color: var(--muted); font-weight: 600; }
+.sr-head .btn { min-height: 40px; }
+.sr-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sr-step { display: flex; gap: 10px; align-items: flex-start; background: var(--surface-2); border-radius: 12px; padding: 8px 10px; }
+.sr-mark { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 13px; background: #3a3a44; color: #ddd; }
+.sr-step.is-run .sr-mark { background: var(--yellow); color: var(--ink); }
+.sr-step.is-ok .sr-mark { background: #1e9e4a; color: #fff; }
+.sr-step.is-ng .sr-mark, .sr-step.is-ask .sr-mark { background: #ff8a80; color: var(--ink); }
+.sr-body { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.sr-title { font-size: 14px; }
+.sr-text { margin: 0; font-size: 13px; color: var(--text-2); overflow-wrap: anywhere; }
+.sr-step.is-ng .sr-text { color: #ffb4ab; }
+.sr-stages { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.sr-stages li { font-size: 11.5px; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.sr-stages li.is-done { color: #9fe0b2; border-color: #2f6b43; }
+.sr-stages li.is-now { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+.sr-bar { height: 6px; border-radius: 6px; background: #3a3a44; overflow: hidden; }
+.sr-bar > span { display: block; height: 100%; background: var(--yellow); }
+.sr-ask { margin-top: 4px; }
+.sr-ask .btn, .sr-sum .btn { min-height: 40px; }
+.sr-sum { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 6px; }
+.sr-sum p { margin: 0; }
+.sr-sum-text { font-weight: 800; font-size: 14px; overflow-wrap: anywhere; }
+.sr-chip { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 12px; border-radius: 12px; background: #2b2a22; border: 1.5px solid var(--yellow); color: var(--yellow); font-weight: 800; font-size: 13px; cursor: pointer; min-width: 0; }
+.sr-chip:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.sr-chip.is-info { background: var(--surface-2); border-color: var(--line); color: var(--text-2); }
+.sr-chip.is-auto { cursor: default; color: var(--text); flex-wrap: wrap; }
+.sr-chip-tx { flex: 1; min-width: 0; }
+.sr-chip-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: currentColor; animation: sr-pulse 1.6s ease-in-out infinite; }
+.sr-chip.is-auto .sr-chip-dot, .sr-chip.is-info .sr-chip-dot { animation: none; }
+@keyframes sr-pulse { 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .sr-chip-dot { animation: none; } }
+@media (max-width: 760px) { .seiri-panel { top: auto; bottom: 12px; right: 12px; left: 12px; width: auto; max-height: 70dvh; } }
+
 /* ステップの切り替え（① 投稿からまとまりを作る → ② まとまりを番組に並べる） */
 .bd-steps { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; gap: 8px; }
 .bd-step { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; min-height: 52px; min-width: 0; padding: 6px 14px; border-radius: 16px; border: 2px solid var(--line); cursor: pointer; }
