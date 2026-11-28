@@ -31,26 +31,34 @@ const ds = (posts, generatedAt = '2026-10-16T00:09:00+09:00') => normalizeDatase
 
 // ---------------------------------------------------------------- 番組週
 
-test('番組週: 前週 土 1:00 以上〜今回 土 1:00 未満（基準はデータの時刻）', () => {
+test('番組週: 前週 土曜の深夜（日 1:00）以上〜今回 日 1:00 未満。キーは配信の夜の日付（土曜）', () => {
   const w = showWeekOf(ts('2026-10-16T00:09:00+09:00')); // 金
   assert.equal(w.key, '2026-10-17');
-  assert.equal(w.start, ts('2026-10-10T01:00:00+09:00'));
-  assert.equal(w.end, ts('2026-10-17T01:00:00+09:00'));
-  assert.equal(weekLabel(w), '10/10(土) 1:00 〜 10/17(土) 1:00');
-  // 土 0:59 はその週、土 1:00 ちょうどは次の週
-  assert.equal(showWeekOf(ts('2026-10-17T00:59:59+09:00')).key, '2026-10-17');
-  assert.equal(showWeekOf(ts('2026-10-17T01:00:00+09:00')).key, '2026-10-24');
-  assert.equal(showWeekOf(ts('2026-10-10T01:00:00+09:00')).key, '2026-10-17');
-  assert.equal(showWeekOf(ts('2026-10-10T00:30:00+09:00')).key, '2026-10-10');
-  // 日曜・UTC で日付がずれる時間帯
-  assert.equal(showWeekOf(ts('2026-10-11T08:00:00+09:00')).key, '2026-10-17');
+  assert.equal(w.start, ts('2026-10-11T01:00:00+09:00'));
+  assert.equal(w.end, ts('2026-10-18T01:00:00+09:00'));
+  assert.equal(weekLabel(w), '10/11(日) 1:00 〜 10/18(日) 1:00');
+  // 土曜の昼・夜はその週（2026-11-28 まではここが次の週になっていた）
+  assert.equal(showWeekOf(ts('2026-10-17T15:00:00+09:00')).key, '2026-10-17');
+  assert.equal(showWeekOf(ts('2026-10-17T23:59:00+09:00')).key, '2026-10-17');
+  // 日 0:59 はその週、日 1:00 ちょうどは次の週
+  assert.equal(showWeekOf(ts('2026-10-18T00:59:59+09:00')).key, '2026-10-17');
+  assert.equal(showWeekOf(ts('2026-10-18T01:00:00+09:00')).key, '2026-10-24');
+  assert.equal(showWeekOf(ts('2026-10-11T01:00:00+09:00')).key, '2026-10-17');
+  assert.equal(showWeekOf(ts('2026-10-11T00:30:00+09:00')).key, '2026-10-10');
+  // UTC で日付がずれる時間帯
+  assert.equal(showWeekOf(ts('2026-10-12T08:00:00+09:00')).key, '2026-10-17');
   assert.equal(showWeekOf(ts('2026-10-16T23:30:00+09:00')).key, '2026-10-17');
   assert.equal(showWeekOf(null), null);
+  // 月・年をまたぐキー
+  assert.equal(showWeekOf(ts('2026-12-26T22:00:00+09:00')).key, '2026-12-26');
+  assert.equal(weekByKey('2026-12-26').end, ts('2026-12-27T01:00:00+09:00'));
+  assert.equal(weekByKey('2027-01-02').start, ts('2026-12-27T01:00:00+09:00'));
 });
 
 test('番組週: キー・前後・一覧・切り出し', () => {
   assert.deepEqual(weekByKey('2026-10-17'), showWeekOf(ts('2026-10-12T00:00:00+09:00')));
   assert.equal(weekByKey('2026-10-16'), null, '土曜以外は不正');
+  assert.equal(weekByKey('2026-10-18'), null, '配信時刻の日（日曜）ではなく夜の日付（土曜）がキー');
   assert.equal(weekByKey('bad'), null);
   assert.equal(shiftWeekKey('2026-10-17', 1), '2026-10-24');
   assert.equal(shiftWeekKey('2026-10-17', -1), '2026-10-10');
@@ -523,7 +531,7 @@ test('振り返り一覧とテキスト書き出し（概要欄用はメモを�
     postsById: new Map(d.posts.map((p) => [p.id, p])), refTs: d.refTs,
   };
   const pub = scriptText({ ...args, mode: 'public' });
-  assert.match(pub, /^【T】ホストコール／王子の引退\n配信：10\/17\(土\) 1:00〜（約90分）/);
+  assert.match(pub, /^【T】ホストコール／王子の引退\n配信：10\/17\(土\) 深夜1:00〜（約90分）/);
   assert.match(pub, /00:00 メイン3トピック\n45:00 カテゴリ別ニュース\n1:15:00 雑談（一般のバズ）\n/);
   assert.ok(!/オープニング|中休み|答え合わせ|エンディング/.test(pub), '旧コーナーは出ない');
   assert.match(pub, /1\. ホストコール\n {3}今週「ホストコール」が話題に。/);
@@ -1732,7 +1740,7 @@ test('対象期間: 番組週（既定）・前回配信から今まで・直近
   assert.deepEqual([wk.mode, wk.start, wk.end, wk.isWeek], ['week', w.start, w.end, true]);
   const since = resolveRange({ mode: 'since' }, w, now);
   assert.deepEqual([since.start, since.end], [w.start, now + 1], '前回配信（番組週の始まり）〜 今（含む）');
-  assert.match(since.label, /^10\/10\(土\) 1:00 〜 今（10\/16\(金\) 0:09）$/);
+  assert.match(since.label, /^10\/11\(日\) 1:00 〜 今（10\/16\(金\) 0:09）$/);
   for (const [mode, days] of [['d3', 3], ['d7', 7], ['d14', 14], ['d30', 30]]) {
     const r = resolveRange({ mode }, w, now);
     assert.equal(r.end - r.start, days * 86400 + 1, mode);

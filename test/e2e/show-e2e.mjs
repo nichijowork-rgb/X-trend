@@ -2816,7 +2816,7 @@ async function main() {
     const OUJI = 't:サンプル王子さんの引退';
     const BDAY = 'd:d-birthday';
     const TOYOKO = 'd:d-toyoko';
-    const GAME = 'c:2110001791739706034';
+    const GAME = 'c:2110001791796608034';
 
     await check('かんたん編成（#plan が既定）: 左右 2 列・素材→メインの枠（置ける所が光る・番号つきで入る・左は薄く）・一般はメインに入れない（理由）・カテゴリ別の選んだ位置・並べ替え・コーナーの間・枠の入れ替え・押し出し・✕ と左へ戻すで外す・Esc・外で離す', async () => {
       const c = await newCtx();

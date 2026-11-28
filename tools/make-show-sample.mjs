@@ -5,7 +5,7 @@
 //   node tools/make-show-sample.mjs /tmp/out     # 出力先を指定（data/ には出さないこと）
 //
 // ダッシュボード用の sample/*.json とは別ファイル（ダッシュボードのテストに影響させないため）。
-// 番組週（前週 土 1:00 〜 土 1:00）が埋まるよう generated_at を金曜 0:09 にし、
+// 番組週（前週 土曜の深夜＝日 1:00 〜 日 1:00。キーは土曜の日付）が埋まるよう generated_at を金曜 0:09 にし、
 // 話題辞書でまとまる投稿（ホストコール・シャンパンタワー・生誕祭・トー横）、データ側の話題名（topic:）、
 // 本文が似ている投稿、同じアカウントの投稿、@で関係者に言及した投稿、ばらばらの1件投稿、前週の投稿を含む。
 // 検証用に <img onerror> を含む本文、表示数の欠損、写真（pbs.twimg.com の SAMPLE_ok_）も混ぜる。
@@ -23,7 +23,7 @@ const OUT = path.resolve(process.argv[2] || path.join(ROOT, 'sample', 'show'));
 
 const GENERATED_AT = '2026-10-16T00:09:00+09:00';
 const REF = Math.floor(Date.parse(GENERATED_AT) / 1000);
-const WEEK_START = Math.floor(Date.parse('2026-10-10T01:00:00+09:00') / 1000);
+const WEEK_START = Math.floor(Date.parse('2026-10-11T01:00:00+09:00') / 1000);
 const PREV_START = WEEK_START - 7 * 86400;
 
 function mulberry32(seed) {
@@ -225,7 +225,7 @@ for (const [p, reason] of picks) {
 const idsOf = (pred) => posts.filter((p) => p.ts >= WEEK_START && pred(p)).map((p) => p.id);
 const botTopics = {
   generated_at: GENERATED_AT,
-  week: { from: '2026-10-10T01:00:00+09:00', to: '2026-10-17T01:00:00+09:00' },
+  week: { from: '2026-10-11T01:00:00+09:00', to: '2026-10-18T01:00:00+09:00' },
   topics: [
     {
       id: 'sample-ramen-2026w42', name: '麺屋サンプルの深夜行列', genre: '歌舞伎町',

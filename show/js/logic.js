@@ -16,8 +16,8 @@ const pad2 = (n) => String(n).padStart(2, '0');
 
 /**
  * 基準時刻（データの generated_at）を含む番組週。
- * 番組週 = 前回配信（前週 土 1:00 JST）以上 〜 今回配信（土 1:00 JST）未満。
- * 返り値: { key: 'YYYY-MM-DD'（今回配信の日付）, start, end }（UNIX 秒）
+ * 番組週 = 前回配信（前週 土曜の深夜＝日 1:00 JST）以上 〜 今回配信（日 1:00 JST）未満。
+ * 返り値: { key: 'YYYY-MM-DD'（今回配信の夜の日付＝土曜。bc.keyDayOffset）, start, end }（UNIX 秒）
  */
 export function showWeekOf(refTs, bc = SHOW_DEFAULTS.broadcast) {
   if (!isNum(refTs)) return null;
@@ -27,39 +27,39 @@ export function showWeekOf(refTs, bc = SHOW_DEFAULTS.broadcast) {
   const wd = new Date((t + JST) * 1000).getUTCDay();
   t += ((bc.weekday - wd + 7) % 7) * 86400;
   if (t <= refTs) t += WEEK; // 配信時刻ちょうどは次の週
-  return weekFromEnd(t);
+  return weekFromEnd(t, bc);
 }
 
-function weekFromEnd(end) {
-  const p = jstParts(end);
+function weekFromEnd(end, bc = SHOW_DEFAULTS.broadcast) {
+  const p = jstParts(end + (bc.keyDayOffset || 0) * 86400);
   return { key: `${p.y}-${pad2(p.m)}-${pad2(p.d)}`, start: end - WEEK, end };
 }
 
-/** 'YYYY-MM-DD'（配信日）から番組週。不正なら null */
+/** 'YYYY-MM-DD'（番組週のキー＝配信の夜の日付）から番組週。不正なら null */
 export function weekByKey(key, bc = SHOW_DEFAULTS.broadcast) {
   if (typeof key !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return null;
   const [y, m, d] = key.split('-').map(Number);
-  const end = Math.floor(Date.UTC(y, m - 1, d, bc.hour, bc.minute) / 1000) - JST;
+  const end = Math.floor(Date.UTC(y, m - 1, d - (bc.keyDayOffset || 0), bc.hour, bc.minute) / 1000) - JST;
   if (!isNum(end)) return null;
-  const w = weekFromEnd(end);
+  const w = weekFromEnd(end, bc);
   const wd = new Date((end + JST) * 1000).getUTCDay();
   return w.key === key && wd === bc.weekday ? w : null;
 }
 
 /** 隣の番組週のキー（n=1 で翌週、-1 で前週） */
-export function shiftWeekKey(key, n) {
-  const w = weekByKey(key);
-  return w ? weekFromEnd(w.end + n * WEEK).key : null;
+export function shiftWeekKey(key, n, bc = SHOW_DEFAULTS.broadcast) {
+  const w = weekByKey(key, bc);
+  return w ? weekFromEnd(w.end + n * WEEK, bc).key : null;
 }
 
 /** 選べる番組週（新しい順）。基準時刻の週から、最古の投稿の週まで（最大 limit 週） */
-export function listWeeks(refTs, minTs, limit = 8) {
-  const cur = showWeekOf(refTs);
+export function listWeeks(refTs, minTs, limit = 8, bc = SHOW_DEFAULTS.broadcast) {
+  const cur = showWeekOf(refTs, bc);
   if (!cur) return [];
   const out = [cur];
   let w = cur;
   while (out.length < limit && isNum(minTs) && w.start > minTs) {
-    w = weekFromEnd(w.start);
+    w = weekFromEnd(w.start, bc);
     out.push(w);
   }
   return out;
@@ -169,7 +169,19 @@ export function formatJstShort(ts) {
   return `${p.m}/${p.d}(${wd}) ${p.hh}:${pad2(p.mm)}`;
 }
 
-/** 番組週の表示「10/10(土) 1:00 〜 10/17(土) 1:00」 */
+/**
+ * 配信の開始時刻の表示。深夜（0〜4 時台）は前の日の「深夜」として書く（土曜の深夜＝日 1:00 →「10/17(土) 深夜1:00」）
+ */
+export function formatBroadcastStart(ts) {
+  const p = jstParts(ts);
+  if (!p) return UNKNOWN;
+  if (p.hh >= 5) return formatJstShort(ts);
+  const q = jstParts(ts - 86400);
+  const wd = '日月火水木金土'[new Date((ts - 86400 + JST) * 1000).getUTCDay()];
+  return `${q.m}/${q.d}(${wd}) 深夜${p.hh}:${pad2(p.mm)}`;
+}
+
+/** 番組週の表示「10/11(日) 1:00 〜 10/18(日) 1:00」 */
 export function weekLabel(week) {
   return week ? `${formatJstShort(week.start)} 〜 ${formatJstShort(week.end)}` : UNKNOWN;
 }
@@ -1894,7 +1906,7 @@ function chapterTime(sec) {
  * mode: 'public'（告知・概要欄用：見出し・リード・チャプター・投稿URL）/ 'full'（話すポイント・質問・メモも）
  */
 export function scriptText({ title, week, rundown, topicsById, script, notes, postsById, refTs, mode = 'public', rangeLabel = null }) {
-  const lines = [title, `配信：${week ? formatJstShort(week.end) : UNKNOWN}〜（約${totalMinutes(rundown)}分）`];
+  const lines = [title, `配信：${week ? formatBroadcastStart(week.end) : UNKNOWN}〜（約${totalMinutes(rundown)}分）`];
   if (rangeLabel) lines.push(`対象：${rangeLabel} の投稿`);
   else if (week) lines.push(`対象：${weekLabel(week)} の投稿`);
   lines.push('');

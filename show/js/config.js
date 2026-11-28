@@ -4,8 +4,12 @@
 /** 番組の既定値 */
 export const SHOW_DEFAULTS = Object.freeze({
   showName: '週刊ヨルニュース',
-  /** 配信: 毎週 土曜 1:00（JST） */
-  broadcast: Object.freeze({ weekday: 6, hour: 1, minute: 0 }), // weekday: 0=日 … 6=土
+  /**
+   * 配信: 毎週 土曜の深夜＝日曜 1:00（JST）。weekday: 0=日 … 6=土（配信が始まる時刻の曜日）。
+   * keyDayOffset: 番組週のキー（「11/28 配信」）の日付を、配信時刻の何日前の日付にするか（-1＝前日＝土曜の日付）。
+   * 2026-11-28 オーナー確認（それまでは 土 1:00 として作っていた。キーは同じ土曜の日付のまま、区切りが 24 時間後ろへ）
+   */
+  broadcast: Object.freeze({ weekday: 0, hour: 1, minute: 0, keyDayOffset: -1 }),
   totalMinutes: 90,
   /** 進行の押し・巻きを「予定どおり」とみなす幅（秒） */
   driftToleranceSec: 60,
@@ -13,8 +17,8 @@ export const SHOW_DEFAULTS = Object.freeze({
 
 /** 事前確認（チェックポイント）。ラベルは画面表示用 */
 export const CHECKPOINTS = Object.freeze([
-  Object.freeze({ kind: 'preview', label: '下見', when: '金 1:00' }),
-  Object.freeze({ kind: 'final', label: '最終確認', when: '金 22:00' }),
+  Object.freeze({ kind: 'preview', label: '下見', when: '配信の前日' }),
+  Object.freeze({ kind: 'final', label: '最終確認', when: '配信の数時間前' }),
 ]);
 
 /**
