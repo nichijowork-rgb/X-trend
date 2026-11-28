@@ -1,0 +1,14 @@
+{
+ "app": "xtrend-prepare-status",
+ "v": 1,
+ "request_id": "test-bot-status-write-20261128",
+ "state": "done",
+ "stage": "push",
+ "message": "ボット側の書き込みテストです（番組への反映はありません）",
+ "started_at": "2026-11-28T22:53:35+09:00",
+ "updated_at": "2026-11-28T22:53:35+09:00",
+ "finished_at": "2026-11-28T22:53:35+09:00",
+ "eta_min": null,
+ "result": null,
+ "error": null
+}
